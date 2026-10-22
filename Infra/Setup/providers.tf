@@ -24,7 +24,7 @@ provider "proxmox" {
     agent    = true
     username = "root" # required when using api_token
     # Either use password or private_key for SSH authentication.
-    password = var.proxmox_ssh_password # required when using api_token
+    #password = var.proxmox_ssh_password # required when using api_token
     #private_key = trimspace(var.proxmox_ssh_private_key) # required when using api_token
   }
 }

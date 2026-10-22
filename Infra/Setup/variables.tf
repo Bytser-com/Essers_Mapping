@@ -10,7 +10,7 @@ variable "proxmox_api_url" {
 variable "proxmox_api_insecure" {
   type        = bool
   default     = true
-  description = "Set to true to bypass SSL/TLS certificate verification for self-signed certificates."
+  description = "Set to true to bypass SSL/TLS certificate verification for self_signed certificates."
 }
 
 variable "proxmox_api_token" {
@@ -51,7 +51,7 @@ variable "node01_name" {
   description = "The targeted Proxmox node where assets are downloaded and VMs are run."
 }
 
-variable "download_datastore_id" {
+variable "local_datastore_id" {
   type        = string
   default     = "local"
   description = "The identity of the storage pool where downloaded image files are stored."
@@ -74,7 +74,7 @@ variable "debian_cloud_image_file_name" {
 
 variable "debian_cloud_image_url" {
   type        = string
-  description = "The source URL pointing to the official Debian distribution cloud-init image file."
+  description = "The source URL pointing to the official Debian distribution cloud_init image file."
 }
 
 variable "debian_cloud_image_checksum" {
@@ -85,7 +85,7 @@ variable "debian_cloud_image_checksum" {
 variable "debian_vm_efi_pre_enrolled_keys" {
   type        = bool
   default     = true
-  description = "Ensures UEFI firmware paths utilize pre-loaded Secure Boot standard keys."
+  description = "Ensures UEFI firmware paths utilize pre_loaded Secure Boot standard keys."
 }
 
 variable "debian_vm_startup_up_delay" {
@@ -143,350 +143,350 @@ variable "debian_vm_timeout_delete" {
 
 
 # ==============================================================================
-# SECTION 4: VM CONFIGURATIONS (INSTANCE-SPECIFIC)
+# SECTION 4: VM CONFIGURATIONS (INSTANCE_SPECIFIC)
 # ==============================================================================
 
 
 # ====================
-# pipeline-runner
+# pipeline_runner
 # ====================
 
-variable "pipeline-runner_vm_description" {
+variable "pipeline_runner_vm_description" {
   type        = string
   description = "The descriptive text notes visible within the Proxmox web interface for this specific VM."
 }
 
-variable "pipeline-runner_vm_tags" {
+variable "pipeline_runner_vm_tags" {
   type        = list(string)
   default     = ["Dev"]
   description = "An array of environmental labels or tags used to organize this specific instance."
 }
 
 
-# pipeline-runner
-variable "pipeline-runner_vm_name" {
+# pipeline_runner
+variable "pipeline_runner_vm_name" {
   type        = string
   description = "The unique system name / hostname assigned to the target virtual machine."
 }
 
-variable "pipeline-runner_vm_id" {
+variable "pipeline_runner_vm_id" {
   type        = number
   description = "The explicit numeric virtual machine ID (VMID) within the Proxmox cluster."
 }
 
-variable "pipeline-runner_vm_started" {
+variable "pipeline_runner_vm_started" {
   type        = bool
   default     = false
   description = "Configures the running state of this instance Virtual Machine."
 }
 
-variable "pipeline-runner_vm_on_boot" {
+variable "pipeline_runner_vm_on_boot" {
   type        = bool
   default     = false
   description = "Configures this instance to boot automatically when the Proxmox host initializes."
 }
 
-variable "pipeline-runner_vm_startup_order" {
+variable "pipeline_runner_vm_startup_order" {
   type        = string
   default     = "9999"
   description = "The exact startup hierarchy boot ranking priority for this specific VM."
 }
 
-variable "pipeline-runner_vm_protection" {
+variable "pipeline_runner_vm_protection" {
   type        = bool
   default     = false
   description = "Locks this virtual instance in place inside Proxmox to prevent accidental destruction."
 }
 
-variable "pipeline-runner_vm_cpu_cores" {
+variable "pipeline_runner_vm_cpu_cores" {
   type        = number
   default     = 6
   description = "The total number of physical vCPU cores allocated to this machine profile."
 }
 
-variable "pipeline-runner_vm_memory_size" {
+variable "pipeline_runner_vm_memory_size" {
   type        = number
   default     = 8192
   description = "The total amount of system RAM allocated to this guest OS in Megabytes (MiB)."
 }
 
-variable "pipeline-runner_vm_disk_size_gb" {
+variable "pipeline_runner_vm_disk_size_gb" {
   type        = number
   default     = 64
   description = "The volume size of the primary OS root storage block expressed in Gigabytes (GB)."
 }
 
-variable "pipeline-runner_vm_disk_backup" {
+variable "pipeline_runner_vm_disk_backup" {
   type        = bool
   default     = true
   description = "Whether this instance's root storage disk is included in global backup schedules."
 }
 
-variable "pipeline-runner_vm_disk_replicate" {
+variable "pipeline_runner_vm_disk_replicate" {
   type        = bool
   default     = true
   description = "Whether this instance's root storage disk is included in global replication schedules."
 }
 
-variable "pipeline-runner_vm_network_bridge" {
+variable "pipeline_runner_vm_network_bridge" {
   type        = string
   default     = "vmbr0"
   description = "The virtual network switch bridge name allocated for this machine's network interface."
 }
 
-variable "pipeline-runner_vm_network_tag" {
+variable "pipeline_runner_vm_network_tag" {
   type        = number
   description = "The internal network VLAN ID partition tag used to restrict this machine's communication boundaries."
 }
 
-variable "pipeline-runner_vm_network_firewall" {
+variable "pipeline_runner_vm_network_firewall" {
   type        = bool
   default     = true
   description = "Enables the baseline Proxmox hypervisor firewall filter context on this adapter interface."
 }
 
-variable "pipeline-runner_vm_network_mac" {
+variable "pipeline_runner_vm_network_mac" {
   type        = string
   default     = null
-  description = "A custom hardware MAC address for the network interface on the host (set to null to auto-generate)."
+  description = "A custom hardware MAC address for the network interface on the host (set to null to auto_generate)."
 }
 
-variable "pipeline-runner_vm_ipv4_address" {
+variable "pipeline_runner_vm_ipv4_address" {
   type        = string
   description = "The static IPv4 allocation config along with CIDR subnet prefix notation (e.g., 10.145.0.230/24)."
 }
 
-variable "pipeline-runner_vm_dns_domain" {
+variable "pipeline_runner_vm_dns_domain" {
   type        = string
   description = "The DNS domain name assigned to this virtual machine for hostname resolution."
 }
 
 
 # ====================
-# k8s-master
+# k8s_master
 # ====================
 
-variable "k8s-master_vm_description" {
+variable "k8s_master_vm_description" {
   type        = string
   description = "The descriptive text notes visible within the Proxmox web interface for this specific VM."
 }
 
-variable "k8s-master_vm_tags" {
+variable "k8s_master_vm_tags" {
   type        = list(string)
   default     = ["Dev"]
   description = "An array of environmental labels or tags used to organize this specific instance."
 }
 
 
-# k8s-master
-variable "k8s-master_vm_name" {
+# k8s_master
+variable "k8s_master_vm_name" {
   type        = string
   description = "The unique system name / hostname assigned to the target virtual machine."
 }
 
-variable "k8s-master_vm_id" {
+variable "k8s_master_vm_id" {
   type        = number
   description = "The explicit numeric virtual machine ID (VMID) within the Proxmox cluster."
 }
 
-variable "k8s-master_vm_started" {
+variable "k8s_master_vm_started" {
   type        = bool
   default     = false
   description = "Configures the running state of this instance Virtual Machine."
 }
 
-variable "k8s-master_vm_on_boot" {
+variable "k8s_master_vm_on_boot" {
   type        = bool
   default     = false
   description = "Configures this instance to boot automatically when the Proxmox host initializes."
 }
 
-variable "k8s-master_vm_startup_order" {
+variable "k8s_master_vm_startup_order" {
   type        = string
   default     = "9999"
   description = "The exact startup hierarchy boot ranking priority for this specific VM."
 }
 
-variable "k8s-master_vm_protection" {
+variable "k8s_master_vm_protection" {
   type        = bool
   default     = false
   description = "Locks this virtual instance in place inside Proxmox to prevent accidental destruction."
 }
 
-variable "k8s-master_vm_cpu_cores" {
+variable "k8s_master_vm_cpu_cores" {
   type        = number
   default     = 6
   description = "The total number of physical vCPU cores allocated to this machine profile."
 }
 
-variable "k8s-master_vm_memory_size" {
+variable "k8s_master_vm_memory_size" {
   type        = number
   default     = 8192
   description = "The total amount of system RAM allocated to this guest OS in Megabytes (MiB)."
 }
 
-variable "k8s-master_vm_disk_size_gb" {
+variable "k8s_master_vm_disk_size_gb" {
   type        = number
   default     = 64
   description = "The volume size of the primary OS root storage block expressed in Gigabytes (GB)."
 }
 
-variable "k8s-master_vm_disk_backup" {
+variable "k8s_master_vm_disk_backup" {
   type        = bool
   default     = true
   description = "Whether this instance's root storage disk is included in global backup schedules."
 }
 
-variable "k8s-master_vm_disk_replicate" {
+variable "k8s_master_vm_disk_replicate" {
   type        = bool
   default     = true
   description = "Whether this instance's root storage disk is included in global replication schedules."
 }
 
-variable "k8s-master_vm_network_bridge" {
+variable "k8s_master_vm_network_bridge" {
   type        = string
   default     = "vmbr0"
   description = "The virtual network switch bridge name allocated for this machine's network interface."
 }
 
-variable "k8s-master_vm_network_tag" {
+variable "k8s_master_vm_network_tag" {
   type        = number
   description = "The internal network VLAN ID partition tag used to restrict this machine's communication boundaries."
 }
 
-variable "k8s-master_vm_network_firewall" {
+variable "k8s_master_vm_network_firewall" {
   type        = bool
   default     = true
   description = "Enables the baseline Proxmox hypervisor firewall filter context on this adapter interface."
 }
 
-variable "k8s-master_vm_network_mac" {
+variable "k8s_master_vm_network_mac" {
   type        = string
   default     = null
-  description = "A custom hardware MAC address for the network interface on the host (set to null to auto-generate)."
+  description = "A custom hardware MAC address for the network interface on the host (set to null to auto_generate)."
 }
 
-variable "k8s-master_vm_ipv4_address" {
+variable "k8s_master_vm_ipv4_address" {
   type        = string
   description = "The static IPv4 allocation config along with CIDR subnet prefix notation (e.g., 10.145.0.230/24)."
 }
 
-variable "k8s-master_vm_dns_domain" {
+variable "k8s_master_vm_dns_domain" {
   type        = string
   description = "The DNS domain name assigned to this virtual machine for hostname resolution."
 }
 
 
 # ====================
-# k8s-worker
+# k8s_worker
 # ====================
 
-variable "k8s-worker_vm_description" {
+variable "k8s_worker_vm_description" {
   type        = string
   description = "The descriptive text notes visible within the Proxmox web interface for this specific VM."
 }
 
-variable "k8s-worker_vm_tags" {
+variable "k8s_worker_vm_tags" {
   type        = list(string)
   default     = ["Dev"]
   description = "An array of environmental labels or tags used to organize this specific instance."
 }
 
 
-# k8s-worker
-variable "k8s-worker_vm_name" {
+# k8s_worker
+variable "k8s_worker_vm_name" {
   type        = string
   description = "The unique system name / hostname assigned to the target virtual machine."
 }
 
-variable "k8s-worker_vm_id" {
+variable "k8s_worker_vm_id" {
   type        = number
   description = "The explicit numeric virtual machine ID (VMID) within the Proxmox cluster."
 }
 
-variable "k8s-worker_vm_started" {
+variable "k8s_worker_vm_started" {
   type        = bool
   default     = false
   description = "Configures the running state of this instance Virtual Machine."
 }
 
-variable "k8s-worker_vm_on_boot" {
+variable "k8s_worker_vm_on_boot" {
   type        = bool
   default     = false
   description = "Configures this instance to boot automatically when the Proxmox host initializes."
 }
 
-variable "k8s-worker_vm_startup_order" {
+variable "k8s_worker_vm_startup_order" {
   type        = string
   default     = "9999"
   description = "The exact startup hierarchy boot ranking priority for this specific VM."
 }
 
-variable "k8s-worker_vm_protection" {
+variable "k8s_worker_vm_protection" {
   type        = bool
   default     = false
   description = "Locks this virtual instance in place inside Proxmox to prevent accidental destruction."
 }
 
-variable "k8s-worker_vm_cpu_cores" {
+variable "k8s_worker_vm_cpu_cores" {
   type        = number
   default     = 6
   description = "The total number of physical vCPU cores allocated to this machine profile."
 }
 
-variable "k8s-worker_vm_memory_size" {
+variable "k8s_worker_vm_memory_size" {
   type        = number
   default     = 8192
   description = "The total amount of system RAM allocated to this guest OS in Megabytes (MiB)."
 }
 
-variable "k8s-worker_vm_disk_size_gb" {
+variable "k8s_worker_vm_disk_size_gb" {
   type        = number
   default     = 64
   description = "The volume size of the primary OS root storage block expressed in Gigabytes (GB)."
 }
 
-variable "k8s-worker_vm_disk_backup" {
+variable "k8s_worker_vm_disk_backup" {
   type        = bool
   default     = true
   description = "Whether this instance's root storage disk is included in global backup schedules."
 }
 
-variable "k8s-worker_vm_disk_replicate" {
+variable "k8s_worker_vm_disk_replicate" {
   type        = bool
   default     = true
   description = "Whether this instance's root storage disk is included in global replication schedules."
 }
 
-variable "k8s-worker_vm_network_bridge" {
+variable "k8s_worker_vm_network_bridge" {
   type        = string
   default     = "vmbr0"
   description = "The virtual network switch bridge name allocated for this machine's network interface."
 }
 
-variable "k8s-worker_vm_network_tag" {
+variable "k8s_worker_vm_network_tag" {
   type        = number
   description = "The internal network VLAN ID partition tag used to restrict this machine's communication boundaries."
 }
 
-variable "k8s-worker_vm_network_firewall" {
+variable "k8s_worker_vm_network_firewall" {
   type        = bool
   default     = true
   description = "Enables the baseline Proxmox hypervisor firewall filter context on this adapter interface."
 }
 
-variable "k8s-worker_vm_network_mac" {
+variable "k8s_worker_vm_network_mac" {
   type        = string
   default     = null
-  description = "A custom hardware MAC address for the network interface on the host (set to null to auto-generate)."
+  description = "A custom hardware MAC address for the network interface on the host (set to null to auto_generate)."
 }
 
-variable "k8s-worker_vm_ipv4_address" {
+variable "k8s_worker_vm_ipv4_address" {
   type        = string
   description = "The static IPv4 allocation config along with CIDR subnet prefix notation (e.g., 10.145.0.230/24)."
 }
 
-variable "k8s-worker_vm_dns_domain" {
+variable "k8s_worker_vm_dns_domain" {
   type        = string
   description = "The DNS domain name assigned to this virtual machine for hostname resolution."
 }

@@ -2,7 +2,7 @@
 resource "proxmox_download_file" "debian_cloud_image" {
   for_each            = toset([var.node01_name])
   content_type        = "import"
-  datastore_id        = var.download_datastore_id
+  datastore_id        = var.local_datastore_id
   file_name           = var.debian_cloud_image_file_name
   node_name           = each.value
   url                 = var.debian_cloud_image_url
@@ -36,7 +36,7 @@ resource "proxmox_virtual_environment_vm" "basic_vm" {
   boot_order      = ["scsi0"]
   hotplug         = "network,disk,usb"
   keyboard_layout = "en-us"
-  on_boot         = each.value.protection # Corresponds to "Start at boot: Yes"
+  on_boot         = each.value.on_boot # Corresponds to "Start at boot: Yes"
   startup {
     order      = each.value.startup_order
     up_delay   = each.value.up_delay   # Delay (in seconds) before moving on to the next VM
