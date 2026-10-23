@@ -43,4 +43,12 @@
 - name: Flush pending service handlers for common role
   ansible.builtin.meta: flush_handlers
   tags:
-    - always
+    - common
+    - bootstrap
+    - preflight
+    - packages
+    - hostname
+    - time
+    - ntp
+    - users
+    - security

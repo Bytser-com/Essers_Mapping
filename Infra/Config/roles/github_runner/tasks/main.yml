@@ -19,6 +19,14 @@
     - github_runner
     - runner_tooling
 
+- name: Configure kubeconfig on runner to manage the Kubernetes cluster
+  ansible.builtin.import_tasks: kubeconfig.yml
+  tags:
+    - runner
+    - cicd
+    - github_runner
+    - runner_kubeconfig
+
 - name: Download, configure, and register GitHub Actions Self-Hosted Runner
   ansible.builtin.import_tasks: runner.yml
   tags:

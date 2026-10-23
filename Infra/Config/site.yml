@@ -9,7 +9,10 @@
 - name: Stage 2 - Kubernetes Cluster Provisioning (Control Plane & Workers)
   ansible.builtin.import_playbook: playbooks/kubernetes.yml
 
-- name: Stage 3 - CI/CD Self-Hosted GitHub Runner Configuration
+- name: Stage 3 - CI/CD Self-Hosted GitHub Runner Configuration (Opt-In via --tags runner)
   ansible.builtin.import_playbook: playbooks/runner.yml
-
-
+  tags:
+    - never
+    - runner
+    - cicd
+    - github_runner

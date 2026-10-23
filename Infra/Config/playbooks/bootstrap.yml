@@ -1,14 +1,62 @@
 ---
 # ==============================================================================
 # PLAYBOOK: BASE OS BOOTSTRAP & HARDENING
-# Targets: All Debian 13 VMs (k8s-masterServer, k8s-workerServer, pipeline-runner)
+# Targets:
+#   1. Kubernetes Cluster VMs (k8s-masterServer, k8s-workerServer) - default
+#   2. CI/CD Pipeline Runner VM (pipeline-runner) - tagged 'never' (opt-in only)
 # ==============================================================================
 
-- name: Wait for SSH connectivity and bootstrap all Debian 13 virtual machines
-  hosts: all
+- name: Wait for SSH connectivity and bootstrap Kubernetes Debian 13 virtual machines
+  hosts: k8s_cluster
   become: true
   gather_facts: false
+  tags:
+    - bootstrap
+    - common
+    - preflight
+    - packages
+    - hostname
+    - time
+    - ntp
+    - users
+    - security
   pre_tasks:
+    - name: Materialize PIPELINE_SSH_PRIVATE_KEY to .cache/id_pipeline if provided via environment
+      ansible.builtin.copy:
+        content: "{{ lookup('env', 'PIPELINE_SSH_PRIVATE_KEY') | regex_replace('\\r', '') }}\n"
+        dest: "{{ playbook_dir }}/../.cache/id_pipeline"
+        mode: "0600"
+      delegate_to: localhost
+      become: false
+      run_once: true
+      no_log: true
+      when: lookup('env', 'PIPELINE_SSH_PRIVATE_KEY') | length > 0
+      tags:
+        - bootstrap
+        - common
+        - preflight
+        - packages
+        - hostname
+        - time
+        - ntp
+        - users
+        - security
+
+    - name: Set ansible_ssh_private_key_file when PIPELINE_SSH_PRIVATE_KEY is used
+      ansible.builtin.set_fact:
+        ansible_ssh_private_key_file: "{{ playbook_dir }}/../.cache/id_pipeline"
+      when: lookup('env', 'PIPELINE_SSH_PRIVATE_KEY') | length > 0
+      tags:
+        - bootstrap
+        - common
+        - preflight
+        - packages
+        - hostname
+        - time
+        - ntp
+        - users
+        - security
+
     - name: Verify required ansible_host IP is provided via .env
       ansible.builtin.assert:
         that:
@@ -18,32 +66,65 @@
       delegate_to: localhost
       become: false
       tags:
-        - always
+        - bootstrap
+        - common
+        - preflight
+        - packages
+        - hostname
+        - time
+        - ntp
+        - users
+        - security
 
     - name: Wait for SSH daemon to become reachable on target VM
       ansible.builtin.wait_for_connection:
         delay: 2
         timeout: 180
       tags:
-        - always
+        - bootstrap
+        - common
+        - preflight
+        - packages
+        - hostname
+        - time
+        - ntp
+        - users
+        - security
 
     - name: Wait for cloud-init to finish initial provisioning if present
       ansible.builtin.command:
         cmd: cloud-init status --wait
       register: cloud_init_wait
       changed_when: false
+      # Exit code 0 = done, 2 = done with recoverable warnings (Cloud-Init 23.2+ on Debian 13)
       failed_when:
-        - cloud_init_wait.rc != 0
+        - cloud_init_wait.rc not in [0, 2]
         - "'not found' not in (cloud_init_wait.stderr | default(''))"
         - "'No such file' not in (cloud_init_wait.msg | default(''))"
       when: not ansible_check_mode
       tags:
-        - always
+        - bootstrap
+        - common
+        - preflight
+        - packages
+        - hostname
+        - time
+        - ntp
+        - users
+        - security
 
     - name: Gather host system facts
       ansible.builtin.setup:
       tags:
-        - always
+        - bootstrap
+        - common
+        - preflight
+        - packages
+        - hostname
+        - time
+        - ntp
+        - users
+        - security
 
   roles:
     - role: common
@@ -51,3 +132,66 @@
         - bootstrap
         - common
         - security
+
+- name: Wait for SSH connectivity and bootstrap CI/CD Runner Debian 13 virtual machine
+  hosts: runners
+  become: true
+  gather_facts: false
+  tags:
+    - never
+    - runner
+    - cicd
+    - github_runner
+  pre_tasks:
+    - name: Materialize PIPELINE_SSH_PRIVATE_KEY to .cache/id_pipeline for runner if provided
+      ansible.builtin.copy:
+        content: "{{ lookup('env', 'PIPELINE_SSH_PRIVATE_KEY') | regex_replace('\\r', '') }}\n"
+        dest: "{{ playbook_dir }}/../.cache/id_pipeline"
+        mode: "0600"
+      delegate_to: localhost
+      become: false
+      run_once: true
+      no_log: true
+      when: lookup('env', 'PIPELINE_SSH_PRIVATE_KEY') | length > 0
+
+    - name: Set ansible_ssh_private_key_file for runner when PIPELINE_SSH_PRIVATE_KEY is used
+      ansible.builtin.set_fact:
+        ansible_ssh_private_key_file: "{{ playbook_dir }}/../.cache/id_pipeline"
+      when: lookup('env', 'PIPELINE_SSH_PRIVATE_KEY') | length > 0
+
+    - name: Verify required ansible_host IP is provided via .env for runner
+      ansible.builtin.assert:
+        that:
+          - ansible_host is defined
+          - ansible_host | length > 0
+        fail_msg: "Missing IPv4 address for {{ inventory_hostname }}. Did you run 'source .env'?"
+      delegate_to: localhost
+      become: false
+
+    - name: Wait for SSH daemon to become reachable on runner VM
+      ansible.builtin.wait_for_connection:
+        delay: 2
+        timeout: 180
+
+    - name: Wait for cloud-init to finish initial provisioning on runner VM if present
+      ansible.builtin.command:
+        cmd: cloud-init status --wait
+      register: runner_cloud_init_wait
+      changed_when: false
+      # Exit code 0 = done, 2 = done with recoverable warnings (Cloud-Init 23.2+ on Debian 13)
+      failed_when:
+        - runner_cloud_init_wait.rc not in [0, 2]
+        - "'not found' not in (runner_cloud_init_wait.stderr | default(''))"
+        - "'No such file' not in (runner_cloud_init_wait.msg | default(''))"
+      when: not ansible_check_mode
+
+    - name: Gather runner host system facts
+      ansible.builtin.setup:
+
+  roles:
+    - role: common
+      tags:
+        - never
+        - runner
+        - cicd
+        - github_runner

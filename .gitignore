@@ -134,4 +134,6 @@ tfplan
 .terraform.lock.hcl
 
 ### Ansible ###
+.env
+.cache/
 *.retry

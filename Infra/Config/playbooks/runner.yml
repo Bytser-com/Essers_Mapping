@@ -2,15 +2,52 @@
 # ==============================================================================
 # PLAYBOOK: GITHUB ACTIONS SELF-HOSTED RUNNER CONFIGURATION
 # Targets: runners (pipeline-runner)
+# Tagged with 'never' so it only runs when explicitly requested via --tags
 # ==============================================================================
 
 - name: Configure CI/CD Pipeline Runner and automation tooling
   hosts: runners
   become: true
-  gather_facts: true
+  gather_facts: false
+  tags:
+    - never
+    - runner
+    - cicd
+    - github_runner
+  pre_tasks:
+    - name: Materialize PIPELINE_SSH_PRIVATE_KEY to .cache/id_pipeline if provided via environment
+      ansible.builtin.copy:
+        content: "{{ lookup('env', 'PIPELINE_SSH_PRIVATE_KEY') | regex_replace('\\r', '') }}\n"
+        dest: "{{ playbook_dir }}/../.cache/id_pipeline"
+        mode: "0600"
+      delegate_to: localhost
+      become: false
+      run_once: true
+      no_log: true
+      when: lookup('env', 'PIPELINE_SSH_PRIVATE_KEY') | length > 0
+
+    - name: Set ansible_ssh_private_key_file when PIPELINE_SSH_PRIVATE_KEY is used
+      ansible.builtin.set_fact:
+        ansible_ssh_private_key_file: "{{ playbook_dir }}/../.cache/id_pipeline"
+      when: lookup('env', 'PIPELINE_SSH_PRIVATE_KEY') | length > 0
+
+    - name: Set ansible_ssh_private_key_file on Control Plane for kubeconfig delegation
+      ansible.builtin.set_fact:
+        ansible_ssh_private_key_file: "{{ playbook_dir }}/../.cache/id_pipeline"
+      delegate_to: "{{ groups['k8s_masters'][0] }}"
+      delegate_facts: true
+      when:
+        - lookup('env', 'PIPELINE_SSH_PRIVATE_KEY') | length > 0
+        - groups['k8s_masters'] is defined
+        - groups['k8s_masters'] | length > 0
+
+    - name: Gather runner host system facts
+      ansible.builtin.setup:
+
   roles:
     - role: github_runner
       tags:
+        - never
         - runner
         - cicd
         - github_runner

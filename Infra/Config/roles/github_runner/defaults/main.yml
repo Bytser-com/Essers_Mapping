@@ -11,8 +11,16 @@ github_runner_version: "2.338.0"
 github_runner_checksum: "sha256:af4b794c1bc41d73d40535e3fe092a39f9679cd8d965954c2aca25a05ca41d32"
 
 # Registration Parameters (Provided via .env or CI secrets)
-github_runner_org_or_repo_url: "{{ lookup('env', 'GITHUB_REPO_URL') | default('', true) }}"
-github_runner_registration_token: "{{ lookup('env', 'GITHUB_RUNNER_TOKEN') | default('', true) }}"
+github_runner_org_or_repo_url: "{{ lookup('env', 'GH_REPO_URL') | default(lookup('env', 'GITHUB_REPO_URL'), true) | default('https://github.com/Bytser-com/Essers_Mapping', true) }}"
+github_runner_pat: "{{ lookup('env', 'RUNNER_REGISTRATION_PAT') | default(lookup('env', 'GITHUB_PAT'), true) | default('', true) }}"
+github_runner_registration_token: "{{ lookup('env', 'GH_RUNNER_TOKEN') | default(lookup('env', 'GITHUB_RUNNER_TOKEN'), true) | default('', true) }}"
+github_runner_repo_path: "{{ github_runner_org_or_repo_url | regex_replace('^https?://github\\.com/', '') | regex_replace('/+$', '') }}"
+github_runner_token_api_url: >-
+  {{
+    'https://api.github.com/repos/' ~ github_runner_repo_path ~ '/actions/runners/registration-token'
+    if ('/' in github_runner_repo_path)
+    else 'https://api.github.com/orgs/' ~ github_runner_repo_path ~ '/actions/runners/registration-token'
+  }}
 github_runner_name: "{{ (hostname_short | lower) }}-{{ env_name }}"
 github_runner_labels:
   - "self-hosted"
@@ -30,7 +38,18 @@ runner_install_terraform: true
 runner_terraform_version: "1.9.*"
 runner_install_ansible: true
 runner_install_kubectl: true
-runner_k8s_version_minor: "1.31"
+runner_k8s_version_minor: "{{ hostvars[groups['k8s_masters'][0]]['k8s_version_minor'] | default('1.37') }}"
+runner_configure_kubeconfig: true
+runner_kubeconfig_users:
+  - user: "{{ github_runner_user }}"
+    group: "{{ github_runner_group }}"
+    home: "/home/{{ github_runner_user }}"
+  - user: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    home: "/home/{{ ansible_user }}"
+  - user: "root"
+    group: "root"
+    home: "/root"
 runner_install_helm: true
 runner_install_docker: true
 runner_docker_packages:

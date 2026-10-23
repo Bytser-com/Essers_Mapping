@@ -46,14 +46,41 @@
     path: "{{ github_runner_install_dir }}/.runner"
   register: runner_registered
 
-- name: Ensure GITHUB_REPO_URL and GITHUB_RUNNER_TOKEN are set before registration
+- name: Ensure GH_REPO_URL and RUNNER_REGISTRATION_PAT (or GH_RUNNER_TOKEN) are set before registration
   ansible.builtin.assert:
     that:
       - github_runner_org_or_repo_url | length > 0
-      - github_runner_registration_token | length > 0
+      - (github_runner_pat | length > 0) or (github_runner_registration_token | length > 0)
     fail_msg: >-
-      GITHUB_REPO_URL and GITHUB_RUNNER_TOKEN must be set in your environment (.env)
-      to register the GitHub Actions runner.
+      GH_REPO_URL and RUNNER_REGISTRATION_PAT (or GH_RUNNER_TOKEN) must be set in your
+      environment (.env) to register the GitHub Actions runner.
+  when: not runner_registered.stat.exists
+
+- name: Request temporary runner registration token from GitHub API using RUNNER_REGISTRATION_PAT
+  ansible.builtin.uri:
+    url: "{{ github_runner_token_api_url | trim }}"
+    method: POST
+    headers:
+      Accept: "application/vnd.github+json"
+      Authorization: "Bearer {{ github_runner_pat }}"
+      X-GitHub-Api-Version: "2022-11-28"
+    status_code: 201
+  register: registration_response
+  no_log: true
+  when:
+    - not runner_registered.stat.exists
+    - not ansible_check_mode
+    - github_runner_pat | length > 0
+
+- name: Set dynamic registration token fact from GitHub API response
+  ansible.builtin.set_fact:
+    github_runner_effective_token: >-
+      {{
+        registration_response.json.token
+        if (registration_response is defined and registration_response.json is defined and registration_response.json.token is defined)
+        else github_runner_registration_token
+      }}
+  no_log: true
   when: not runner_registered.stat.exists
 
 - name: Configure and register GitHub Actions runner
@@ -62,7 +89,7 @@
       {{ github_runner_install_dir }}/config.sh
       --unattended
       --url "{{ github_runner_org_or_repo_url }}"
-      --token "{{ github_runner_registration_token }}"
+      --token "{{ github_runner_effective_token }}"
       --name "{{ github_runner_name }}"
       --labels "{{ github_runner_labels | join(',') }}"
       --work "_work"
@@ -92,4 +119,3 @@
     state: started
     daemon_reload: true
   when: not ansible_check_mode
-
