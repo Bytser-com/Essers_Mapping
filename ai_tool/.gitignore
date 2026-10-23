@@ -1,0 +1,11 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+output/*
+!output/.gitkeep
+data/source/*.xml
+!data/source/example_delivery.xml
+data/target/*.xml
+!data/target/example_target.xml
+data/reference/verified_mappings.json

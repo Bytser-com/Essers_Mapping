@@ -1,0 +1,8 @@
+[
+  {
+    "source_path": "/DELVRY03/IDOC/E1EDL20/VBELN",
+    "target_path": "/SHP_OBDLV_SAVE_REPLICA05/IDOC/E1SHP_OBDLV_SAVE_REPLICA/E1BPOBDLVHDR/DELIV_NUMB",
+    "rule_type": "DIRECT",
+    "notes": "FORMAT EXAMPLE ONLY — replace with a mapping confirmed by your team."
+  }
+]

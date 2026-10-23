@@ -1,1 +1,0 @@
-Confirm that the you received this message and that the api endpoint works.
