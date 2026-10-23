@@ -1,0 +1,25 @@
+---
+# ==============================================================================
+# ROLE TASKS ENTRYPOINT: k8s_common
+# ==============================================================================
+
+- name: Configure official Kubernetes APT repository
+  ansible.builtin.import_tasks: repo.yml
+  tags:
+    - k8s
+    - k8s_common
+    - k8s_repo
+
+- name: Install and version-pin kubelet, kubeadm, and kubectl
+  ansible.builtin.import_tasks: install.yml
+  tags:
+    - k8s
+    - k8s_common
+    - k8s_install
+
+- name: Configure kubelet node IP and crictl runtime endpoint
+  ansible.builtin.import_tasks: configure.yml
+  tags:
+    - k8s
+    - k8s_common
+    - k8s_configure

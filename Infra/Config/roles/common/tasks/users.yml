@@ -1,0 +1,22 @@
+---
+# ==============================================================================
+# COMMON TASKS: ADMINISTRATIVE USER & SUDOERS
+# ==============================================================================
+
+- name: Ensure administrative user '{{ ansible_user }}' exists and is in sudo group
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: sudo
+    append: true
+    shell: /bin/bash
+    state: present
+
+- name: Configure passwordless sudo for '{{ ansible_user }}'
+  ansible.builtin.copy:
+    content: "{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL\n"
+    dest: "/etc/sudoers.d/90-{{ ansible_user }}"
+    owner: root
+    group: root
+    mode: "0440"
+    validate: "/usr/sbin/visudo -cf %s"
+  when: security_passwordless_sudo | bool

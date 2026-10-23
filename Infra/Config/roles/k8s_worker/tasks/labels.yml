@@ -1,0 +1,45 @@
+---
+# ==============================================================================
+# K8S_WORKER TASKS: NODE LABELING
+# ==============================================================================
+
+- name: Wait for worker node '{{ hostname_short | lower }}' to register and become Ready
+  ansible.builtin.command:
+    cmd: "kubectl wait --for=condition=Ready node/{{ hostname_short | lower }} --timeout=300s"
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  delegate_to: "{{ groups['k8s_masters'][0] }}"
+  changed_when: false
+  when: not ansible_check_mode or k8s_kubelet_conf.stat.exists
+
+- name: Query pending kubelet-serving CSRs after worker join
+  ansible.builtin.command:
+    cmd: >-
+      kubectl get csr -o jsonpath='{range .items[?(@.spec.signerName=="kubernetes.io/kubelet-serving")]}{.metadata.name}{" "}{.status.conditions[*].type}{"\n"}{end}'
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  delegate_to: "{{ groups['k8s_masters'][0] }}"
+  register: worker_pending_csrs
+  changed_when: false
+  when: not ansible_check_mode
+
+- name: Approve pending kubelet-serving CSRs for worker TLS bootstrap
+  ansible.builtin.command:
+    cmd: "kubectl certificate approve {{ item.split()[0] }}"
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  delegate_to: "{{ groups['k8s_masters'][0] }}"
+  loop: "{{ (worker_pending_csrs.stdout_lines | default([])) | select('search', '^\\S+\\s*$') | list }}"
+  changed_when: true
+  when: not ansible_check_mode
+
+- name: Apply node labels to worker '{{ hostname_short | lower }}'
+  ansible.builtin.command:
+    cmd: "kubectl label node {{ hostname_short | lower }} {{ item.key }}={{ item.value }} --overwrite"
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  delegate_to: "{{ groups['k8s_masters'][0] }}"
+  loop: "{{ k8s_worker_node_labels | dict2items }}"
+  register: label_result
+  changed_when: "'labeled' in label_result.stdout and 'not labeled' not in label_result.stdout"
+  when: not ansible_check_mode or k8s_kubelet_conf.stat.exists

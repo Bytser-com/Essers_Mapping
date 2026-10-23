@@ -1,0 +1,7 @@
+---
+# ==============================================================================
+# HOST VARIABLES: k8s-workerServer (Production)
+# ==============================================================================
+
+hostname_short: "k8s-workerServer"
+fqdn: "{{ lookup('env', 'K8S_WORKER_VM_DNS_DOMAIN') | default(undef('K8S_WORKER_VM_DNS_DOMAIN is required in .env'), true) }}"

@@ -1,0 +1,8 @@
+---
+# Handlers for 'github_runner' role
+- name: Restart github-runner service
+  ansible.builtin.systemd:
+    name: "{{ runner_systemd_unit }}"
+    state: restarted
+    daemon_reload: true
+  when: runner_systemd_unit is defined and (runner_systemd_unit | length > 0)

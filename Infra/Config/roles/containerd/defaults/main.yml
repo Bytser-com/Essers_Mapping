@@ -1,0 +1,17 @@
+---
+# ==============================================================================
+# ROLE DEFAULTS: containerd
+# ==============================================================================
+
+containerd_config_path: "/etc/containerd/config.toml"
+containerd_systemd_cgroup: true
+containerd_sandbox_image: "registry.k8s.io/pause:3.10"
+
+k8s_kernel_modules:
+  - overlay
+  - br_netfilter
+
+k8s_sysctl_params:
+  net.bridge.bridge-nf-call-iptables: 1
+  net.bridge.bridge-nf-call-ip6tables: 1
+  net.ipv4.ip_forward: 1

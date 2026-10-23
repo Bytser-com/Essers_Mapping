@@ -1,0 +1,40 @@
+---
+# ==============================================================================
+# CONTAINERD TASKS: INSTALLATION & CONFIGURATION
+# ==============================================================================
+
+- name: Install containerd and runc packages
+  ansible.builtin.apt:
+    name:
+      - containerd
+      - runc
+    state: present
+    lock_timeout: 120
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Ensure /etc/containerd configuration directory exists
+  ansible.builtin.file:
+    path: /etc/containerd
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Deploy containerd CRI configuration with SystemdCgroup enabled
+  ansible.builtin.template:
+    src: config.toml.j2
+    dest: "{{ containerd_config_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart containerd
+
+- name: Ensure containerd service is enabled and running
+  ansible.builtin.systemd:
+    name: containerd
+    enabled: true
+    state: started
+
+- name: Flush containerd handlers so CRI runtime restarts immediately
+  ansible.builtin.meta: flush_handlers

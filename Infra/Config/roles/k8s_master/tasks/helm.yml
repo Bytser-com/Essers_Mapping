@@ -1,0 +1,57 @@
+---
+# ==============================================================================
+# K8S_MASTER TASKS: HELM 3 INSTALLATION
+# ==============================================================================
+
+- name: Download Helm APT repository GPG key
+  ansible.builtin.get_url:
+    url: https://packages.buildkite.com/helm-linux/helm-debian/gpgkey
+    dest: /etc/apt/keyrings/helm-signing.asc
+    owner: root
+    group: root
+    mode: "0644"
+  register: helm_gpg_key_dl
+  when: k8s_install_helm | bool
+
+- name: Check if Helm binary GPG keyring exists
+  ansible.builtin.stat:
+    path: /etc/apt/keyrings/helm.gpg
+  register: helm_keyring_stat
+  when: k8s_install_helm | bool
+
+- name: Dearmor Helm APT GPG key into keyring
+  ansible.builtin.command:
+    cmd: gpg --dearmor --yes -o /etc/apt/keyrings/helm.gpg /etc/apt/keyrings/helm-signing.asc
+  changed_when: true
+  when:
+    - k8s_install_helm | bool
+    - helm_gpg_key_dl.changed or not helm_keyring_stat.stat.exists
+
+- name: Ensure Helm GPG keyring is readable by APT
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/helm.gpg
+    owner: root
+    group: root
+    mode: "0644"
+  when:
+    - k8s_install_helm | bool
+    - not ansible_check_mode or helm_keyring_stat.stat.exists
+
+- name: Add official Helm Debian APT repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main"
+    filename: helm-stable-debian
+    state: present
+    update_cache: "{{ not ansible_check_mode or helm_keyring_stat.stat.exists }}"
+  when: k8s_install_helm | bool
+
+- name: Install Helm package
+  ansible.builtin.apt:
+    name: helm
+    state: present
+    lock_timeout: 120
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  when:
+    - k8s_install_helm | bool
+    - not ansible_check_mode or helm_keyring_stat.stat.exists
