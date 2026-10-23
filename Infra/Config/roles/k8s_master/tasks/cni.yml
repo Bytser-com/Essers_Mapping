@@ -25,6 +25,26 @@
     mode: "0644"
   when: k8s_cni_plugin == 'calico'
 
+- name: Check if Calico CNI manifest exists
+  ansible.builtin.stat:
+    path: /etc/kubernetes/cni-calico.yaml
+  register: calico_manifest_stat
+  when: k8s_cni_plugin == 'calico'
+
+- name: Check if Calico CNI manifest has pending changes
+  ansible.builtin.command:
+    cmd: kubectl diff -f /etc/kubernetes/cni-calico.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  register: calico_diff
+  changed_when: false
+  failed_when: calico_diff.rc not in [0, 1]
+  check_mode: false
+  when:
+    - k8s_cni_plugin == 'calico'
+    - k8s_admin_conf.stat.exists
+    - calico_manifest_stat.stat.exists
+
 - name: Apply Calico CNI manifest to cluster
   ansible.builtin.command:
     cmd: kubectl apply -f /etc/kubernetes/cni-calico.yaml
@@ -34,7 +54,7 @@
   changed_when: "'created' in calico_apply.stdout or 'configured' in calico_apply.stdout"
   when:
     - k8s_cni_plugin == 'calico'
-    - not ansible_check_mode or k8s_admin_conf.stat.exists
+    - not k8s_admin_conf.stat.exists or not calico_manifest_stat.stat.exists or (calico_diff.rc is defined and calico_diff.rc == 1)
 
 - name: Download Flannel CNI manifest
   ansible.builtin.get_url:
@@ -45,6 +65,26 @@
     mode: "0644"
   when: k8s_cni_plugin == 'flannel'
 
+- name: Check if Flannel CNI manifest exists
+  ansible.builtin.stat:
+    path: /etc/kubernetes/cni-flannel.yaml
+  register: flannel_manifest_stat
+  when: k8s_cni_plugin == 'flannel'
+
+- name: Check if Flannel CNI manifest has pending changes
+  ansible.builtin.command:
+    cmd: kubectl diff -f /etc/kubernetes/cni-flannel.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  register: flannel_diff
+  changed_when: false
+  failed_when: flannel_diff.rc not in [0, 1]
+  check_mode: false
+  when:
+    - k8s_cni_plugin == 'flannel'
+    - k8s_admin_conf.stat.exists
+    - flannel_manifest_stat.stat.exists
+
 - name: Apply Flannel CNI manifest to cluster
   ansible.builtin.command:
     cmd: kubectl apply -f /etc/kubernetes/cni-flannel.yaml
@@ -54,7 +94,7 @@
   changed_when: "'created' in flannel_apply.stdout or 'configured' in flannel_apply.stdout"
   when:
     - k8s_cni_plugin == 'flannel'
-    - not ansible_check_mode or k8s_admin_conf.stat.exists
+    - not k8s_admin_conf.stat.exists or not flannel_manifest_stat.stat.exists or (flannel_diff.rc is defined and flannel_diff.rc == 1)
 
 - name: Wait for Control Plane node to report Ready status
   ansible.builtin.command:
