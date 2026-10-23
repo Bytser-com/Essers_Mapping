@@ -11,6 +11,9 @@ state = "/run/containerd"
 [plugins]
   [plugins."io.containerd.grpc.v1.cri"]
     sandbox_image = "{{ containerd_sandbox_image }}"
+    [plugins."io.containerd.grpc.v1.cri".cni]
+      bin_dir = "/opt/cni/bin"
+      conf_dir = "/etc/cni/net.d"
     [plugins."io.containerd.grpc.v1.cri".containerd]
       snapshotter = "overlayfs"
       default_runtime_name = "runc"

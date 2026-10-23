@@ -64,6 +64,14 @@
   changed_when: false
   when: not ansible_check_mode or k8s_admin_conf.stat.exists
 
+- name: Wait for CoreDNS pods to become Ready in kube-system
+  ansible.builtin.command:
+    cmd: "kubectl wait --for=condition=Ready pod -l k8s-app=kube-dns -n kube-system --timeout=300s"
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  changed_when: false
+  when: not ansible_check_mode or k8s_admin_conf.stat.exists
+
 - name: Query pending kubelet-serving CSRs on Control Plane
   ansible.builtin.command:
     cmd: >-

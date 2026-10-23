@@ -5,7 +5,7 @@
 
 - name: Download Helm APT repository GPG key
   ansible.builtin.get_url:
-    url: https://baltocdn.com/helm/signing.asc
+    url: https://packages.buildkite.com/helm-linux/helm-debian/gpgkey
     dest: /etc/apt/keyrings/helm-signing.asc
     owner: root
     group: root
@@ -39,7 +39,7 @@
 
 - name: Add official Helm Debian APT repository
   ansible.builtin.apt_repository:
-    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main"
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main"
     filename: helm-stable-debian
     state: present
     update_cache: "{{ not ansible_check_mode or helm_keyring_stat.stat.exists }}"

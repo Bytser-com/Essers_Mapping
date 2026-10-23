@@ -76,11 +76,21 @@
     name: "{{ 'terraform=' ~ runner_terraform_version if (runner_terraform_version | default('') | length > 0) else 'terraform' }}"
     state: present
     allow_change_held_packages: true
+    allow_downgrade: true
     lock_timeout: 120
   environment:
     DEBIAN_FRONTEND: noninteractive
   when:
     - runner_install_terraform | bool
+    - not ansible_check_mode or hashicorp_keyring_stat.stat.exists
+
+- name: Hold Terraform package to prevent unintended automatic upgrades
+  ansible.builtin.dpkg_selections:
+    name: terraform
+    selection: hold
+  when:
+    - runner_install_terraform | bool
+    - runner_terraform_version | default('') | length > 0
     - not ansible_check_mode or hashicorp_keyring_stat.stat.exists
 
 # --- Kubernetes CLI (kubectl) ---
@@ -140,7 +150,7 @@
 # --- Helm 3 CLI ---
 - name: Download Helm APT repository GPG key on runner
   ansible.builtin.get_url:
-    url: https://baltocdn.com/helm/signing.asc
+    url: https://packages.buildkite.com/helm-linux/helm-debian/gpgkey
     dest: /etc/apt/keyrings/helm-signing.asc
     owner: root
     group: root
@@ -174,7 +184,7 @@
 
 - name: Add Helm APT repository on runner
   ansible.builtin.apt_repository:
-    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main"
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main"
     filename: helm-stable-debian
     state: present
     update_cache: "{{ not ansible_check_mode or runner_helm_keyring_stat.stat.exists }}"

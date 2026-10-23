@@ -46,6 +46,17 @@
     path: "{{ github_runner_install_dir }}/.runner"
   register: runner_registered
 
+- name: Install GitHub Actions runner .NET runtime dependencies
+  ansible.builtin.command:
+    cmd: "{{ github_runner_install_dir }}/bin/installdependencies.sh"
+    chdir: "{{ github_runner_install_dir }}"
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  changed_when: true
+  when:
+    - not runner_registered.stat.exists
+    - not ansible_check_mode
+
 - name: Ensure GH_REPO_URL and RUNNER_REGISTRATION_PAT (or GH_RUNNER_TOKEN) are set before registration
   ansible.builtin.assert:
     that:
