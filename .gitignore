@@ -18,6 +18,9 @@ npm-debug.log
 yarn-error.log
 yarn-debug.log
 .pnpm-debug.log
+dist
+dist-ssr
+*.local
 
 ### Python ###
 __pycache__/
@@ -47,6 +50,12 @@ target/
 
 ### Log file ###
 *.log
+logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 /logs/
 /log/
 
@@ -101,13 +110,25 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
+### IDE directories and files ###
 .vscode/
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 ### Terraform ###
+tfplan
 *.tfplan
 *.tfplan.binary
 *.tfstate
+*.tfstate.backup
+*.tfstate.*
 *.tflock
 .terraform/
 .terraform.lock.hcl

@@ -1,0 +1,219 @@
+---
+# ==============================================================================
+# GITHUB_RUNNER TASKS: CI/CD TOOLING INSTALLATION
+# ==============================================================================
+
+- name: Ensure /etc/apt/keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+# --- Ansible & Linting Stack ---
+- name: Install Ansible, yamllint, ansible-lint, and Python dependencies
+  ansible.builtin.apt:
+    name:
+      - ansible
+      - yamllint
+      - ansible-lint
+      - python3-pip
+      - python3-venv
+      - python3-kubernetes
+      - sshpass
+    state: present
+    lock_timeout: 120
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  when: runner_install_ansible | bool
+
+# --- HashiCorp Terraform ---
+- name: Download HashiCorp APT repository GPG key
+  ansible.builtin.get_url:
+    url: https://apt.releases.hashicorp.com/gpg
+    dest: /etc/apt/keyrings/hashicorp-archive-keyring.asc
+    owner: root
+    group: root
+    mode: "0644"
+  register: hashicorp_gpg_dl
+  when: runner_install_terraform | bool
+
+- name: Check if HashiCorp binary GPG keyring exists
+  ansible.builtin.stat:
+    path: /etc/apt/keyrings/hashicorp-archive-keyring.gpg
+  register: hashicorp_keyring_stat
+  when: runner_install_terraform | bool
+
+- name: Dearmor HashiCorp GPG key into keyring
+  ansible.builtin.command:
+    cmd: gpg --dearmor --yes -o /etc/apt/keyrings/hashicorp-archive-keyring.gpg /etc/apt/keyrings/hashicorp-archive-keyring.asc
+  changed_when: true
+  when:
+    - runner_install_terraform | bool
+    - hashicorp_gpg_dl.changed or not hashicorp_keyring_stat.stat.exists
+
+- name: Ensure HashiCorp GPG keyring permissions are world-readable by APT
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/hashicorp-archive-keyring.gpg
+    owner: root
+    group: root
+    mode: "0644"
+  when:
+    - runner_install_terraform | bool
+    - not ansible_check_mode or hashicorp_keyring_stat.stat.exists
+
+- name: Add HashiCorp APT repository (bookworm compatible for Debian 13)
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com bookworm main"
+    filename: hashicorp
+    state: present
+    update_cache: "{{ not ansible_check_mode or hashicorp_keyring_stat.stat.exists }}"
+  when: runner_install_terraform | bool
+
+- name: Install Terraform CLI
+  ansible.builtin.apt:
+    name: "{{ 'terraform=' ~ runner_terraform_version if (runner_terraform_version | default('') | length > 0) else 'terraform' }}"
+    state: present
+    allow_change_held_packages: true
+    lock_timeout: 120
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  when:
+    - runner_install_terraform | bool
+    - not ansible_check_mode or hashicorp_keyring_stat.stat.exists
+
+# --- Kubernetes CLI (kubectl) ---
+- name: Download Kubernetes APT repository GPG key on runner
+  ansible.builtin.get_url:
+    url: "https://pkgs.k8s.io/core:/stable:/v{{ runner_k8s_version_minor }}/deb/Release.key"
+    dest: /etc/apt/keyrings/kubernetes-Release.key
+    owner: root
+    group: root
+    mode: "0644"
+  register: runner_k8s_gpg_dl
+  when: runner_install_kubectl | bool
+
+- name: Check if Kubernetes binary GPG keyring exists on runner
+  ansible.builtin.stat:
+    path: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+  register: runner_k8s_keyring_stat
+  when: runner_install_kubectl | bool
+
+- name: Dearmor Kubernetes APT GPG key on runner
+  ansible.builtin.command:
+    cmd: gpg --dearmor --yes -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg /etc/apt/keyrings/kubernetes-Release.key
+  changed_when: true
+  when:
+    - runner_install_kubectl | bool
+    - runner_k8s_gpg_dl.changed or not runner_k8s_keyring_stat.stat.exists
+
+- name: Ensure Kubernetes GPG keyring permissions are world-readable by APT on runner
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+    owner: root
+    group: root
+    mode: "0644"
+  when:
+    - runner_install_kubectl | bool
+    - not ansible_check_mode or runner_k8s_keyring_stat.stat.exists
+
+- name: Add Kubernetes APT repository on runner
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v{{ runner_k8s_version_minor }}/deb/ /"
+    filename: kubernetes
+    state: present
+    update_cache: "{{ not ansible_check_mode or runner_k8s_keyring_stat.stat.exists }}"
+  when: runner_install_kubectl | bool
+
+- name: Install kubectl on runner
+  ansible.builtin.apt:
+    name: kubectl
+    state: present
+    lock_timeout: 120
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  when:
+    - runner_install_kubectl | bool
+    - not ansible_check_mode or runner_k8s_keyring_stat.stat.exists
+
+# --- Helm 3 CLI ---
+- name: Download Helm APT repository GPG key on runner
+  ansible.builtin.get_url:
+    url: https://baltocdn.com/helm/signing.asc
+    dest: /etc/apt/keyrings/helm-signing.asc
+    owner: root
+    group: root
+    mode: "0644"
+  register: runner_helm_gpg_dl
+  when: runner_install_helm | bool
+
+- name: Check if Helm binary GPG keyring exists on runner
+  ansible.builtin.stat:
+    path: /etc/apt/keyrings/helm.gpg
+  register: runner_helm_keyring_stat
+  when: runner_install_helm | bool
+
+- name: Dearmor Helm GPG key on runner
+  ansible.builtin.command:
+    cmd: gpg --dearmor --yes -o /etc/apt/keyrings/helm.gpg /etc/apt/keyrings/helm-signing.asc
+  changed_when: true
+  when:
+    - runner_install_helm | bool
+    - runner_helm_gpg_dl.changed or not runner_helm_keyring_stat.stat.exists
+
+- name: Ensure Helm GPG keyring permissions are world-readable by APT on runner
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/helm.gpg
+    owner: root
+    group: root
+    mode: "0644"
+  when:
+    - runner_install_helm | bool
+    - not ansible_check_mode or runner_helm_keyring_stat.stat.exists
+
+- name: Add Helm APT repository on runner
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main"
+    filename: helm-stable-debian
+    state: present
+    update_cache: "{{ not ansible_check_mode or runner_helm_keyring_stat.stat.exists }}"
+  when: runner_install_helm | bool
+
+- name: Install Helm on runner
+  ansible.builtin.apt:
+    name: helm
+    state: present
+    lock_timeout: 120
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  when:
+    - runner_install_helm | bool
+    - not ansible_check_mode or runner_helm_keyring_stat.stat.exists
+
+# --- Docker Engine for Containerized CI Workflows ---
+- name: Install Docker & container build tooling from Debian repositories
+  ansible.builtin.apt:
+    name: "{{ runner_docker_packages }}"
+    state: present
+    lock_timeout: 120
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  when: runner_install_docker | bool
+
+- name: Ensure Docker service is enabled and running
+  ansible.builtin.systemd:
+    name: docker
+    enabled: true
+    state: started
+  when: runner_install_docker | bool
+
+- name: Add '{{ github_runner_user }}' and '{{ ansible_user }}' to docker group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: docker
+    append: true
+  loop:
+    - "{{ github_runner_user }}"
+    - "{{ ansible_user }}"
+  when: runner_install_docker | bool

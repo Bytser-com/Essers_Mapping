@@ -1,0 +1,46 @@
+---
+# ==============================================================================
+# ROLE TASKS ENTRYPOINT: common
+# ==============================================================================
+
+- name: Run preflight environment and OS checks
+  ansible.builtin.import_tasks: preflight.yml
+  tags:
+    - common
+    - preflight
+
+- name: Configure system packages and Proxmox guest utilities
+  ansible.builtin.import_tasks: packages.yml
+  tags:
+    - common
+    - packages
+
+- name: Configure hostname and cluster /etc/hosts resolution
+  ansible.builtin.import_tasks: hostname.yml
+  tags:
+    - common
+    - hostname
+
+- name: Configure timezone and NTP synchronization
+  ansible.builtin.import_tasks: time.yml
+  tags:
+    - common
+    - time
+    - ntp
+
+- name: Configure administrative user and sudo privileges
+  ansible.builtin.import_tasks: users.yml
+  tags:
+    - common
+    - users
+
+- name: Apply SSH, Fail2Ban, and automatic security updates hardening
+  ansible.builtin.import_tasks: security.yml
+  tags:
+    - common
+    - security
+
+- name: Flush pending service handlers for common role
+  ansible.builtin.meta: flush_handlers
+  tags:
+    - always

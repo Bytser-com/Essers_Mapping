@@ -1,0 +1,58 @@
+---
+# ==============================================================================
+# K8S_MASTER TASKS: CONTROL PLANE INITIALIZATION
+# ==============================================================================
+
+- name: Check if Kubernetes Control Plane is already initialized
+  ansible.builtin.stat:
+    path: /etc/kubernetes/admin.conf
+  register: k8s_admin_conf
+
+- name: Detect installed kubeadm version for ClusterConfiguration pinning
+  ansible.builtin.command:
+    cmd: kubeadm version -o short
+  register: kubeadm_version_cmd
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Set resolved Kubernetes version fact
+  ansible.builtin.set_fact:
+    k8s_resolved_version: >-
+      {{
+        (kubeadm_version_cmd.stdout | trim)
+        if (kubeadm_version_cmd.rc is defined and kubeadm_version_cmd.rc == 0 and (kubeadm_version_cmd.stdout | trim | length > 0))
+        else ('v' ~ k8s_version_minor ~ '.0')
+      }}
+
+- name: Ensure /etc/kubernetes directory exists
+  ansible.builtin.file:
+    path: /etc/kubernetes
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Render kubeadm initialization configuration
+  ansible.builtin.template:
+    src: kubeadm-config.yaml.j2
+    dest: /etc/kubernetes/kubeadm-config.yaml
+    owner: root
+    group: root
+    mode: "0600"
+
+- name: Pre-pull Kubernetes Control Plane container images
+  ansible.builtin.command:
+    cmd: kubeadm config images pull --config /etc/kubernetes/kubeadm-config.yaml
+  when: not k8s_admin_conf.stat.exists
+  changed_when: true
+
+- name: Initialize Kubernetes Control Plane via kubeadm
+  ansible.builtin.command:
+    cmd: kubeadm init --config /etc/kubernetes/kubeadm-config.yaml --upload-certs
+    creates: /etc/kubernetes/admin.conf
+
+- name: Refresh admin.conf stat after Control Plane initialization
+  ansible.builtin.stat:
+    path: /etc/kubernetes/admin.conf
+  register: k8s_admin_conf

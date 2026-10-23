@@ -1,0 +1,15 @@
+---
+# ==============================================================================
+# ROLE DEFAULTS: k8s_common
+# ==============================================================================
+
+k8s_version_minor: "1.31"
+k8s_package_version: "1.31.*"
+k8s_apt_keyring_path: "/etc/apt/keyrings/kubernetes-apt-keyring.gpg"
+k8s_apt_repo_url: "https://pkgs.k8s.io/core:/stable:/v{{ k8s_version_minor }}/deb/"
+k8s_cri_socket: "unix:///run/containerd/containerd.sock"
+
+k8s_packages:
+  - kubelet
+  - kubeadm
+  - kubectl

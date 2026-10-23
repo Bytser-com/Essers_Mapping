@@ -1,0 +1,33 @@
+# Managed by Ansible (roles/k8s_master) - Do not edit manually
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: "{{ ansible_host }}"
+  bindPort: {{ k8s_apiserver_bind_port }}
+nodeRegistration:
+  name: "{{ hostname_short | lower }}"
+  criSocket: "{{ k8s_cri_socket }}"
+  imagePullPolicy: IfNotPresent
+  kubeletExtraArgs:
+    - name: node-ip
+      value: "{{ ansible_host }}"
+---
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: ClusterConfiguration
+clusterName: "{{ k8s_cluster_name }}"
+kubernetesVersion: "{{ k8s_resolved_version | default('v' ~ k8s_version_minor ~ '.0') }}"
+controlPlaneEndpoint: "{{ k8s_control_plane_endpoint }}"
+networking:
+  dnsDomain: "{{ k8s_dns_domain }}"
+  podSubnet: "{{ k8s_pod_network_cidr }}"
+  serviceSubnet: "{{ k8s_service_cidr }}"
+apiServer:
+  certSANs:
+{% for san in (['127.0.0.1', 'localhost', ansible_host, (hostname_short | lower), hostname_short, fqdn] | unique) %}
+    - "{{ san }}"
+{% endfor %}
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+cgroupDriver: systemd
+serverTLSBootstrap: true

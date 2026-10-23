@@ -1,0 +1,28 @@
+---
+# ==============================================================================
+# COMMON TASKS: TIMEZONE, LOCALE & NTP SYNCHRONIZATION
+# ==============================================================================
+
+- name: Ensure system locale {{ system_locale }} is generated
+  community.general.locale_gen:
+    name: "{{ system_locale }}"
+    state: present
+
+- name: Set system timezone to {{ system_timezone }}
+  community.general.timezone:
+    name: "{{ system_timezone }}"
+
+- name: Configure systemd-timesyncd NTP servers
+  ansible.builtin.template:
+    src: timesyncd.conf.j2
+    dest: /etc/systemd/timesyncd.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart systemd-timesyncd
+
+- name: Ensure systemd-timesyncd is enabled and running
+  ansible.builtin.systemd:
+    name: systemd-timesyncd
+    enabled: true
+    state: started

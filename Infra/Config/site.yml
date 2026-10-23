@@ -1,0 +1,15 @@
+---
+# ==============================================================================
+# MASTER SITE PLAYBOOK
+# Orchestrates full configuration of all Proxmox Debian 13 VMs
+# ==============================================================================
+- name: Stage 1 - Base OS Bootstrap & Hardening (All Hosts)
+  ansible.builtin.import_playbook: playbooks/bootstrap.yml
+
+- name: Stage 2 - Kubernetes Cluster Provisioning (Control Plane & Workers)
+  ansible.builtin.import_playbook: playbooks/kubernetes.yml
+
+- name: Stage 3 - CI/CD Self-Hosted GitHub Runner Configuration
+  ansible.builtin.import_playbook: playbooks/runner.yml
+
+

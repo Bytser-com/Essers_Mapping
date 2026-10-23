@@ -1,0 +1,95 @@
+---
+# ==============================================================================
+# GITHUB_RUNNER TASKS: GITHUB ACTIONS RUNNER BINARY & SERVICE REGISTRATION
+# ==============================================================================
+
+- name: Ensure GitHub Actions runner installation directory exists
+  ansible.builtin.file:
+    path: "{{ github_runner_install_dir }}"
+    state: directory
+    owner: "{{ github_runner_user }}"
+    group: "{{ github_runner_group }}"
+    mode: "0755"
+
+- name: Check if GitHub Actions runner is already extracted
+  ansible.builtin.stat:
+    path: "{{ github_runner_install_dir }}/config.sh"
+  register: runner_config_script
+
+- name: Download GitHub Actions runner package (v{{ github_runner_version }})
+  ansible.builtin.get_url:
+    url: "https://github.com/actions/runner/releases/download/v{{ github_runner_version }}/actions-runner-linux-x64-{{ github_runner_version }}.tar.gz"
+    dest: "{{ github_runner_install_dir }}/actions-runner-linux-x64-{{ github_runner_version }}.tar.gz"
+    checksum: "{{ github_runner_checksum }}"
+    owner: "{{ github_runner_user }}"
+    group: "{{ github_runner_group }}"
+    mode: "0644"
+  when: not runner_config_script.stat.exists
+
+- name: Extract GitHub Actions runner installer
+  ansible.builtin.unarchive:
+    src: "{{ github_runner_install_dir }}/actions-runner-linux-x64-{{ github_runner_version }}.tar.gz"
+    dest: "{{ github_runner_install_dir }}"
+    remote_src: true
+    owner: "{{ github_runner_user }}"
+    group: "{{ github_runner_group }}"
+    creates: "{{ github_runner_install_dir }}/config.sh"
+  when: not runner_config_script.stat.exists
+
+- name: Remove downloaded runner tarball after extraction
+  ansible.builtin.file:
+    path: "{{ github_runner_install_dir }}/actions-runner-linux-x64-{{ github_runner_version }}.tar.gz"
+    state: absent
+
+- name: Check if runner is already registered with GitHub
+  ansible.builtin.stat:
+    path: "{{ github_runner_install_dir }}/.runner"
+  register: runner_registered
+
+- name: Ensure GITHUB_REPO_URL and GITHUB_RUNNER_TOKEN are set before registration
+  ansible.builtin.assert:
+    that:
+      - github_runner_org_or_repo_url | length > 0
+      - github_runner_registration_token | length > 0
+    fail_msg: >-
+      GITHUB_REPO_URL and GITHUB_RUNNER_TOKEN must be set in your environment (.env)
+      to register the GitHub Actions runner.
+  when: not runner_registered.stat.exists
+
+- name: Configure and register GitHub Actions runner
+  ansible.builtin.command:
+    cmd: >-
+      {{ github_runner_install_dir }}/config.sh
+      --unattended
+      --url "{{ github_runner_org_or_repo_url }}"
+      --token "{{ github_runner_registration_token }}"
+      --name "{{ github_runner_name }}"
+      --labels "{{ github_runner_labels | join(',') }}"
+      --work "_work"
+      --replace
+    chdir: "{{ github_runner_install_dir }}"
+    creates: "{{ github_runner_install_dir }}/.runner"
+  become: true
+  become_user: "{{ github_runner_user }}"
+  no_log: true
+  when: not runner_registered.stat.exists
+
+- name: Install GitHub Actions runner systemd service via svc.sh
+  ansible.builtin.command:
+    cmd: "{{ github_runner_install_dir }}/svc.sh install {{ github_runner_user }}"
+    chdir: "{{ github_runner_install_dir }}"
+    creates: "{{ github_runner_install_dir }}/.service"
+
+- name: Read systemd service unit name from .service file
+  ansible.builtin.slurp:
+    src: "{{ github_runner_install_dir }}/.service"
+  register: runner_service_slurp
+
+- name: Ensure GitHub Actions runner service is enabled and running
+  ansible.builtin.systemd:
+    name: "{{ runner_service_slurp.content | b64decode | trim }}"
+    enabled: true
+    state: started
+    daemon_reload: true
+  when: not ansible_check_mode
+

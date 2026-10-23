@@ -1,0 +1,53 @@
+---
+# ==============================================================================
+# PLAYBOOK: BASE OS BOOTSTRAP & HARDENING
+# Targets: All Debian 13 VMs (k8s-masterServer, k8s-workerServer, pipeline-runner)
+# ==============================================================================
+
+- name: Wait for SSH connectivity and bootstrap all Debian 13 virtual machines
+  hosts: all
+  become: true
+  gather_facts: false
+  pre_tasks:
+    - name: Verify required ansible_host IP is provided via .env
+      ansible.builtin.assert:
+        that:
+          - ansible_host is defined
+          - ansible_host | length > 0
+        fail_msg: "Missing IPv4 address for {{ inventory_hostname }}. Did you run 'source .env'?"
+      delegate_to: localhost
+      become: false
+      tags:
+        - always
+
+    - name: Wait for SSH daemon to become reachable on target VM
+      ansible.builtin.wait_for_connection:
+        delay: 2
+        timeout: 180
+      tags:
+        - always
+
+    - name: Wait for cloud-init to finish initial provisioning if present
+      ansible.builtin.command:
+        cmd: cloud-init status --wait
+      register: cloud_init_wait
+      changed_when: false
+      failed_when:
+        - cloud_init_wait.rc != 0
+        - "'not found' not in (cloud_init_wait.stderr | default(''))"
+        - "'No such file' not in (cloud_init_wait.msg | default(''))"
+      when: not ansible_check_mode
+      tags:
+        - always
+
+    - name: Gather host system facts
+      ansible.builtin.setup:
+      tags:
+        - always
+
+  roles:
+    - role: common
+      tags:
+        - bootstrap
+        - common
+        - security

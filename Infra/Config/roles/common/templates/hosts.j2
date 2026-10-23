@@ -1,0 +1,12 @@
+# Managed by Ansible (roles/common) - Do not edit manually
+127.0.0.1   localhost
+
+# Cluster & Infrastructure Nodes ({{ env_name }})
+{% for host in groups['all'] | sort %}
+{{ hostvars[host]['ansible_host'] }}   {{ hostvars[host]['fqdn'] }} {{ hostvars[host]['hostname_short'] | lower }}{% if (hostvars[host]['hostname_short'] | lower) != hostvars[host]['hostname_short'] %} {{ hostvars[host]['hostname_short'] }}{% endif %}
+
+{% endfor %}
+# IPv6 loopback
+::1         localhost ip6-localhost ip6-loopback
+ff02::1     ip6-allnodes
+ff02::2     ip6-allrouters

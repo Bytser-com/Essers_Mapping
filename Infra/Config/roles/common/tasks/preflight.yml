@@ -1,0 +1,21 @@
+---
+# ==============================================================================
+# COMMON TASKS: PREFLIGHT VALIDATION
+# ==============================================================================
+
+- name: Verify target host is running Debian
+  ansible.builtin.assert:
+    that:
+      - ansible_facts['os_family'] == 'Debian'
+    fail_msg: "Unsupported OS family '{{ ansible_facts['os_family'] }}'. This role targets Debian."
+    success_msg: "Verified Debian OS ({{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }})."
+
+- name: Verify required network and host variables are defined and non-empty
+  ansible.builtin.assert:
+    that:
+      - ansible_host is defined and (ansible_host | length > 0)
+      - network_gateway is defined and (network_gateway | length > 0)
+      - fqdn is defined and (fqdn | length > 0)
+      - hostname_short is defined and (hostname_short | length > 0)
+    fail_msg: "Missing required host/network variables. Ensure .env is sourced before running Ansible."
+    success_msg: "All required network and identity variables are present for {{ inventory_hostname }}."

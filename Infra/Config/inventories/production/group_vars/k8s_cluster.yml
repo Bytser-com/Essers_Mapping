@@ -1,0 +1,33 @@
+---
+# ==============================================================================
+# KUBERNETES CLUSTER VARIABLES - PRODUCTION ENVIRONMENT
+# Shared across both Control Plane (k8s_masters) and Worker (k8s_workers) nodes
+# ==============================================================================
+
+# --- Kubernetes Versioning (pkgs.k8s.io) ---
+k8s_version_minor: "1.37"
+k8s_package_version: "1.37.*"
+
+# --- Container Runtime (containerd) ---
+containerd_systemd_cgroup: true
+containerd_sandbox_image: "registry.k8s.io/pause:3.10"
+
+# --- Cluster Networking ---
+k8s_cluster_name: "essers-k8s-production"
+k8s_pod_network_cidr: "10.244.0.0/16"
+#k8s_service_cidr: "10.96.0.0/12"
+k8s_dns_domain: "essers-k8s-production.lan"
+
+# --- CNI Plugin Configuration ---
+k8s_cni_plugin: "calico" # Options: calico | flannel
+k8s_calico_version: "v3.29.1"
+
+# --- Kernel Modules & Sysctl Prerequisites ---
+k8s_kernel_modules:
+  - overlay
+  - br_netfilter
+
+k8s_sysctl_params:
+  net.bridge.bridge-nf-call-iptables: 1
+  net.bridge.bridge-nf-call-ip6tables: 1
+  net.ipv4.ip_forward: 1
