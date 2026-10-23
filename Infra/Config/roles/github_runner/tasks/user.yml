@@ -1,0 +1,38 @@
+---
+# ==============================================================================
+# GITHUB_RUNNER TASKS: SERVICE ACCOUNT & STATE DIRECTORIES
+# ==============================================================================
+
+- name: Ensure GitHub Runner group '{{ github_runner_group }}' exists
+  ansible.builtin.group:
+    name: "{{ github_runner_group }}"
+    state: present
+
+- name: Ensure GitHub Runner user '{{ github_runner_user }}' exists
+  ansible.builtin.user:
+    name: "{{ github_runner_user }}"
+    group: "{{ github_runner_group }}"
+    groups: sudo
+    append: true
+    shell: /bin/bash
+    home: "/home/{{ github_runner_user }}"
+    create_home: true
+    state: present
+
+- name: Configure passwordless sudo for '{{ github_runner_user }}'
+  ansible.builtin.copy:
+    content: "{{ github_runner_user }} ALL=(ALL) NOPASSWD: ALL\n"
+    dest: "/etc/sudoers.d/90-{{ github_runner_user }}"
+    owner: root
+    group: root
+    mode: "0440"
+    validate: "/usr/sbin/visudo -cf %s"
+
+- name: Create Terraform state directories matching github workflow STATE_DIR
+  ansible.builtin.file:
+    path: "{{ terraform_state_base_dir }}/{{ item }}"
+    state: directory
+    owner: "{{ github_runner_user }}"
+    group: "{{ github_runner_group }}"
+    mode: "0775"
+  loop: "{{ terraform_state_environments }}"

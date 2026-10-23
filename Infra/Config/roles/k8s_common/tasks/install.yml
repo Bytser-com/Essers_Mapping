@@ -1,0 +1,24 @@
+---
+# ==============================================================================
+# K8S_COMMON TASKS: PACKAGE INSTALLATION & VERSION PINNING
+# ==============================================================================
+
+- name: Install version-pinned Kubernetes packages (kubelet, kubeadm, kubectl)
+  ansible.builtin.apt:
+    name:
+      - "kubelet={{ k8s_package_version }}"
+      - "kubeadm={{ k8s_package_version }}"
+      - "kubectl={{ k8s_package_version }}"
+    state: present
+    allow_change_held_packages: true
+    update_cache: true
+    lock_timeout: 120
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  when: not ansible_check_mode or (k8s_keyring_stat.stat.exists | default(false))
+
+- name: Hold Kubernetes packages to prevent unintended automatic upgrades
+  ansible.builtin.dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop: "{{ k8s_packages }}"
