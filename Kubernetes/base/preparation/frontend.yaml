@@ -1,0 +1,219 @@
+# ==============================================================================
+# PREPARATION STAGE: NGINX FRONTEND + API REVERSE PROXY
+# - Publicly reachable on its own IP with ports 80 & 443 open:
+#     * Testing:    192.168.100.101 (Ports 80, 443)
+#     * Production: 192.168.100.201 (Ports 80, 443)
+# - Serves static frontend assets AND proxies `/api/*` requests internally to:
+#     * /api/converter/*       -> http://mapping-converter:8000/
+#     * /api/proposal/*        -> http://mapping-proposal:8000/
+#     * /api/version-control/* -> http://version-control-backend:8080/
+# - Also has Read/Write access to the Shared SFTP share (`sftp-shared`).
+# ==============================================================================
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: frontend-sa
+  labels:
+    app.kubernetes.io/name: frontend
+    essers.io/zone: preparation
+automountServiceAccountToken: false
+imagePullSecrets:
+  - name: ghcr-pull-secret
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-nginx-config
+  labels:
+    app.kubernetes.io/name: frontend
+    essers.io/zone: preparation
+data:
+  default.conf: |
+    server {
+        listen 80;
+        listen 443;
+        server_name _;
+
+        client_max_body_size 50M;
+
+        # Serve Frontend SPA (Vite / React / Vue build)
+        location / {
+            root /usr/share/nginx/html;
+            index index.html index.htm;
+            try_files $uri $uri/ /index.html;
+        }
+
+        # Healthcheck endpoint for Kubernetes probes
+        location = /healthz {
+            access_log off;
+            return 200 "healthy\n";
+            add_header Content-Type text/plain;
+        }
+
+        # Proxy /api/converter/* -> Python Backend 1 (mapping-converter)
+        location /api/converter/ {
+            proxy_pass http://mapping-converter:8000/;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        # Proxy /api/proposal/* -> Python Backend 2 (mapping-proposal)
+        location /api/proposal/ {
+            proxy_pass http://mapping-proposal:8000/;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        # Proxy /api/version-control/* -> Java Spring Boot Backend (version-control-backend)
+        location /api/version-control/ {
+            proxy_pass http://version-control-backend:8080/;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app.kubernetes.io/name: frontend
+    app.kubernetes.io/component: nginx-frontend
+    app.kubernetes.io/tier: frontend
+    essers.io/zone: preparation
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: frontend
+      essers.io/zone: preparation
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: frontend
+        app.kubernetes.io/component: nginx-frontend
+        app.kubernetes.io/tier: frontend
+        essers.io/zone: preparation
+        # Grants access to sftp-shared in the shared-storage zone
+        essers.io/sftp-shared-access: "true"
+    spec:
+      serviceAccountName: frontend-sa
+      securityContext:
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: frontend
+          # TODO: Replace with your built NGINX frontend image (e.g. ghcr.io/bytser-com/essers_mapping/frontend)
+          image: ghcr.io/bytser-com/essers_mapping/frontend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+            - name: https
+              containerPort: 443
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: common-config
+          env:
+            - name: SERVICE_NAME
+              value: "frontend"
+            - name: SFTP_SHARED_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sftp-shared-credentials
+                  key: SFTP_PASSWORD
+            - name: SHARED_MOUNT_PATH
+              value: "/mnt/sftp-shared"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          volumeMounts:
+            - name: nginx-conf
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+              readOnly: true
+            - name: shared-files
+              mountPath: /mnt/sftp-shared
+              readOnly: false
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: frontend-nginx-config
+        - name: shared-files
+          persistentVolumeClaim:
+            claimName: sftp-shared-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  labels:
+    app.kubernetes.io/name: frontend
+    app.kubernetes.io/component: nginx-frontend
+    app.kubernetes.io/tier: frontend
+    essers.io/zone: preparation
+  annotations:
+    # Overridden per environment in overlays/testing (192.168.100.101) & overlays/production (192.168.100.201)
+    metallb.universe.tf/loadBalancerIPs: "192.168.100.101"
+spec:
+  type: LoadBalancer
+  loadBalancerIP: "192.168.100.101"
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+    - name: https
+      port: 443
+      targetPort: https
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: frontend
+    essers.io/zone: preparation
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: frontend-pdb
+  labels:
+    essers.io/zone: preparation
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: frontend
+      essers.io/zone: preparation
