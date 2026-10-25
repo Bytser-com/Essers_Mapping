@@ -10,6 +10,11 @@ Industry-grade, Kustomize-based Kubernetes declarative architecture for **Essers
 Kubernetes/
 ├── README.MD
 ├── cluster-addons/
+│   ├── cert-manager/
+│   │   └── cluster-issuers.yaml                  # Let's Encrypt (prod/staging) & Self-Signed ClusterIssuers
+│   ├── ingress-nginx/
+│   │   ├── values-testing.yaml                   # Binds ingress-nginx LoadBalancer to 192.168.100.101 (80 -> 443 + TLS)
+│   │   └── values-production.yaml                # Binds ingress-nginx LoadBalancer to 192.168.100.201 (80 -> 443 + TLS)
 │   └── longhorn/
 │       └── values-single-worker.yaml             # Longhorn Helm values tuned for 1 Worker (8 vCPU / 8GB RAM / 128GB)
 ├── base/                                         # Shared base manifests across all environments
@@ -21,7 +26,8 @@ Kubernetes/
 │   │   └── network-policies.yaml                 # Calico Zero-Trust NetworkPolicies (Ingress & Egress per zone)
 │   ├── preparation/                              # ZONE 1: PREPARATION STAGE
 │   │   ├── kustomization.yaml
-│   │   ├── frontend.yaml                         # NGINX Frontend + /api/* Reverse Proxy (Public IP: .101 / .201)
+│   │   ├── ingress.yaml                          # Edge Ingress (80 -> 443 redirect, cert-manager TLS -> frontend:8080)
+│   │   ├── frontend.yaml                         # NGINX Frontend (:8080 ClusterIP) + /api/* Reverse Proxy
 │   │   ├── mapping-converter.yaml                # Python Backend 1 (Internal ClusterIP only)
 │   │   ├── mapping-proposal.yaml                 # Python Backend 2 (Internal ClusterIP only)
 │   │   └── version-control-backend.yaml          # Java Spring Boot Version Control Backend (Internal ClusterIP only)
@@ -38,14 +44,14 @@ Kubernetes/
     │   ├── hpa.yaml                              # Testing HPAs (Prep: 2..3, Runtime: 3..5)
     │   ├── metallb-ippool.yaml                   # MetalLB L2 Pool for 192.168.100.101 - 192.168.100.103
     │   └── patches/
-    │       ├── loadbalancer-ips-patch.yaml       # Binds .101 (frontend), .102 (sftp-shared), .103 (sftp-runtime)
+    │       ├── loadbalancer-ips-patch.yaml       # Patches Ingress ClusterIssuer & binds .102 (sftp-shared), .103 (sftp-runtime)
     │       └── resources-patch.yaml              # Testing CPU/RAM sizing, 10Gi Longhorn PVCs, nodeSelector: testing
     └── production/                               # Production Environment (IPs: 192.168.100.201-203)
         ├── kustomization.yaml                    # Prep & Runtime: 3 baseline replicas (2+1 hot spare)
         ├── hpa.yaml                              # Production HPAs (Prep: 3..4, Runtime: 3..5)
         ├── metallb-ippool.yaml                   # MetalLB L2 Pool for 192.168.100.201 - 192.168.100.203
         └── patches/
-            ├── loadbalancer-ips-patch.yaml       # Binds .201 (frontend), .202 (sftp-shared), .203 (sftp-runtime)
+            ├── loadbalancer-ips-patch.yaml       # Patches Ingress ClusterIssuer & binds .202 (sftp-shared), .203 (sftp-runtime)
             └── resources-patch.yaml              # Production CPU/RAM sizing, PDB minAvailable=2, 35Gi Longhorn PVCs
 ```
 
@@ -57,7 +63,7 @@ Kubernetes/
 
 | Public Service | Logical Zone | Open Ports | Testing IP | Production IP | Purpose |
 | :--- | :--- | :---: | :---: | :---: | :--- |
-| **`frontend`** (NGINX) | `preparation` | `80`, `443` | **`192.168.100.101`** | **`192.168.100.201`** | Serves web UI & proxies `/api/converter/*`, `/api/proposal/*`, `/api/version-control/*` |
+| **`ingress-nginx-controller`** | `ingress-nginx` (Cluster Edge) | `80`, `443` | **`192.168.100.101`** | **`192.168.100.201`** | Redirects `80` $\rightarrow$ `443`, terminates TLS (`cert-manager`), forwards plain HTTP to `frontend:8080` |
 | **`sftp-shared`** (SFTPGo) | `shared-storage` (In-Between) | `22` (SFTP), `8080` (WebUI/API) | **`192.168.100.102`** | **`192.168.100.202`** | Shared SFTPGo file share (external SFTP clients + all internal workloads) |
 | **`sftp-runtime`** (SFTPGo) | `runtime` | `22` (SFTP), `8080` (WebUI/API) | **`192.168.100.103`** | **`192.168.100.203`** | Runtime SFTPGo file share (external SFTP clients + `runtime-backend` ONLY) |
 
@@ -67,7 +73,7 @@ Kubernetes/
 
 | Workload | GHCR Container Image | Zone (`essers.io/zone`) | Service Type | Testing Replicas (`Min+Spare .. Max`) | Production Replicas (`Min+Spare .. Max`) | Publicly Reachable? | Reachable by `frontend`? | `sftp-shared` Access | `sftp-runtime` Access |
 | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **`frontend`** (NGINX) | `ghcr.io/bytser-com/essers_mapping/frontend` | `preparation` | `LoadBalancer` | **`2`** (`1+1` .. max `3`) | **`3`** (`2+1` .. max `4`) | **YES (`.101` / `.201`)** | — | **Read / Write** | **BLOCKED** |
+| **`frontend`** (NGINX) | `ghcr.io/bytser-com/essers_mapping/frontend` | `preparation` | `ClusterIP` (`:8080`) | **`2`** (`1+1` .. max `3`) | **`3`** (`2+1` .. max `4`) | **YES (via Ingress `.101` / `.201`)** | — | **Read / Write** | **BLOCKED** |
 | **`mapping-converter`** (Python) | `ghcr.io/bytser-com/essers_mapping/mapping-converter` | `preparation` | `ClusterIP` (`:8000`) | **`2`** (`1+1` .. max `3`) | **`3`** (`2+1` .. max `4`) | **NO** (`/api/converter/`) | **YES** | **Read / Write** | **BLOCKED** |
 | **`mapping-proposal`** (Python) | `ghcr.io/bytser-com/essers_mapping/mapping-proposal` | `preparation` | `ClusterIP` (`:8000`) | **`2`** (`1+1` .. max `3`) | **`3`** (`2+1` .. max `4`) | **NO** (`/api/proposal/`) | **YES** | **Read / Write** | **BLOCKED** |
 | **`version-control-backend`** (Java) | `ghcr.io/bytser-com/essers_mapping/version-control-backend` | `preparation` | `ClusterIP` (`:8080`) | **`2`** (`1+1` .. max `3`) | **`3`** (`2+1` .. max `4`) | **NO** (`/api/version-control/`) | **YES** | **Read / Write** | **BLOCKED** |
@@ -77,20 +83,24 @@ Kubernetes/
 
 ---
 
-## 3. How Frontend Routing & Zone Isolation Work
+## 3. How Edge Ingress, Frontend Routing & Zone Isolation Work
 
-### 1. NGINX Frontend Reverse Proxy (`base/preparation/frontend.yaml`)
+### 1. Edge Ingress Controller & `cert-manager` (`base/preparation/ingress.yaml`)
+- **HTTP $\rightarrow$ HTTPS Redirect & TLS Termination**: `essers-frontend-ingress` uses the `ingress-nginx` controller on `.101` (Testing) / `.201` (Production) to redirect port `80` $\rightarrow$ `443` (`301 Moved Permanently`) and terminate SSL on port `443` using certificates managed automatically by `cert-manager` (`letsencrypt-prod` for public domains, or `selfsigned-cluster-issuer` for private LAN testing).
+- **Decrypted Internal Forwarding**: Once TLS is terminated at the cluster edge, `ingress-nginx` forwards plain HTTP requests with `X-Forwarded-Proto: https` to the internal `frontend` `ClusterIP` Service on port `8080`.
+
+### 2. NGINX Frontend Reverse Proxy (`base/preparation/frontend.yaml`)
 The `frontend` Deployment includes a pre-configured `frontend-nginx-config` ConfigMap that:
-- Serves your SPA static files on `/` (ports `80` and `443`).
-- Proxies all `/api/*` calls internally over Kubernetes DNS so your backends stay completely private (`ClusterIP`):
+- Listens on plain HTTP port `8080` inside the private Kubernetes network and serves your SPA static files on `/`.
+- Proxies all `/api/*` calls internally over Kubernetes DNS (forwarding `X-Forwarded-Proto $http_x_forwarded_proto`) so your backends stay completely private (`ClusterIP`):
   - `/api/converter/*` $\rightarrow$ `http://mapping-converter:8000/`
   - `/api/proposal/*` $\rightarrow$ `http://mapping-proposal:8000/`
   - `/api/version-control/*` $\rightarrow$ `http://version-control-backend:8080/`
 - Has full Read/Write access to `sftp-shared` (both via SFTP at `sftp-shared:22` and mounted PVC at `/mnt/sftp-shared`).
 
-### 2. Zero-Trust Network Policies (`base/common/network-policies.yaml`)
+### 3. Zero-Trust Network Policies (`base/common/network-policies.yaml`)
 Enforced automatically by **Calico CNI**:
-- **`allow-public-to-frontend`**: Opens TCP `80` and `443` on `frontend`.
+- **`allow-ingress-to-frontend`**: Allows TCP `8080` on `frontend` exclusively from the `ingress-nginx` namespace.
 - **`allow-frontend-to-preparation-backends`**: Ensures `mapping-converter`, `mapping-proposal`, and `version-control-backend` ONLY accept traffic from `frontend` (and fellow `preparation` backends)—never from outside or from the `runtime` zone.
 - **`restrict-preparation-zone-egress`**: Strict Egress policy on the `preparation` zone so `frontend`, `mapping-converter`, `mapping-proposal`, and `version-control-backend` can ONLY talk to CoreDNS, each other, and `sftp-shared`—making it impossible for them to connect to `sftp-runtime` or `runtime-backend`.
 - **`allow-all-authorized-and-public-to-sftp-shared`**: Allows external SFTP connections on `.102`/`.202` (port `22`) plus internal connections from all 5 workloads (`frontend`, `mapping-converter`, `mapping-proposal`, `version-control-backend`, and `runtime-backend`).
@@ -115,28 +125,52 @@ kubectl apply -f Kubernetes/overlays/testing/metallb-ippool.yaml
 kubectl apply -f Kubernetes/overlays/production/metallb-ippool.yaml
 ```
 
-### Step 2: Preview or Deploy Testing & Production Overlays
+### Step 2: Install NGINX Ingress Controller & `cert-manager` (Once per Cluster)
+```bash
+# 1. Install cert-manager & ClusterIssuers (letsencrypt-prod, letsencrypt-staging, selfsigned-cluster-issuer)
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.16.2/cert-manager.yaml
+kubectl wait --namespace cert-manager --for=condition=ready pod --selector=app.kubernetes.io/instance=cert-manager --timeout=120s
+kubectl apply -f Kubernetes/cluster-addons/cert-manager/cluster-issuers.yaml
+
+# 2. Install NGINX Ingress Controller bound to .101 (Testing) or .201 (Production)
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+
+# On Testing cluster (binds LoadBalancer IP 192.168.100.101):
+helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
+  --namespace ingress-nginx --create-namespace \
+  -f Kubernetes/cluster-addons/ingress-nginx/values-testing.yaml
+
+# On Production cluster (binds LoadBalancer IP 192.168.100.201):
+helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
+  --namespace ingress-nginx --create-namespace \
+  -f Kubernetes/cluster-addons/ingress-nginx/values-production.yaml
+```
+
+### Step 3: Preview or Deploy Testing & Production Overlays
 ```bash
 # Preview rendered manifests
 kubectl kustomize Kubernetes/overlays/testing
 kubectl kustomize Kubernetes/overlays/production
 
-# Deploy Testing Environment (2 replicas per service, IPs: .101, .102, .103)
+# Deploy Testing Environment (2 replicas per service, IPs: .101 Ingress, .102, .103)
 kubectl apply -k Kubernetes/overlays/testing
 
-# Deploy Production Environment (5 replicas per service + HPA, IPs: .201, .202, .203)
+# Deploy Production Environment (3+ replicas per service + HPA, IPs: .201 Ingress, .202, .203)
 kubectl apply -k Kubernetes/overlays/production
 ```
 
-### Step 3: Verify Dedicated IPs & Pods
+### Step 4: Verify Dedicated IPs, Ingress & Pods
 ```bash
-kubectl get svc,pods,pvc,netpol -n essers-mapping-testing -o wide
+kubectl get svc -n ingress-nginx
+kubectl get ingress,svc,pods,pvc,netpol -n essers-mapping-testing -o wide
 ```
 You will see:
-- `service/frontend` $\rightarrow$ `EXTERNAL-IP: 192.168.100.101` (`80:.../TCP, 443:.../TCP`)
+- `service/ingress-nginx-controller` (`-n ingress-nginx`) $\rightarrow$ `EXTERNAL-IP: 192.168.100.101` (`80:.../TCP, 443:.../TCP`)
+- `ingress/essers-frontend-ingress` $\rightarrow$ `CLASS: nginx`, `PORTS: 80, 443` $\rightarrow$ routes to `frontend:8080`
 - `service/sftp-shared` $\rightarrow$ `EXTERNAL-IP: 192.168.100.102` (`22:.../TCP`)
 - `service/sftp-runtime` $\rightarrow$ `EXTERNAL-IP: 192.168.100.103` (`22:.../TCP`)
-- `service/mapping-converter`, `service/mapping-proposal`, `service/version-control-backend`, `service/runtime-backend` $\rightarrow$ `ClusterIP` (`EXTERNAL-IP: <none>`)
+- `service/frontend`, `service/mapping-converter`, `service/mapping-proposal`, `service/version-control-backend`, `service/runtime-backend` $\rightarrow$ `ClusterIP` (`EXTERNAL-IP: <none>`)
 
 ---
 

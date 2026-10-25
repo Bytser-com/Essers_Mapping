@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - frontend.yaml
+  - ingress.yaml
   - mapping-converter.yaml
   - mapping-proposal.yaml
   - version-control-backend.yaml

@@ -16,12 +16,13 @@ spec:
   policyTypes:
     - Ingress
 ---
-# 2. PUBLIC FRONTEND (NGINX):
-#    - Ingress: Publicly reachable from ANY external IP on HTTP (80) and HTTPS (443)
+# 2. FRONTEND (NGINX on Internal Port 8080):
+#    - Ingress: Reachable ONLY from the NGINX Ingress Controller (`ingress-nginx` namespace)
+#      after edge HTTP (80) -> HTTPS (443) redirect & TLS termination.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-public-to-frontend
+  name: allow-ingress-to-frontend
 spec:
   podSelector:
     matchLabels:
@@ -30,11 +31,13 @@ spec:
   policyTypes:
     - Ingress
   ingress:
-    - ports:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
         - protocol: TCP
-          port: 80
-        - protocol: TCP
-          port: 443
+          port: 8080
 ---
 # 3. PREPARATION BACKENDS (Internal ClusterIP Only - NOT Publicly Available):
 #    - mapping-converter (Python, port 8000)

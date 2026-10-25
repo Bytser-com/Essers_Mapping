@@ -1,8 +1,8 @@
 # ==============================================================================
-# PREPARATION STAGE: NGINX FRONTEND + API REVERSE PROXY
-# - Publicly reachable on its own IP with ports 80 & 443 open:
-#     * Testing:    192.168.100.101 (Ports 80, 443)
-#     * Production: 192.168.100.201 (Ports 80, 443)
+# PREPARATION STAGE: NGINX FRONTEND + API REVERSE PROXY (Internal Port 8080)
+# - Reached via `essers-frontend-ingress` (NGINX Ingress Controller handles
+#   port 80 -> 443 redirect & Let's Encrypt / cert-manager TLS termination at edge)
+# - Listens on plain HTTP port 8080 inside the private Kubernetes network
 # - Serves static frontend assets AND proxies `/api/*` requests internally to:
 #     * /api/converter/*       -> http://mapping-converter:8000/
 #     * /api/proposal/*        -> http://mapping-proposal:8000/
@@ -30,8 +30,7 @@ metadata:
 data:
   default.conf: |
     server {
-        listen 80;
-        listen 443;
+        listen 8080;
         server_name _;
 
         client_max_body_size 50M;
@@ -57,7 +56,7 @@ data:
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
         }
 
         # Proxy /api/proposal/* -> Python Backend 2 (mapping-proposal)
@@ -67,7 +66,7 @@ data:
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
         }
 
         # Proxy /api/version-control/* -> Java Spring Boot Backend (version-control-backend)
@@ -77,7 +76,7 @@ data:
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
         }
     }
 ---
@@ -124,10 +123,7 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
-              containerPort: 80
-              protocol: TCP
-            - name: https
-              containerPort: 443
+              containerPort: 8080
               protocol: TCP
           envFrom:
             - configMapRef:
@@ -186,20 +182,14 @@ metadata:
     app.kubernetes.io/component: nginx-frontend
     app.kubernetes.io/tier: frontend
     essers.io/zone: preparation
-  annotations:
-    # Overridden per environment in overlays/testing (192.168.100.101) & overlays/production (192.168.100.201)
-    metallb.universe.tf/loadBalancerIPs: "192.168.100.101"
 spec:
-  type: LoadBalancer
-  loadBalancerIP: "192.168.100.101"
+  # Internal ClusterIP on plain HTTP port 8080 — external HTTPS (443) and HTTP (80)
+  # redirect are terminated at the edge by `essers-frontend-ingress` (ingress-nginx).
+  type: ClusterIP
   ports:
     - name: http
-      port: 80
+      port: 8080
       targetPort: http
-      protocol: TCP
-    - name: https
-      port: 443
-      targetPort: https
       protocol: TCP
   selector:
     app.kubernetes.io/name: frontend
