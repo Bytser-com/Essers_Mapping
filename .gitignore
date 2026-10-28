@@ -1,5 +1,7 @@
 ### Environments ###
 .env
+.env*
+!.env.example
 
 ### Secrets file ###
 secrets.yml

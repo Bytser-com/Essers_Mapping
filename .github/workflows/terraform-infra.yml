@@ -1,0 +1,208 @@
+name: Terraform - Infra Setup
+
+on:
+  pull_request:
+    branches: [main, testing]
+    paths:
+      - "Infra/Setup/**"
+      - ".github/workflows/terraform-infra.yml"
+
+  push:
+    branches: [main, testing]
+    paths:
+      - "Infra/Setup/**"
+      - ".github/workflows/terraform-infra.yml"
+
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Terraform action"
+        type: choice
+        options: [plan, apply, destroy]
+        default: plan
+
+# Avoid concurrent access to the runner state / Proxmox resources
+concurrency:
+  group: terraform-infra-setup-${{ github.base_ref || github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "false"
+  # Max 2 concurrent operations to avoid Proxmox storage locks / corruption
+  TF_CLI_ARGS_plan: "-parallelism=2"
+  TF_CLI_ARGS_apply: "-parallelism=2"
+  TF_CLI_ARGS_destroy: "-parallelism=2"
+  # Dynamic state directory separated per branch/environment
+  STATE_DIR: "/opt/terraform-state/essers-infra-setup/${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}"
+  WORKDIR: "Infra/Setup"
+
+  # --- Secrets ---
+  TF_VAR_proxmox_api_token: ${{ secrets.PROXMOX_API_TOKEN }}
+  TF_VAR_proxmox_ssh_password: ${{ secrets.PROXMOX_SSH_PASSWORD }}
+  TF_VAR_debian_vm_user_password: ${{ secrets.DEBIAN_VM_USER_PASSWORD }}
+
+  # --- Variables (Loaded from target Environment) ---
+  TF_VAR_proxmox_api_url: ${{ vars.PROXMOX_API_URL }}
+  TF_VAR_pipeline_ssh_public_key: ${{ vars.PIPELINE_SSH_PUBLIC_KEY }}
+  TF_VAR_node01_name: ${{ vars.NODE01_NAME }}
+  TF_VAR_cloud_image_url: ${{ vars.CLOUD_IMAGE_URL }}
+  TF_VAR_cloud_image_checksum: ${{ vars.CLOUD_IMAGE_CHECKSUM }}
+  TF_VAR_ipv4_gateway: ${{ vars.IPV4_GATEWAY }}
+  TF_VAR_pipeline-runner_vm_dns_domain: ${{ vars.PIPELINE_RUNNER_VM_DNS_DOMAIN }}
+  TF_VAR_pipeline-runner_vm_ipv4_address: ${{ vars.PIPELINE_RUNNER_VM_IPV4_ADDRESS }}
+  TF_VAR_k8s-master_vm_dns_domain: ${{ vars.K8S_MASTER_VM_DNS_DOMAIN }}
+  TF_VAR_k8s-master_vm_ipv4_address: ${{ vars.K8S_MASTER_VM_IPV4_ADDRESS }}
+  TF_VAR_k8s-worker_vm_dns_domain: ${{ vars.K8S_WORKER_VM_DNS_DOMAIN }}
+  TF_VAR_k8s-worker_vm_ipv4_address: ${{ vars.K8S_WORKER_VM_IPV4_ADDRESS }}
+
+jobs:
+  plan:
+    name: Plan
+    runs-on: [self-hosted, linux, "${{ vars.RUNNER_LABEL }}"]
+    environment: ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
+    defaults:
+      run:
+        working-directory: ${{ env.WORKDIR }}
+    outputs:
+      has_changes: ${{ steps.plan.outputs.has_changes }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.9"
+          terraform_wrapper: false
+
+      - name: Ensure state directory exists
+        run: mkdir -p "$STATE_DIR"
+
+      - name: Terraform fmt
+        run: terraform fmt -check -recursive
+
+      - name: Terraform init
+        run: terraform init -backend-config="path=$STATE_DIR/terraform.tfstate"
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Terraform plan
+        id: plan
+        run: |
+          DESTROY_FLAG=""
+          if [ "${{ github.event.inputs.action }}" = "destroy" ]; then
+            DESTROY_FLAG="-destroy"
+          fi
+
+          set +e
+          # Output plan directly inside the current workspace
+          terraform plan $DESTROY_FLAG -detailed-exitcode -out="tfplan.binary"
+          code=$?
+          set -e
+
+          if [ $code -eq 1 ]; then 
+            echo "::error::Terraform plan failed"
+            exit 1
+          fi
+          
+          if [ $code -eq 2 ]; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Plan summary
+        if: always()
+        run: |
+          if [ -f "tfplan.binary" ]; then
+            {
+              echo '### Terraform Plan Output'
+              echo '```hcl'
+              terraform show -no-color tfplan.binary | tail -n 200
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # Upload the plan artifact securely to GitHub
+      - name: Upload Terraform Plan
+        if: steps.plan.outputs.has_changes == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan-${{ github.run_id }}
+          path: ${{ env.WORKDIR }}/tfplan.binary
+          retention-days: 7
+          if-no-files-found: error
+
+  apply:
+    name: ${{ github.event.inputs.action == 'destroy' && 'Destroy' || 'Apply' }}
+    needs: plan
+    if: >-
+      needs.plan.outputs.has_changes == 'true' &&
+      (
+        (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/testing')) ||
+        (github.event_name == 'workflow_dispatch' &&
+          (github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy'))
+      )
+    runs-on: [self-hosted, linux, "${{ vars.RUNNER_LABEL }}"]
+    environment: ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
+    defaults:
+      run:
+        working-directory: ${{ env.WORKDIR }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.9"
+          terraform_wrapper: false
+
+      - name: Download Terraform Plan Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan-${{ github.run_id }}
+          path: ${{ env.WORKDIR }}
+
+      - name: Terraform init
+        run: terraform init -backend-config="path=$STATE_DIR/terraform.tfstate"
+
+      # Runs apply, pipes output to log file, and prints real-time stdout
+      - name: Terraform apply
+        id: apply
+        run: |
+          set -o pipefail
+          terraform apply -no-color tfplan.binary 2>&1 | tee apply.log
+
+      # Writes clear deployment summary to the GitHub Actions overview page
+      - name: Apply summary
+        if: always()
+        run: |
+          STATUS="${{ steps.apply.outcome == 'success' && '✅ Succeeded' || '❌ Failed' }}"
+          {
+            echo "### Terraform Deployment Summary: ${STATUS}"
+            echo ""
+            if [ -f apply.log ]; then
+              echo "<details><summary>Click to view Apply Execution Log</summary>"
+              echo ""
+              echo '```text'
+              tail -n 150 apply.log
+              echo '```'
+              echo "</details>"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # Configure the VMs with Ansible after Terraform applied changes (not after a destroy)
+  configure:
+    name: Configure (Ansible)
+    needs: apply
+    if: github.event.inputs.action != 'destroy'
+    uses: ./.github/workflows/ansible-infra.yml
+    with:
+      mode: apply
+    secrets: inherit
