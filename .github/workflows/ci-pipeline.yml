@@ -683,6 +683,11 @@ jobs:
     needs: [discover, frontend-tests, java-backends-tests, python-backends-tests]
     if: >-
       !cancelled() &&
+      (
+        (github.event_name == 'pull_request' && (github.base_ref == 'Development' || github.base_ref == 'development')) ||
+        (github.event_name == 'push' && github.ref == 'refs/heads/Development') ||
+        github.event_name == 'workflow_dispatch'
+      ) &&
       (needs.frontend-tests.result == 'success' || needs.frontend-tests.result == 'skipped') &&
       (needs.java-backends-tests.result == 'success' || needs.java-backends-tests.result == 'skipped') &&
       (needs.python-backends-tests.result == 'success' || needs.python-backends-tests.result == 'skipped')
@@ -958,11 +963,17 @@ jobs:
           SONAR_RES="${{ needs.sonarqube.result }}"
 
           FAILED=false
-          for res in "$DISCOVER_RES" "$FRONTEND_RES" "$E2E_RES" "$SONAR_RES"; do
+          for res in "$DISCOVER_RES" "$FRONTEND_RES" "$E2E_RES"; do
             if [ "$res" != "success" ]; then
               FAILED=true
             fi
           done
+
+          # SonarQube is required on PRs and on the main baseline branch (Development),
+          # but may be skipped on direct pushes to secondary release branches (e.g. testing/main).
+          if [ "$SONAR_RES" != "success" ] && [ "$SONAR_RES" != "skipped" ]; then
+            FAILED=true
+          fi
 
           for optional_res in "$JAVA_RES" "$PYTHON_RES"; do
             if [ "$optional_res" != "success" ] && [ "$optional_res" != "skipped" ]; then
