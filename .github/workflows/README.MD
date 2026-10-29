@@ -27,9 +27,10 @@ Configure the following in **Settings $\rightarrow$ Secrets and variables $\righ
 
 | Name | Type | Description |
 | :--- | :--- | :--- |
-| **`SONAR_TOKEN`** | Repository Secret | Authentication token generated in your SonarQube Server (or SonarCloud) under *My Account $\rightarrow$ Security*. |
-| **`SONAR_HOST_URL`** | Repository Secret or Variable | Base URL of your SonarQube server (e.g., `https://sonarqube.yourdomain.com` or `https://sonarcloud.io`). |
-| **`SONAR_PROJECT_KEY`** | Optional Repository Variable | Defaults to `Essers_Mapping` (matching [`sonar-project.properties`](../../sonar-project.properties)). |
+| **`SONAR_TOKEN`** | Repository Secret | Authentication token generated in SonarCloud under *My Account $\rightarrow$ Security*. |
+| **`SONAR_HOST_URL`** | Repository Secret or Variable | Base URL: `https://sonarcloud.io` |
+| **`SONAR_PROJECT_KEY`** | Optional Variable | Defaults to `Bytser-com_Essers_Mapping` (matching [`sonar-project.properties`](../../sonar-project.properties)). |
+| **`SONAR_ORGANIZATION`** | Optional Variable | Defaults to `bytser-com`. |
 
 ---
 
