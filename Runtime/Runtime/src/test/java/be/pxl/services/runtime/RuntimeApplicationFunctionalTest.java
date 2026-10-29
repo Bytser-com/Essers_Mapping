@@ -18,7 +18,7 @@ class RuntimeApplicationFunctionalTest {
 	@DisplayName("Functional: Runtime environment configuration is active and resolvable")
 	void environmentIsConfiguredAndResolvable() {
 		assertNotNull(environment, "Spring Environment must be available for runtime functional execution");
-		assertNotNull(environment.getSystemProperties(), "System properties must be accessible");
+		assertNotNull(environment.getProperty("java.version"), "Java version property must be accessible from environment");
 	}
 
 }
