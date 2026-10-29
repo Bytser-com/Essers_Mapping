@@ -2,4 +2,3 @@ google-genai
 python-dotenv
 openpyxl
 httpx
-openai

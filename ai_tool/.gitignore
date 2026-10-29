@@ -1,11 +1,27 @@
+
+# Environment variables and API keys
 .env
+.env.*
+!.env.example
+
+# Python virtual environment
 .venv/
+venv/
+
+# Python cache
 __pycache__/
-*.pyc
-output/*
-!output/.gitkeep
-data/source/*.xml
-!data/source/example_delivery.xml
-data/target/*.xml
-!data/target/example_target.xml
-data/reference/verified_mappings.json
+*.py[cod]
+.pytest_cache/
+
+# Customer XMLs and historical examples
+/data/
+
+# Generated mapping packages, JSON and checkpoints
+/output/
+
+# IDE and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+

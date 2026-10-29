@@ -1,91 +1,173 @@
-# Essers XML Mapping Prototype (v0.1)
+# H.Essers — AI XML Mapping Proposal (Simple Prototype)
 
-This is an **AI-assisted mapping proposal generator**. It inventories XML leaf fields, asks Gemini to propose source-to-target mappings, validates basic structure, and writes an `.xlsx` review workbook based on the supplied **Mapping_Review_Nouryon_Outbound.xlsx** layout. Its suggestions are **not** approved mapping rules or executable transformations.
+**Goal:** Give Gemini examples of previous customer XML conversions and raw XML messages from a new customer. Gemini proposes how the new customer's data could be mapped into the common H.Essers target format. The program saves its proposals in the **existing Excel mapping template** for an integration specialist to review.
 
-## Quick start (Windows PowerShell / VS Code)
+This is a **proposal generator**, not an executable XML converter. No AI proposal should be implemented without human approval.
 
-From the project folder:
+## What happens when you run it?
 
-```powershell
-py -3.14 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-```
+1. **Python reads your data.** It finds all original XML files in `data/source/`, matches the previous customers' `Original` and `Converted` files in `data/historical/`, and lists all available source and target XML paths.
+2. **Python picks complete example documents.** It chooses a small number of raw XML messages from the new customer and matched historical original/converted pairs. **It does not convert these XML documents into JSON before giving them to Gemini.**
+3. **Gemini analyzes the examples.** It compares past originals with their converted versions, studies the new customer's raw XML, and proposes source paths, target paths, conditions, transformations, loops, lookups, and open questions.
+4. **Python checks and exports the proposal.** It checks that the named XML paths exist and writes Gemini's structured JSON output into `mapping_package.xlsx`, preserving the supplied Excel template.
 
-**Test everything except the API call** using the included toy XML files and illustrative mappings:
+**Important:** Python scans **all** XMLs to build its field-path inventories, but Gemini receives only the **selected complete raw XML examples** plus the field-path inventories. That distinction is intentional: you can gradually increase how many real examples Gemini sees without changing the code. The model does not permanently train or remember earlier runs.
 
-```powershell
-.\.venv\Scripts\python.exe main.py --offline
-```
-
-This creates `output/mapping_package.xlsx`, `output/mapping_proposals.json`, `output/validation_issues.json`, and `output/rejected_proposals.json`.
-
-## Live Gemini run
-
-1. Put your **current source XMLs** in `data/source/`.
-2. Put one or more **target example XMLs** showing the desired structure in `data/target/`. An XSD-only target is **not supported yet**.
-3. Remove the bundled toy XMLs from those folders so they don't contaminate your inventories.
-4. Copy `.env.example` to `.env` and set your own API key and model. **Never commit `.env`**.
-   Gemini HTTP requests have a 120-second timeout by default. To change it, add
-   `GEMINI_TIMEOUT_MS=180000` to `.env` (the value is in milliseconds).
-5. Optionally create `data/reference/verified_mappings.json` using the format of `verified_mappings.example.json`. Only include truly approved historical mappings. The bundled example is *not* verified evidence.
-6. Run:
-
-```powershell
-.\.venv\Scripts\python.exe main.py --limit-targets 10
-```
-
-This requests proposals for the first **10 target leaf fields**, sorted by path. It makes **one Gemini call** by default. Once this works, try `--limit-targets 20`, or `--limit-targets 0` for all targets. The `--batch-size` argument controls requests per batch; each call can consume quota.
-
-## Directory layout
+## Project folders
 
 ```text
-main.py                     Pipeline entry point
-xml_parser.py               XML field extraction (ElementTree)
-readprompt.py               Gemini JSON response + configurable 120 s timeout and 503 retry
-mapping_validator.py        Structural validation of AI proposals
-excel_generator.py          Excel output using original workbook layout
-prompt.txt                  Editable AI instructions
-requirements.txt            Python packages
-.env.example                API settings template (no secrets)
-data/source/                Source XML documents
-  example_delivery.xml      Toy XML for --offline
-data/target/                Target XML examples
-  example_target.xml         Toy XML for --offline
-data/reference/             Optional verified mapping examples
-  verified_mappings.example.json   Example format only
-  demo_proposals.json       Toy offline output, not approved evidence
-templates/
-  mapping_template.xlsx     Existing workbook layout; contains historical *example content*
-output/                     Generated reports (Git-ignored)
+ai_tool/
+├── main.py                 Runs the complete workflow
+├── prompt.txt              Explains the mapping task and rules to Gemini
+├── .env.example            API key configuration example
+├── requirements.txt        Python packages to install
+├── scripts/
+│   ├── __init__.py
+│   ├── xml_parser.py       Reads XML, discovers valid paths, matches historical pairs
+│   ├── readprompt.py       Builds Gemini's request; handles API calls, quota/retries
+│   ├── mapping_validator.py  Flags unknown source/target paths or invalid rule types
+│   └── excel_generator.py  Fills the original mapping Excel template
+├── data/
+│   ├── source/             Original XML files from the NEW customer (currently Nouryon)
+│   └── historical/
+│       ├── christeyns/    Matched *_Original.xml and *_Converted.xml
+│       ├── chugoku/       Matched *_Original.xml and *_Converted.xml
+│       └── hempel/        Matched *_Original.xml and *_Converted.xml
+├── templates/
+│   └── mapping_template.xlsx
+└── output/
+    └── runs/               Excel packages, proposals and resumable checkpoints
 ```
 
-## What the pipeline does
+**Which files are where?** The ZIP already includes the scrambled Essers dataset: 100 Nouryon original XMLs and 400 matched historical pairs (100 Christeyns, 150 Chugoku, 150 Hempel). You do **not** need to manually split historical originals and converted files into different folders. A pair is matched by the common filename stem, e.g. `Outbound_Hempel_001_Original.xml` with `Outbound_Hempel_001_Converted.xml`.
 
-1. Extracts XML leaf paths, occurrence counts, source filenames, and up to three sample values per path.
-2. Sends the source inventory, a batch of target paths, and any manually added verified examples to Gemini.
-3. Requests structured JSON mapping proposals (direct, fixed, conditional, lookup, etc.). The AI is explicitly asked **not to invent paths or constants**.
-4. Validates returned paths and flags source-path mismatches; rejects proposals for nonexistent targets.
-5. Reuses the uploaded eight-tab workbook layout but clears previous customer-specific rows before writing. Populates **Mapping Proposal**, **Review Questions**, **Runtime Field Inventory**, **File Classification**, and **Summary**. **Rule Types** is retained; **Reference Evidence** and **Assumptions & Risks** are intentionally left unpopulated until actual evidence/risk generation is implemented.
-6. Saves both the review workbook and machine-readable JSON files.
+### What each Python file does (in normal language)
 
-## Important limitations / next steps
+| File | What it does | What it does **not** do |
+|---|---|---|
+| **main.py** | Finds the data, chooses how many examples to send, runs batches, and saves results | Does not decide which business fields should map |
+| **scripts/xml_parser.py** | Reads XML files, remembers field paths, matches each historic original to its converted partner, selects complete examples | Does not infer mapping rules |
+| **scripts/readprompt.py** | Sends the selected raw XML examples and valid path lists to Gemini; requests structured JSON; handles temporary API failures | Does not secretly train a new model |
+| **scripts/mapping_validator.py** | Checks that paths and rule types are valid; flags suspicious structural output | Cannot prove a mapping is correct for Essers |
+| **scripts/excel_generator.py** | Places approved-for-review *proposals* into the Excel template, with review questions and field inventories | Does not execute the mappings |
+| **prompt.txt** | Instructions that tell Gemini how to reason from the examples | It is not program code |
 
-- **Proof of concept only**: source-to-target semantic correctness is **not proven** by path validation.
-- The target parser needs a **representative target XML**. A full XSD parser is a later task.
-- Verified reference mapping pairs (`*_Original.xml`, `*_Converted.xml`) are **not automatically learned yet**. For now, curated `verified_mappings.json` examples are supported.
-- XML namespaces are stripped for path comparison; same-name elements across distinct namespaces may collide.
-- Leaf-only inventory doesn't capture full loop hierarchy or cardinality; repetitive structures need review.
-- Gemini's confidence score is **subjective**, not measured accuracy.
-- The example workbook originally contains customer-specific historical rows; generation clears those rows in the output file. The template on disk is unchanged.
-- The offline data is toy data to verify the plumbing, **not a verified mapping**.
-- A matching current input/target corpus and approved examples should be used before evaluating accuracy. Keep benchmark/ground-truth examples separate from prompts where practical.
+## First-time setup (Windows / VS Code)
 
-## Team review checklist
+1. Open the **`ai_tool` folder** in VS Code or a PowerShell terminal.
+2. Make sure Python is installed (preferably Python 3.11 or later).
+3. Optional but recommended: create a virtual environment:
 
-Check each high-impact mapping for semantic correctness, qualifiers, date formats, partner roles, quantity rules, fixed control values, and loop boundaries. The output is a review document; human approval remains required.
+   ```powershell
+   python -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   ```
 
-## Unit tests (no Gemini requests)
+4. Install the dependencies:
+
+   ```powershell
+   python -m pip install -r requirements.txt
+   ```
+
+5. Make a local `.env` file from `.env.example`:
+
+   ```powershell
+   Copy-Item .env.example .env
+   ```
+
+6. Open `.env` and replace `replace_with_your_key` with a **valid Gemini API key**. You can also change `GEMINI_MODEL` to another model available to your account. **Never commit or share `.env`.**
+
+## Your first mapping proposal
+
+**Step A — Preview without consuming any Gemini quota:**
 
 ```powershell
-.\.venv\Scripts\python.exe -m unittest test_core.py
+python main.py --preview
 ```
+
+This prints how many files are present, which raw examples would be sent, and an approximate prompt size. It doesn't create a workbook.
+
+**Step B — Create a small mapping package:**
+
+```powershell
+python main.py
+```
+
+This uses the defaults: **1 historical pair per company** (3 pairs total), **2 raw new-customer XML examples**, and **10 requested target fields in one batch**.
+
+For a more informative initial mapping of delivery items rather than the alphabetically first target fields, use:
+
+```powershell
+python main.py --target-segment E1BPOBDLVITEM --limit-targets 10
+```
+
+Look for a final line starting with `Created Excel:`. The workbook lives in a subfolder under `output/runs/`.
+
+### Gradually give Gemini more real examples
+
+You can change **two numbers** without editing any Python files:
+
+| Experiment | Command | What Gemini receives |
+|---|---|---|
+| **Small start** | `python main.py --history-pairs 1 --source-samples 2` | 1 pair from each of the 3 companies; 2 raw new-customer XMLs |
+| **A little more history** | `python main.py --history-pairs 2 --source-samples 2` | 2 pairs from each company (6 total); 2 raw new-customer XMLs |
+| **More customer examples** | `python main.py --history-pairs 2 --source-samples 4` | 6 historical pairs; 4 raw new-customer XMLs, if they fit the raw-XML budget |
+| **All target fields** | `python main.py --history-pairs 1 --source-samples 2 --limit-targets 0` | 3 historical pairs and 2 customer XMLs for every target batch; all target paths requested |
+
+Add `--preview` to **any** command to check the size and selected files before using your Gemini quota. More examples increase context and token usage; **they do not guarantee better mapping quality**. Compare the Excel proposals with expert judgment.
+
+**Other useful options:**
+
+- `--batch-size 5` maps five target fields per API call (more calls, smaller responses).
+- `--target-segment E1BPOBDLVITEM` focuses on target delivery-item fields.
+- `--max-source-chars 400000` increases the combined size allowance for the *complete* raw customer XML examples. The program never sends half of a document; it selects fewer if necessary.
+- `--model MODEL_NAME` temporarily chooses another available Gemini model.
+- `python main.py --help` lists every option.
+
+**Example with a bigger XML allowance:**
+
+```powershell
+python main.py --history-pairs 2 --source-samples 4 --max-source-chars 400000 --limit-targets 10 --preview
+```
+
+**How many files does Gemini actually see?** The console says `Raw customer XMLs provided to Gemini` and `Matched historical pairs provided to Gemini`. It does **not** receive all 400 historical pairs unless you explicitly choose a very large number—which may exceed your API limits.
+
+## Output and resuming an interrupted run
+
+Each unique set of files and settings gets its own folder, for example:
+
+```text
+output/runs/history1_source2_targets10_ab12cd34/
+├── mapping_package.xlsx       The actual mapping review workbook
+├── mapping_proposals.json     Gemini's structured proposals after validation
+├── rejected_proposals.json    Invalid target entries, if any
+├── validation_issues.json     Structural warnings, if any
+├── run_info.json              Exactly what was sent and which settings were used
+└── checkpoints/              Saved completed batches
+```
+
+If Gemini is overloaded (**503**) or you've reached a per-minute quota (**429**), a completed batch is kept. **Rerun the exact same command** and it will resume where it left off. Daily quotas may require waiting for a quota reset or changing your API plan. Increasing the number of examples can make a single request too large for your quota; use `--preview` before experimenting.
+
+If `mapping_package.xlsx` is open in Excel during a rerun, close it before saving. The generator can also use a `_new.xlsx` fallback filename.
+
+## Using the tool for another customer
+
+1. Back up or archive the current `data/source/` XMLs somewhere outside the project.
+2. Put the **new customer's ORIGINAL XML files** into `data/source/`.
+3. Keep `data/historical/` unchanged; those are the previous conversions Gemini can learn from as examples.
+4. Run `python main.py --preview`, then `python main.py` (or adjust the evidence counts).
+5. Have an Essers integration specialist review the generated Excel before anyone implements a mapping.
+
+To add another historical company later, create `data/historical/company_name/` and put its matching `*_Original.xml` and `*_Converted.xml` documents there. Missing or duplicate partners produce an explicit error rather than being silently ignored.
+
+## What to check in the Excel
+
+Open **Mapping Proposal** first. Check whether the source field actually represents the target's business meaning, and whether qualifiers, date/time conversions, quantity units, repeating item/partner loops and constants have been described correctly. The **Review Questions** sheet collects ambiguities. **Reference Evidence** lists which historic XML pairs were shown to Gemini; it does not claim those pairs are expert-verified mappings.
+
+**No valid path error** means only that the proposed source/target paths exist. It does **not** prove a mapping is semantically correct. A higher confidence score is not a measured accuracy rate. The tool cannot invent undocumented customer-specific rules, so human review is always required.
+
+## Privacy and teamwork
+
+Only use XML files that Essers explicitly authorizes for an external AI API. The files included here were supplied as scrambled examples; don't substitute real customer personal or confidential data without approval. `.env` is ignored by Git. The `.gitignore` also excludes XML files by default so new datasets are not accidentally committed.
+
+Your teammates need Python, the dependency installation, their own authorized API key, and access to the same scrambled example files to run this project. There is **no web frontend or deployment server** yet; this is a local command-line prototype.

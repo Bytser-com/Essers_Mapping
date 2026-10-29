@@ -40,7 +40,10 @@ def _write_records(sheet, headers, records, start_row):
 
 
 def export_excel(mappings, source_inventory, source_files, target_files,
-                 output_path: str | Path, template_path: str | Path):
+                 output_path: str | Path, template_path: str | Path,
+                 historical_pairs=None, selected_historical_examples=None):
+    historical_pairs = historical_pairs or []
+    selected_historical_examples = selected_historical_examples or []
     template_path, output_path = Path(template_path), Path(output_path)
     if not template_path.exists():
         raise FileNotFoundError(f'Excel template not found: {template_path}')
@@ -66,7 +69,7 @@ def export_excel(mappings, source_inventory, source_files, target_files,
         mapping_id = f'MP-{i:03d}'
         records.append({
             'Mapping ID': mapping_id,
-            'Runtime source group': 'Prototype XML input',
+            'Runtime source group': 'New customer original XML',
             'Runtime source file example': (source_detail.get('files') or [''])[0],
             'Confidence %': m['confidence'],
             'Requires review': 'Yes' if m['requires_review'] else 'No',
@@ -126,30 +129,73 @@ def export_excel(mappings, source_inventory, source_files, target_files,
     csheet = wb['File Classification']
     cheaders = [csheet.cell(1, c).value for c in range(1, 6)]
     file_records = [
-        {'File': p.name, 'Classification': 'Runtime Original', 'Role in execution': 'Source inventory', 'Pair/group': 'Current', 'Comment': 'Current XML input'}
+        {
+            'File': p.name, 'Classification': 'Runtime Original',
+            'Role in execution': 'New customer source inventory',
+            'Pair/group': 'Current customer', 'Comment': 'Unconverted customer input',
+        }
         for p in source_files
-    ] + [
-        {'File': p.name, 'Classification': 'Target Example', 'Role in execution': 'Target inventory', 'Pair/group': 'Current', 'Comment': 'Target XML example or specification'}
-        for p in target_files
     ]
+    for pair in historical_pairs:
+        group = f"{pair['company']} / {pair['pair_id']}"
+        file_records.extend([
+            {
+                'File': pair['original_file'].name,
+                'Classification': 'Historical Original',
+                'Role in execution': 'Historical conversion evidence',
+                'Pair/group': group,
+                'Comment': 'Matched to converted file; may be sampled for AI context',
+            },
+            {
+                'File': pair['converted_file'].name,
+                'Classification': 'Historical Converted',
+                'Role in execution': 'Common target inventory and historical evidence',
+                'Pair/group': group,
+                'Comment': 'Historical target structure; paired with original',
+            },
+        ])
+    if not historical_pairs:
+        file_records.extend({
+            'File': p.name, 'Classification': 'Target Example',
+            'Role in execution': 'Target inventory', 'Pair/group': 'Current',
+            'Comment': 'Target example',
+        } for p in target_files)
     _write_records(csheet, cheaders, file_records, 2)
 
     summary = wb['Summary']
     summary_items = [
-        ('Aantal aangeleverde bestanden', len(source_files) + len(target_files)),
+        ('Aantal aangeleverde bestanden', len(source_files) + (2 * len(historical_pairs) if historical_pairs else len(target_files))),
         ('Aantal Runtime Original-bestanden', len(source_files)),
         ('Gekozen werkingsmodus', 'AI Mapping Prototype (human review)'),
         ('Aantal voorgestelde mappings', len(mappings)),
         ('Aantal high confidence mappings', sum(m['confidence'] >= 90 for m in mappings)),
         ('Aantal mappings requiring review', len(questions)),
         ('Aantal source paths discovered', len(source_inventory)),
+        ('Historical pairs discovered', len(historical_pairs)),
+        ('Historical pairs sent to Gemini per batch', len(selected_historical_examples)),
     ]
     for index, (label, value) in enumerate(summary_items, 2):
         summary.cell(index, 1).value = label
         summary.cell(index, 2).value = value
 
-    # Rule Types remains intact as the codebook; it is not customer-specific data.
-    # Reference Evidence and Assumptions & Risks are left blank rather than fabricated.
+    # Record only which historical paired documents were supplied to Gemini.
+    # Do not fabricate field-level historical mappings or claim expert verification.
+    reference_sheet = wb['Reference Evidence']
+    reference_headers = [reference_sheet.cell(1, c).value for c in range(1, 10)]
+    reference_records = [{
+        'Reference pair': f"{item['company']} / {item['pair_id']}",
+        'Historical Original': item['original_filename'],
+        'Historical Converted': item['converted_filename'],
+        'Evidence type': 'Observed XML conversion pair',
+        'Historical source path': '',
+        'Historical target path': '',
+        'Example value': '',
+        'Evidence note': 'Paired documents supplied to AI as contextual examples; mapping not independently verified',
+        'Usefulness': 'Reference context only',
+    } for item in selected_historical_examples]
+    _write_records(reference_sheet, reference_headers, reference_records, 2)
+
+    # Rule Types is restored from the template; assumptions and risks are not fabricated.
     rules = wb['Rule Types']
     # Rule Types contains definitions in the original workbook, restore them separately
     # from reference template at the end to prevent erasing the codebook.
@@ -161,5 +207,12 @@ def export_excel(mappings, source_inventory, source_files, target_files,
     original.close()
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    wb.save(output_path)
+    try:
+        wb.save(output_path)
+    except PermissionError:
+        # Avoid losing the finished package if the original is open in Excel.
+        backup_path = output_path.with_name(output_path.stem + '_new.xlsx')
+        wb.save(backup_path)
+        print(f'Original Excel file is locked. Saved to: {backup_path}')
+        output_path = backup_path
     return output_path

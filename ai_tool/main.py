@@ -1,218 +1,253 @@
-"""Entry point for the XML-to-mapping-proposal prototype, with resumable batches."""
+"""Essers XML mapping prototype: raw historical pairs + new customer XML -> Excel.
+
+Run ``python main.py --preview`` first, then ``python main.py``.
+All mapping decisions are proposed by Gemini and require expert approval.
+"""
+from __future__ import annotations
 
 import argparse
+from collections import Counter
 import hashlib
 import json
 import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-from excel_generator import export_excel
-from mapping_validator import validate_mappings
-from xml_parser import parse_xml_directory
+
+from scripts.excel_generator import export_excel
+from scripts.mapping_validator import validate_mappings
+from scripts.readprompt import build_mapping_contents, run_gemini
+from scripts.xml_parser import (
+    discover_historical_pairs,
+    parse_xml_files,
+    select_historical_examples,
+    select_raw_examples,
+)
 
 ROOT = Path(__file__).resolve().parent
 
 
-def _write_json(path, payload):
-    """Write JSON atomically so an interruption cannot leave a half-written checkpoint."""
+def save_json(path: Path, data) -> None:
+    """Safely save results and checkpoints without partial JSON files."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    temp_path = path.with_name(path.name + ".tmp")
-    temp_path.write_text(
-        json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8"
-    )
-    os.replace(temp_path, path)
+    temp = path.with_suffix(path.suffix + '.tmp')
+    temp.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding='utf-8')
+    os.replace(temp, path)
 
 
-def _job_signature(sources, targets, selected_targets, verified_path, batch_size, model):
-    """Identify the exact inputs/settings that produced a set of checkpoints."""
-    digest = hashlib.sha256()
-    settings = {
-        "model": model,
-        "batch_size": batch_size,
-        "target_paths": [field["path"] for field in selected_targets],
-    }
-    digest.update(json.dumps(settings, sort_keys=True).encode("utf-8"))
+def read_json(path: Path):
+    return json.loads(path.read_text(encoding='utf-8'))
 
-    # Reuse checkpoints only when the XML files, prompt, and references are unchanged.
-    inputs = sorted(
-        [*sources, *targets, verified_path, ROOT / "prompt.txt", ROOT / "readprompt.py"],
-        key=lambda path: str(path),
-    )
-    for path in inputs:
-        digest.update(str(path.relative_to(ROOT)).encode("utf-8"))
-        if path.is_file():
-            digest.update(path.read_bytes())
-        else:
-            digest.update(b"<missing>")
 
+def job_signature(settings: dict, files: list[Path]) -> str:
+    """A changed XML, prompt, or setting creates a fresh independent run."""
+    digest = hashlib.sha256(json.dumps(settings, sort_keys=True).encode('utf-8'))
+    for file in sorted(set(files), key=str):
+        digest.update(str(file.relative_to(ROOT)).encode('utf-8'))
+        digest.update(file.read_bytes() if file.exists() else b'<missing>')
     return digest.hexdigest()
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Generate proposed XML mappings into an Excel review workbook."
-    )
-    parser.add_argument(
-        "--offline", action="store_true",
-        help="Run bundled demonstration without calling Gemini"
-    )
-    parser.add_argument(
-        "--limit-targets", type=int, default=10,
-        help="Only map first N target fields (default: 10; 0 = all)"
-    )
-    parser.add_argument(
-        "--batch-size", type=int, default=10,
-        help="Number of target fields per Gemini call"
-    )
+def unresolved(target: str) -> dict:
+    """Clearly labelled placeholder when Gemini omits a target."""
+    return {
+        'source_path': '', 'target_path': target,
+        'rule_type': 'REVIEW_REQUIRED', 'confidence': 0,
+        'requires_review': True, 'review_priority': 'High',
+        'reason': 'Gemini did not produce a valid mapping proposal for this target.',
+        'evidence': '', 'fixed_value': '', 'transformation': '',
+        'condition': '', 'lookup': '', 'loop': '',
+        'review_question': 'Which source field or business rule should populate this target?',
+        'risk_category': 'Unmapped target', 'validation_issues': [],
+    }
+
+
+def needs_repair(proposals: list[dict], batch: list[dict], source_paths: set[str]) -> list[dict]:
+    """Identify omitted, duplicated, or structurally invalid target proposals."""
+    valid_rules = {
+        'DIRECT', 'FIXED', 'DEFAULT_IF_EMPTY', 'DERIVED', 'CONDITIONAL',
+        'LOOKUP', 'LOOP', 'FORMAT_DATE', 'REVIEW_REQUIRED',
+    }
+    fix = []
+    for field in batch:
+        path = field['path']
+        choices = [p for p in proposals if isinstance(p, dict) and p.get('target_path') == path]
+        if len(choices) != 1:
+            fix.append(field)
+            continue
+        proposal = choices[0]
+        source = str(proposal.get('source_path') or '').strip()
+        rule = str(proposal.get('rule_type') or '').upper().strip()
+        if (
+            rule not in valid_rules
+            or (source and source not in source_paths)
+            or (not source and rule not in {'FIXED', 'REVIEW_REQUIRED'})
+            or (rule == 'FIXED' and not str(proposal.get('fixed_value') or '').strip())
+        ):
+            fix.append(field)
+    return fix
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description='Create an AI source-to-target mapping proposal from XML examples.')
+    parser.add_argument('--history-pairs', type=int, default=1,
+                        help='Complete original/converted examples from EACH historical company (default 1).')
+    parser.add_argument('--source-samples', type=int, default=2,
+                        help='Complete raw new-customer XML examples sent to Gemini (default 2).')
+    parser.add_argument('--max-source-chars', type=int, default=180000,
+                        help='Combined character budget for raw new-customer examples (default 180000).')
+    parser.add_argument('--limit-targets', type=int, default=10,
+                        help='Number of target fields to propose (default 10, 0 = all).')
+    parser.add_argument('--batch-size', type=int, default=10,
+                        help='Target fields per Gemini request (default 10).')
+    parser.add_argument('--target-segment', default='',
+                        help='Optional target segment filter, e.g. E1BPOBDLVITEM.')
+    parser.add_argument('--model', default='', help='Optional override for GEMINI_MODEL from .env.')
+    parser.add_argument('--preview', action='store_true',
+                        help='Show exactly what would be sent, without calling Gemini.')
     args = parser.parse_args()
-    if args.batch_size < 1 or args.limit_targets < 0:
-        parser.error("batch-size must be >= 1 and limit-targets must be >= 0")
+    if args.history_pairs < 0 or args.source_samples < 1 or args.max_source_chars < 1 or args.limit_targets < 0 or args.batch_size < 1:
+        parser.error('history-pairs and limit-targets must be >=0; other numbers must be >=1.')
 
-    source_dir = ROOT / "data" / "source"
-    target_dir = ROOT / "data" / "target"
-    sources = sorted(source_dir.rglob("*.xml"))
-    targets = sorted(target_dir.rglob("*.xml"))
-    if not sources or not targets:
-        raise SystemExit(
-            "Place at least one source XML in data/source and one target XML in data/target."
-        )
+    load_dotenv(ROOT / '.env')
+    model = args.model or os.getenv('GEMINI_MODEL', 'gemini-3.5-flash-lite')
 
-    source_inventory = parse_xml_directory(source_dir)
-    target_inventory = parse_xml_directory(target_dir)
-
-    # No DELIV_NUMB-only filter: process the selected number of target fields.
-    if not source_inventory or not target_inventory:
-        raise SystemExit("No XML leaf fields found in source and target directories.")
+    # Python reads ALL files to discover the valid source/target field paths.
+    source_files = sorted((ROOT / 'data' / 'source').rglob('*.xml'))
+    if not source_files:
+        raise SystemExit('No new-customer XML files in data/source/.')
+    pairs = discover_historical_pairs(ROOT / 'data' / 'historical')
+    converted_files = [pair['converted_file'] for pair in pairs]
+    source_fields = parse_xml_files(source_files)
+    all_target_fields = parse_xml_files(converted_files)
+    if not source_fields or not all_target_fields:
+        raise SystemExit('No XML fields found. Check data/source and data/historical.')
+    target_fields = all_target_fields
+    if args.target_segment:
+        target_fields = [f for f in target_fields if args.target_segment.casefold()
+                         in f['path'].rsplit('/', 1)[0].casefold()]
+        if not target_fields:
+            raise SystemExit(f'No target fields found for segment {args.target_segment!r}.')
     if args.limit_targets:
-        target_inventory = target_inventory[:args.limit_targets]
+        target_fields = target_fields[:args.limit_targets]
 
-    print(
-        f"Discovered {len(source_inventory)} source fields "
-        f"and {len(target_inventory)} target fields to propose."
+    # Gemini receives SELECTED complete raw XML files, not all hundreds by default.
+    source_docs = select_raw_examples(source_files, args.source_samples, args.max_source_chars)
+    historical_docs = select_historical_examples(pairs, args.history_pairs)
+    batches = [target_fields[i:i + args.batch_size]
+               for i in range(0, len(target_fields), args.batch_size)]
+    first_contents = build_mapping_contents(
+        source_fields, batches[0], all_target_fields, source_docs, historical_docs
     )
+    companies = Counter(pair['company'] for pair in pairs)
+    print('Historical pairs found: ' + ', '.join(f'{c}={n}' for c, n in sorted(companies.items())))
+    print(f'New customer: {len(source_files)} XML files analyzed by Python; {len(source_fields)} unique source fields.')
+    print(f'Target format: {len(converted_files)} historical converted XML files; {len(all_target_fields)} total paths, {len(target_fields)} selected.')
+    print(f'Raw customer XMLs provided to Gemini: {len(source_docs)}')
+    print('  ' + ', '.join(d['filename'] for d in source_docs))
+    print(f'Matched historical pairs provided to Gemini: {len(historical_docs)}')
+    print('  ' + (', '.join(f"{p['company']}/{p['pair_id']}" for p in historical_docs) or '(none)'))
+    print(f'First request size: {len(first_contents):,} characters; batches: {len(batches)}')
+    if len(source_docs) < args.source_samples:
+        print('WARNING: Not all requested raw customer examples fit the character budget.')
+    if args.preview:
+        print('Preview only: no Gemini request and no Excel output.')
+        return
+    if not os.getenv('GEMINI_API_KEY'):
+        raise SystemExit('GEMINI_API_KEY is missing. Copy .env.example to .env and add your API key.')
 
-    verified_path = ROOT / "data" / "reference" / "verified_mappings.json"
-    verified = (
-        json.loads(verified_path.read_text(encoding="utf-8"))
-        if verified_path.exists() else []
-    )
-
-    if args.offline:
-        print("OFFLINE MODE: using bundled illustrative proposals, not Gemini.")
-        sample = ROOT / "data" / "reference" / "demo_proposals.json"
-        proposals = json.loads(sample.read_text(encoding="utf-8"))["mappings"]
-    else:
-        from google.genai import errors
-        from readprompt import run_gemini
-
-        load_dotenv(ROOT / ".env")
-        model = os.environ.get("GEMINI_MODEL", "")
-        if not model:
-            raise SystemExit("Set GEMINI_MODEL in your .env file.")
-
-        signature = _job_signature(
-            sources, targets, target_inventory, verified_path, args.batch_size, model
-        )
-        checkpoint_dir = ROOT / "output" / "checkpoints" / signature[:16]
-        print(f"Checkpoint folder: {checkpoint_dir}")
-        proposals = []
-
-        batches = [
-            target_inventory[offset:offset + args.batch_size]
-            for offset in range(0, len(target_inventory), args.batch_size)
-        ]
-        for index, group in enumerate(batches, start=1):
-            target_paths = [field["path"] for field in group]
-            checkpoint_file = checkpoint_dir / f"batch_{index:04d}.json"
-
-            if checkpoint_file.exists():
-                try:
-                    saved = json.loads(checkpoint_file.read_text(encoding="utf-8"))
-                    if (
-                        saved.get("job_signature") == signature
-                        and saved.get("target_paths") == target_paths
-                        and isinstance(saved.get("proposals"), list)
-                    ):
-                        proposals.extend(saved["proposals"])
-                        print(f"Batch {index}/{len(batches)}: restored from checkpoint.")
-                        continue
-                except (OSError, ValueError, TypeError, AttributeError):
-                    pass
-                print(f"Batch {index}: checkpoint invalid; regenerating.")
-
-            print(f"Mapping batch {index}/{len(batches)}: {len(group)} target fields")
+    settings = {
+        'model': model, 'history_pairs_per_company': args.history_pairs,
+        'source_samples': args.source_samples,
+        'max_source_chars': args.max_source_chars,
+        'target_paths': [f['path'] for f in target_fields],
+        'batch_size': args.batch_size,
+        'selected_source_docs': [d['filename'] for d in source_docs],
+        'selected_history_docs': [p['company'] + '/' + p['pair_id'] for p in historical_docs],
+    }
+    signature = job_signature(settings, [
+        *source_files, *converted_files,
+        *[p['original_file'] for p in pairs],
+        ROOT / 'prompt.txt', ROOT / 'main.py',
+        ROOT / 'scripts' / 'readprompt.py', ROOT / 'scripts' / 'xml_parser.py',
+    ])
+    name = f"history{args.history_pairs}_source{args.source_samples}_targets{len(target_fields)}_{signature[:8]}"
+    run_dir = ROOT / 'output' / 'runs' / name
+    checkpoints = run_dir / 'checkpoints'
+    save_json(run_dir / 'run_info.json', {
+        **settings,
+        'source_files_read_by_python': len(source_files),
+        'historical_pairs_discovered': len(pairs),
+        'raw_customer_examples': [d['filename'] for d in source_docs],
+        'historical_examples': [
+            {'company': p['company'], 'pair_id': p['pair_id'],
+             'original': p['original_filename'], 'converted': p['converted_filename']}
+            for p in historical_docs
+        ],
+        'note': 'The model sees selected raw examples plus full source/target path lists; not every original XML value.',
+    })
+    print(f'Output folder: {run_dir}')
+    proposals = []
+    source_paths = {f['path'] for f in source_fields}
+    for index, batch in enumerate(batches, start=1):
+        target_paths = [f['path'] for f in batch]
+        checkpoint = checkpoints / f'batch_{index:04d}.json'
+        if checkpoint.is_file():
             try:
-                batch_proposals = run_gemini(source_inventory, group, verified)
-            except errors.ServerError as exc:
-                if exc.code == 503:
-                    raise SystemExit(
-                        "Gemini is overloaded (503). Earlier batches are saved. "
-                        "Run the SAME command to resume."
-                    ) from None
-                raise
-            except errors.ClientError as exc:
-                if exc.code == 429:
-                    raise SystemExit(
-                        "Gemini rate limit exceeded (429). Earlier batches are saved. "
-                        "Run the SAME command after your quota resets to resume."
-                    ) from None
-                raise
+                saved = read_json(checkpoint)
+                if saved.get('signature') == signature and saved.get('targets') == target_paths and isinstance(saved.get('proposals'), list):
+                    proposals.extend(saved['proposals'])
+                    print(f'Batch {index}/{len(batches)} restored from checkpoint.')
+                    continue
+            except (OSError, ValueError, TypeError, AttributeError):
+                print(f'Batch {index}: corrupt checkpoint; regenerating.')
 
-            if not isinstance(batch_proposals, list):
-                raise SystemExit(
-                    "Gemini returned an unexpected response. Earlier batches are saved; "
-                    "the current batch was NOT checkpointed."
-                )
-
-            # Write the checkpoint BEFORE moving on to the next API request.
-            _write_json(checkpoint_file, {
-                "job_signature": signature,
-                "batch_number": index,
-                "target_paths": target_paths,
-                "proposals": batch_proposals,
-            })
-            proposals.extend(batch_proposals)
-            print(
-                f"Batch {index}/{len(batches)} saved "
-                f"({len(batch_proposals)} proposals)."
+        print(f'Mapping batch {index}/{len(batches)}: {len(batch)} target fields')
+        try:
+            batch_proposals = run_gemini(
+                source_fields, batch, all_target_fields=all_target_fields,
+                source_documents=source_docs, historical_pairs=historical_docs, model=model,
             )
+            repair = needs_repair(batch_proposals, batch, source_paths)
+            if repair:
+                print(f'Gemini omitted or invalidated {len(repair)} target(s); retrying those once.')
+                corrections = run_gemini(
+                    source_fields, repair, all_target_fields=all_target_fields,
+                    source_documents=source_docs, historical_pairs=historical_docs, model=model,
+                )
+                corrected = {p.get('target_path'): p for p in corrections
+                             if isinstance(p, dict) and p.get('target_path') in {r['path'] for r in repair}}
+                original = {p.get('target_path'): p for p in batch_proposals
+                            if isinstance(p, dict) and p.get('target_path') in target_paths}
+                original.update(corrected)
+                batch_proposals = [original[p] for p in target_paths if p in original]
+        except Exception as error:
+            if getattr(error, 'code', None) in (429, 503):
+                raise SystemExit(f'Gemini error {error.code}. Completed batches are saved. Run the SAME command to resume.') from None
+            raise
+        batch_proposals = [p for p in batch_proposals if isinstance(p, dict) and p.get('target_path') in target_paths]
+        save_json(checkpoint, {'signature': signature, 'targets': target_paths, 'proposals': batch_proposals})
+        proposals.extend(batch_proposals)
+        print(f'Saved {len(batch_proposals)} proposal(s).')
 
-    # Only generate the final package after every requested batch has completed.
-    accepted, rejected, issues = validate_mappings(
-        proposals, source_inventory, target_inventory
+    accepted, rejected, issues = validate_mappings(proposals, source_fields, target_fields)
+    found = {p['target_path'] for p in accepted}
+    missing = [f['path'] for f in target_fields if f['path'] not in found]
+    accepted.extend(unresolved(path) for path in missing)
+    if missing:
+        print(f'WARNING: {len(missing)} target fields have explicit placeholders (not Gemini mappings).')
+    save_json(run_dir / 'mapping_proposals.json', accepted)
+    save_json(run_dir / 'rejected_proposals.json', rejected)
+    save_json(run_dir / 'validation_issues.json', issues)
+    workbook = export_excel(
+        accepted, source_fields, source_files, converted_files,
+        run_dir / 'mapping_package.xlsx', ROOT / 'templates' / 'mapping_template.xlsx',
+        historical_pairs=pairs, selected_historical_examples=historical_docs,
     )
-
-    covered_targets = {mapping["target_path"] for mapping in accepted}
-    for field in target_inventory:
-        if field["path"] not in covered_targets:
-            accepted.append({
-                "source_path": "", "target_path": field["path"],
-                "rule_type": "REVIEW_REQUIRED", "confidence": 0,
-                "requires_review": True, "review_priority": "High",
-                "reason": "No valid mapping proposal generated for this target field.",
-                "evidence": "", "fixed_value": "", "transformation": "",
-                "condition": "", "lookup": "", "loop": "",
-                "review_question": "Which source field or business rule populates this target?",
-                "risk_category": "Unmapped target", "validation_issues": [],
-            })
-
-    out = ROOT / "output"
-    _write_json(out / "mapping_proposals.json", accepted)
-    _write_json(out / "rejected_proposals.json", rejected)
-    _write_json(out / "validation_issues.json", issues)
-
-    output_path = export_excel(
-        accepted, source_inventory, sources, targets,
-        out / "mapping_package.xlsx", ROOT / "templates" / "mapping_template.xlsx"
-    )
-    print(f"Created: {output_path}")
-    print(
-        f"{len(accepted)} mapping proposals; {len(rejected)} rejected; "
-        f"{len(issues)} with validation issues."
-    )
-    print("These are proposals requiring expert approval, not executable mappings.")
+    print(f'Created Excel: {workbook}')
+    print(f'{len(accepted)} rows; {len(missing)} placeholders; {len(rejected)} rejected; {len(issues)} structural issues.')
+    print('Every proposal needs expert approval; structural checks cannot prove business correctness.')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
