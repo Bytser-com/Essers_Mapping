@@ -36,6 +36,10 @@ ai_tool/
 ├── templates/
 │   └── mapping_template.xlsx
 └── output/
+    ├── experiments.csv      One row per actual execution (open in Excel)
+    ├── experiments/        Detailed JSON record for each execution
+    │   ├── 20261029T120000_abcd1234.json
+    │   └── ...
     └── runs/               Excel packages, proposals and resumable checkpoints
 ```
 
@@ -49,7 +53,8 @@ ai_tool/
 | **scripts/xml_parser.py** | Reads XML files, remembers field paths, matches each historic original to its converted partner, selects complete examples | Does not infer mapping rules |
 | **scripts/readprompt.py** | Sends the selected raw XML examples and valid path lists to Gemini; requests structured JSON; handles temporary API failures | Does not secretly train a new model |
 | **scripts/mapping_validator.py** | Checks that paths and rule types are valid; flags suspicious structural output | Cannot prove a mapping is correct for Essers |
-| **scripts/excel_generator.py** | Places approved-for-review *proposals* into the Excel template, with review questions and field inventories | Does not execute the mappings |
+| **scripts/excel_generator.py** | Places *proposals for review* into the Excel template, with review questions and field inventories | Does not execute the mappings |
+| **scripts/experiment_tracker.py** | Writes the experiment log automatically after each run | Does not assess mapping correctness or send data anywhere |
 | **prompt.txt** | Instructions that tell Gemini how to reason from the examples | It is not program code |
 
 ## First-time setup (Windows / VS Code)
@@ -150,6 +155,64 @@ If Gemini is overloaded (**503**) or you've reached a per-minute quota (**429**)
 
 If `mapping_package.xlsx` is open in Excel during a rerun, close it before saving. The generator can also use a `_new.xlsx` fallback filename.
 
+## Experiment tracking (automatic; no separate command)
+
+Every normal `python main.py ...` execution records **one row** in `output/experiments.csv`. This file can be opened in Excel and is kept **only on your computer**, not on GitHub. The same information is also saved as an individual JSON record in the **central `output/experiments/` folder** (not inside `runs/`). Both files remain outside Git. Each record contains `run_folder` and `workbook_path` to link it to the corresponding mapping output.
+
+**What it records automatically:**
+
+| Column / group | Plain-English meaning |
+|---|---|
+| `run_id`, `started_utc`, `finished_utc`, `status` | Which execution, when it happened, and whether it completed |
+| `model` | Which Gemini model you requested |
+| `dataset_version` | First 12 characters of a content fingerprint across **all source and historical XML files**; changes if any XML content/file path changes |
+| `prompt_sha256`, `code_version` | Fingerprints of the prompt and the project code/template, so changes can be traced |
+| `history_pairs_per_company`, `historical_pairs_sent`, `source_samples_sent` | Exactly how many complete historical pairs and customer files were supplied |
+| `targets_requested`, `batch_size`, `batches_total`, `batches_restored` | What was mapped and whether cached checkpoints were reused |
+| `api_attempts`, `api_retries`, `api_errors` | How many Gemini API attempts, retries and errors occurred |
+| `input_tokens`, `output_tokens`, `total_tokens` | Sum of **reported usage** over new Gemini responses in this execution, including any repair requests; blank if no usage was reported |
+| `duration_seconds` | Runtime in seconds, including local XML processing and Excel export |
+| `mapping_rows`, `placeholders`, `rejected_proposals`, `structural_issues` | Output completeness and basic structural checks, **not mapping accuracy** |
+| `workbook_path` | Location of that experiment's Excel result |
+| `expert_review_status` | Starts as `pending`; a human reviewer may update it after reviewing the Excel |
+
+No raw XML, API key or full Gemini prompt is copied into the tracking CSV or JSON file. An error entry records only the error type, stage and HTTP code (if available), not the API's full error text.
+
+### A practical experiment sequence
+
+Run a small experiment first:
+
+```powershell
+python main.py --history-pairs 1 --source-samples 2 --target-segment E1BPOBDLVITEM --limit-targets 10
+```
+
+Then increase only the historical evidence:
+
+```powershell
+python main.py --history-pairs 2 --source-samples 2 --target-segment E1BPOBDLVITEM --limit-targets 10
+```
+
+Open `output/experiments.csv` in Excel. The two rows show the **settings**, **tokens**, **time**, **API reliability**, and **workbook locations** side by side. Open both mapping workbooks to assess **which one offers more useful mapping proposals**. A stronger experiment keeps the model, target segment and number of target fields the same while varying just one setting.
+
+**After an Essers expert reviews the workbook:** You can manually fill the review columns in `experiments.csv` (`expert_review_status`, `expert_correct`, `expert_partial`, `expert_incorrect`, `expert_unverifiable`, `expert_acceptance_rate`). Suggested acceptance rate: `100 × correct / (correct + partial + incorrect)`; exclude unverifiable cases from the denominator, and leave the rate blank if no proposals have been reviewed. Use the same review criteria each time. The program intentionally **does not invent an accuracy percentage** from confidence scores or structural validation. Human review edits to the CSV aren't reflected in the original per-run JSON snapshot.
+
+**Existing experiment records:** If you already ran the earlier tracking version, its JSON records will stay under `output/runs/<run-name>/experiments/`. This update puts **new** records in `output/experiments/`; it does not move or delete older files. Your existing `output/experiments.csv` remains unchanged and continues to accumulate records. To move old records into the central folder manually (optional), run from `ai_tool/` in PowerShell:
+
+```powershell
+New-Item -ItemType Directory -Force output/experiments | Out-Null
+Get-ChildItem output/runs -Recurse -Filter *.json | Where-Object { $_.Directory.Name -eq "experiments" } | Move-Item -Destination output/experiments
+```
+
+This moves only experiment JSON records and leaves all run mapping packages/checkpoints alone. The old `experiments/` directories may remain empty; they can be deleted manually if desired.
+
+**Preview and resume details:**
+
+- `python main.py --preview` does not call Gemini and **does not add** an experiment row.
+- If a batch was completed previously, running the **same command** restores its checkpoint. A new invocation row will appear with `batches_restored > 0` and possibly `api_attempts = 0`, because no new Gemini inference was performed. **Do not interpret a cached run as a new experiment.**
+- If a run fails while calling Gemini, it is logged with `status=failed` and its completed batches are still safe. The next run can resume.
+- Dataset and prompt hashes are content fingerprints, not a secure data-storage or dataset-approval system. Keep the XMLs in approved storage and out of Git.
+- The CSV is a simple local log. Teammates running on separate computers each have their own `output/experiments.csv` unless you deliberately combine their records.
+
 ## Using the tool for another customer
 
 1. Back up or archive the current `data/source/` XMLs somewhere outside the project.
@@ -168,6 +231,6 @@ Open **Mapping Proposal** first. Check whether the source field actually represe
 
 ## Privacy and teamwork
 
-Only use XML files that Essers explicitly authorizes for an external AI API. The files included here were supplied as scrambled examples; don't substitute real customer personal or confidential data without approval. `.env` is ignored by Git. The `.gitignore` also excludes XML files by default so new datasets are not accidentally committed.
+Only use XML files that Essers explicitly authorizes for an external AI API. The files included here were supplied as scrambled examples; don't substitute real customer personal or confidential data without approval. `.env` is ignored by Git. The `.gitignore` excludes the entire `data/` and `output/` folders from Git; datasets, generated workbooks and experiment logs stay local.
 
 Your teammates need Python, the dependency installation, their own authorized API key, and access to the same scrambled example files to run this project. There is **no web frontend or deployment server** yet; this is a local command-line prototype.

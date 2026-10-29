@@ -1,27 +1,19 @@
-
-# Environment variables and API keys
+# Secrets and local Python environment
 .env
 .env.*
 !.env.example
-
-# Python virtual environment
 .venv/
 venv/
-
-# Python cache
 __pycache__/
 *.py[cod]
 .pytest_cache/
 
-# Customer XMLs and historical examples
+# Customer datasets and generated output (including experiment logs)
 /data/
-
-# Generated mapping packages, JSON and checkpoints
 /output/
 
-# IDE and operating system files
+# Editor / operating system noise
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
-

@@ -11,6 +11,7 @@ import random
 import re
 import time
 from pathlib import Path
+from typing import Callable
 
 import httpx
 from dotenv import load_dotenv
@@ -147,6 +148,7 @@ def run_gemini(
     source_documents: list[dict] | None = None,
     historical_pairs: list[dict] | None = None,
     model: str | None = None,
+    on_event: Callable[[dict], None] | None = None,
 ) -> list[dict]:
     """Propose mappings using direct raw XML context (no knowledge distillation)."""
     if genai is None:
@@ -176,6 +178,8 @@ def run_gemini(
         for attempt in range(1, 5):
             try:
                 print(f'Gemini request: {model} (attempt {attempt}/4)')
+                if on_event:
+                    on_event({'type': 'attempt'})
                 response = client.models.generate_content(
                     model=model,
                     contents=contents,
@@ -190,6 +194,13 @@ def run_gemini(
                     print(f'Input tokens: {usage.prompt_token_count}')
                     print(f'Output tokens: {usage.candidates_token_count}')
                     print(f'Total tokens: {usage.total_token_count}')
+                    if on_event:
+                        on_event({
+                            'type': 'usage',
+                            'input_tokens': usage.prompt_token_count,
+                            'output_tokens': usage.candidates_token_count,
+                            'total_tokens': usage.total_token_count,
+                        })
                 if not response.text:
                     raise RuntimeError('Gemini returned no text')
                 result = json.loads(response.text)
@@ -197,6 +208,8 @@ def run_gemini(
                     raise ValueError('Gemini response did not contain a mappings list')
                 return result['mappings']
             except errors.ClientError as error:
+                if on_event:
+                    on_event({'type': 'api_error', 'code': getattr(error, 'code', None)})
                 if getattr(error, 'code', None) != 429:
                     raise
                 kind = _quota_type(error)
@@ -205,14 +218,22 @@ def run_gemini(
                     raise
                 delay = (_retry_after_seconds(error) or 65.0) + 2.0
                 print(f'Per-minute quota reached. Waiting {delay:.1f}s before retrying...')
+                if on_event:
+                    on_event({'type': 'retry'})
                 time.sleep(delay)
             except errors.ServerError as error:
+                if on_event:
+                    on_event({'type': 'api_error', 'code': getattr(error, 'code', None)})
                 if getattr(error, 'code', None) != 503 or attempt == 4:
                     raise
                 delay = min(2 ** (attempt - 1) + random.uniform(0, 1), 30)
                 print(f'Gemini overloaded (503). Retrying in {delay:.1f}s...')
+                if on_event:
+                    on_event({'type': 'retry'})
                 time.sleep(delay)
             except httpx.TimeoutException as error:
+                if on_event:
+                    on_event({'type': 'api_error', 'code': 'timeout'})
                 raise RuntimeError(f'Gemini request timed out ({timeout} ms)') from error
     finally:
         client.close()
