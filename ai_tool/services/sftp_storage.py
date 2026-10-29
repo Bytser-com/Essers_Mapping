@@ -2,6 +2,7 @@ import os
 import posixpath
 from contextlib import contextmanager
 from io import BytesIO
+from datetime import datetime
 
 import paramiko
 
@@ -33,3 +34,8 @@ def load(path: str) -> BytesIO:
         sftp.getfo(_full_path(path), buffer)
     buffer.seek(0)
     return buffer
+
+def get_modified_time(path: str) -> str:
+    with _connect() as sftp:
+        info = sftp.stat(_full_path(path))
+    return datetime.fromtimestamp(info.st_mtime).isoformat()

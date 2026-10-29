@@ -1,14 +1,100 @@
-@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&family=Roboto+Mono:wght@400;500&display=swap");
+
+/* Huisstijl H.Essers */
+:root {
+  --color-red: #a50000;
+  --color-anthracite: #1c1c1f;
+  --color-grey: #6b6b73;
+  --color-mid-grey: #a1a1ab;
+  --color-line-grey: #e3e3e8;
+  --color-background: #f4f4f6;
+  --color-white: #ffffff;
+
+  --font-title: "Montserrat", sans-serif;
+  --font-text: "Inter", sans-serif;
+  --font-mono: "Roboto Mono", monospace;
+
+  --radius-small: 6px;
+  --radius-medium: 10px;
+  --radius-large: 14px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background: var(--color-background);
+  color: var(--color-anthracite);
+  font-family: var(--font-text);
+  font-size: 14px;
 }
 
-#root {
-  min-height: 100vh;
+/* Knoppen: één donkere hoofdactie, witte knoppen voor de rest */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px;
+  border: 1px solid var(--color-line-grey);
+  border-radius: var(--radius-small);
+  background: var(--color-white);
+  color: var(--color-anthracite);
+  font-family: var(--font-text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btn:hover {
+  background: var(--color-background);
+}
+
+.btn--primary {
+  border-color: var(--color-anthracite);
+  background: var(--color-anthracite);
+  color: var(--color-white);
+}
+
+.btn--primary:hover {
+  background: #000000;
+}
+
+.btn:disabled {
+  border-color: var(--color-line-grey);
+  background: var(--color-line-grey);
+  color: var(--color-mid-grey);
+  cursor: not-allowed;
+}
+
+/* Status: altijd een label met tekst erin */
+.status {
+  display: inline-block;
+  padding: 3px 9px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status--success {
+  background: var(--color-line-grey);
+  color: var(--color-anthracite);
+}
+
+.status--failed,
+.status--ready {
+  background: var(--color-anthracite);
+  color: var(--color-white);
+}
+
+.status--review {
+  border-color: var(--color-anthracite);
+  background: var(--color-white);
+  color: var(--color-anthracite);
 }
