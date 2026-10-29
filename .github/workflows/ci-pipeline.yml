@@ -690,7 +690,8 @@ jobs:
     env:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL || vars.SONAR_HOST_URL }}
-      SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY || 'Essers_Mapping' }}
+      SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY || 'Bytser-com_Essers_Mapping' }}
+      SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION || 'bytser-com' }}
     steps:
       - name: Checkout repository (full history for SonarQube blame & new-code period)
         uses: actions/checkout@v4
@@ -727,6 +728,10 @@ jobs:
           PY_XUNIT_PATHS=$(find . -name "pytest-junit.xml" | sed 's|^\./||' | paste -sd, - || true)
 
           EXTRA_ARGS="-Dsonar.projectKey=${SONAR_PROJECT_KEY} -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=300"
+
+          if [ -n "${SONAR_ORGANIZATION:-}" ]; then
+            EXTRA_ARGS="${EXTRA_ARGS} -Dsonar.organization=${SONAR_ORGANIZATION}"
+          fi
 
           if [ -f "Frontend/coverage/lcov.info" ]; then
             EXTRA_ARGS="${EXTRA_ARGS} -Dsonar.javascript.lcov.reportPaths=Frontend/coverage/lcov.info"
@@ -789,7 +794,7 @@ jobs:
     timeout-minutes: 5
     env:
       SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL || vars.SONAR_HOST_URL }}
-      SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY || 'Essers_Mapping' }}
+      SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY || 'Bytser-com_Essers_Mapping' }}
     steps:
       - name: Download All Test, Coverage & E2E Artifacts for Unified Reporting
         uses: actions/download-artifact@v4
