@@ -1,5 +1,7 @@
 ### Environments ###
 .env
+.env*
+!.env.example
 
 ### Secrets file ###
 secrets.yml
@@ -139,6 +141,15 @@ tfplan
 .env
 .cache/
 *.retry
+
+### Testing & SonarQube ###
+coverage/
+test-results/
+playwright-report/
+.scannerwork/
+.coverage
+coverage.xml
+.pytest_cache/
 
 # Testbestanden voor de lokale SFTP
 sftp-data/
