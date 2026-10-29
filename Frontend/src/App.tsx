@@ -1,9 +1,13 @@
 import { Outlet } from 'react-router-dom'
+import Sidebar from './components/Sidebar'
 
 function App() {
   return (
-    <div className="min-h-screen bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
-      <Outlet />
+    <div className="flex min-h-screen bg-[#f4f4f6] text-[#1c1c1f]">
+      <Sidebar />
+      <main className="flex-1">
+        <Outlet />
+      </main>
     </div>
   )
 }
