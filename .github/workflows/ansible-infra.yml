@@ -203,3 +203,15 @@ jobs:
             find "$RUNNER_TEMP/ansible-ssh" -type f -exec shred -u {} + 2>/dev/null || rm -rf "$RUNNER_TEMP/ansible-ssh"
           fi
           rm -f "$RUNNER_TEMP/inventory.yml" "$RUNNER_TEMP/ansible.log"
+
+  # Deploy Kubernetes manifests after Ansible configured the VMs (not after a dry-run)
+  deploy:
+    name: Deploy (Kubernetes)
+    needs: ansible
+    if: >-
+      github.event_name == 'push' ||
+      inputs.mode == 'apply'
+    uses: ./.github/workflows/kubernetes-deploy.yml
+    with:
+      mode: apply
+    secrets: inherit
