@@ -32,6 +32,8 @@ __pycache__/
 .eggs/
 dist/
 build/
+.venv/
+venv/
 
 ### Ruby ###
 *.gem
@@ -137,3 +139,6 @@ tfplan
 .env
 .cache/
 *.retry
+
+# Testbestanden voor de lokale SFTP
+sftp-data/

@@ -1,4 +1,3 @@
-# ai_tool/services/sftp_storage.py
 import os
 import posixpath
 from contextlib import contextmanager
