@@ -1,0 +1,202 @@
+# ==============================================================================
+# PRODUCTION ENVIRONMENT: RESOURCE, QUOTA, PDB & STORAGE SIZING PATCHES
+# Tuned specifically to fit inside an 8 vCPU / 8 GB RAM / 128 GB Disk Worker VM
+# running Longhorn + 5 replicas of each service (25 application pods + 2 SFTP pods)
+# ==============================================================================
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: essers-mapping-quota
+spec:
+  hard:
+    requests.cpu: "6"
+    requests.memory: 6Gi
+    limits.cpu: "16"
+    limits.memory: 14Gi
+    pods: "60"
+    persistentvolumeclaims: "10"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  template:
+    spec:
+      nodeSelector:
+        environment: production
+      containers:
+        - name: frontend
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mapping-converter
+spec:
+  template:
+    spec:
+      nodeSelector:
+        environment: production
+      containers:
+        - name: mapping-converter
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mapping-proposal
+spec:
+  template:
+    spec:
+      nodeSelector:
+        environment: production
+      containers:
+        - name: mapping-proposal
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: version-control-backend
+spec:
+  template:
+    spec:
+      nodeSelector:
+        environment: production
+      containers:
+        - name: version-control-backend
+          resources:
+            requests:
+              cpu: 150m
+              memory: 320Mi
+            limits:
+              cpu: 1000m
+              memory: 768Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: runtime-backend
+spec:
+  template:
+    spec:
+      nodeSelector:
+        environment: production
+      containers:
+        - name: runtime-backend
+          resources:
+            requests:
+              cpu: 150m
+              memory: 320Mi
+            limits:
+              cpu: 1000m
+              memory: 768Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sftp-shared
+spec:
+  template:
+    spec:
+      nodeSelector:
+        environment: production
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sftp-runtime
+spec:
+  template:
+    spec:
+      nodeSelector:
+        environment: production
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: frontend-pdb
+spec:
+  minAvailable: 2
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: mapping-converter-pdb
+spec:
+  minAvailable: 2
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: mapping-proposal-pdb
+spec:
+  minAvailable: 2
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: version-control-backend-pdb
+spec:
+  minAvailable: 2
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: sftp-shared-pdb
+spec:
+  minAvailable: 2
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: runtime-backend-pdb
+spec:
+  minAvailable: 2
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: sftp-runtime-pdb
+spec:
+  minAvailable: 2
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sftp-shared-pvc
+spec:
+  storageClassName: longhorn
+  resources:
+    requests:
+      # 35Gi + 35Gi = 70Gi total PVC allocation, leaving ~58GB headroom on the 128GB worker disk
+      storage: 35Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sftp-runtime-pvc
+spec:
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 35Gi

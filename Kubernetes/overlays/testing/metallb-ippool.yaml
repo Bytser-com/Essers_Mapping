@@ -1,0 +1,22 @@
+# ==============================================================================
+# METALLB L2 IP ADDRESS POOL CONFIGURATION (TESTING: 192.168.100.101 - .103)
+# Apply this after installing MetalLB (`kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.9/config/manifests/metallb-native.yaml`)
+# so your bare-metal Proxmox Kubernetes cluster advertises the dedicated IPs via ARP.
+# ==============================================================================
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: essers-testing-ip-pool
+  namespace: metallb-system
+spec:
+  addresses:
+    - 192.168.100.101-192.168.100.103
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: essers-testing-l2-adv
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - essers-testing-ip-pool

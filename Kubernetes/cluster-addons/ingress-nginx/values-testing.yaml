@@ -1,0 +1,39 @@
+# ==============================================================================
+# NGINX INGRESS CONTROLLER HELM VALUES — TESTING (192.168.100.101)
+# Binds the NGINX Ingress Controller LoadBalancer Service to MetalLB IP 192.168.100.101
+# on ports 80 (HTTP -> 443 Redirect) and 443 (HTTPS SSL Termination).
+#
+# Install command:
+#   helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+#   helm repo update
+#   helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
+#     --namespace ingress-nginx \
+#     --create-namespace \
+#     -f Kubernetes/cluster-addons/ingress-nginx/values-testing.yaml
+# ==============================================================================
+controller:
+  replicaCount: 1
+  ingressClassResource:
+    name: nginx
+    enabled: true
+    default: true
+    controllerValue: "k8s.io/ingress-nginx"
+  service:
+    type: LoadBalancer
+    loadBalancerIP: "192.168.100.101"
+    annotations:
+      metallb.universe.tf/loadBalancerIPs: "192.168.100.101"
+    ports:
+      http: 80
+      https: 443
+  config:
+    use-forwarded-headers: "true"
+    compute-full-forwarded-for: "true"
+    proxy-body-size: "50m"
+  resources:
+    requests:
+      cpu: 50m
+      memory: 96Mi
+    limits:
+      cpu: 300m
+      memory: 256Mi
