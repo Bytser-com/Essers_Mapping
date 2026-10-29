@@ -1,0 +1,151 @@
+# ==============================================================================
+# PREPARATION STAGE — PYTHON BACKEND 2: MAPPING PROPOSAL (Mapping_Proposal)
+# - Internal ClusterIP ONLY (NOT publicly exposed; proxied via Frontend `/api/proposal/*`)
+# - Access:
+#     * sftp-shared (Shared-Storage Zone) -> ALLOWED (Read/Write)
+#     * sftp-runtime (Runtime Zone)       -> BLOCKED
+# ==============================================================================
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mapping-proposal-sa
+  labels:
+    app.kubernetes.io/name: mapping-proposal
+    essers.io/zone: preparation
+automountServiceAccountToken: false
+imagePullSecrets:
+  - name: ghcr-pull-secret
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mapping-proposal
+  labels:
+    app.kubernetes.io/name: mapping-proposal
+    app.kubernetes.io/component: python-backend
+    app.kubernetes.io/tier: backend
+    essers.io/zone: preparation
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mapping-proposal
+      essers.io/zone: preparation
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mapping-proposal
+        app.kubernetes.io/component: python-backend
+        app.kubernetes.io/tier: backend
+        essers.io/zone: preparation
+        essers.io/sftp-shared-access: "true"
+    spec:
+      serviceAccountName: mapping-proposal-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: mapping-proposal
+          image: ghcr.io/bytser-com/essers_mapping/mapping-proposal:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: common-config
+          env:
+            - name: SERVICE_NAME
+              value: "mapping-proposal"
+            - name: SFTP_SHARED_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sftp-shared-credentials
+                  key: SFTP_PASSWORD
+            - name: SHARED_MOUNT_PATH
+              value: "/mnt/sftp-shared"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          startupProbe:
+            tcpSocket:
+              port: http
+            failureThreshold: 30
+            periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          volumeMounts:
+            - name: tmp-dir
+              mountPath: /tmp
+            - name: shared-files
+              mountPath: /mnt/sftp-shared
+              readOnly: false
+      volumes:
+        - name: tmp-dir
+          emptyDir: {}
+        - name: shared-files
+          persistentVolumeClaim:
+            claimName: sftp-shared-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mapping-proposal
+  labels:
+    app.kubernetes.io/name: mapping-proposal
+    app.kubernetes.io/component: python-backend
+    app.kubernetes.io/tier: backend
+    essers.io/zone: preparation
+spec:
+  # Strictly internal ClusterIP — all external requests are proxied by `frontend` on `/api/proposal/*`
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: mapping-proposal
+    essers.io/zone: preparation
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: mapping-proposal-pdb
+  labels:
+    essers.io/zone: preparation
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mapping-proposal
+      essers.io/zone: preparation

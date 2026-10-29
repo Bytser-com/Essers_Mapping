@@ -1,0 +1,36 @@
+---
+# ==============================================================================
+# ROLE TASKS ENTRYPOINT: github_runner
+# ==============================================================================
+
+- name: Configure runner service account and Terraform state directories
+  ansible.builtin.import_tasks: user.yml
+  tags:
+    - runner
+    - cicd
+    - github_runner
+    - runner_user
+
+- name: Install CI/CD CLI tooling (Docker, Terraform, Ansible, kubectl, Helm)
+  ansible.builtin.import_tasks: tooling.yml
+  tags:
+    - runner
+    - cicd
+    - github_runner
+    - runner_tooling
+
+- name: Configure kubeconfig on runner to manage the Kubernetes cluster
+  ansible.builtin.import_tasks: kubeconfig.yml
+  tags:
+    - runner
+    - cicd
+    - github_runner
+    - runner_kubeconfig
+
+- name: Download, configure, and register GitHub Actions Self-Hosted Runner
+  ansible.builtin.import_tasks: runner.yml
+  tags:
+    - runner
+    - cicd
+    - github_runner
+    - runner_service

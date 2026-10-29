@@ -1,0 +1,21 @@
+---
+# ==============================================================================
+# K8S_MASTER TASKS: WORKER JOIN TOKEN GENERATION
+# ==============================================================================
+
+- name: Generate kubeadm join command for worker nodes
+  ansible.builtin.command:
+    cmd: kubeadm token create --print-join-command
+  register: kubeadm_join_cmd
+  changed_when: false
+  check_mode: false
+  when: k8s_admin_conf.stat.exists
+
+- name: Store cluster join command in host facts for k8s_worker consumption
+  ansible.builtin.set_fact:
+    k8s_join_command: >-
+      {{
+        (kubeadm_join_cmd.stdout | trim)
+        if (kubeadm_join_cmd.stdout is defined and (kubeadm_join_cmd.stdout | trim | length > 0))
+        else 'kubeadm join ' ~ k8s_control_plane_endpoint ~ ' --token <check-mode-placeholder> --discovery-token-ca-cert-hash sha256:0000'
+      }}

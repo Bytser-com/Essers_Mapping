@@ -1,0 +1,21 @@
+---
+# ==============================================================================
+# CONTAINERD TASKS: SWAP DISABLEMENT
+# ==============================================================================
+
+- name: Disable active swap immediately if swap is enabled
+  ansible.builtin.command:
+    cmd: swapoff -a
+  when: ansible_facts['swaptotal_mb'] | default(0) > 0
+  changed_when: true
+
+- name: Remove swap partitions and files from /etc/fstab
+  ansible.builtin.replace:
+    path: /etc/fstab
+    regexp: '^([^#].*?\sswap\s+.*)$'
+    replace: '# \1'
+
+- name: Mask systemd swap.target to prevent UEFI/GPT auto-activation on reboot
+  ansible.builtin.systemd:
+    name: swap.target
+    masked: true
