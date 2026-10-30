@@ -21,53 +21,14 @@ except ImportError:  # Preview/offline modes work before installing API dependen
 
 # Settings (API key, model, timeout) now come from config.py instead of
 # reading .env here; errors are translated into the tool's own error types.
-from .config import PROMPT_PATH, load_settings
+from .config import PROMPT_PATH, ROOT, load_settings
 from .errors import ConfigError, GeminiError, QuotaExceededError
 
 logger = logging.getLogger(__name__)
 
-RULE_SCHEMA = {
-    'type': 'object',
-    'properties': {
-        'mappings': {
-            'type': 'array',
-            'items': {
-                'type': 'object',
-                'properties': {
-                    'source_path': {'type': 'string'},
-                    'target_path': {'type': 'string'},
-                    'rule_type': {
-                        'type': 'string',
-                        'enum': [
-                            'DIRECT', 'FIXED', 'DEFAULT_IF_EMPTY', 'DERIVED',
-                            'CONDITIONAL', 'LOOKUP', 'LOOP', 'FORMAT_DATE',
-                            'REVIEW_REQUIRED', 'NOT_MAPPED',
-                        ],
-                    },
-                    'confidence': {'type': 'integer'},
-                    'requires_review': {'type': 'boolean'},
-                    'review_priority': {'type': 'string'},
-                    'reason': {'type': 'string'},
-                    'evidence': {'type': 'string'},
-                    'fixed_value': {'type': 'string'},
-                    'transformation': {'type': 'string'},
-                    'condition': {'type': 'string'},
-                    'lookup': {'type': 'string'},
-                    'loop': {'type': 'string'},
-                    'review_question': {'type': 'string'},
-                    'risk_category': {'type': 'string'},
-                },
-                'required': [
-                    'source_path', 'target_path', 'rule_type', 'confidence',
-                    'requires_review', 'review_priority', 'reason', 'evidence',
-                    'fixed_value', 'transformation', 'condition', 'lookup',
-                    'loop', 'review_question', 'risk_category',
-                ],
-            },
-        },
-    },
-    'required': ['mappings'],
-}
+# The response contract is data, not Python transport logic.
+# Keep mapping_schema.json next to prompt.txt in the project root.
+RULE_SCHEMA = json.loads((ROOT / 'mapping_schema.json').read_text(encoding='utf-8'))
 
 
 def _quota_type(error: Exception) -> str:

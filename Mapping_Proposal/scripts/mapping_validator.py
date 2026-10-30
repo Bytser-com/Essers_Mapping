@@ -104,6 +104,17 @@ def validate_mappings(proposals: list, source_fields: list, target_fields: list)
         mapping['source_path'] = _clean(mapping['source_path'])
         mapping['rule_type'] = rule
         mapping['confidence'] = confidence
+        # Risk category represents SEVERITY, not business-risk taxonomy.
+        # Preserve unsupported original labels in validation_issues instead of
+        # silently guessing whether DATA_INTEGRITY etc. means HIGH or LOW.
+        risk_raw = _clean(mapping.get('risk_category')).upper()
+        if risk_raw in {'LOW', 'MEDIUM', 'HIGH'}:
+            mapping['risk_category'] = risk_raw
+        elif risk_raw == 'NONE':
+            mapping['risk_category'] = 'LOW'
+        else:
+            problem.append(f'Risk severity must be LOW/MEDIUM/HIGH; received: {risk_raw or "(empty)"}')
+            mapping['risk_category'] = 'HIGH'  # Conservative pending expert review.
         # Gemini may answer true/'yes'/'1'; any structural problem forces a review.
         mapping['requires_review'] = (
             mapping['requires_review'] is True

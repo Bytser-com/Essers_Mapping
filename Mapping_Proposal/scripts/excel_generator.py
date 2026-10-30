@@ -62,9 +62,11 @@ def _write_records(sheet, headers, records, start_row):
 
 def export_excel(mappings, source_inventory, source_files, target_files,
                  output_path: str | Path, template_path: str | Path,
-                 historical_pairs=None, selected_historical_examples=None):
+                 historical_pairs=None, selected_historical_examples=None,
+                 verified_historical_evidence=None):
     historical_pairs = historical_pairs or []
     selected_historical_examples = selected_historical_examples or []
+    verified_historical_evidence = verified_historical_evidence or []
     template_path, output_path = Path(template_path), Path(output_path)
     if not template_path.exists():
         raise FileNotFoundError(f'Excel template not found: {template_path}')
@@ -199,21 +201,29 @@ def export_excel(mappings, source_inventory, source_files, target_files,
         summary.cell(index, 1).value = label
         summary.cell(index, 2).value = value
 
-    # Record only which historical paired documents were supplied to Gemini.
-    # Do not fabricate field-level historical mappings or claim expert verification.
+    # Field-level candidate matches are computed independently from the historical
+    # XML files by scripts/historical_evidence.py. Equal values alone do not
+    # prove that two fields should be mapped.
     reference_sheet = wb['Reference Evidence']
     reference_headers = _headers(reference_sheet, 1)
-    reference_records = [{
-        'Reference pair': f"{item['company']} / {item['pair_id']}",
-        'Historical Original': item['original_filename'],
-        'Historical Converted': item['converted_filename'],
-        'Evidence type': 'Observed XML conversion pair',
-        'Historical source path': '',
-        'Historical target path': '',
-        'Example value': '',
-        'Evidence note': 'Paired documents supplied to AI as contextual examples; mapping not independently verified',
-        'Usefulness': 'Reference context only',
-    } for item in selected_historical_examples]
+    reference_records = list(verified_historical_evidence)
+    # Still show which pairs Gemini received, even when no meaningful value matched.
+    with_matches = {row['Reference pair'] for row in reference_records}
+    for pair in selected_historical_examples:
+        pair_label = f"{pair['company']} / {pair['pair_id']}"
+        if pair_label in with_matches:
+            continue
+        reference_records.append({
+            'Reference pair': pair_label,
+            'Historical Original': pair['original_filename'],
+            'Historical Converted': pair['converted_filename'],
+            'Evidence type': 'Context only (no informative exact match)',
+            'Historical source path': '',
+            'Historical target path': '',
+            'Example value': '',
+            'Evidence note': 'Pair was supplied to Gemini; no informative field-level exact match was found.',
+            'Usefulness': 'Context only',
+        })
     _write_records(reference_sheet, reference_headers, reference_records, 2)
 
     # Rule Types is restored from the template; assumptions and risks are not fabricated.
