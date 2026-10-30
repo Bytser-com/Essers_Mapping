@@ -5,8 +5,8 @@ import iconError from '../assets/home/icon-error.svg'
 import iconSuccess from '../assets/home/icon-success.svg'
 
 type InterfaceUploadProps = {
-  // Sends the file to the backend, see services/uploadService.ts
-  onUpload?: (file: File) => void | Promise<void>
+  // Sends the file and customer name to the backend, see services/uploadService.ts
+  onUpload?: (file: File, customerName: string) => void | Promise<void>
 }
 
 type UploadError = 'customer' | 'noFile' | 'file' | 'server' | null
@@ -56,9 +56,9 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
       return
     }
 
-    // Send the file to the backend and show the result
+    // Send the file and customer name to the backend and show the result
     try {
-      await onUpload?.(file)
+      await onUpload?.(file, customerName.trim())
       setUploadedFor(customerName.trim())
     } catch (error) {
       setServerMessage(error instanceof Error ? error.message : 'Upload mislukt.')

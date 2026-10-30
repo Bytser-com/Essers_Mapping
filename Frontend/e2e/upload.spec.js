@@ -59,6 +59,26 @@ test.describe('E2E - Upload card on the Home page', () => {
     expect(uploadRequests).toBe(1)
   })
 
+  test('TC-48-04 upload request includes the filled customer name', async ({ page }) => {
+    let capturedBody = ''
+    await page.route('**/upload', async (route) => {
+      capturedBody = route.request().postData() || ''
+      return route.fulfill({
+        status: 201,
+        headers: { 'Access-Control-Allow-Origin': '*' },
+        json: { file_name: xmlFile.name, customer_name: 'Ostavel' },
+      })
+    })
+
+    await page.getByLabel('Klantnaam').fill('Ostavel')
+    await page.getByTestId('file-input').setInputFiles(xmlFile)
+    await page.getByRole('button', { name: 'Uploaden' }).click()
+
+    await expect(page.getByRole('status')).toBeVisible()
+    expect(capturedBody).toContain('name="customer_name"')
+    expect(capturedBody).toContain('Ostavel')
+  })
+
   test('TC-60-01 a message is shown after a successful XML upload', async ({ page }) => {
     await page.getByLabel('Klantnaam').fill('Ostavel')
     await page.getByTestId('file-input').setInputFiles(xmlFile)
