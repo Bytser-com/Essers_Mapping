@@ -3,7 +3,7 @@ from collections import Counter
 
 RULE_TYPES = {
     'DIRECT', 'FIXED', 'DEFAULT_IF_EMPTY', 'DERIVED', 'CONDITIONAL',
-    'LOOKUP', 'LOOP', 'FORMAT_DATE', 'REVIEW_REQUIRED',
+    'LOOKUP', 'LOOP', 'FORMAT_DATE', 'REVIEW_REQUIRED', 'NOT_MAPPED',
 }
 
 
@@ -36,8 +36,10 @@ def validate_mappings(proposals: list, source_fields: list, target_fields: list)
             rule = 'REVIEW_REQUIRED'
         if source_path and source_path not in source_paths:
             problem.append(f'Source path not found: {source_path}')
-        if not source_path and rule not in {'FIXED', 'REVIEW_REQUIRED'}:
+        if not source_path and rule not in {'FIXED', 'REVIEW_REQUIRED', 'NOT_MAPPED'}:
             problem.append('Non-FIXED proposal has no source path')
+        if rule == 'NOT_MAPPED' and source_path:
+            problem.append('NOT_MAPPED should have an empty source path')
         if rule == 'FIXED' and not str(mapping['fixed_value']).strip():
             problem.append('FIXED mapping has no fixed value')
         try:
@@ -57,6 +59,7 @@ def validate_mappings(proposals: list, source_fields: list, target_fields: list)
             mapping['requires_review'] is True
             or str(mapping['requires_review']).lower() in {'true', 'yes', '1'}
             or bool(problem)
+            or rule == 'NOT_MAPPED'
         )
         if mapping['requires_review'] and str(mapping['review_priority']).lower() not in ('high', 'critical'):
             mapping['review_priority'] = 'High' if problem else (mapping['review_priority'] or 'Medium')

@@ -33,7 +33,14 @@ RULE_SCHEMA = {
                 'properties': {
                     'source_path': {'type': 'string'},
                     'target_path': {'type': 'string'},
-                    'rule_type': {'type': 'string'},
+                    'rule_type': {
+                        'type': 'string',
+                        'enum': [
+                            'DIRECT', 'FIXED', 'DEFAULT_IF_EMPTY', 'DERIVED',
+                            'CONDITIONAL', 'LOOKUP', 'LOOP', 'FORMAT_DATE',
+                            'REVIEW_REQUIRED', 'NOT_MAPPED',
+                        ],
+                    },
                     'confidence': {'type': 'integer'},
                     'requires_review': {'type': 'boolean'},
                     'review_priority': {'type': 'string'},
