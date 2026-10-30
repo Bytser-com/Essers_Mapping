@@ -8,18 +8,12 @@ common_apt_lock_timeout: 120
 common_upgrade_packages: true
 
 common_base_packages:
-  - apt-transport-https
   - ca-certificates
   - curl
-  - gnupg
-  - lsb-release
   - locales
   - jq
   - git
-  - vim
   - htop
-  - iotop
-  - net-tools
   - dnsutils
   - bash-completion
   - unzip
@@ -28,7 +22,6 @@ common_base_packages:
   - systemd-timesyncd
   - fail2ban
   - unattended-upgrades
-  - apt-listchanges
 
 # Proxmox Guest Integration
 proxmox_qemu_guest_agent_enabled: true
