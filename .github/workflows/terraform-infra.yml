@@ -2,13 +2,13 @@ name: Terraform - Infra Setup
 
 on:
   pull_request:
-    branches: [main, testing]
+    branches: [main, Testing]
     paths:
       - "Infra/Setup/**"
       - ".github/workflows/terraform-infra.yml"
 
   push:
-    branches: [main, testing]
+    branches: [main, Testing]
     paths:
       - "Infra/Setup/**"
       - ".github/workflows/terraform-infra.yml"
@@ -144,7 +144,7 @@ jobs:
     if: >-
       needs.plan.outputs.has_changes == 'true' &&
       (
-        (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/testing')) ||
+        (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/Testing')) ||
         (github.event_name == 'workflow_dispatch' &&
           (github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy'))
       )
