@@ -37,21 +37,33 @@
     - k8s_install_helm | bool
     - not ansible_check_mode or helm_keyring_stat.stat.exists
 
+- name: Remove legacy Helm Debian APT repository list file if present
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/helm-stable-debian.list
+    state: absent
+  when: k8s_install_helm | bool
+
 - name: Add official Helm Debian APT repository
-  ansible.builtin.apt_repository:
-    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main"
-    filename: helm-stable-debian
+  ansible.builtin.deb822_repository:
+    name: helm-stable-debian
+    types: deb
+    uris: https://packages.buildkite.com/helm-linux/helm-debian/any/
+    suites: any
+    components: main
+    architectures: amd64
+    signed_by: /etc/apt/keyrings/helm.gpg
     state: present
-    update_cache: "{{ not ansible_check_mode or helm_keyring_stat.stat.exists }}"
+    enabled: true
   when: k8s_install_helm | bool
 
 - name: Install Helm package
   ansible.builtin.apt:
     name: helm
     state: present
+    update_cache: true
     lock_timeout: 120
   environment:
     DEBIAN_FRONTEND: noninteractive
   when:
     - k8s_install_helm | bool
-    - not ansible_check_mode or helm_keyring_stat.stat.exists
+    - not ansible_check_mode or (helm_keyring_stat.stat.exists | default(false))

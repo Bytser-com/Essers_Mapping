@@ -3,24 +3,19 @@
 # ROLE DEFAULTS: common
 # ==============================================================================
 
-common_apt_cache_valid_time: 3600
+common_apt_cache_valid_time: 0
 common_apt_lock_timeout: 120
 common_upgrade_packages: true
 
 common_base_packages:
-  - apt-transport-https
   - ca-certificates
   - curl
   - gnupg
-  - lsb-release
   - locales
   - jq
   - git
-  - vim
   - htop
-  - iotop
-  - net-tools
-  - dnsutils
+  - bind9-dnsutils
   - bash-completion
   - unzip
   - tar
@@ -28,7 +23,6 @@ common_base_packages:
   - systemd-timesyncd
   - fail2ban
   - unattended-upgrades
-  - apt-listchanges
 
 # Proxmox Guest Integration
 proxmox_qemu_guest_agent_enabled: true

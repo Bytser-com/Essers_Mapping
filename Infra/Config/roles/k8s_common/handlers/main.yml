@@ -5,3 +5,4 @@
     name: kubelet
     state: restarted
     daemon_reload: true
+  when: not ansible_check_mode or (k8s_keyring_stat.stat.exists | default(false))

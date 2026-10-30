@@ -23,13 +23,17 @@
     owner: root
     group: root
     mode: "0644"
-  when: k8s_cni_plugin == 'calico'
+  when:
+    - k8s_cni_plugin == 'calico'
+    - not ansible_check_mode or k8s_admin_conf.stat.exists
 
 - name: Check if Calico CNI manifest exists
   ansible.builtin.stat:
     path: /etc/kubernetes/cni-calico.yaml
   register: calico_manifest_stat
-  when: k8s_cni_plugin == 'calico'
+  when:
+    - k8s_cni_plugin == 'calico'
+    - not ansible_check_mode or k8s_admin_conf.stat.exists
 
 - name: Check if Calico CNI manifest has pending changes
   ansible.builtin.command:
@@ -63,13 +67,17 @@
     owner: root
     group: root
     mode: "0644"
-  when: k8s_cni_plugin == 'flannel'
+  when:
+    - k8s_cni_plugin == 'flannel'
+    - not ansible_check_mode or k8s_admin_conf.stat.exists
 
 - name: Check if Flannel CNI manifest exists
   ansible.builtin.stat:
     path: /etc/kubernetes/cni-flannel.yaml
   register: flannel_manifest_stat
-  when: k8s_cni_plugin == 'flannel'
+  when:
+    - k8s_cni_plugin == 'flannel'
+    - not ansible_check_mode or k8s_admin_conf.stat.exists
 
 - name: Check if Flannel CNI manifest has pending changes
   ansible.builtin.command:
