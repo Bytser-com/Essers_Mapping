@@ -7,13 +7,13 @@ name: Kubernetes - Cluster Deploy
 #  - Manual (workflow_dispatch)           -> choose check / apply / restart
 on:
   pull_request:
-    branches: [main, testing]
+    branches: [main, Testing]
     paths:
       - "Kubernetes/**"
       - ".github/workflows/kubernetes-deploy.yml"
 
   push:
-    branches: [main, testing]
+    branches: [main, Testing]
     paths:
       - "Kubernetes/**"
       - ".github/workflows/kubernetes-deploy.yml"
