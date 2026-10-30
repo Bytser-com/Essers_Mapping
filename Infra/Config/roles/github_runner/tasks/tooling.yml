@@ -63,12 +63,23 @@
     - runner_install_terraform | bool
     - not ansible_check_mode or hashicorp_keyring_stat.stat.exists
 
+- name: Remove legacy HashiCorp APT repository list file if present
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/hashicorp.list
+    state: absent
+  when: runner_install_terraform | bool
+
 - name: Add HashiCorp APT repository (bookworm compatible for Debian 13)
-  ansible.builtin.apt_repository:
-    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com bookworm main"
-    filename: hashicorp
+  ansible.builtin.deb822_repository:
+    name: hashicorp
+    types: deb
+    uris: https://apt.releases.hashicorp.com
+    suites: bookworm
+    components: main
+    architectures: amd64
+    signed_by: /etc/apt/keyrings/hashicorp-archive-keyring.gpg
     state: present
-    update_cache: "{{ not ansible_check_mode or hashicorp_keyring_stat.stat.exists }}"
+    enabled: true
   when: runner_install_terraform | bool
 
 - name: Install Terraform CLI
@@ -128,12 +139,22 @@
     - runner_install_kubectl | bool
     - not ansible_check_mode or runner_k8s_keyring_stat.stat.exists
 
+- name: Remove legacy Kubernetes APT repository list file if present on runner
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/kubernetes.list
+    state: absent
+  when: runner_install_kubectl | bool
+
 - name: Add Kubernetes APT repository on runner
-  ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v{{ runner_k8s_version_minor }}/deb/ /"
-    filename: kubernetes
+  ansible.builtin.deb822_repository:
+    name: kubernetes
+    types: deb
+    uris: "https://pkgs.k8s.io/core:/stable:/v{{ runner_k8s_version_minor }}/deb/"
+    suites: /
+    components: ""
+    signed_by: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
     state: present
-    update_cache: "{{ not ansible_check_mode or runner_k8s_keyring_stat.stat.exists }}"
+    enabled: true
   when: runner_install_kubectl | bool
 
 - name: Install kubectl on runner
@@ -182,12 +203,23 @@
     - runner_install_helm | bool
     - not ansible_check_mode or runner_helm_keyring_stat.stat.exists
 
+- name: Remove legacy Helm APT repository list file if present on runner
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/helm-stable-debian.list
+    state: absent
+  when: runner_install_helm | bool
+
 - name: Add Helm APT repository on runner
-  ansible.builtin.apt_repository:
-    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main"
-    filename: helm-stable-debian
+  ansible.builtin.deb822_repository:
+    name: helm-stable-debian
+    types: deb
+    uris: https://packages.buildkite.com/helm-linux/helm-debian/any/
+    suites: any
+    components: main
+    architectures: amd64
+    signed_by: /etc/apt/keyrings/helm.gpg
     state: present
-    update_cache: "{{ not ansible_check_mode or runner_helm_keyring_stat.stat.exists }}"
+    enabled: true
   when: runner_install_helm | bool
 
 - name: Install Helm on runner
