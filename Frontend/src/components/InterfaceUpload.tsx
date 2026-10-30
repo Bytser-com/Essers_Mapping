@@ -9,7 +9,7 @@ type InterfaceUploadProps = {
   onUpload?: (file: File) => void | Promise<void>
 }
 
-type UploadError = 'customer' | 'file' | 'server' | null
+type UploadError = 'customer' | 'noFile' | 'file' | 'server' | null
 
 // Upload card on the Home page (user story 60)
 function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
@@ -45,7 +45,11 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
       return
     }
 
-    if (!file) return
+    // A file must be chosen before uploading
+    if (!file) {
+      setUploadError('noFile')
+      return
+    }
     // Only XML files are allowed
     if (!file.name.toLowerCase().endsWith('.xml')) {
       setUploadError('file')
@@ -127,6 +131,11 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
               <>
                 <p className="text-[13px] font-semibold">Upload mislukt: Vul eerst een klant in.</p>
                 <p className="text-[12px] text-[#6b6b73]">Vul de klantnaam in en probeer opnieuw.</p>
+              </>
+            ) : uploadError === 'noFile' ? (
+              <>
+                <p className="text-[13px] font-semibold">Upload mislukt: kies eerst een XML-bestand.</p>
+                <p className="text-[12px] text-[#6b6b73]">Kies een XML-bestand van de klant en probeer opnieuw.</p>
               </>
             ) : uploadError === 'server' ? (
               <p className="text-[13px] font-semibold">{serverMessage}</p>

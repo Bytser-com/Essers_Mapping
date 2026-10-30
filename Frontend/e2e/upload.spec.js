@@ -71,6 +71,12 @@ test.describe('E2E - Upload card on the Home page', () => {
 
   test('TC-60-03 a file that is not XML is rejected', async ({ page }) => {
     await page.getByLabel('Klantnaam').fill('Ostavel')
+
+    // No file chosen yet
+    await page.getByRole('button', { name: 'Uploaden' }).click()
+    await expect(page.getByRole('alert')).toContainText('Upload mislukt: kies eerst een XML-bestand.')
+
+    // A PDF file instead of an XML file
     await page.getByTestId('file-input').setInputFiles(pdfFile)
     await page.getByRole('button', { name: 'Uploaden' }).click()
 
