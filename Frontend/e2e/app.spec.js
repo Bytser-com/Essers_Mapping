@@ -5,7 +5,7 @@ test.describe('End-to-End (E2E) - Essers Mapping Frontend & Nginx', () => {
     const response = await page.goto('/')
     expect(response?.status()).toBe(200)
 
-    await expect(page.getByRole('heading', { name: /essers mapping/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Home' })).toBeVisible()
     await expect(page.getByTestId('home-page')).toBeVisible()
   })
 
