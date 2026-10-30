@@ -11,15 +11,12 @@ common_base_packages:
   - ca-certificates
   - curl
   - locales
-  - jq
   - git
   - htop
-  - dnsutils
   - bash-completion
   - unzip
   - tar
   - sudo
-  - systemd-timesyncd
   - fail2ban
   - unattended-upgrades
 
