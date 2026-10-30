@@ -8,6 +8,7 @@
     update_cache: true
     cache_valid_time: "{{ common_apt_cache_valid_time }}"
     lock_timeout: "{{ common_apt_lock_timeout }}"
+  check_mode: false
 
 - name: Perform safe system package upgrade
   ansible.builtin.apt:
