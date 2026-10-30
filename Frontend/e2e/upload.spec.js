@@ -12,6 +12,12 @@ const xmlFile = {
   buffer: Buffer.from('<root />'),
 }
 
+const secondXmlFile = {
+  name: 'ostavel_levering_002.xml',
+  mimeType: 'text/xml',
+  buffer: Buffer.from('<root />'),
+}
+
 const pdfFile = {
   name: 'ostavel_levering_001.pdf',
   mimeType: 'application/pdf',
@@ -61,12 +67,15 @@ test.describe('E2E - Upload card on the Home page', () => {
 
   test('TC-60-01 a message is shown after a successful XML upload', async ({ page }) => {
     await page.getByLabel('Klantnaam').fill('Ostavel')
-    await page.getByTestId('file-input').setInputFiles(xmlFile)
+    // Two XML files are uploaded at the same time
+    await page.getByTestId('file-input').setInputFiles([xmlFile, secondXmlFile])
+    await expect(page.getByRole('listitem')).toContainText([xmlFile.name, secondXmlFile.name])
     await page.getByRole('button', { name: 'Uploaden' }).click()
 
     await expect(page.getByRole('status')).toHaveText(
       'Upload gelukt. Er is een nieuwe proposal aangemaakt voor Ostavel.',
     )
+    expect(uploadRequests).toBe(2)
   })
 
   test('TC-60-03 a file that is not XML is rejected', async ({ page }) => {
@@ -78,6 +87,12 @@ test.describe('E2E - Upload card on the Home page', () => {
 
     // A PDF file instead of an XML file
     await page.getByTestId('file-input').setInputFiles(pdfFile)
+    await page.getByRole('button', { name: 'Uploaden' }).click()
+
+    await expect(page.getByRole('alert')).toContainText('Upload mislukt: dit is geen XML-bestand.')
+
+    // An XML file together with a PDF file: nothing is uploaded
+    await page.getByTestId('file-input').setInputFiles([xmlFile, pdfFile])
     await page.getByRole('button', { name: 'Uploaden' }).click()
 
     await expect(page.getByRole('alert')).toContainText('Upload mislukt: dit is geen XML-bestand.')

@@ -5,7 +5,7 @@ import iconError from '../assets/home/icon-error.svg'
 import iconSuccess from '../assets/home/icon-success.svg'
 
 type InterfaceUploadProps = {
-  // Sends the file to the backend, see services/uploadService.ts
+  // Sends one file to the backend, called once per chosen file (see services/uploadService.ts)
   onUpload?: (file: File) => void | Promise<void>
 }
 
@@ -15,26 +15,35 @@ type UploadError = 'customer' | 'noFile' | 'file' | 'server' | null
 function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
   const fileInput = useRef<HTMLInputElement>(null)
   const [customerName, setCustomerName] = useState('')
-  const [file, setFile] = useState<File | null>(null)
+  const [files, setFiles] = useState<File[]>([])
   const [uploadError, setUploadError] = useState<UploadError>(null)
   const [serverMessage, setServerMessage] = useState('')
   // Customer name shown in the success message after a successful upload
   const [uploadedFor, setUploadedFor] = useState<string | null>(null)
 
-  function chooseFile(chosen: File | undefined) {
-    if (!chosen) return
-    setFile(chosen)
+  // More than one file can be chosen at the same time
+  function chooseFiles(chosen: FileList | null) {
+    if (!chosen || chosen.length === 0) return
+    setFiles(Array.from(chosen))
     setUploadError(null)
     setUploadedFor(null)
   }
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
-    chooseFile(event.target.files?.[0])
+    chooseFiles(event.target.files)
+    // Clear the input so the same file can be chosen again after removing it
+    event.target.value = ''
+  }
+
+  // Removes one chosen file before uploading
+  function removeFile(index: number) {
+    setFiles((current) => current.filter((_, i) => i !== index))
+    setUploadedFor(null)
   }
 
   function handleDrop(event: DragEvent<HTMLDivElement>) {
     event.preventDefault()
-    chooseFile(event.dataTransfer.files[0])
+    chooseFiles(event.dataTransfer.files)
   }
 
   async function handleUpload() {
@@ -46,19 +55,21 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
     }
 
     // A file must be chosen before uploading
-    if (!file) {
+    if (files.length === 0) {
       setUploadError('noFile')
       return
     }
-    // Only XML files are allowed
-    if (!file.name.toLowerCase().endsWith('.xml')) {
+    // Only XML files are allowed, nothing is sent if one of them is not XML
+    if (files.some((file) => !file.name.toLowerCase().endsWith('.xml'))) {
       setUploadError('file')
       return
     }
 
-    // Send the file to the backend and show the result
+    // Send the files to the backend one by one and show the result
     try {
-      await onUpload?.(file)
+      for (const file of files) {
+        await onUpload?.(file)
+      }
       setUploadedFor(customerName.trim())
     } catch (error) {
       setServerMessage(error instanceof Error ? error.message : 'Upload mislukt.')
@@ -92,7 +103,7 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
           className="flex flex-1 flex-col items-center gap-2 rounded-[10px] border border-dashed border-[#a1a1ab] bg-[#f4f4f6] px-5 py-[18px]"
         >
           <img src={iconUpload} alt="" width={26} height={26} />
-          <p className="text-[13px] font-semibold">Sleep een XML-bestand hierheen</p>
+          <p className="text-[13px] font-semibold">Sleep XML-bestanden hierheen</p>
           <button
             type="button"
             onClick={() => fileInput.current?.click()}
@@ -104,12 +115,32 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
             ref={fileInput}
             type="file"
             accept=".xml"
+            multiple
             onChange={handleFileChange}
             className="hidden"
             data-testid="file-input"
           />
           <p className="text-[12px] text-[#6b6b73]">Alleen XML-bestanden</p>
-          {file && <p className="text-[13px] font-semibold">Gekozen: {file.name}</p>}
+          {files.length > 0 && (
+            <ul className="flex flex-wrap justify-center gap-2">
+              {files.map((file, index) => (
+                <li
+                  key={`${file.name}-${index}`}
+                  className="flex items-center gap-2 rounded-full border border-[#e3e3e8] bg-white py-1 pr-2 pl-3 text-[12px] font-semibold"
+                >
+                  {file.name}
+                  <button
+                    type="button"
+                    onClick={() => removeFile(index)}
+                    aria-label={`Verwijder ${file.name}`}
+                    className="cursor-pointer rounded-full px-1 text-[14px] leading-none text-[#6b6b73] hover:bg-[#f4f4f6] hover:text-[#1c1c1f]"
+                  >
+                    ×
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="flex flex-col justify-end self-stretch">
