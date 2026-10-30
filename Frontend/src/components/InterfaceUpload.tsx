@@ -2,12 +2,14 @@ import { useRef, useState } from 'react'
 import type { ChangeEvent, DragEvent } from 'react'
 import iconUpload from '../assets/home/icon-upload.svg'
 import iconError from '../assets/home/icon-error.svg'
+import iconSuccess from '../assets/home/icon-success.svg'
 
 type InterfaceUploadProps = {
-  onUpload?: (file: File) => void
+  // Sends the file to the backend, see services/uploadService.ts
+  onUpload?: (file: File) => void | Promise<void>
 }
 
-type UploadError = 'customer' | 'file' | null
+type UploadError = 'customer' | 'file' | 'server' | null
 
 // Upload card on the Home page (user story 60)
 function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
@@ -15,11 +17,15 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
   const [customerName, setCustomerName] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [uploadError, setUploadError] = useState<UploadError>(null)
+  const [serverMessage, setServerMessage] = useState('')
+  // Customer name shown in the success message after a successful upload
+  const [uploadedFor, setUploadedFor] = useState<string | null>(null)
 
   function chooseFile(chosen: File | undefined) {
     if (!chosen) return
     setFile(chosen)
     setUploadError(null)
+    setUploadedFor(null)
   }
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
@@ -31,7 +37,9 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
     chooseFile(event.dataTransfer.files[0])
   }
 
-  function handleUpload() {
+  async function handleUpload() {
+    setUploadedFor(null)
+    setUploadError(null)
     if (!customerName.trim()) {
       setUploadError('customer')
       return
@@ -43,8 +51,15 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
       setUploadError('file')
       return
     }
-    // TODO: send the file to the backend when the upload endpoint is ready
-    onUpload?.(file)
+
+    // Send the file to the backend and show the result
+    try {
+      await onUpload?.(file)
+      setUploadedFor(customerName.trim())
+    } catch (error) {
+      setServerMessage(error instanceof Error ? error.message : 'Upload mislukt.')
+      setUploadError('server')
+    }
   }
 
   return (
@@ -113,6 +128,8 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
                 <p className="text-[13px] font-semibold">Upload mislukt: Vul eerst een klant in.</p>
                 <p className="text-[12px] text-[#6b6b73]">Vul de klantnaam in en probeer opnieuw.</p>
               </>
+            ) : uploadError === 'server' ? (
+              <p className="text-[13px] font-semibold">{serverMessage}</p>
             ) : (
               <>
                 <p className="text-[13px] font-semibold">Upload mislukt: dit is geen XML-bestand.</p>
@@ -120,6 +137,15 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
               </>
             )}
           </div>
+        </div>
+      )}
+
+      {uploadedFor && (
+        <div role="status" className="flex items-center gap-3 rounded-lg border border-[#1c1c1f] bg-white px-4 py-3">
+          <img src={iconSuccess} alt="" width={18} height={18} />
+          <p className="text-[13px] font-semibold">
+            Upload gelukt. Er is een nieuwe proposal aangemaakt voor {uploadedFor}.
+          </p>
         </div>
       )}
     </>

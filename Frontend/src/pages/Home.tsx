@@ -1,4 +1,5 @@
 import InterfaceUpload from '../components/InterfaceUpload'
+import { uploadInterface } from '../services/uploadService'
 
 function Home() {
   return (
@@ -9,7 +10,7 @@ function Home() {
           Upload een interface van een klant. De AI maakt er een mapping proposal van.
         </p>
       </div>
-      <InterfaceUpload />
+      <InterfaceUpload onUpload={uploadInterface} />
     </div>
   )
 }
