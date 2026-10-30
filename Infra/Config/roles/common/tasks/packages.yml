@@ -27,6 +27,7 @@
     lock_timeout: "{{ common_apt_lock_timeout }}"
   environment:
     DEBIAN_FRONTEND: noninteractive
+  register: base_packages_pkg
 
 - name: Install Proxmox QEMU Guest Agent
   ansible.builtin.apt:
@@ -34,6 +35,7 @@
     state: present
     lock_timeout: "{{ common_apt_lock_timeout }}"
   when: proxmox_qemu_guest_agent_enabled | bool
+  register: qemu_guest_agent_pkg
   notify: Restart qemu-guest-agent
 
 - name: Ensure QEMU Guest Agent service is enabled and running
@@ -41,7 +43,9 @@
     name: qemu-guest-agent
     enabled: true
     state: started
-  when: proxmox_qemu_guest_agent_enabled | bool
+  when:
+    - proxmox_qemu_guest_agent_enabled | bool
+    - not (ansible_check_mode and (qemu_guest_agent_pkg.changed | default(false)))
 
 - name: Enable periodic SSD fstrim timer for Proxmox thin provisioning
   ansible.builtin.systemd:

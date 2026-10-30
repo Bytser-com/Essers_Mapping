@@ -38,7 +38,9 @@
     name: fail2ban
     enabled: true
     state: started
-  when: security_fail2ban_enabled | bool
+  when:
+    - security_fail2ban_enabled | bool
+    - not (ansible_check_mode and (base_packages_pkg.changed | default(false)))
 
 - name: Enable unattended security upgrades
   ansible.builtin.copy:
