@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&family=Roboto+Mono:wght@400;500&display=swap");
+@import "tailwindcss";
 
-/* Huisstijl H.Essers */
-:root {
+@theme {
   --color-red: #a50000;
   --color-anthracite: #1c1c1f;
   --color-grey: #6b6b73;
@@ -19,82 +19,44 @@
   --radius-large: 14px;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+@layer base {
+  body {
+    @apply bg-background text-anthracite font-text text-[14px] antialiased;
+  }
+
+  #root {
+    @apply min-h-screen;
+  }
 }
 
-body {
-  margin: 0;
-  background: var(--color-background);
-  color: var(--color-anthracite);
-  font-family: var(--font-text);
-  font-size: 14px;
-}
+@layer components {
+  .btn {
+    @apply inline-flex items-center gap-1.5 px-3.5 py-2.25
+      border border-line-grey rounded-small bg-white text-anthracite
+      font-text text-[13px] font-semibold cursor-pointer
+      transition-colors duration-150 hover:bg-background
+      disabled:border-line-grey disabled:bg-line-grey disabled:text-mid-grey disabled:cursor-not-allowed;
+  }
 
-/* Knoppen: één donkere hoofdactie, witte knoppen voor de rest */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 9px 14px;
-  border: 1px solid var(--color-line-grey);
-  border-radius: var(--radius-small);
-  background: var(--color-white);
-  color: var(--color-anthracite);
-  font-family: var(--font-text);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
+  .btn--primary {
+    @apply border-anthracite bg-anthracite text-white hover:bg-black;
+  }
 
-.btn:hover {
-  background: var(--color-background);
-}
+  .status {
+    @apply inline-block px-2.25 py-0.75 border border-transparent rounded-full
+      text-[11px] font-semibold whitespace-nowrap;
+  }
 
-.btn--primary {
-  border-color: var(--color-anthracite);
-  background: var(--color-anthracite);
-  color: var(--color-white);
-}
+  .status--success {
+    @apply bg-line-grey text-anthracite;
+  }
 
-.btn--primary:hover {
-  background: #000000;
-}
+  .status--failed,
+  .status--ready {
+    @apply bg-anthracite text-white;
+  }
 
-.btn:disabled {
-  border-color: var(--color-line-grey);
-  background: var(--color-line-grey);
-  color: var(--color-mid-grey);
-  cursor: not-allowed;
-}
-
-/* Status: altijd een label met tekst erin */
-.status {
-  display: inline-block;
-  padding: 3px 9px;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.status--success {
-  background: var(--color-line-grey);
-  color: var(--color-anthracite);
-}
-
-.status--failed,
-.status--ready {
-  background: var(--color-anthracite);
-  color: var(--color-white);
-}
-
-.status--review {
-  border-color: var(--color-anthracite);
-  background: var(--color-white);
-  color: var(--color-anthracite);
+  .status--review {
+    @apply border-anthracite bg-white text-anthracite;
+  }
 }

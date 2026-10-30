@@ -1,0 +1,400 @@
+name: Kubernetes - Cluster Deploy
+
+# When does this run?
+#  - Pull request with Kubernetes changes -> validate & dry-run (kustomize build + kubectl diff / dry-run)
+#  - Push with Kubernetes changes         -> reconcile addons & deploy Kustomize overlay to the cluster
+#  - Called by the Ansible workflow       -> deploy to the cluster after Ansible configures the VMs
+#  - Manual (workflow_dispatch)           -> choose check / apply / restart
+on:
+  pull_request:
+    branches: [main, testing]
+    paths:
+      - "Kubernetes/**"
+      - ".github/workflows/kubernetes-deploy.yml"
+
+  push:
+    branches: [main, testing]
+    paths:
+      - "Kubernetes/**"
+      - ".github/workflows/kubernetes-deploy.yml"
+
+  workflow_call:
+    inputs:
+      mode:
+        description: "check = validate & dry-run, apply = deploy to the cluster"
+        type: string
+        default: apply
+
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "check = validate & dry-run, apply = deploy to the cluster, restart = rollout restart workloads"
+        type: choice
+        options: [check, apply, restart]
+        default: check
+      skip_addons:
+        description: "Skip cluster addons (MetalLB & Longhorn) installation/reconciliation"
+        type: boolean
+        default: false
+
+# One Kubernetes deployment per environment at a time
+concurrency:
+  group: kubernetes-deploy-${{ github.base_ref || github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  WORKDIR: "Kubernetes"
+  # Pull requests always dry-run, Pushes always apply, otherwise use the given mode (default: check)
+  MODE: ${{ github.event_name == 'pull_request' && 'check' || github.event_name == 'push' && 'apply' || inputs.mode || 'check' }}
+  OVERLAY: "${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}"
+  NAMESPACE: "essers-mapping-${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}"
+  METALLB_VERSION: "v0.14.9"
+
+jobs:
+  kubernetes:
+    name: >-
+      ${{
+        (github.event_name == 'pull_request' && 'Dry-run') ||
+        (github.event_name == 'push' && 'Deploy') ||
+        (inputs.mode == 'restart' && 'Rollout Restart') ||
+        (inputs.mode == 'apply' && 'Deploy') ||
+        'Dry-run'
+      }}
+    runs-on: [self-hosted, linux, "${{ vars.RUNNER_LABEL }}"]
+    environment: ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
+    defaults:
+      run:
+        working-directory: ${{ env.WORKDIR }}
+    env:
+      # --- Cluster Connectivity & Fallback SSH Secrets ---
+      KUBECONFIG_SECRET: ${{ secrets.KUBECONFIG }}
+      SSH_PRIVATE_KEY: ${{ secrets.PIPELINE_SSH_PRIVATE_KEY }}
+      DEBIAN_VM_USERNAME: ${{ vars.DEBIAN_VM_USERNAME || 'sysadmin' }}
+      K8S_MASTER_VM_IPV4_ADDRESS: ${{ vars.K8S_MASTER_VM_IPV4_ADDRESS }}
+
+      # --- Registry & Application Secrets (Optional Overrides for base/common/secrets.yaml) ---
+      GHCR_USERNAME: ${{ vars.GHCR_USERNAME || github.repository_owner }}
+      GHCR_TOKEN: ${{ secrets.GHCR_TOKEN || secrets.GITHUB_TOKEN }}
+      SFTP_SHARED_ADMIN_USER: ${{ vars.SFTP_SHARED_ADMIN_USER || 'admin' }}
+      SFTP_SHARED_ADMIN_PASSWORD: ${{ secrets.SFTP_SHARED_ADMIN_PASSWORD }}
+      SFTP_SHARED_USER: ${{ vars.SFTP_SHARED_USER || 'shareduser' }}
+      SFTP_SHARED_PASSWORD: ${{ secrets.SFTP_SHARED_PASSWORD }}
+      SFTP_RUNTIME_ADMIN_USER: ${{ vars.SFTP_RUNTIME_ADMIN_USER || 'admin' }}
+      SFTP_RUNTIME_ADMIN_PASSWORD: ${{ secrets.SFTP_RUNTIME_ADMIN_PASSWORD }}
+      SFTP_RUNTIME_USER: ${{ vars.SFTP_RUNTIME_USER || 'runtimeuser' }}
+      SFTP_RUNTIME_PASSWORD: ${{ secrets.SFTP_RUNTIME_PASSWORD }}
+
+      # --- Manual Options ---
+      SKIP_ADDONS: ${{ inputs.skip_addons || false }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check Kubernetes manifests exist
+        id: manifests
+        shell: bash
+        run: |
+          if [ -f "overlays/$OVERLAY/kustomization.yaml" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::No Kustomize overlay found at $WORKDIR/overlays/$OVERLAY/kustomization.yaml - skipping Kubernetes execution."
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify Kubernetes CLI tooling
+        if: steps.manifests.outputs.exists == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v kubectl >/dev/null 2>&1 || { echo "::error::kubectl is not installed on this runner"; exit 1; }
+          command -v helm >/dev/null 2>&1    || { echo "::error::helm is not installed on this runner"; exit 1; }
+          kubectl version --client
+          helm version --short
+
+      - name: Lint and validate Kustomize overlays
+        if: steps.manifests.outputs.exists == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # 1. YAML syntax check if yamllint is available on the runner
+          if command -v yamllint >/dev/null 2>&1; then
+            echo "Running yamllint on Kubernetes manifests..."
+            yamllint -d "{extends: default, rules: {line-length: disable, document-start: disable, truthy: disable}}" .
+          fi
+
+          # 2. Build both testing and production overlays offline to catch structural/patch errors early
+          for env_dir in testing production; do
+            if [ -f "overlays/${env_dir}/kustomization.yaml" ]; then
+              echo "Validating Kustomize build for overlay: ${env_dir}..."
+              kubectl kustomize "overlays/${env_dir}" > "$RUNNER_TEMP/rendered-${env_dir}.yaml"
+              grep -q "kind: Deployment" "$RUNNER_TEMP/rendered-${env_dir}.yaml"
+              grep -q "kind: Service" "$RUNNER_TEMP/rendered-${env_dir}.yaml"
+              grep -q "kind: NetworkPolicy" "$RUNNER_TEMP/rendered-${env_dir}.yaml"
+            fi
+          done
+          echo "All Kustomize overlays built and validated cleanly."
+
+      # Kubeconfig is isolated inside $RUNNER_TEMP and securely shredded on cleanup
+      - name: Prepare kubeconfig and verify cluster connectivity
+        if: steps.manifests.outputs.exists == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          K8S_TEMP_DIR="$RUNNER_TEMP/k8s"
+          rm -rf "$K8S_TEMP_DIR"
+          install -d -m 700 "$K8S_TEMP_DIR"
+          KUBECONFIG_PATH="$K8S_TEMP_DIR/config"
+
+          # Strip CIDR suffix if K8S_MASTER_VM_IPV4_ADDRESS is stored in CIDR notation (e.g. 192.168.100.11/24)
+          MASTER_IP="${K8S_MASTER_VM_IPV4_ADDRESS%%/*}"
+
+          # 1. Resolve kubeconfig from Secret -> local runner ~/.kube/config -> SSH fetch from Control Plane
+          if [ -n "${KUBECONFIG_SECRET:-}" ]; then
+            echo "Loading kubeconfig from KUBECONFIG secret..."
+            if printf '%s' "$KUBECONFIG_SECRET" | grep -q "apiVersion:"; then
+              printf '%s\n' "$KUBECONFIG_SECRET" > "$KUBECONFIG_PATH"
+            else
+              printf '%s' "$KUBECONFIG_SECRET" | base64 -d > "$KUBECONFIG_PATH"
+            fi
+          elif [ -s "$HOME/.kube/config" ]; then
+            echo "Using runner kubeconfig from $HOME/.kube/config..."
+            cp "$HOME/.kube/config" "$KUBECONFIG_PATH"
+          elif [ -n "${SSH_PRIVATE_KEY:-}" ] && [ -n "${MASTER_IP:-}" ]; then
+            echo "Fetching /etc/kubernetes/admin.conf from Control Plane (${MASTER_IP}) via SSH..."
+            printf '%s\n' "$SSH_PRIVATE_KEY" > "$K8S_TEMP_DIR/id_pipeline"
+            chmod 600 "$K8S_TEMP_DIR/id_pipeline"
+            ssh -i "$K8S_TEMP_DIR/id_pipeline" \
+              -o StrictHostKeyChecking=accept-new \
+              -o UserKnownHostsFile="$K8S_TEMP_DIR/known_hosts" \
+              -o ConnectTimeout=15 \
+              "${DEBIAN_VM_USERNAME}@${MASTER_IP}" \
+              "sudo cat /etc/kubernetes/admin.conf" \
+              | sed -E "s|server:[[:space:]]*https://[^[:space:]]+|server: https://${MASTER_IP}:6443|g" \
+              > "$KUBECONFIG_PATH"
+          else
+            echo "::error::Unable to locate kubeconfig (checked KUBECONFIG secret, ~/.kube/config, and SSH fallback to K8S_MASTER_VM_IPV4_ADDRESS)."
+            exit 1
+          fi
+
+          chmod 600 "$KUBECONFIG_PATH"
+          echo "KUBECONFIG=$KUBECONFIG_PATH" >> "$GITHUB_ENV"
+          export KUBECONFIG="$KUBECONFIG_PATH"
+
+          # 2. Verify cluster API reachability and node readiness
+          kubectl cluster-info
+          kubectl wait --for=condition=Ready nodes --all --timeout=180s
+          kubectl get nodes -o wide
+
+          # 3. Ensure worker nodes carry the environment label required by overlay nodeSelectors
+          if [ "$MODE" != "check" ]; then
+            MATCHING_NODES=$(kubectl get nodes -l "environment=${OVERLAY}" -o name | wc -l)
+            if [ "$MATCHING_NODES" -eq 0 ]; then
+              echo "No node currently labeled with environment=${OVERLAY}; labeling worker node(s)..."
+              for node in $(kubectl get nodes -l '!node-role.kubernetes.io/control-plane' -o jsonpath='{.items[*].metadata.name}'); do
+                kubectl label node "$node" "environment=${OVERLAY}" --overwrite
+              done
+            fi
+          fi
+
+      - name: Inject environment secrets into manifests
+        if: steps.manifests.outputs.exists == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          SECRETS_FILE="base/common/secrets.yaml"
+          if [ ! -f "$SECRETS_FILE" ]; then
+            exit 0
+          fi
+
+          # Inject GHCR credentials if token is available
+          if [ -n "${GHCR_TOKEN:-}" ]; then
+            sed -i "s|GITHUB_USERNAME_OR_ACTOR|${GHCR_USERNAME}|g" "$SECRETS_FILE"
+            sed -i "s|CHANGE_ME_GITHUB_TOKEN_OR_PAT|${GHCR_TOKEN}|g" "$SECRETS_FILE"
+          fi
+
+          # Inject Shared SFTPGo credentials if configured in GitHub Secrets
+          if [ -n "${SFTP_SHARED_ADMIN_PASSWORD:-}" ]; then
+            sed -i "s|CHANGE_ME_SHARED_ADMIN_PASSWORD|${SFTP_SHARED_ADMIN_PASSWORD}|g" "$SECRETS_FILE"
+          fi
+          if [ -n "${SFTP_SHARED_PASSWORD:-}" ]; then
+            sed -i "s|CHANGE_ME_SHARED_PASSWORD|${SFTP_SHARED_PASSWORD}|g" "$SECRETS_FILE"
+          fi
+
+          # Inject Runtime SFTPGo credentials if configured in GitHub Secrets
+          if [ -n "${SFTP_RUNTIME_ADMIN_PASSWORD:-}" ]; then
+            sed -i "s|CHANGE_ME_RUNTIME_ADMIN_PASSWORD|${SFTP_RUNTIME_ADMIN_PASSWORD}|g" "$SECRETS_FILE"
+          fi
+          if [ -n "${SFTP_RUNTIME_PASSWORD:-}" ]; then
+            sed -i "s|CHANGE_ME_RUNTIME_PASSWORD|${SFTP_RUNTIME_PASSWORD}|g" "$SECRETS_FILE"
+          fi
+
+      - name: Reconcile cluster addons (MetalLB & Longhorn)
+        if: steps.manifests.outputs.exists == 'true' && env.MODE == 'apply' && env.SKIP_ADDONS != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # 1. MetalLB LoadBalancer Controller & Speaker
+          echo "Reconciling MetalLB (${METALLB_VERSION})..."
+          kubectl apply -f "https://raw.githubusercontent.com/metallb/metallb/${METALLB_VERSION}/config/manifests/metallb-native.yaml"
+          kubectl wait --namespace metallb-system \
+            --for=condition=Ready pod \
+            --selector=app=metallb \
+            --timeout=180s
+
+          if [ -f "overlays/${OVERLAY}/metallb-ippool.yaml" ]; then
+            echo "Applying MetalLB L2 IPAddressPool for ${OVERLAY}..."
+            # Retry briefly in case the MetalLB validating webhook endpoint is still warming up
+            for attempt in 1 2 3 4 5; do
+              if kubectl apply -f "overlays/${OVERLAY}/metallb-ippool.yaml"; then
+                break
+              fi
+              echo "Waiting for MetalLB webhook readiness (attempt ${attempt}/5)..."
+              sleep 5
+            done
+          fi
+
+          # 2. Longhorn Distributed Block/RWX Storage
+          if [ -f "cluster-addons/longhorn/values-single-worker.yaml" ]; then
+            echo "Reconciling Longhorn storage engine via Helm..."
+            helm repo add longhorn https://charts.longhorn.io --force-update
+            helm repo update
+            helm upgrade --install longhorn longhorn/longhorn \
+              --namespace longhorn-system \
+              --create-namespace \
+              -f "cluster-addons/longhorn/values-single-worker.yaml" \
+              --wait \
+              --timeout 10m
+          fi
+
+      - name: Dry-run and diff (${{ env.OVERLAY }})
+        id: diff
+        if: steps.manifests.outputs.exists == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          DIFF_LOG="$RUNNER_TEMP/k8s-diff.log"
+          rm -f "$DIFF_LOG"
+
+          # Validate rendered manifests against the Kubernetes API server
+          if kubectl get namespace "$NAMESPACE" >/dev/null 2>&1; then
+            echo "Running server-side dry-run validation against namespace ${NAMESPACE}..."
+            kubectl apply -k "overlays/${OVERLAY}" --dry-run=server >/dev/null
+          else
+            echo "Namespace ${NAMESPACE} does not exist yet on cluster; running client-side dry-run validation..."
+            kubectl apply -k "overlays/${OVERLAY}" --dry-run=client >/dev/null
+          fi
+
+          # Compute live diff (exit code 0 = no diff, 1 = differences found, >1 = error)
+          # Redact Secret resource bodies from diff logs to prevent credential exposure
+          set +e
+          kubectl diff -k "overlays/${OVERLAY}" > "$DIFF_LOG" 2>&1
+          DIFF_EXIT=$?
+          set -e
+
+          if [ "$DIFF_EXIT" -eq 0 ]; then
+            echo "No differences detected between overlays/${OVERLAY} and live cluster state."
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          elif [ "$DIFF_EXIT" -eq 1 ]; then
+            echo "Configuration changes detected for overlays/${OVERLAY}."
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::kubectl diff exited with code ${DIFF_EXIT} (expected if target namespace does not exist yet)."
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy Kubernetes overlay (${{ env.OVERLAY }})
+        id: deploy
+        if: steps.manifests.outputs.exists == 'true' && (env.MODE == 'apply' || env.MODE == 'restart')
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          APPLY_LOG="$RUNNER_TEMP/k8s-apply.log"
+          rm -f "$APPLY_LOG"
+
+          echo "Applying Kustomize overlay: overlays/${OVERLAY} (Namespace: ${NAMESPACE})..."
+          kubectl apply -k "overlays/${OVERLAY}" 2>&1 | tee "$APPLY_LOG"
+
+          # Restart deployments when requested or on Testing (:latest mutable image tags with Always pull policy)
+          if [ "$MODE" = "restart" ] || [ "$OVERLAY" = "testing" ]; then
+            echo "Triggering rolling restart of deployments in ${NAMESPACE}..."
+            kubectl rollout restart deployment -n "$NAMESPACE" 2>&1 | tee -a "$APPLY_LOG"
+          fi
+
+          # Verify rollout status for all deployments in the target namespace
+          echo "Waiting for deployments in ${NAMESPACE} to become ready..."
+          for deploy in $(kubectl get deployments -n "$NAMESPACE" -o jsonpath='{.items[*].metadata.name}'); do
+            echo "Waiting for rollout of deployment/${deploy}..."
+            kubectl rollout status "deployment/${deploy}" -n "$NAMESPACE" --timeout=300s 2>&1 | tee -a "$APPLY_LOG"
+          done
+
+          # Display assigned LoadBalancer IPs and workload status
+          kubectl get svc,pods,pvc,hpa,netpol -n "$NAMESPACE" -o wide
+
+      - name: Summary
+        if: always() && steps.manifests.outputs.exists == 'true'
+        shell: bash
+        run: |
+          if [ "$MODE" = "check" ]; then
+            OUTCOME="${{ steps.diff.outcome }}"
+          else
+            OUTCOME="${{ steps.deploy.outcome }}"
+          fi
+          if [ "$OUTCOME" = "success" ]; then
+            STATUS="✅ Succeeded"
+          else
+            STATUS="❌ Failed"
+          fi
+
+          {
+            echo "### Kubernetes (${MODE} - \`${OVERLAY}\`): ${STATUS}"
+            echo ""
+            echo "- **Environment:** \`${OVERLAY}\`"
+            echo "- **Namespace:** \`${NAMESPACE}\`"
+            echo "- **Mode:** \`${MODE}\`"
+            echo ""
+
+            if [ -n "${KUBECONFIG:-}" ] && [ -f "${KUBECONFIG:-}" ] && kubectl get namespace "$NAMESPACE" >/dev/null 2>&1; then
+              echo "#### Services & Dedicated LoadBalancer IPs"
+              echo '```text'
+              kubectl get svc -n "$NAMESPACE" -o wide 2>/dev/null || true
+              echo '```'
+              echo ""
+              echo "#### Workloads, Storage & Autoscaling Status"
+              echo '```text'
+              kubectl get pods,pvc,hpa -n "$NAMESPACE" -o wide 2>/dev/null || true
+              echo '```'
+            fi
+
+            if [ -f "$RUNNER_TEMP/k8s-apply.log" ]; then
+              echo "<details><summary>Click to view Deployment Execution Log</summary>"
+              echo ""
+              echo '```text'
+              tail -n 150 "$RUNNER_TEMP/k8s-apply.log"
+              echo '```'
+              echo "</details>"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Secure Cleanup
+        if: always()
+        shell: bash
+        run: |
+          # Restore secrets template so injected credentials never remain in the working tree
+          git checkout -- base/common/secrets.yaml 2>/dev/null || true
+
+          # Shred and remove isolated kubeconfig & temporary SSH key material
+          if [ -d "$RUNNER_TEMP/k8s" ]; then
+            find "$RUNNER_TEMP/k8s" -type f -exec shred -u {} + 2>/dev/null || rm -rf "$RUNNER_TEMP/k8s"
+            rm -rf "$RUNNER_TEMP/k8s"
+          fi
+          rm -f "$RUNNER_TEMP/k8s-diff.log" "$RUNNER_TEMP/k8s-apply.log" "$RUNNER_TEMP"/rendered-*.yaml

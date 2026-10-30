@@ -2,7 +2,7 @@ from services import sftp_storage
 from openpyxl import load_workbook
 import re
 
-VERSION_PATTERN = r"\_V(\d+)(_edited)?\.xlsx$"
+VERSION_PATTERN = r"^MProposal-.+_V(\d+)(_edited)?\.xlsx$"
 
 def get_proposal_file(company):
     best_key = (0, False)
