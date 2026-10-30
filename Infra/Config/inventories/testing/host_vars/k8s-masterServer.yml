@@ -4,4 +4,4 @@
 # ==============================================================================
 
 hostname_short: "k8s-masterServer"
-fqdn: "{{ lookup('env', 'K8S_MASTER_VM_DNS_DOMAIN') | default(undef('K8S_MASTER_VM_DNS_DOMAIN is required in .env'), true) }}"
+fqdn: "{{ (lookup('env', 'K8S_MASTER_VM_DNS_DOMAIN') | default(undef('K8S_MASTER_VM_DNS_DOMAIN is required in .env'), true)) | lower | replace('_', '-') }}"
