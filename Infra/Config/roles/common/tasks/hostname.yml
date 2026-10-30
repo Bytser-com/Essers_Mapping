@@ -1,0 +1,17 @@
+---
+# ==============================================================================
+# COMMON TASKS: HOSTNAME & /ETC/HOSTS RESOLUTION
+# ==============================================================================
+
+- name: Set system hostname (RFC 1123 lowercase)
+  ansible.builtin.hostname:
+    name: "{{ hostname_short | lower }}"
+    use: systemd
+
+- name: Render /etc/hosts with all inventory nodes
+  ansible.builtin.template:
+    src: hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: "0644"

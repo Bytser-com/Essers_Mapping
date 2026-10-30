@@ -1,0 +1,197 @@
+# ==============================================================================
+# ZERO-TRUST NETWORK POLICIES (Calico CNI Enforced)
+# Architecture divided into 3 logical zones:
+#   1. Zone `preparation`: frontend, mapping-converter, mapping-proposal, version-control-backend
+#   2. Zone `shared-storage` (In-Between Zone): sftp-shared
+#   3. Zone `runtime`: runtime-backend, sftp-runtime
+# ==============================================================================
+
+# 1. Default Deny ALL Ingress & Egress in the namespace unless explicitly allowed
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+# 2. FRONTEND (NGINX on Internal Port 8080):
+#    - Ingress: Reachable ONLY from the NGINX Ingress Controller (`ingress-nginx` namespace)
+#      after edge HTTP (80) -> HTTPS (443) redirect & TLS termination.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-to-frontend
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: frontend
+      essers.io/zone: preparation
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8080
+---
+# 3. PREPARATION BACKENDS (Internal ClusterIP Only - NOT Publicly Available):
+#    - mapping-converter (Python, port 8000)
+#    - mapping-proposal (Python, port 8000)
+#    - version-control-backend (Java Spring Boot, port 8080)
+#    - Ingress: ONLY reachable from the NGINX `frontend` pod (which proxies `/api/*`)
+#      and from other pods within the `preparation` zone.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-frontend-to-preparation-backends
+spec:
+  podSelector:
+    matchLabels:
+      essers.io/zone: preparation
+      app.kubernetes.io/tier: backend
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: frontend
+              essers.io/zone: preparation
+        - podSelector:
+            matchLabels:
+              essers.io/zone: preparation
+              app.kubernetes.io/tier: backend
+      ports:
+        - protocol: TCP
+          port: 8000
+        - protocol: TCP
+          port: 8080
+---
+# 4. SHARED SFTPGo FILE SHARE (`sftp-shared` in `shared-storage` in-between zone):
+#    - Ingress:
+#      a) Reachable internally by ALL workloads with `essers.io/sftp-shared-access: "true"`
+#         (frontend, mapping-converter, mapping-proposal, version-control-backend, runtime-backend)
+#      b) Publicly reachable on its dedicated IP (192.168.100.102 / .202) on port 2022 (mapped from Service 22) and 8080 (SFTPGo WebClient/API)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-all-authorized-and-public-to-sftp-shared
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: sftp-shared
+      essers.io/zone: shared-storage
+  policyTypes:
+    - Ingress
+  ingress:
+    # Internal cluster access from Frontend + Preparation Backends + Runtime Backend
+    - from:
+        - podSelector:
+            matchLabels:
+              essers.io/sftp-shared-access: "true"
+      ports:
+        - protocol: TCP
+          port: 2022
+        - protocol: TCP
+          port: 8080
+    # External/Public access via Dedicated LoadBalancer IP (192.168.100.102 / 192.168.100.202)
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 2022
+        - protocol: TCP
+          port: 8080
+---
+# 5. RUNTIME SFTPGo FILE SHARE (`sftp-runtime` in `runtime` zone):
+#    - Ingress:
+#      a) Inside the cluster: Reachable EXCLUSIVELY by `runtime-backend`.
+#         Preparation zone pods (frontend, python backends, version-control-backend) are
+#         strictly blocked via Egress + Ingress rules from connecting to `sftp-runtime`.
+#      b) Externally: Publicly reachable via its dedicated LoadBalancer IP (192.168.100.103 / .203) on port 2022 (mapped from Service 22) and 8080.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-runtime-backend-and-public-to-sftp-runtime
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: sftp-runtime
+      essers.io/zone: runtime
+  policyTypes:
+    - Ingress
+  ingress:
+    # Inside cluster: ONLY runtime-backend
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: runtime-backend
+              essers.io/zone: runtime
+              essers.io/sftp-runtime-access: "true"
+      ports:
+        - protocol: TCP
+          port: 2022
+        - protocol: TCP
+          port: 8080
+    # External/Public access via Dedicated LoadBalancer IP (192.168.100.103 / 192.168.100.203)
+    # Note: Pod CIDR (10.244.0.0/16) is excluded from external ipBlock so Preparation pods cannot spoof access
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.244.0.0/16
+      ports:
+        - protocol: TCP
+          port: 2022
+        - protocol: TCP
+          port: 8080
+---
+# 6. PREPARATION ZONE EGRESS RESTRICTION:
+#    Explicitly ensures Preparation pods (frontend, python backends, version-control-backend)
+#    can ONLY talk to DNS, Preparation backends, and `sftp-shared` — NEVER to `runtime` zone (`sftp-runtime` or `runtime-backend`).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: restrict-preparation-zone-egress
+spec:
+  podSelector:
+    matchLabels:
+      essers.io/zone: preparation
+  policyTypes:
+    - Egress
+  egress:
+    # Allow CoreDNS resolution (UDP/TCP 53)
+    - ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Allow talking to other pods in the Preparation zone (e.g. Frontend -> /api/* backends)
+    - to:
+        - podSelector:
+            matchLabels:
+              essers.io/zone: preparation
+      ports:
+        - protocol: TCP
+          port: 8000
+        - protocol: TCP
+          port: 8080
+    # Allow talking to the Shared SFTPGo server in the Shared-Storage zone (Service port 22 -> Pod port 2022 & API 8080)
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: sftp-shared
+              essers.io/zone: shared-storage
+      ports:
+        - protocol: TCP
+          port: 22
+        - protocol: TCP
+          port: 2022
+        - protocol: TCP
+          port: 8080

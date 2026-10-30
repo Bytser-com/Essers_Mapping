@@ -1,0 +1,7 @@
+---
+# Handlers for 'k8s_common' role
+- name: Restart kubelet
+  ansible.builtin.systemd:
+    name: kubelet
+    state: restarted
+    daemon_reload: true

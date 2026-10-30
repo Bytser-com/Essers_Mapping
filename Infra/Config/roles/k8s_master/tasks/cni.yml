@@ -1,0 +1,132 @@
+---
+# ==============================================================================
+# K8S_MASTER TASKS: CNI NETWORKING DEPLOYMENT
+# ==============================================================================
+
+- name: Validate configured CNI plugin is supported
+  ansible.builtin.assert:
+    that:
+      - k8s_cni_plugin in ['calico', 'flannel']
+    fail_msg: "Unsupported k8s_cni_plugin '{{ k8s_cni_plugin }}'. Supported values: 'calico', 'flannel'."
+
+- name: Wait for Kubernetes API Server to listen on port {{ k8s_apiserver_bind_port }}
+  ansible.builtin.wait_for:
+    host: "{{ ansible_host }}"
+    port: "{{ k8s_apiserver_bind_port }}"
+    timeout: 180
+  when: not ansible_check_mode or k8s_admin_conf.stat.exists
+
+- name: Download Calico CNI manifest
+  ansible.builtin.get_url:
+    url: "{{ k8s_calico_manifest_url }}"
+    dest: /etc/kubernetes/cni-calico.yaml
+    owner: root
+    group: root
+    mode: "0644"
+  when: k8s_cni_plugin == 'calico'
+
+- name: Check if Calico CNI manifest exists
+  ansible.builtin.stat:
+    path: /etc/kubernetes/cni-calico.yaml
+  register: calico_manifest_stat
+  when: k8s_cni_plugin == 'calico'
+
+- name: Check if Calico CNI manifest has pending changes
+  ansible.builtin.command:
+    cmd: kubectl diff -f /etc/kubernetes/cni-calico.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  register: calico_diff
+  changed_when: false
+  failed_when: calico_diff.rc not in [0, 1]
+  check_mode: false
+  when:
+    - k8s_cni_plugin == 'calico'
+    - k8s_admin_conf.stat.exists
+    - calico_manifest_stat.stat.exists
+
+- name: Apply Calico CNI manifest to cluster
+  ansible.builtin.command:
+    cmd: kubectl apply -f /etc/kubernetes/cni-calico.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  register: calico_apply
+  changed_when: "'created' in calico_apply.stdout or 'configured' in calico_apply.stdout"
+  when:
+    - k8s_cni_plugin == 'calico'
+    - not k8s_admin_conf.stat.exists or not calico_manifest_stat.stat.exists or (calico_diff.rc is defined and calico_diff.rc == 1)
+
+- name: Download Flannel CNI manifest
+  ansible.builtin.get_url:
+    url: "{{ k8s_flannel_manifest_url }}"
+    dest: /etc/kubernetes/cni-flannel.yaml
+    owner: root
+    group: root
+    mode: "0644"
+  when: k8s_cni_plugin == 'flannel'
+
+- name: Check if Flannel CNI manifest exists
+  ansible.builtin.stat:
+    path: /etc/kubernetes/cni-flannel.yaml
+  register: flannel_manifest_stat
+  when: k8s_cni_plugin == 'flannel'
+
+- name: Check if Flannel CNI manifest has pending changes
+  ansible.builtin.command:
+    cmd: kubectl diff -f /etc/kubernetes/cni-flannel.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  register: flannel_diff
+  changed_when: false
+  failed_when: flannel_diff.rc not in [0, 1]
+  check_mode: false
+  when:
+    - k8s_cni_plugin == 'flannel'
+    - k8s_admin_conf.stat.exists
+    - flannel_manifest_stat.stat.exists
+
+- name: Apply Flannel CNI manifest to cluster
+  ansible.builtin.command:
+    cmd: kubectl apply -f /etc/kubernetes/cni-flannel.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  register: flannel_apply
+  changed_when: "'created' in flannel_apply.stdout or 'configured' in flannel_apply.stdout"
+  when:
+    - k8s_cni_plugin == 'flannel'
+    - not k8s_admin_conf.stat.exists or not flannel_manifest_stat.stat.exists or (flannel_diff.rc is defined and flannel_diff.rc == 1)
+
+- name: Wait for Control Plane node to report Ready status
+  ansible.builtin.command:
+    cmd: "kubectl wait --for=condition=Ready node/{{ hostname_short | lower }} --timeout=300s"
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  changed_when: false
+  when: not ansible_check_mode or k8s_admin_conf.stat.exists
+
+- name: Wait for CoreDNS pods to become Ready in kube-system
+  ansible.builtin.command:
+    cmd: "kubectl wait --for=condition=Ready pod -l k8s-app=kube-dns -n kube-system --timeout=300s"
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  changed_when: false
+  when: not ansible_check_mode or k8s_admin_conf.stat.exists
+
+- name: Query pending kubelet-serving CSRs on Control Plane
+  ansible.builtin.command:
+    cmd: >-
+      kubectl get csr -o jsonpath='{range .items[?(@.spec.signerName=="kubernetes.io/kubelet-serving")]}{.metadata.name}{" "}{.status.conditions[*].type}{"\n"}{end}'
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  register: master_pending_csrs
+  changed_when: false
+  when: not ansible_check_mode
+
+- name: Approve pending kubelet-serving CSRs for Control Plane TLS bootstrap
+  ansible.builtin.command:
+    cmd: "kubectl certificate approve {{ item.split()[0] }}"
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  loop: "{{ (master_pending_csrs.stdout_lines | default([])) | select('search', '^\\S+\\s*$') | list }}"
+  changed_when: true
+  when: not ansible_check_mode

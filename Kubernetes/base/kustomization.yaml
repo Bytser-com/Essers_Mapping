@@ -1,0 +1,36 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+labels:
+  - includeSelectors: false
+    pairs:
+      app.kubernetes.io/part-of: essers-mapping
+      app.kubernetes.io/managed-by: kustomize
+
+configMapGenerator:
+  - name: common-config
+    literals:
+      - TZ=Europe/Brussels
+      - LOG_LEVEL=INFO
+      # Shared SFTP Server (In-Between Zone)
+      - SFTP_SHARED_HOST=sftp-shared
+      - SFTP_SHARED_PORT=22
+      - SFTP_SHARED_USER=shareduser
+      - SFTP_SHARED_REMOTE_DIR=/upload
+      # Runtime SFTP Server (Runtime Zone)
+      - SFTP_RUNTIME_HOST=sftp-runtime
+      - SFTP_RUNTIME_PORT=22
+      - SFTP_RUNTIME_USER=runtimeuser
+      - SFTP_RUNTIME_REMOTE_DIR=/data
+      # Internal Preparation Zone Service URLs
+      - MAPPING_CONVERTER_URL=http://mapping-converter:8000
+      - MAPPING_PROPOSAL_URL=http://mapping-proposal:8000
+      - VERSION_CONTROL_BACKEND_URL=http://version-control-backend:8080
+      # Internal Runtime Zone Service URL
+      - RUNTIME_BACKEND_URL=http://runtime-backend:8080
+
+resources:
+  - common
+  - shared-storage
+  - preparation
+  - runtime

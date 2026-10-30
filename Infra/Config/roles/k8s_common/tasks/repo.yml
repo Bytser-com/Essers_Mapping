@@ -1,0 +1,47 @@
+---
+# ==============================================================================
+# K8S_COMMON TASKS: APT REPOSITORY SETUP (pkgs.k8s.io)
+# ==============================================================================
+
+- name: Ensure /etc/apt/keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Download Kubernetes APT repository ASCII GPG key
+  ansible.builtin.get_url:
+    url: "{{ k8s_apt_repo_url }}Release.key"
+    dest: "/etc/apt/keyrings/kubernetes-Release.key"
+    owner: root
+    group: root
+    mode: "0644"
+  register: k8s_gpg_key_dl
+
+- name: Check if Kubernetes APT binary GPG keyring exists
+  ansible.builtin.stat:
+    path: "{{ k8s_apt_keyring_path }}"
+  register: k8s_keyring_stat
+
+- name: Dearmor Kubernetes APT GPG key into keyring
+  ansible.builtin.command:
+    cmd: "gpg --dearmor --yes -o {{ k8s_apt_keyring_path }} /etc/apt/keyrings/kubernetes-Release.key"
+  changed_when: true
+  when: k8s_gpg_key_dl.changed or not k8s_keyring_stat.stat.exists
+
+- name: Ensure Kubernetes GPG keyring permissions are world-readable by APT
+  ansible.builtin.file:
+    path: "{{ k8s_apt_keyring_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  when: not ansible_check_mode or k8s_keyring_stat.stat.exists
+
+- name: Add official Kubernetes APT repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by={{ k8s_apt_keyring_path }}] {{ k8s_apt_repo_url }} /"
+    filename: kubernetes
+    state: present
+    update_cache: "{{ not ansible_check_mode or k8s_keyring_stat.stat.exists }}"
