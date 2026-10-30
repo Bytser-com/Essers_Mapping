@@ -13,6 +13,12 @@ type ConfidenceProps = {
 };
 
 const REVIEW_REQUIRED = "REVIEW_REQUIRED";
+const IN_REVIEW = "In review";
+
+// Tabel (Figma: "Tabel – mappings"): 16px rand links/rechts, 12px tussen de kolommen
+const thClass =
+  "px-1.5 py-2.5 first:pl-4 last:pr-4 text-left font-bold text-[11px] tracking-[0.06em] uppercase text-grey";
+const tdClass = "px-1.5 py-[13px] first:pl-4 last:pr-4 align-middle text-[13px]";
 
 function formatUploadDate(isoDate: string): string {
   const date = new Date(isoDate);
@@ -30,10 +36,10 @@ function Confidence({ value }: ConfidenceProps) {
   }
 
   return (
-    <div className="confidence">
-      <span className="confidence__value">{value}%</span>
-      <span className="confidence__track">
-        <span className="confidence__fill" style={{ width: `${value}%` }} />
+    <div className="flex items-center gap-2">
+      <span className="font-semibold">{value}%</span>
+      <span className="relative w-17.5 h-1.5 overflow-hidden rounded-[3px] bg-line-grey">
+        <span className="absolute inset-y-0 left-0 rounded-[3px] bg-anthracite" style={{ width: `${value}%` }} />
       </span>
     </div>
   );
@@ -52,32 +58,35 @@ export default function ProposalPage({ onDownload, onUpload, onApprove }: Propos
     }
   }, [company, fetchProposal]);
 
-  if (loading) return <p>Voorstel wordt geladen...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading) return <p className="px-8 py-7 text-grey">Voorstel wordt geladen...</p>;
+  if (error) return <p className="px-8 py-7">{error}</p>;
   if (!proposal) return null;
 
   const hasReviewFields = proposal.mappings.some((m) => !m.bronveld);
 
   return (
-    <main className="flex-1 px-6 py-5 bg-background min-h-screen">
-      <nav className="flex gap-1.5 mb-1.5 text-grey text-[11px]">
-        <span>Home</span>
-        <span>/</span>
-        <span>{proposal.klant}</span>
-      </nav>
+    <main className="flex flex-1 flex-col gap-4 min-h-screen px-8 py-7 bg-background">
+      <header className="flex items-end gap-4">
+        <div className="flex flex-1 flex-col gap-1.5">
+          <nav className="flex gap-2 text-xs text-grey">
+            <span>Home</span>
+            <span>/</span>
+            <span>{proposal.klant}</span>
+          </nav>
 
-      <header className="flex justify-between items-start gap-4 mb-3.5">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <h1 className="m-0 font-title text-[22px] font-bold">
+          <div className="flex items-center gap-3">
+            <h1 className="m-0 font-title text-2xl font-bold">
               {proposal.klant} · v{proposal.versie}
             </h1>
-            <span className={`status ${proposal.status === "In review" ? "status--review" : "status--ready"}`}>{proposal.status}</span>
+            <span className={`status ${proposal.status === IN_REVIEW ? "status--review" : "status--ready"}`}>
+              {proposal.status}
+            </span>
           </div>
-          <p className="mt-1 text-grey text-xs">Geüpload op {formatUploadDate(proposal.geupload)}</p>
+
+          <p className="m-0 text-[13px] text-grey">Geüpload op {formatUploadDate(proposal.geupload)}</p>
         </div>
 
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex items-center gap-2.5">
           <button type="button" className="btn" onClick={onDownload}>
             Download Excel
           </button>
@@ -91,39 +100,47 @@ export default function ProposalPage({ onDownload, onUpload, onApprove }: Propos
       </header>
 
       {hasReviewFields && (
-        <div className="flex items-center gap-2.5 px-3 py-2.5 mb-4.5 border border-line-grey rounded-small bg-white text-xs">
-          <span className="inline-flex justify-center items-center w-4 h-4 shrink-0 rounded-full bg-anthracite text-white text-[10px] font-bold">i</span>
+        <div className="flex items-center gap-2.5 px-3.5 py-2.5 border border-mid-grey rounded-small bg-white text-[13px]">
+          <span className="inline-flex justify-center items-center size-4.5 shrink-0 rounded-full bg-anthracite text-white text-[11px] font-bold">
+            i
+          </span>
           Velden met REVIEW_REQUIRED kon de AI niet invullen. Pas ze aan in de Excel en upload die opnieuw.
         </div>
       )}
 
-      <h2 className="mb-2.5 font-title text-sm font-bold">Inhoud van het voorstel</h2>
+      <h2 className="m-0 font-title text-base font-bold">Inhoud van het voorstel</h2>
 
       <div className="overflow-hidden border border-line-grey rounded-medium bg-white">
-        <table className="w-full border-collapse">
-          <thead>
+        <table className="w-full table-fixed border-collapse">
+          <colgroup>
+            <col className="w-65.5" />
+            <col className="w-63" />
+            <col className="w-48" />
+            <col />
+          </colgroup>
+          <thead className="bg-background border-b border-line-grey">
             <tr>
-              <th className="px-3 py-2.5 border-b border-line-grey bg-background text-grey text-[10px] font-semibold tracking-wider text-left uppercase">Bronveld (klant)</th>
-              <th className="px-3 py-2.5 border-b border-line-grey bg-background text-grey text-[10px] font-semibold tracking-wider text-left uppercase">Doelveld (H.Essers)</th>
-              <th className="px-3 py-2.5 border-b border-line-grey bg-background text-grey text-[10px] font-semibold tracking-wider text-left uppercase">Zekerheid</th>
-              <th className="px-3 py-2.5 border-b border-line-grey bg-background text-grey text-[10px] font-semibold tracking-wider text-left uppercase">Opmerking</th>
+              <th className={thClass}>Bronveld (klant)</th>
+              <th className={thClass}>Doelveld (H.Essers)</th>
+              <th className={thClass}>Zekerheid</th>
+              <th className={thClass}>Opmerking</th>
             </tr>
           </thead>
           <tbody>
             {proposal.mappings.map((mapping) => (
-              <tr key={mapping.id}>
-                <td className="p-3 border-b border-line-grey text-xs align-middle">
+              <tr key={mapping.id} className="border-b border-line-grey last:border-b-0">
+                <td className={tdClass}>
                   {!mapping.bronveld ? (
-                    <span className="inline-block px-2.25 py-0.75 rounded-full bg-anthracite text-white font-mono text-[10px] font-medium">{REVIEW_REQUIRED}</span>
+                    <span className="status status--required">{REVIEW_REQUIRED}</span>
                   ) : (
                     <code className="font-mono text-xs">{mapping.bronveld}</code>
                   )}
                 </td>
-                <td className="p-3 border-b border-line-grey text-xs align-middle">{mapping.doelveld}</td>
-                <td className="p-3 border-b border-line-grey text-xs align-middle">
+                <td className={tdClass}>{mapping.doelveld}</td>
+                <td className={tdClass}>
                   <Confidence value={mapping.zekerheid} />
                 </td>
-                <td className="leading-snug, p-3 border-b border-line-grey text-xs align-middle">{mapping.opmerking}</td>
+                <td className={tdClass}>{mapping.opmerking}</td>
               </tr>
             ))}
           </tbody>

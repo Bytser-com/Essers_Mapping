@@ -3,6 +3,7 @@ from openpyxl import load_workbook
 import re
 
 VERSION_PATTERN = r"^MProposal-.+_V(\d+)(_edited)?\.xlsx$"
+SHEET_NAME = "Mapping Proposal"
 
 def get_proposal_file(company):
     best_key = (0, False)
@@ -38,7 +39,10 @@ def get_list_from_excel(company):
     if excel is None:
         return None, None, None, None
     wb = load_workbook(excel, read_only=True)
-    ws = wb["Mapping Proposal"]
+    if SHEET_NAME not in wb.sheetnames:
+        wb.close()
+        return None, None, None, None
+    ws = wb[SHEET_NAME]
     titles = []
     for cell in ws[2]:
         titles.append(cell.value)

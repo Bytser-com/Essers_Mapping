@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&family=Roboto+Mono:wght@400;500&display=swap");
 @import "tailwindcss";
 
+/* Huisstijl H.Essers (Figma: pagina "Huisstijl") */
 @theme {
   --color-red: #a50000;
   --color-anthracite: #1c1c1f;
@@ -9,19 +10,20 @@
   --color-line-grey: #e3e3e8;
   --color-background: #f4f4f6;
   --color-white: #ffffff;
+  --color-label-grey: #ededf0; /* achtergrond van het lichte statuslabel (component "Label") */
 
   --font-title: "Montserrat", sans-serif;
   --font-text: "Inter", sans-serif;
   --font-mono: "Roboto Mono", monospace;
 
-  --radius-small: 6px;
-  --radius-medium: 10px;
-  --radius-large: 14px;
+  --radius-small: 8px;  /* knoppen, meldingen, zijbalk-items */
+  --radius-medium: 12px; /* tabellen */
+  --radius-large: 16px; /* kaarten */
 }
 
 @layer base {
   body {
-    @apply bg-background text-anthracite font-text text-[14px] antialiased;
+    @apply bg-background text-anthracite font-text text-sm antialiased;
   }
 
   #root {
@@ -30,10 +32,11 @@
 }
 
 @layer components {
+  /* Knoppen (component "Knop"): één donkere hoofdactie, witte knoppen voor de rest */
   .btn {
-    @apply inline-flex items-center gap-1.5 px-3.5 py-2.25
+    @apply inline-flex items-center justify-center px-4 py-2.5
       border border-line-grey rounded-small bg-white text-anthracite
-      font-text text-[13px] font-semibold cursor-pointer
+      font-text text-sm font-semibold whitespace-nowrap cursor-pointer
       transition-colors duration-150 hover:bg-background
       disabled:border-line-grey disabled:bg-line-grey disabled:text-mid-grey disabled:cursor-not-allowed;
   }
@@ -42,20 +45,25 @@
     @apply border-anthracite bg-anthracite text-white hover:bg-black;
   }
 
+  /* Status (component "Label"): altijd een label met tekst erin */
   .status {
-    @apply inline-block px-2.25 py-0.75 border border-transparent rounded-full
-      text-[11px] font-semibold whitespace-nowrap;
+    @apply inline-flex items-center px-[9px] py-[3px] border border-transparent rounded-full
+      font-text text-xs font-medium whitespace-nowrap;
   }
 
+  /* Licht: Geslaagd */
   .status--success {
-    @apply bg-line-grey text-anthracite;
+    @apply bg-label-grey text-anthracite;
   }
 
+  /* Donker: Mislukt, Klaar om na te kijken, REVIEW_REQUIRED */
   .status--failed,
-  .status--ready {
+  .status--ready,
+  .status--required {
     @apply bg-anthracite text-white;
   }
 
+  /* Omlijnd: In review */
   .status--review {
     @apply border-anthracite bg-white text-anthracite;
   }
