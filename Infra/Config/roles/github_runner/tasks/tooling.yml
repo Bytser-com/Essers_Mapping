@@ -73,7 +73,7 @@
 
 - name: Install Terraform CLI
   ansible.builtin.apt:
-    name: "{{ 'terraform=' ~ runner_terraform_version if (runner_terraform_version | default('') | length > 0) else 'terraform' }}"
+    name: "{{ ('terraform=' ~ runner_terraform_version) if (runner_terraform_version | default('') | length > 0 and '*' not in runner_terraform_version) else 'terraform' }}"
     state: present
     allow_change_held_packages: true
     allow_downgrade: true

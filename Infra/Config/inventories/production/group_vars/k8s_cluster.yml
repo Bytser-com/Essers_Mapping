@@ -6,7 +6,7 @@
 
 # --- Kubernetes Versioning (pkgs.k8s.io) ---
 k8s_version_minor: "1.37"
-k8s_package_version: "1.37.*"
+k8s_package_version: ""
 
 # --- Container Runtime (containerd) ---
 containerd_systemd_cgroup: true
