@@ -1,6 +1,6 @@
 name: Setup Ansible
 description: >-
-  Installs pinned ansible-core + ansible-lint into a cached Python virtualenv
+  Installs pinned ansible-core + ansible-lint into a fresh Python virtualenv
   on the runner and installs Galaxy requirements in an isolated workspace.
 
 inputs:
@@ -19,49 +19,29 @@ inputs:
 runs:
   using: composite
   steps:
-    # Venv is cached in the runner tool cache and keyed on the pinned versions,
-    # so it is only (re)built when the versions change.
-    - name: Create / reuse Ansible virtualenv
+    - name: Create fresh Ansible virtualenv
       shell: bash
       env:
         ANSIBLE_CORE_VERSION: ${{ inputs.ansible-core-version }}
         ANSIBLE_LINT_VERSION: ${{ inputs.ansible-lint-version }}
       run: |
         set -euo pipefail
-        # Include python binary path & version in cache key to invalidate if host Python updates
-        PY_VER=$(python3 -V 2>&1 | tr ' ' '_')
-        KEY=$(printf '%s|%s|%s' "$PY_VER" "$ANSIBLE_CORE_VERSION" "$ANSIBLE_LINT_VERSION" | sha256sum | cut -c1-16)
-        
-        CACHE_BASE="${RUNNER_TOOL_CACHE:-$HOME/.cache}/ansible-venv"
-        VENV="${CACHE_BASE}/${KEY}"
-        LOCKFILE="${CACHE_BASE}/.lock_${KEY}"
 
-        mkdir -p "$CACHE_BASE"
+        # Use job-scoped temp directory so each run has a clean environment
+        VENV="${RUNNER_TEMP}/ansible-venv"
+        rm -rf "$VENV"
 
-        # Concurrency safety: acquire file lock to prevent simultaneous builds
-        exec 200>"$LOCKFILE"
-        flock -x 200
-
-        # Check not just that the file exists, but that it can actually execute
-        if [ ! -x "$VENV/bin/ansible-playbook" ] || ! "$VENV/bin/ansible-playbook" --version > /dev/null 2>&1; then
-          echo "Building or rebuilding broken Ansible virtualenv at $VENV..."
-          TMP_DIR=$(mktemp -d "${CACHE_BASE}/venv_tmp_XXXXXX")
-          
-          python3 -m venv "$TMP_DIR"
-          "$TMP_DIR/bin/pip" install --no-cache-dir --upgrade pip wheel
-          "$TMP_DIR/bin/pip" install --no-cache-dir \
-            "ansible-core${ANSIBLE_CORE_VERSION}" \
-            "ansible-lint${ANSIBLE_LINT_VERSION}"
-          
-          rm -rf "$VENV"
-          mv "$TMP_DIR" "$VENV"
-        else
-          echo "Reusing cached Ansible virtualenv at $VENV"
-        fi
-
-        # Release lock
-        flock -u 200
-        rm -f "$LOCKFILE" 
+        echo "Creating fresh Ansible virtualenv at $VENV..."
+        python3 -m venv "$VENV"
+        "$VENV/bin/pip" install --no-cache-dir --upgrade pip wheel
+        "$VENV/bin/pip" install --no-cache-dir \
+          "ansible-core${ANSIBLE_CORE_VERSION}" \
+          "ansible-lint${ANSIBLE_LINT_VERSION}" \
+          netaddr \
+          jmespath \
+          cryptography \
+          kubernetes \
+          requests
 
         echo "$VENV/bin" >> "$GITHUB_PATH"
 
@@ -71,8 +51,8 @@ runs:
       run: |
         set -euo pipefail
         
-        # Isolate galaxy paths to the runner temp directory to prevent state leakage between runs
-        GALAXY_DIR="${RUNNER_TEMP:-/tmp}/ansible-galaxy"
+        GALAXY_DIR="${RUNNER_TEMP}/ansible-galaxy"
+        rm -rf "$GALAXY_DIR"
         mkdir -p "$GALAXY_DIR/collections" "$GALAXY_DIR/roles"
 
         echo "ANSIBLE_COLLECTIONS_PATH=$GALAXY_DIR/collections" >> "$GITHUB_ENV"
@@ -81,7 +61,6 @@ runs:
         for req in requirements.yml collections/requirements.yml roles/requirements.yml; do
           if [ -f "$req" ]; then
             echo "Installing Galaxy requirements from $req..."
-            # Install roles and collections to isolated paths
             ansible-galaxy role install -r "$req" -p "$GALAXY_DIR/roles" || true
             ansible-galaxy collection install -r "$req" -p "$GALAXY_DIR/collections" || true
           fi
