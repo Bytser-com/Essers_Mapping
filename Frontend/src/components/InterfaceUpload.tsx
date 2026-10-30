@@ -68,7 +68,7 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
           <button
             type="button"
             onClick={() => fileInput.current?.click()}
-            className="rounded-lg border border-[#e3e3e8] bg-white px-4 py-[10px] text-[14px] font-semibold"
+            className="cursor-pointer rounded-lg border border-[#e3e3e8] bg-white px-4 py-[10px] text-[14px] font-semibold transition-colors hover:bg-[#f4f4f6]"
           >
             Bestanden kiezen
           </button>
@@ -88,7 +88,7 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
           <button
             type="button"
             onClick={handleUpload}
-            className="rounded-lg bg-[#1c1c1f] px-4 py-[10px] text-[14px] font-semibold text-white"
+            className="cursor-pointer rounded-lg bg-[#1c1c1f] px-4 py-[10px] text-[14px] font-semibold text-white transition-opacity hover:opacity-85"
           >
             Uploaden
           </button>
