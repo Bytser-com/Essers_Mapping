@@ -1,1 +1,1 @@
-"""Unit tests for scripts/storage.py with a mocked SFTP connection."""
+"""Unit tests for services/storage.py with a mocked SFTP connection."""

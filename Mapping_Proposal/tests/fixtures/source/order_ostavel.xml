@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Test data for the proposals overview (fit criterion 4): one outbound order of customer Ostavel. -->
+<OutboundOrder>
+  <Head>
+    <OrderNumber>SO-OST-0001</OrderNumber>
+    <Customer>Ostavel</Customer>
+    <DeliveryDate>2026-10-30</DeliveryDate>
+  </Head>
+  <Lines>
+    <Line>
+      <LineNumber>10</LineNumber>
+      <ProductCode>OST-4711</ProductCode>
+      <Quantity>12</Quantity>
+    </Line>
+  </Lines>
+</OutboundOrder>

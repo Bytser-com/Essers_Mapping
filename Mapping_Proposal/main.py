@@ -13,6 +13,7 @@ import sys
 from scripts.errors import MappingError
 from scripts.models import MappingSettings
 from scripts.pipeline import log_preview, preview_mapping, run_mapping
+from services.proposal_runner import run_for_customer
 
 
 # ---------------------------------------------------------------------------
@@ -34,6 +35,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument('--target-segment', default='',
                         help='Optional target segment filter, e.g. E1BPOBDLVITEM.')
     parser.add_argument('--model', default='', help='Optional override for GEMINI_MODEL from .env.')
+    parser.add_argument('--customer', default='',
+                        help='Customer name: register the run as a proposal, so the overview shows its status.')
     parser.add_argument('--preview', action='store_true',
                         help='Show exactly what would be sent, without calling Gemini.')
     return parser
@@ -56,10 +59,11 @@ def _configure_logging() -> None:
     # (httpx, google-genai) stay silent.
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(_ConsoleFormatter())
-    tool_logger = logging.getLogger('scripts')
-    tool_logger.handlers[:] = [handler]
-    tool_logger.setLevel(logging.INFO)
-    tool_logger.propagate = False
+    for name in ('scripts', 'services'):  # the AI pipeline and the proposal services
+        tool_logger = logging.getLogger(name)
+        tool_logger.handlers[:] = [handler]
+        tool_logger.setLevel(logging.INFO)
+        tool_logger.propagate = False
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -87,6 +91,9 @@ def main(argv: list[str] | None = None) -> int:
         if args.preview:
             log_preview(preview_mapping(settings))
             print('Preview only: no Gemini request and no Excel output.')
+        elif args.customer:
+            # The proposals overview shows "AI maakt voorstel / Bezig" during this run.
+            run_for_customer(args.customer, settings)
         else:
             run_mapping(settings)
     except MappingError as error:

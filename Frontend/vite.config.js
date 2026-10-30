@@ -5,6 +5,16 @@ import { defineConfig } from 'vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  // Local development: send /api/proposal/* to the Mapping_Proposal backend
+  // (uvicorn on port 8000), like the frontend proxy does in Kubernetes.
+  server: {
+    proxy: {
+      '/api/proposal': {
+        target: 'http://localhost:8000',
+        rewrite: (path) => path.replace(/^\/api\/proposal/, ''),
+      },
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',

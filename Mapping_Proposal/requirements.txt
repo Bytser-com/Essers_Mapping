@@ -4,3 +4,5 @@ openpyxl
 httpx
 pytest
 pytest-mock
+fastapi
+uvicorn

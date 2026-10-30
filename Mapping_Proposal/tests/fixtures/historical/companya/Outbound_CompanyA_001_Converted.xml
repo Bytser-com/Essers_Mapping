@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Small historical example for the tests: the same message in the common target format. -->
+<SHP_OBDLV_SAVE_REPLICA05>
+  <IDOC>
+    <E1BPOBDLVHDR>
+      <DELIV_NUMB>SO-A-0001</DELIV_NUMB>
+      <DELIV_DATE>20260901</DELIV_DATE>
+    </E1BPOBDLVHDR>
+    <E1BPOBDLVITEM>
+      <ITM_NUMBER>000010</ITM_NUMBER>
+      <MATERIAL>A-100</MATERIAL>
+      <DLV_QTY>5</DLV_QTY>
+    </E1BPOBDLVITEM>
+  </IDOC>
+</SHP_OBDLV_SAVE_REPLICA05>

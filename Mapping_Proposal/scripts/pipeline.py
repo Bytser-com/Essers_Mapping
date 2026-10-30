@@ -64,7 +64,13 @@ def fingerprint_files(files: list[Path]) -> str:
     """Private, content-based dataset version; never stores XML in the experiment log."""
     digest = hashlib.sha256()
     for file in sorted(set(files), key=str):
-        digest.update(file.relative_to(ROOT).as_posix().encode('utf-8'))
+        # Paths inside the project are stored relative to it; files on the shared
+        # storage (e.g. /mnt/sftp-shared in Kubernetes) are outside it.
+        try:
+            name = file.relative_to(ROOT).as_posix()
+        except ValueError:
+            name = file.as_posix()
+        digest.update(name.encode('utf-8'))
         digest.update(b'\0')
         with file.open('rb') as handle:
             for block in iter(lambda: handle.read(1024 * 1024), b''):
@@ -126,9 +132,13 @@ def _prepare(settings: MappingSettings) -> _Inputs:
 
     # Python scans ALL files, so the lists of valid source and target paths are
     # complete, even though Gemini only receives a few example documents.
-    source_files = sorted(SOURCE_DIR.rglob('*.xml'))
+    # settings.source_dir is set when a run belongs to a proposal (services/proposal_runner.py).
+    # Only the XML files directly in the folder: uploads waiting in subfolders of
+    # data/source/ (see services/incoming_watcher.py) are not part of this run.
+    source_dir = settings.source_dir or SOURCE_DIR
+    source_files = sorted(source_dir.glob('*.xml'))
     if not source_files:
-        raise InputDataError('No new-customer XML files in data/source/.')
+        raise InputDataError(f'No new-customer XML files in {source_dir}.')
     try:
         pairs = discover_historical_pairs(HISTORICAL_DIR)
         converted_files = [pair['converted_file'] for pair in pairs]

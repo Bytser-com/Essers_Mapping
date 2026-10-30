@@ -16,12 +16,21 @@ This is a **proposal generator**, not an executable XML converter. No AI proposa
 ## Project folders
 
 ```text
-ai_tool/
+Mapping_Proposal/
+├── api.py                  HTTP API (FastAPI): creates the app, registers routers/, starts the upload watcher
 ├── main.py                 Command line: reads the options and calls scripts/pipeline.py
 ├── prompt.txt              Explains the mapping task and rules to Gemini
 ├── .env                    Your local API key configuration (not in Git)
 ├── requirements.txt        Python packages to install
-├── scripts/
+├── routers/                HTTP endpoints, one file per resource (thin: they call services/)
+│   └── proposals.py        GET /proposals – the overview on Home
+├── services/               Business logic used by the API and the command line
+│   ├── proposals.py        Read/write proposals on the shared storage (SFTP share)
+│   ├── proposal_runner.py  Run the AI for one proposal and keep its status up to date
+│   ├── incoming_watcher.py Start the AI automatically for every complete upload
+│   ├── storage.py          (to do) SFTP upload
+│   └── jobs.py             (to do) job status for API runs
+├── scripts/                The AI pipeline and the shared basics (config, errors, models)
 │   ├── __init__.py
 │   ├── pipeline.py         The complete workflow: preview_mapping() and run_mapping()
 │   ├── config.py           Project paths and settings from .env (read in one place)
@@ -31,7 +40,9 @@ ai_tool/
 │   ├── readprompt.py       Builds Gemini's request; handles API calls, quota/retries
 │   ├── mapping_validator.py  Flags unknown source/target paths or invalid rule types
 │   ├── excel_generator.py  Fills the original mapping Excel template
-│   └── experiment_tracker.py  Writes the experiment log
+│   ├── experiment_tracker.py  Writes the experiment log
+│   └── dev_seed.py         Example proposals for local development
+├── tests/                  unit/, integration/, api/ and fixtures/ (small test XML, in Git)
 ├── data/
 │   ├── source/             Original XML files from the NEW customer (currently Nouryon)
 │   └── historical/
@@ -243,3 +254,76 @@ Open **Mapping Proposal** first. Check whether the source field actually represe
 Only use XML files that Essers explicitly authorizes for an external AI API. The files included here were supplied as scrambled examples; don't substitute real customer personal or confidential data without approval. `.env` is ignored by Git. The `.gitignore` excludes the entire `data/` and `output/` folders from Git; datasets, generated workbooks and experiment logs stay local.
 
 Your teammates need Python, the dependency installation, their own authorized API key, and access to the same scrambled example files to run this project. There is **no web frontend or deployment server** yet; this is a local command-line prototype.
+
+## Proposals API (overview on the Home page)
+
+`api.py` creates the FastAPI app; the endpoints live in `routers/` (`routers/proposals.py` lists the proposals stored on the shared storage, the SFTP share).
+
+| Endpoint | Returns |
+|---|---|
+| `GET /health` | `{"status": "ok"}` |
+| `GET /proposals` | `{"total": 6, "proposals": [...]}`: latest version per customer, newest upload first |
+| `GET /proposals?all_versions=true` | every version |
+
+One proposal in the response:
+
+```json
+{"id": "voorbeeldbedrijf-a/v1", "customer": "Voorbeeldbedrijf A", "version": 1,
+ "uploaded_at": "2026-10-22T14:05:00+02:00", "status": "AI_GENERATING",
+ "ai_status": "RUNNING", "can_open": false}
+```
+
+`status` is one of `AI_GENERATING`, `READY_FOR_REVIEW`, `IN_REVIEW`, `AI_CHECKING_REVIEW`, `RETURNED`; `ai_status` is `RUNNING`, `FAILED` or `null`. The frontend shows the Dutch labels.
+
+**Where the data comes from.** Each version of a proposal is a folder with a `proposal.json` (layout and format: see `services/proposals.py`):
+
+```text
+<shared storage>/proposals/<customer-folder>/v<version>/proposal.json
+```
+
+- In Kubernetes the SFTP share is mounted at `SHARED_MOUNT_PATH` (`/mnt/sftp-shared`), so no SFTP client is needed.
+- Locally, without an SFTP server, `data/sftp-shared/` is used. Fill it with example data: `python -m scripts.dev_seed`.
+
+**Run locally** (from `Mapping_Proposal/`):
+
+```powershell
+python -m pip install -r requirements.txt
+python -m scripts.dev_seed
+uvicorn api:app --reload --port 8000
+```
+
+Open http://localhost:8000/docs to try the endpoints. When the Vite frontend calls the API directly, add `CORS_ORIGINS=http://localhost:5173` to `.env`.
+
+### AI status in the overview
+
+Run the AI for a customer with `--customer`; the run is then registered as a proposal on the shared storage:
+
+```powershell
+python main.py --customer "Voorbeeldbedrijf A"
+```
+
+- Start: a new version folder appears with status `AI_GENERATING` / `RUNNING` ("AI maakt voorstel" / "Bezig").
+- Success: `READY_FOR_REVIEW` ("Klaar om na te kijken"); the Excel is saved next to it as `MProposal-<Klant>_V<N>.xlsx` (e.g. `MProposal-Brunos_V2.xlsx`).
+- Failure or Ctrl+C: `ai_status` becomes `FAILED` ("Mislukt"), with a short `error` in `proposal.json`.
+
+The frontend refreshes the list every 5 seconds while a proposal is "Bezig". Only the Excel goes to SFTP; the XML files are not copied there. See `services/proposal_runner.py`.
+
+### Automatic AI start for uploads
+
+While the API runs (`uvicorn api:app`), a watcher checks the source folder (`data/source/`) every 5 seconds and starts the AI for every complete upload, without any command. Agreement with the upload story:
+
+```text
+data/source/<upload-id>/           one new folder per upload (INCOMING_DIR overrides data/source/)
+    order_1.xml, order_2.xml       one or more XML files
+    upload.json                    written LAST: {"customer": "Ostavel"}
+```
+
+- All XML files of one upload together give one proposal for that customer. The row appears on Home at once ("AI maakt voorstel"); the AI handles uploads one after another.
+- Afterwards the upload is moved to `processed/`, or to `failed/` with an `error.txt` (no XML, no customer name, AI error).
+- After a restart, an upload that was still being processed gets AI status "Mislukt", so no row stays on "Bezig".
+- Settings in `.env`: `INCOMING_DIR`, `WATCH_INCOMING=0` (turn off), `INCOMING_POLL_SECONDS` (default 5), `AI_LIMIT_TARGETS` (target fields per proposal, default 10, 0 = all).
+- Without the API: `python -m services.incoming_watcher` (keep watching) or `--once`.
+
+**Kubernetes:** the container's root filesystem is read-only, so set `INCOMING_DIR` to a writable folder such as `/tmp/source`.
+
+`python main.py` only reads the XML files directly in `data/source/`, not the uploads in its subfolders. The upload must be written by this same service (the folder is local to each pod).
