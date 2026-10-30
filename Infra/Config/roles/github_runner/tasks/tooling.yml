@@ -209,6 +209,7 @@
     lock_timeout: 120
   environment:
     DEBIAN_FRONTEND: noninteractive
+  register: runner_docker_pkg
   when: runner_install_docker | bool
 
 - name: Ensure Docker service is enabled and running
@@ -216,7 +217,9 @@
     name: docker
     enabled: true
     state: started
-  when: runner_install_docker | bool
+  when:
+    - runner_install_docker | bool
+    - not (ansible_check_mode and (runner_docker_pkg.changed | default(false)))
 
 - name: Add '{{ github_runner_user }}' and '{{ ansible_user }}' to docker group
   ansible.builtin.user:
@@ -226,4 +229,6 @@
   loop:
     - "{{ github_runner_user }}"
     - "{{ ansible_user }}"
-  when: runner_install_docker | bool
+  when:
+    - runner_install_docker | bool
+    - not (ansible_check_mode and (runner_docker_pkg.changed | default(false)))
