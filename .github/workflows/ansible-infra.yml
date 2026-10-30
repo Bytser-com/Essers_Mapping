@@ -63,7 +63,10 @@ env:
 jobs:
   ansible:
     name: ${{ (github.event_name == 'pull_request' && 'Dry-run') || (github.event_name == 'push' && 'Configure') || (inputs.mode == 'apply' && 'Configure') || 'Dry-run' }}
-    runs-on: [self-hosted, linux, "${{ vars.RUNNER_LABEL }}"]
+    runs-on: 
+      - self-hosted
+      - linux
+      - ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
     environment: ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
     defaults:
       run:

@@ -62,7 +62,10 @@ env:
 jobs:
   plan:
     name: Plan
-    runs-on: [self-hosted, linux, "${{ vars.RUNNER_LABEL }}"]
+    runs-on: 
+      - self-hosted
+      - linux
+      - ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
     environment: ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
     defaults:
       run:
@@ -148,7 +151,10 @@ jobs:
         (github.event_name == 'workflow_dispatch' &&
           (github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy'))
       )
-    runs-on: [self-hosted, linux, "${{ vars.RUNNER_LABEL }}"]
+    runs-on: 
+      - self-hosted
+      - linux
+      - ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
     environment: ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
     defaults:
       run:
