@@ -7,14 +7,14 @@ name: Ansible - Infra Config
 #  - Manual                             -> choose check / apply
 on:
   pull_request:
-    branches: [main, testing]
+    branches: [main, Testing]
     paths:
       - "Infra/Config/**"
       - ".github/workflows/ansible-infra.yml"
       - ".github/actions/setup-ansible/**"
 
   push:
-    branches: [main, testing]
+    branches: [main, Testing]
     paths:
       - "Infra/Config/**"
       - ".github/workflows/ansible-infra.yml"
@@ -63,7 +63,10 @@ env:
 jobs:
   ansible:
     name: ${{ (github.event_name == 'pull_request' && 'Dry-run') || (github.event_name == 'push' && 'Configure') || (inputs.mode == 'apply' && 'Configure') || 'Dry-run' }}
-    runs-on: [self-hosted, linux, "${{ vars.RUNNER_LABEL }}"]
+    runs-on: 
+      - self-hosted
+      - linux
+      - ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
     environment: ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
     defaults:
       run:

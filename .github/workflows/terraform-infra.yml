@@ -2,13 +2,13 @@ name: Terraform - Infra Setup
 
 on:
   pull_request:
-    branches: [main, testing]
+    branches: [main, Testing]
     paths:
       - "Infra/Setup/**"
       - ".github/workflows/terraform-infra.yml"
 
   push:
-    branches: [main, testing]
+    branches: [main, Testing]
     paths:
       - "Infra/Setup/**"
       - ".github/workflows/terraform-infra.yml"
@@ -49,20 +49,23 @@ env:
   TF_VAR_proxmox_api_url: ${{ vars.PROXMOX_API_URL }}
   TF_VAR_pipeline_ssh_public_key: ${{ vars.PIPELINE_SSH_PUBLIC_KEY }}
   TF_VAR_node01_name: ${{ vars.NODE01_NAME }}
-  TF_VAR_cloud_image_url: ${{ vars.CLOUD_IMAGE_URL }}
-  TF_VAR_cloud_image_checksum: ${{ vars.CLOUD_IMAGE_CHECKSUM }}
+  TF_VAR_debian_cloud_image_url: ${{ vars.CLOUD_IMAGE_URL }}
+  TF_VAR_debian_cloud_image_checksum: ${{ vars.CLOUD_IMAGE_CHECKSUM }}
   TF_VAR_ipv4_gateway: ${{ vars.IPV4_GATEWAY }}
-  TF_VAR_pipeline-runner_vm_dns_domain: ${{ vars.PIPELINE_RUNNER_VM_DNS_DOMAIN }}
-  TF_VAR_pipeline-runner_vm_ipv4_address: ${{ vars.PIPELINE_RUNNER_VM_IPV4_ADDRESS }}
-  TF_VAR_k8s-master_vm_dns_domain: ${{ vars.K8S_MASTER_VM_DNS_DOMAIN }}
-  TF_VAR_k8s-master_vm_ipv4_address: ${{ vars.K8S_MASTER_VM_IPV4_ADDRESS }}
-  TF_VAR_k8s-worker_vm_dns_domain: ${{ vars.K8S_WORKER_VM_DNS_DOMAIN }}
-  TF_VAR_k8s-worker_vm_ipv4_address: ${{ vars.K8S_WORKER_VM_IPV4_ADDRESS }}
+  TF_VAR_pipeline_runner_vm_dns_domain: ${{ vars.PIPELINE_RUNNER_VM_DNS_DOMAIN }}
+  TF_VAR_pipeline_runner_vm_ipv4_address: ${{ vars.PIPELINE_RUNNER_VM_IPV4_ADDRESS }}
+  TF_VAR_k8s_master_vm_dns_domain: ${{ vars.K8S_MASTER_VM_DNS_DOMAIN }}
+  TF_VAR_k8s_master_vm_ipv4_address: ${{ vars.K8S_MASTER_VM_IPV4_ADDRESS }}
+  TF_VAR_k8s_worker_vm_dns_domain: ${{ vars.K8S_WORKER_VM_DNS_DOMAIN }}
+  TF_VAR_k8s_worker_vm_ipv4_address: ${{ vars.K8S_WORKER_VM_IPV4_ADDRESS }}
 
 jobs:
   plan:
     name: Plan
-    runs-on: [self-hosted, linux, "${{ vars.RUNNER_LABEL }}"]
+    runs-on: 
+      - self-hosted
+      - linux
+      - ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
     environment: ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
     defaults:
       run:
@@ -144,11 +147,14 @@ jobs:
     if: >-
       needs.plan.outputs.has_changes == 'true' &&
       (
-        (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/testing')) ||
+        (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/Testing')) ||
         (github.event_name == 'workflow_dispatch' &&
           (github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy'))
       )
-    runs-on: [self-hosted, linux, "${{ vars.RUNNER_LABEL }}"]
+    runs-on: 
+      - self-hosted
+      - linux
+      - ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
     environment: ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
     defaults:
       run:

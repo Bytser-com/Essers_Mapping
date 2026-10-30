@@ -7,13 +7,13 @@ name: Kubernetes - Cluster Deploy
 #  - Manual (workflow_dispatch)           -> choose check / apply / restart
 on:
   pull_request:
-    branches: [main, testing]
+    branches: [main, Testing]
     paths:
       - "Kubernetes/**"
       - ".github/workflows/kubernetes-deploy.yml"
 
   push:
-    branches: [main, testing]
+    branches: [main, Testing]
     paths:
       - "Kubernetes/**"
       - ".github/workflows/kubernetes-deploy.yml"
@@ -63,7 +63,10 @@ jobs:
         (inputs.mode == 'apply' && 'Deploy') ||
         'Dry-run'
       }}
-    runs-on: [self-hosted, linux, "${{ vars.RUNNER_LABEL }}"]
+    runs-on: 
+      - self-hosted
+      - linux
+      - ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
     environment: ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
     defaults:
       run:
