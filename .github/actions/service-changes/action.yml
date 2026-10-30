@@ -1,0 +1,55 @@
+name: Detect service changes
+description: Detect changes without leaving required CI checks pending on unrelated pull requests.
+
+inputs:
+  service-path:
+    description: Repository-relative service directory
+    required: true
+  workflow-path:
+    description: Repository-relative CI workflow file
+    required: true
+  shared-paths:
+    description: Additional repository-relative paths, one per line
+    required: false
+    default: ''
+
+outputs:
+  changed:
+    description: Whether the service needs to be checked
+    value: ${{ steps.changes.outputs.changed }}
+
+runs:
+  using: composite
+  steps:
+    - name: Compare service files
+      id: changes
+      shell: bash
+      env:
+        SERVICE_PATH: ${{ inputs.service-path }}
+        WORKFLOW_PATH: ${{ inputs.workflow-path }}
+        SHARED_PATHS: ${{ inputs.shared-paths }}
+        BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+      run: |
+        set -euo pipefail
+
+        # Manual runs, new branches and unavailable push bases check everything.
+        if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]] ||
+           [[ -z "$BASE_SHA" || "$BASE_SHA" =~ ^0+$ ]] ||
+           ! git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+
+        # Disable rename detection so moving a file out of a service also checks it.
+        paths=("$SERVICE_PATH" "$WORKFLOW_PATH" .github/actions/service-changes .gitattributes)
+        while IFS= read -r path; do
+          [[ -z "$path" ]] || paths+=("$path")
+        done <<< "$SHARED_PATHS"
+        changed_files=$(git diff --name-only --no-renames "$BASE_SHA" HEAD -- "${paths[@]}")
+
+        if [[ -n "$changed_files" ]]; then
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "changed=false" >> "$GITHUB_OUTPUT"
+          echo "No changes affecting $SERVICE_PATH. Service checks will be skipped." >> "$GITHUB_STEP_SUMMARY"
+        fi

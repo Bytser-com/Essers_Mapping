@@ -1,0 +1,74 @@
+name: Mapping Proposal CI
+
+on:
+  pull_request:
+    branches: [main, Testing, Development]
+  push:
+    branches: [main, Testing, Development]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mapping-proposal-ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    name: Detect Mapping Proposal changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      changed: ${{ steps.changes.outputs.changed }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Detect service changes
+        id: changes
+        uses: ./.github/actions/service-changes
+        with:
+          service-path: Mapping_Proposal
+          workflow-path: .github/workflows/mapping-proposal-ci.yml
+          shared-paths: |
+            .github/workflows/python-service-ci.yml
+            .github/requirements/python-ci.txt
+            .github/workflows/mapping-proposal-cd.yml
+            .github/workflows/service-cd.yml
+            Scripts/smoke-service-image.sh
+            Scripts/registry-pull-secret.py
+
+  checks:
+    name: Mapping Proposal checks
+    needs: changes
+    if: needs.changes.outputs.changed == 'true'
+    uses: ./.github/workflows/python-service-ci.yml
+    with:
+      service-path: Mapping_Proposal
+      artifact-prefix: mapping-proposal
+
+  quality-gate:
+    name: Mapping Proposal CI Gate
+    needs: [changes, checks]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require successful service checks
+        env:
+          CHANGES_RESULT: ${{ needs.changes.result }}
+          CHANGED: ${{ needs.changes.outputs.changed }}
+          CHECKS_RESULT: ${{ needs.checks.result }}
+        run: |
+          if [[ "$CHANGES_RESULT" == "success" ]] &&
+             { [[ "$CHANGED" == "false" && "$CHECKS_RESULT" == "skipped" ]] ||
+               [[ "$CHANGED" == "true" && "$CHECKS_RESULT" == "success" ]]; }; then
+            echo "Mapping Proposal CI passed." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::error::Mapping Proposal CI failed or was cancelled."
+            exit 1
+          fi

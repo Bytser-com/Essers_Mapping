@@ -128,7 +128,7 @@ Before preparing to merge, verify that your feature works and does not break exi
 
 ---
 
-### 5. Sync with `development` Before Merging
+### 5. Sync with `Development` Before Merging
 Other team members may have added code while you were working on your Feature. Update **your** branch to avoid merge conflicts later.
 
 ```bash
@@ -136,7 +136,7 @@ Other team members may have added code while you were working on your Feature. U
 git fetch origin
 
 # Merge the newest development code into your feature branch
-git merge origin/development
+git merge origin/Development
 
 # If there are merge conflicts:
 # 0. Find the merge conflicts using `git status`.

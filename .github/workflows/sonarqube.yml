@@ -1,0 +1,145 @@
+name: SonarQube
+
+on:
+  push:
+    branches: [Development]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sonarqube-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analysis:
+    name: SonarQube Quality Gate
+    # Preserve the existing SonarCloud baseline and avoid unsupported branch scans.
+    # Feature branches retain local IDE analysis and service tests/coverage.
+    if: github.ref_name == 'Development'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CI: 'true'
+      # --- Variables ---
+      SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL || 'https://sonarcloud.io' }}
+      SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY || 'Bytser-com_Essers_Mapping' }}
+      SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION || 'bytser-com' }}
+    steps:
+      - name: Checkout repository with full history
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Require SonarQube token
+        env:
+          # --- Secrets ---
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          if [[ -z "$SONAR_TOKEN" ]]; then
+            echo "::error::Configure the repository SONAR_TOKEN secret to run SonarQube analysis."
+            exit 1
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: Frontend/package-lock.json
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: Runtime/pom.xml
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            .github/requirements/python-ci.txt
+            Mapping_Proposal/requirements*.txt
+            Mapping_Proposal/pyproject.toml
+            Mapping_Converter/requirements*.txt
+            Mapping_Converter/pyproject.toml
+
+      # Generate coverage for every implemented service at the same revision.
+      # Unchanged services are included so the combined project retains coverage.
+      - name: Frontend tests and coverage
+        working-directory: Frontend
+        run: |
+          npm ci
+          npm run test:coverage
+
+      - name: Runtime tests, bytecode and coverage
+        working-directory: Runtime
+        run: mvn --batch-mode --no-transfer-progress -Dstyle.color=never clean verify
+
+      - name: Python service tests and coverage
+        run: |
+          set -euo pipefail
+          for service in Mapping_Proposal Mapping_Converter; do
+            if [[ ! -f "$service/requirements.txt" && ! -f "$service/pyproject.toml" ]]; then
+              if [[ -d "$service/tests" || -n "$(find "$service" -type f -name '*.py' -print -quit)" ]]; then
+                echo "::error::$service has Python code or tests but no dependency manifest."
+                exit 1
+              fi
+              echo "$service is a placeholder; Python coverage is deferred." >> "$GITHUB_STEP_SUMMARY"
+              continue
+            fi
+            # Isolate service dependencies so their versions cannot conflict.
+            python -m venv "$RUNNER_TEMP/sonar-$service"
+            service_python="$RUNNER_TEMP/sonar-$service/bin/python"
+            "$service_python" -m pip install -r .github/requirements/python-ci.txt
+            (
+              cd "$service"
+              if [[ -f requirements.txt ]]; then
+                "$service_python" -m pip install -r requirements.txt
+              else
+                "$service_python" -m pip install .
+              fi
+              if [[ -f requirements-dev.txt ]]; then
+                "$service_python" -m pip install -r requirements-dev.txt
+              fi
+              "$service_python" -m pip check
+              "$service_python" -m pytest tests -ra \
+                --junitxml=test-results/pytest-junit.xml \
+                --cov=. --cov-branch --cov-report=term-missing \
+                --cov-report=xml:coverage.xml --cov-report=html:coverage
+            )
+          done
+
+      - name: Run SonarQube scan and enforce quality gate
+        uses: SonarSource/sonarqube-scan-action@v8.3.0
+        env:
+          # --- Secrets ---
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >-
+            -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=${{ env.SONAR_ORGANIZATION }}
+
+      - name: Upload combined coverage and test reports
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: sonarqube-reports
+          path: |
+            Frontend/coverage/
+            Frontend/test-results/
+            Runtime/target/site/jacoco/
+            Runtime/target/surefire-reports/
+            Runtime/target/failsafe-reports/
+            Mapping_Proposal/coverage.xml
+            Mapping_Proposal/test-results/
+            Mapping_Converter/coverage.xml
+            Mapping_Converter/test-results/
+          if-no-files-found: warn
+          retention-days: 14

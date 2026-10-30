@@ -11,12 +11,20 @@ on:
     paths:
       - "Kubernetes/**"
       - ".github/workflows/kubernetes-deploy.yml"
+      - ".github/actions/check-infrastructure/**"
+      - "Scripts/check-proxmox-vms.py"
+      - "Scripts/preserve-cd-images.py"
+      - "Scripts/tests/**"
 
   push:
     branches: [main, Testing]
     paths:
       - "Kubernetes/**"
       - ".github/workflows/kubernetes-deploy.yml"
+      - ".github/actions/check-infrastructure/**"
+      - "Scripts/check-proxmox-vms.py"
+      - "Scripts/preserve-cd-images.py"
+      - "Scripts/tests/**"
 
   workflow_call:
     inputs:
@@ -63,10 +71,10 @@ jobs:
         (inputs.mode == 'apply' && 'Deploy') ||
         'Dry-run'
       }}
-    runs-on: 
+    runs-on:
       - self-hosted
       - linux
-      - ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
+      - ${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}
     environment: ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
     defaults:
       run:
@@ -79,8 +87,8 @@ jobs:
       K8S_MASTER_VM_IPV4_ADDRESS: ${{ vars.K8S_MASTER_VM_IPV4_ADDRESS }}
 
       # --- Registry & Application Secrets (Optional Overrides for base/common/secrets.yaml) ---
-      GHCR_USERNAME: ${{ vars.GHCR_USERNAME || github.repository_owner }}
-      GHCR_TOKEN: ${{ secrets.GHCR_TOKEN || secrets.GITHUB_TOKEN }}
+      GHCR_USERNAME: ${{ vars.GHCR_USERNAME }}
+      GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
       SFTP_SHARED_ADMIN_USER: ${{ vars.SFTP_SHARED_ADMIN_USER || 'admin' }}
       SFTP_SHARED_ADMIN_PASSWORD: ${{ secrets.SFTP_SHARED_ADMIN_PASSWORD }}
       SFTP_SHARED_USER: ${{ vars.SFTP_SHARED_USER || 'shareduser' }}
@@ -107,6 +115,14 @@ jobs:
             echo "::warning::No Kustomize overlay found at $WORKDIR/overlays/$OVERLAY/kustomization.yaml - skipping Kubernetes execution."
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Verify infrastructure is deployed
+        if: steps.manifests.outputs.exists == 'true'
+        uses: ./.github/actions/check-infrastructure
+        with:
+          api-url: ${{ vars.PROXMOX_API_URL }}
+          api-token: ${{ secrets.PROXMOX_API_TOKEN }}
+          node-name: ${{ vars.NODE01_NAME }}
 
       - name: Verify Kubernetes CLI tooling
         if: steps.manifests.outputs.exists == 'true'
@@ -218,6 +234,7 @@ jobs:
 
           # Inject GHCR credentials if token is available
           if [ -n "${GHCR_TOKEN:-}" ]; then
+            : "${GHCR_USERNAME:?Set GHCR_USERNAME to the owner of GHCR_TOKEN}"
             sed -i "s|GITHUB_USERNAME_OR_ACTOR|${GHCR_USERNAME}|g" "$SECRETS_FILE"
             sed -i "s|CHANGE_ME_GITHUB_TOKEN_OR_PAT|${GHCR_TOKEN}|g" "$SECRETS_FILE"
           fi
@@ -277,6 +294,22 @@ jobs:
               --timeout 10m
           fi
 
+      - name: Render manifests while preserving service CD releases
+        if: steps.manifests.outputs.exists == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          kubectl kustomize "overlays/${OVERLAY}" > "$RUNNER_TEMP/rendered-overlay.yaml"
+          kubectl create --dry-run=client --validate=false \
+            -f "$RUNNER_TEMP/rendered-overlay.yaml" -o json > "$RUNNER_TEMP/rendered-overlay.json"
+          kubectl get deployments -n "$NAMESPACE" -o json --ignore-not-found > "$RUNNER_TEMP/live-deployments.json"
+          if [ ! -s "$RUNNER_TEMP/live-deployments.json" ]; then
+            printf '{"items":[]}' > "$RUNNER_TEMP/live-deployments.json"
+          fi
+          python3 "$GITHUB_WORKSPACE/Scripts/preserve-cd-images.py" \
+            --live "$RUNNER_TEMP/live-deployments.json" \
+            < "$RUNNER_TEMP/rendered-overlay.json" > "$RUNNER_TEMP/rendered-deploy.json"
+
       - name: Dry-run and diff (${{ env.OVERLAY }})
         id: diff
         if: steps.manifests.outputs.exists == 'true'
@@ -290,16 +323,16 @@ jobs:
           # Validate rendered manifests against the Kubernetes API server
           if kubectl get namespace "$NAMESPACE" >/dev/null 2>&1; then
             echo "Running server-side dry-run validation against namespace ${NAMESPACE}..."
-            kubectl apply -k "overlays/${OVERLAY}" --dry-run=server >/dev/null
+            kubectl apply -f "$RUNNER_TEMP/rendered-deploy.json" --dry-run=server >/dev/null
           else
             echo "Namespace ${NAMESPACE} does not exist yet on cluster; running client-side dry-run validation..."
-            kubectl apply -k "overlays/${OVERLAY}" --dry-run=client >/dev/null
+            kubectl apply -f "$RUNNER_TEMP/rendered-deploy.json" --dry-run=client >/dev/null
           fi
 
           # Compute live diff (exit code 0 = no diff, 1 = differences found, >1 = error)
           # Redact Secret resource bodies from diff logs to prevent credential exposure
           set +e
-          kubectl diff -k "overlays/${OVERLAY}" > "$DIFF_LOG" 2>&1
+          kubectl diff -f "$RUNNER_TEMP/rendered-deploy.json" > "$DIFF_LOG" 2>&1
           DIFF_EXIT=$?
           set -e
 
@@ -325,7 +358,7 @@ jobs:
           rm -f "$APPLY_LOG"
 
           echo "Applying Kustomize overlay: overlays/${OVERLAY} (Namespace: ${NAMESPACE})..."
-          kubectl apply -k "overlays/${OVERLAY}" 2>&1 | tee "$APPLY_LOG"
+          kubectl apply -f "$RUNNER_TEMP/rendered-deploy.json" 2>&1 | tee "$APPLY_LOG"
 
           # Restart deployments when requested or on Testing (:latest mutable image tags with Always pull policy)
           if [ "$MODE" = "restart" ] || [ "$OVERLAY" = "testing" ]; then
@@ -400,4 +433,4 @@ jobs:
             find "$RUNNER_TEMP/k8s" -type f -exec shred -u {} + 2>/dev/null || rm -rf "$RUNNER_TEMP/k8s"
             rm -rf "$RUNNER_TEMP/k8s"
           fi
-          rm -f "$RUNNER_TEMP/k8s-diff.log" "$RUNNER_TEMP/k8s-apply.log" "$RUNNER_TEMP"/rendered-*.yaml
+          rm -f "$RUNNER_TEMP/k8s-diff.log" "$RUNNER_TEMP/k8s-apply.log" "$RUNNER_TEMP/live-deployments.json" "$RUNNER_TEMP"/rendered-*.yaml "$RUNNER_TEMP"/rendered-*.json

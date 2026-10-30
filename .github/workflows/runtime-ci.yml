@@ -1,0 +1,129 @@
+name: Runtime CI
+
+on:
+  pull_request:
+    branches: [main, Testing, Development]
+  push:
+    branches: [main, Testing, Development]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: runtime-ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    name: Detect runtime changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      changed: ${{ steps.changes.outputs.changed }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Detect runtime changes
+        id: changes
+        uses: ./.github/actions/service-changes
+        with:
+          service-path: Runtime
+          workflow-path: .github/workflows/runtime-ci.yml
+          shared-paths: |
+            .github/workflows/runtime-cd.yml
+            .github/workflows/service-cd.yml
+            Scripts/smoke-service-image.sh
+            Scripts/registry-pull-secret.py
+
+  checks:
+    name: Runtime - tests, coverage and package
+    needs: changes
+    if: needs.changes.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: Runtime
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: Runtime/pom.xml
+
+      # verify runs Surefire, Failsafe, merged JaCoCo coverage and JAR packaging.
+      # Use the runner's Maven; the repository's wrapper configuration is absent.
+      - name: Unit, integration and functional tests with coverage and packaging
+        run: mvn --batch-mode --no-transfer-progress -Dstyle.color=never clean verify
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build container for validation
+        uses: docker/build-push-action@v7
+        with:
+          context: Runtime
+          load: true
+          push: false
+          tags: service-ci:local
+
+      - name: Validate container startup and health
+        env:
+          IMAGE: service-ci:local
+          SERVICE_PATH: Runtime
+        run: bash Scripts/smoke-service-image.sh
+        working-directory: ${{ github.workspace }}
+
+      - name: Upload test results and coverage
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: runtime-test-reports
+          path: |
+            Runtime/target/surefire-reports/
+            Runtime/target/failsafe-reports/
+            Runtime/target/site/jacoco/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload application JAR
+        uses: actions/upload-artifact@v6
+        with:
+          name: runtime-jar
+          path: Runtime/target/*.jar
+          if-no-files-found: error
+          retention-days: 7
+
+  quality-gate:
+    name: Runtime CI Gate
+    needs: [changes, checks]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require successful runtime checks
+        env:
+          CHANGES_RESULT: ${{ needs.changes.result }}
+          CHANGED: ${{ needs.changes.outputs.changed }}
+          CHECKS_RESULT: ${{ needs.checks.result }}
+        run: |
+          if [[ "$CHANGES_RESULT" == "success" ]] &&
+             { [[ "$CHANGED" == "false" && "$CHECKS_RESULT" == "skipped" ]] ||
+               [[ "$CHANGED" == "true" && "$CHECKS_RESULT" == "success" ]]; }; then
+            echo "Runtime CI passed." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::error::Runtime CI failed or was cancelled."
+            exit 1
+          fi

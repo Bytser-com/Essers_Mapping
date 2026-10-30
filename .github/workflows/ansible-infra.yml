@@ -11,6 +11,9 @@ on:
     paths:
       - "Infra/Config/**"
       - ".github/workflows/ansible-infra.yml"
+      - ".github/actions/check-infrastructure/**"
+      - "Scripts/check-proxmox-vms.py"
+      - "Scripts/tests/**"
       - ".github/actions/setup-ansible/**"
 
   push:
@@ -18,6 +21,9 @@ on:
     paths:
       - "Infra/Config/**"
       - ".github/workflows/ansible-infra.yml"
+      - ".github/actions/check-infrastructure/**"
+      - "Scripts/check-proxmox-vms.py"
+      - "Scripts/tests/**"
       - ".github/actions/setup-ansible/**"
 
   workflow_call:
@@ -63,10 +69,10 @@ env:
 jobs:
   ansible:
     name: ${{ (github.event_name == 'pull_request' && 'Dry-run') || (github.event_name == 'push' && 'Configure') || (inputs.mode == 'apply' && 'Configure') || 'Dry-run' }}
-    runs-on: 
+    runs-on:
       - self-hosted
       - linux
-      - ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
+      - ${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}
     environment: ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
     defaults:
       run:
@@ -75,11 +81,12 @@ jobs:
       # --- Secrets ---
       SSH_PRIVATE_KEY: ${{ secrets.PIPELINE_SSH_PRIVATE_KEY }}
       ANSIBLE_BECOME_PASS: ${{ secrets.DEBIAN_VM_USER_PASSWORD }}
+      DEBIAN_VM_USER_PASSWORD: ${{ secrets.DEBIAN_VM_USER_PASSWORD }}
+      RUNNER_REGISTRATION_PAT: ${{ secrets.RUNNER_REGISTRATION_PAT }}
 
       # --- Variables ---
       INVENTORY_FILE: "inventories/${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}/hosts.yml"
       DEBIAN_VM_USERNAME: ${{ vars.DEBIAN_VM_USERNAME || 'sysadmin' }}
-      DEBIAN_VM_USER_PASSWORD: ${{ secrets.DEBIAN_VM_USER_PASSWORD }}
       IPV4_GATEWAY: ${{ vars.IPV4_GATEWAY }}
       PIPELINE_RUNNER_VM_IPV4_ADDRESS: ${{ vars.PIPELINE_RUNNER_VM_IPV4_ADDRESS }}
       K8S_MASTER_VM_IPV4_ADDRESS: ${{ vars.K8S_MASTER_VM_IPV4_ADDRESS }}
@@ -87,7 +94,8 @@ jobs:
       PIPELINE_RUNNER_VM_DNS_DOMAIN: ${{ vars.PIPELINE_RUNNER_VM_DNS_DOMAIN || 'pipeline-runner.essers.lan' }}
       K8S_MASTER_VM_DNS_DOMAIN: ${{ vars.K8S_MASTER_VM_DNS_DOMAIN || 'k8s-masterserver.essers.lan' }}
       K8S_WORKER_VM_DNS_DOMAIN: ${{ vars.K8S_WORKER_VM_DNS_DOMAIN || 'k8s-workerserver.essers.lan' }}
-      RUNNER_LABEL: ${{ vars.RUNNER_LABEL }}
+      RUNNER_LABEL: ${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}
+      GH_REPO_URL: ${{ vars.GH_REPO_URL || format('{0}/{1}', github.server_url, github.repository) }}
 
       # --- Manual options ---
       LIMIT: ${{ inputs.limit }}
@@ -107,6 +115,14 @@ jobs:
             echo "::warning::No playbook found at $WORKDIR/$PLAYBOOK - skipping Ansible execution."
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Verify infrastructure is deployed
+        if: steps.playbook.outputs.exists == 'true'
+        uses: ./.github/actions/check-infrastructure
+        with:
+          api-url: ${{ vars.PROXMOX_API_URL }}
+          api-token: ${{ secrets.PROXMOX_API_TOKEN }}
+          node-name: ${{ vars.NODE01_NAME }}
 
       - name: Setup Ansible
         if: steps.playbook.outputs.exists == 'true'

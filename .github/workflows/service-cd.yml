@@ -1,0 +1,262 @@
+name: Service CD (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      service-path:
+        type: string
+        required: true
+      image-name:
+        type: string
+        required: true
+      deployment:
+        type: string
+        required: true
+      ci-workflow:
+        type: string
+        required: true
+      artifact-name:
+        type: string
+        required: true
+      artifact-path:
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+  actions: read
+  packages: write
+
+jobs:
+  select:
+    name: Verify successful CI revision
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      enabled: ${{ steps.ci.outputs.enabled }}
+      sha: ${{ steps.ci.outputs.sha }}
+      branch: ${{ steps.ci.outputs.branch }}
+      run-id: ${{ steps.ci.outputs.run-id }}
+      image: ${{ steps.ci.outputs.image }}
+      environment: ${{ steps.ci.outputs.environment }}
+      namespace: ${{ steps.ci.outputs.namespace }}
+    steps:
+      # Resolve CI metadata before checking out any application code.
+      - name: Select current successful push run and artifact
+        id: ci
+        uses: actions/github-script@v8
+        env:
+          CI_WORKFLOW: ${{ inputs.ci-workflow }}
+          ARTIFACT_NAME: ${{ inputs.artifact-name }}
+          IMAGE_NAME: ${{ inputs.image-name }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const branch = context.payload.workflow_run?.head_branch || context.ref.replace('refs/heads/', '');
+            if (!['Testing', 'main'].includes(branch)) {
+              throw new Error('CD only supports Testing and main. Select one of these branches.');
+            }
+            const { data: ref } = await github.rest.git.getRef({ owner, repo, ref: `heads/${branch}` });
+            const { data: workflow } = await github.rest.actions.getWorkflow({ owner, repo, workflow_id: process.env.CI_WORKFLOW });
+            let run;
+            if (context.payload.workflow_run) {
+              ({ data: run } = await github.rest.actions.getWorkflowRun({ owner, repo, run_id: context.payload.workflow_run.id }));
+            } else {
+              const { data } = await github.rest.actions.listWorkflowRuns({ owner, repo, workflow_id: workflow.id, branch, head_sha: ref.object.sha, event: 'push', status: 'success', per_page: 10 });
+              run = data.workflow_runs[0];
+              if (!run) throw new Error('No successful push CI run exists for the current branch revision. Run CI first.');
+            }
+            if (run.workflow_id !== workflow.id || run.event !== 'push' || run.conclusion !== 'success' ||
+                run.head_branch !== branch || run.head_repository?.full_name !== `${owner}/${repo}`) {
+              throw new Error('Refusing CD: the run is not a successful push CI run from this repository and workflow.');
+            }
+            if (run.head_sha !== ref.object.sha) {
+              core.setOutput('enabled', 'false');
+              await core.summary.addRaw('CD skipped: this CI revision has been superseded by a newer commit.').write();
+              return;
+            }
+            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, { owner, repo, run_id: run.id, per_page: 100 });
+            const artifact = artifacts.find(item => item.name === process.env.ARTIFACT_NAME);
+            if (artifact?.expired) throw new Error('The CI artifact has expired. Rerun CI before deploying.');
+            if (!artifact) {
+              core.setOutput('enabled', 'false');
+              await core.summary.addRaw('CD skipped: CI produced no service build/report artifact (unchanged or placeholder service).').write();
+              return;
+            }
+            core.setOutput('enabled', 'true');
+            core.setOutput('sha', run.head_sha);
+            core.setOutput('branch', branch);
+            core.setOutput('run-id', String(run.id));
+            core.setOutput('image', `ghcr.io/${owner.toLowerCase()}/${repo.toLowerCase()}/${process.env.IMAGE_NAME}`);
+            core.setOutput('environment', branch === 'main' ? 'Production' : 'Testing');
+            core.setOutput('namespace', branch === 'main' ? 'essers-mapping-production' : 'essers-mapping-testing');
+
+  publish:
+    name: Build, smoke test and publish image
+    needs: select
+    if: needs.select.outputs.enabled == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      image: ${{ steps.publish.outputs.image }}
+    steps:
+      - name: Checkout the tested revision
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.select.outputs.sha }}
+          persist-credentials: false
+
+      - name: Require service Dockerfile
+        env:
+          SERVICE_PATH: ${{ inputs.service-path }}
+        run: |
+          test -f "$SERVICE_PATH/Dockerfile" || {
+            echo "::error::Add a Dockerfile to $SERVICE_PATH before activating this service's CD."
+            exit 1
+          }
+
+      - name: Download the tested application artifact
+        if: inputs.artifact-path != ''
+        uses: actions/download-artifact@v6
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ${{ inputs.artifact-path }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ needs.select.outputs.run-id }}
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build the service image locally
+        uses: docker/build-push-action@v7
+        with:
+          context: ${{ inputs.service-path }}
+          load: true
+          push: false
+          tags: ${{ needs.select.outputs.image }}:sha-${{ needs.select.outputs.sha }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ needs.select.outputs.sha }}
+          cache-from: type=gha,scope=${{ inputs.image-name }}
+          cache-to: type=gha,mode=max,scope=${{ inputs.image-name }}
+
+      - name: Smoke test the container before publishing
+        env:
+          IMAGE: ${{ needs.select.outputs.image }}:sha-${{ needs.select.outputs.sha }}
+          SERVICE_PATH: ${{ inputs.service-path }}
+        run: bash Scripts/smoke-service-image.sh
+
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish tested image and record its digest
+        id: publish
+        env:
+          IMAGE: ${{ needs.select.outputs.image }}:sha-${{ needs.select.outputs.sha }}
+        run: |
+          set -euo pipefail
+          docker push "$IMAGE"
+          image_ref=$(docker image inspect "$IMAGE" --format '{{index .RepoDigests 0}}')
+          [[ "$image_ref" == ghcr.io/*@sha256:* ]] || { echo '::error::No registry digest returned'; exit 1; }
+          echo "image=$image_ref" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    name: Deploy service image
+    needs: [select, publish]
+    runs-on:
+      - self-hosted
+      - linux
+      - ${{ needs.select.outputs.branch == 'main' && 'production' || 'testing' }}
+    environment: ${{ needs.select.outputs.environment }}
+    concurrency:
+      group: service-deploy-${{ inputs.deployment }}-${{ needs.select.outputs.branch }}
+      cancel-in-progress: false
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    env:
+      # --- Secrets ---
+      KUBECONFIG_SECRET: ${{ secrets.KUBECONFIG }}
+      SSH_PRIVATE_KEY: ${{ secrets.PIPELINE_SSH_PRIVATE_KEY }}
+      GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+      # --- Variables ---
+      GHCR_USERNAME: ${{ vars.GHCR_USERNAME }}
+      DEBIAN_VM_USERNAME: ${{ vars.DEBIAN_VM_USERNAME || 'sysadmin' }}
+      K8S_MASTER_VM_IPV4_ADDRESS: ${{ vars.K8S_MASTER_VM_IPV4_ADDRESS }}
+      NAMESPACE: ${{ needs.select.outputs.namespace }}
+      DEPLOYMENT: ${{ inputs.deployment }}
+      IMAGE: ${{ needs.publish.outputs.image }}
+      SOURCE_SHA: ${{ needs.select.outputs.sha }}
+      SOURCE_BRANCH: ${{ needs.select.outputs.branch }}
+    steps:
+      - name: Checkout the tested revision
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.select.outputs.sha }}
+          persist-credentials: false
+
+      - name: Verify infrastructure is deployed
+        uses: ./.github/actions/check-infrastructure
+        with:
+          api-url: ${{ vars.PROXMOX_API_URL }}
+          api-token: ${{ secrets.PROXMOX_API_TOKEN }}
+          node-name: ${{ vars.NODE01_NAME }}
+
+      - name: Refuse stale deployments after waiting for the environment
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { data } = await github.rest.git.getRef({ ...context.repo, ref: `heads/${process.env.SOURCE_BRANCH}` });
+            if (data.object.sha !== process.env.SOURCE_SHA) throw new Error('A newer commit exists; refusing to deploy this stale image.');
+
+      - name: Prepare isolated Kubernetes connection
+        run: |
+          set -euo pipefail
+          : "${GHCR_USERNAME:?Set GHCR_USERNAME to the owner of the registry read token}"
+          : "${GHCR_TOKEN:?Set GHCR_TOKEN to a durable read:packages token for Kubernetes image pulls}"
+          install -d -m 700 "$RUNNER_TEMP/k8s"
+          kubeconfig_path="$RUNNER_TEMP/k8s/config"
+          master_ip="${K8S_MASTER_VM_IPV4_ADDRESS%%/*}"
+          if [[ -n "$KUBECONFIG_SECRET" ]]; then
+            if [[ "$KUBECONFIG_SECRET" == *apiVersion:* ]]; then
+              printf '%s\n' "$KUBECONFIG_SECRET" > "$kubeconfig_path"
+            else
+              printf '%s' "$KUBECONFIG_SECRET" | base64 -d > "$kubeconfig_path"
+            fi
+          elif [[ -s "$HOME/.kube/config" ]]; then
+            cp "$HOME/.kube/config" "$kubeconfig_path"
+          else
+            : "${SSH_PRIVATE_KEY:?No kubeconfig or PIPELINE_SSH_PRIVATE_KEY is available}"
+            : "${master_ip:?K8S_MASTER_VM_IPV4_ADDRESS is missing}"
+            printf '%s\n' "$SSH_PRIVATE_KEY" > "$RUNNER_TEMP/k8s/id_pipeline"
+            chmod 600 "$RUNNER_TEMP/k8s/id_pipeline"
+            ssh -i "$RUNNER_TEMP/k8s/id_pipeline" \
+              -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile="$RUNNER_TEMP/k8s/known_hosts" \
+              -o ConnectTimeout=15 "${DEBIAN_VM_USERNAME}@${master_ip}" 'sudo cat /etc/kubernetes/admin.conf' \
+              | sed -E "s|server:[[:space:]]*https://[^[:space:]]+|server: https://${master_ip}:6443|g" > "$kubeconfig_path"
+          fi
+          chmod 600 "$kubeconfig_path"
+          echo "KUBECONFIG=$kubeconfig_path" >> "$GITHUB_ENV"
+
+      - name: Deploy only the selected service and wait for rollout
+        run: |
+          set -euo pipefail
+          kubectl get deployment "$DEPLOYMENT" -n "$NAMESPACE" >/dev/null
+          # Durable credentials allow later restarts/scaling after GITHUB_TOKEN expires.
+          python3 Scripts/registry-pull-secret.py | kubectl apply -f -
+          patch=$(python3 -c 'import json,os; print(json.dumps({"metadata":{"annotations":{"essers.io/image-managed-by":"service-cd","essers.io/source-sha":os.environ["SOURCE_SHA"]}},"spec":{"template":{"spec":{"containers":[{"name":os.environ["DEPLOYMENT"],"image":os.environ["IMAGE"]}]}}}}))')
+          kubectl patch deployment "$DEPLOYMENT" -n "$NAMESPACE" --type=strategic --patch "$patch"
+          kubectl rollout status "deployment/$DEPLOYMENT" -n "$NAMESPACE" --timeout=300s
+          echo "Deployed $DEPLOYMENT at $IMAGE in $NAMESPACE." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Clean temporary connection material
+        if: always()
+        run: |
+          if [[ -d "$RUNNER_TEMP/k8s" ]]; then
+            find "$RUNNER_TEMP/k8s" -type f -exec shred -u {} + 2>/dev/null || true
+            rm -rf "$RUNNER_TEMP/k8s"
+          fi

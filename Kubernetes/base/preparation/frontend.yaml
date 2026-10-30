@@ -118,7 +118,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: frontend
-          # TODO: Replace with your built NGINX frontend image (e.g. ghcr.io/bytser-com/essers_mapping/frontend)
+          # Bootstrap image; service CD pins a tested image digest on this Deployment.
           image: ghcr.io/bytser-com/essers_mapping/frontend:latest
           imagePullPolicy: IfNotPresent
           ports:

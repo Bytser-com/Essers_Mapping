@@ -1,0 +1,148 @@
+name: Frontend CI
+
+on:
+  pull_request:
+    branches: [main, Testing, Development]
+  push:
+    branches: [main, Testing, Development]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    name: Detect frontend changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      changed: ${{ steps.changes.outputs.changed }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Detect frontend changes
+        id: changes
+        uses: ./.github/actions/service-changes
+        with:
+          service-path: Frontend
+          workflow-path: .github/workflows/frontend-ci.yml
+          shared-paths: |
+            .github/workflows/frontend-cd.yml
+            .github/workflows/service-cd.yml
+            Scripts/smoke-service-image.sh
+            Scripts/registry-pull-secret.py
+
+  checks:
+    name: Frontend - lint, types, tests and build
+    needs: changes
+    if: needs.changes.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: Frontend
+    env:
+      CI: 'true'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: Frontend/package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check TypeScript types
+        run: npm run typecheck
+
+      # This command runs unit, integration and functional tests once, with coverage.
+      - name: Unit, integration and functional tests with coverage
+        run: npm run test:coverage
+
+      - name: Build production frontend
+        run: npm run build
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      # playwright.config.js starts Vite preview against the production dist bundle.
+      - name: Browser end-to-end tests
+        run: npm run test:e2e
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build container for validation
+        uses: docker/build-push-action@v7
+        with:
+          context: Frontend
+          load: true
+          push: false
+          tags: service-ci:local
+
+      - name: Validate container startup and health
+        env:
+          IMAGE: service-ci:local
+          SERVICE_PATH: Frontend
+        run: bash Scripts/smoke-service-image.sh
+        working-directory: ${{ github.workspace }}
+
+      - name: Upload test results and coverage
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: frontend-test-reports
+          path: |
+            Frontend/coverage/
+            Frontend/test-results/
+            Frontend/playwright-report/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload production bundle
+        uses: actions/upload-artifact@v6
+        with:
+          name: frontend-dist
+          path: Frontend/dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  quality-gate:
+    name: Frontend CI Gate
+    needs: [changes, checks]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require successful frontend checks
+        env:
+          CHANGES_RESULT: ${{ needs.changes.result }}
+          CHANGED: ${{ needs.changes.outputs.changed }}
+          CHECKS_RESULT: ${{ needs.checks.result }}
+        run: |
+          if [[ "$CHANGES_RESULT" == "success" ]] &&
+             { [[ "$CHANGED" == "false" && "$CHECKS_RESULT" == "skipped" ]] ||
+               [[ "$CHANGED" == "true" && "$CHECKS_RESULT" == "success" ]]; }; then
+            echo "Frontend CI passed." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::error::Frontend CI failed or was cancelled."
+            exit 1
+          fi
