@@ -6,22 +6,25 @@ conversion). The model's response alone is structured JSON for review/export.
 from __future__ import annotations
 
 import json
-import os
+import logging
 import random
 import re
 import time
-from pathlib import Path
 from typing import Callable
 
 import httpx
-from dotenv import load_dotenv
 try:
     from google import genai
     from google.genai import errors, types
 except ImportError:  # Preview/offline modes work before installing API dependencies.
     genai = errors = types = None
 
-ROOT = Path(__file__).resolve().parent.parent
+# Settings (API key, model, timeout) now come from config.py instead of
+# reading .env here; errors are translated into the tool's own error types.
+from .config import PROMPT_PATH, load_settings
+from .errors import ConfigError, GeminiError, QuotaExceededError
+
+logger = logging.getLogger(__name__)
 
 RULE_SCHEMA = {
     'type': 'object',
@@ -81,6 +84,28 @@ def _retry_after_seconds(error: Exception) -> float | None:
     return None
 
 
+# ---------------------------------------------------------------------------
+# Error translation: turn Gemini's long API errors into one clear sentence.
+# ---------------------------------------------------------------------------
+def _short_message(error: Exception) -> str:
+    """The API's own one-line message, without the full JSON payload."""
+    return str(getattr(error, 'message', None) or error).splitlines()[0][:300]
+
+
+def _client_error(error: Exception) -> Exception:
+    """Translate a non-quota 4xx Gemini error into a clear tool error."""
+    code = getattr(error, 'code', None)
+    text = str(error)
+    # 400 with API_KEY_INVALID: the key in .env is wrong or still the placeholder.
+    if 'API_KEY_INVALID' in text or 'API key not valid' in text:
+        return ConfigError('Gemini rejected the API key. Check GEMINI_API_KEY in ai_tool/.env.')
+    if code in (401, 403):
+        return ConfigError(f'Gemini refused access ({code}): {_short_message(error)}')
+    if code == 404:
+        return ConfigError(f'Gemini model not found (404). Check GEMINI_MODEL or --model: {_short_message(error)}')
+    return GeminiError(f'Gemini request failed ({code}): {_short_message(error)}', code=code)
+
+
 def build_mapping_contents(
     source_fields: list[dict],
     target_fields: list[dict],
@@ -94,7 +119,7 @@ def build_mapping_contents(
     File inventories are sent as compact path *indexes*: these are authoritative
     valid-path lists, not substitutes for the full raw XML examples.
     """
-    instructions = (ROOT / 'prompt.txt').read_text(encoding='utf-8')
+    instructions = PROMPT_PATH.read_text(encoding='utf-8')
     source_index = [
         {
             'path': f['path'], 'kind': f['kind'], 'count': f['count'],
@@ -152,21 +177,22 @@ def run_gemini(
 ) -> list[dict]:
     """Propose mappings using direct raw XML context (no knowledge distillation)."""
     if genai is None:
-        raise RuntimeError('google-genai is not installed. Run: python -m pip install -r requirements.txt')
-    load_dotenv(ROOT / '.env')
-    key = os.getenv('GEMINI_API_KEY')
+        raise ConfigError('google-genai is not installed. Run: python -m pip install -r requirements.txt')
+    # Read the API key, model and timeout from the central configuration.
+    settings = load_settings()
+    key = settings.gemini_api_key
     if not key:
-        raise ValueError('GEMINI_API_KEY is not configured in .env')
-    model = model or os.getenv('GEMINI_MODEL', 'gemini-3.5-flash-lite')
+        raise ConfigError('GEMINI_API_KEY is not configured in .env')
+    model = model or settings.gemini_model
     contents = build_mapping_contents(
         source_fields, target_fields, all_target_fields or target_fields,
         source_documents or [], historical_pairs or [], reference_examples,
     )
-    print(f'Raw customer XMLs in request: {len(source_documents or [])}')
-    print(f'Raw historical conversion pairs in request: {len(historical_pairs or [])}')
-    print(f'Prompt size: {len(contents):,} characters')
+    logger.info('Raw customer XMLs in request: %d', len(source_documents or []))
+    logger.info('Raw historical conversion pairs in request: %d', len(historical_pairs or []))
+    logger.info('Prompt size: %s characters', f'{len(contents):,}')
 
-    timeout = int(os.getenv('GEMINI_TIMEOUT_MS', '120000'))
+    timeout = settings.gemini_timeout_ms
     client = genai.Client(
         api_key=key,
         http_options=types.HttpOptions(
@@ -177,7 +203,7 @@ def run_gemini(
     try:
         for attempt in range(1, 5):
             try:
-                print(f'Gemini request: {model} (attempt {attempt}/4)')
+                logger.info('Gemini request: %s (attempt %d/4)', model, attempt)
                 if on_event:
                     on_event({'type': 'attempt'})
                 response = client.models.generate_content(
@@ -191,9 +217,9 @@ def run_gemini(
                 )
                 if response.usage_metadata:
                     usage = response.usage_metadata
-                    print(f'Input tokens: {usage.prompt_token_count}')
-                    print(f'Output tokens: {usage.candidates_token_count}')
-                    print(f'Total tokens: {usage.total_token_count}')
+                    logger.info('Input tokens: %s', usage.prompt_token_count)
+                    logger.info('Output tokens: %s', usage.candidates_token_count)
+                    logger.info('Total tokens: %s', usage.total_token_count)
                     if on_event:
                         on_event({
                             'type': 'usage',
@@ -202,38 +228,47 @@ def run_gemini(
                             'total_tokens': usage.total_token_count,
                         })
                 if not response.text:
-                    raise RuntimeError('Gemini returned no text')
-                result = json.loads(response.text)
+                    raise GeminiError('Gemini returned no text')
+                try:
+                    result = json.loads(response.text)
+                except json.JSONDecodeError as error:
+                    raise GeminiError(f'Gemini returned invalid JSON: {error}') from error
                 if not isinstance(result, dict) or not isinstance(result.get('mappings'), list):
-                    raise ValueError('Gemini response did not contain a mappings list')
+                    raise GeminiError('Gemini response did not contain a mappings list')
                 return result['mappings']
             except errors.ClientError as error:
                 if on_event:
                     on_event({'type': 'api_error', 'code': getattr(error, 'code', None)})
-                if getattr(error, 'code', None) != 429:
-                    raise
+                # 429 = rate limit. Only a per-minute limit is worth waiting for;
+                # a daily limit stops the run (checkpoints keep finished batches).
+                code = getattr(error, 'code', None)
+                if code != 429:
+                    raise _client_error(error) from error
                 kind = _quota_type(error)
                 if kind != 'minute' or attempt == 4:
-                    print(f'Gemini rate limit ({kind}); existing checkpoints are safe.')
-                    raise
+                    raise QuotaExceededError(f'Gemini rate limit reached ({kind} quota).', code=429) from error
                 delay = (_retry_after_seconds(error) or 65.0) + 2.0
-                print(f'Per-minute quota reached. Waiting {delay:.1f}s before retrying...')
+                logger.warning('Per-minute quota reached. Waiting %.1fs before retrying...', delay)
                 if on_event:
                     on_event({'type': 'retry'})
                 time.sleep(delay)
             except errors.ServerError as error:
                 if on_event:
                     on_event({'type': 'api_error', 'code': getattr(error, 'code', None)})
-                if getattr(error, 'code', None) != 503 or attempt == 4:
-                    raise
+                # 503 = Gemini overloaded: retry with increasing waits, up to 4 attempts.
+                code = getattr(error, 'code', None)
+                if code == 503 and attempt == 4:
+                    raise QuotaExceededError('Gemini is overloaded (503).', code=503) from error
+                if code != 503:
+                    raise GeminiError(f'Gemini server error ({code}): {_short_message(error)}', code=code) from error
                 delay = min(2 ** (attempt - 1) + random.uniform(0, 1), 30)
-                print(f'Gemini overloaded (503). Retrying in {delay:.1f}s...')
+                logger.warning('Gemini overloaded (503). Retrying in %.1fs...', delay)
                 if on_event:
                     on_event({'type': 'retry'})
                 time.sleep(delay)
             except httpx.TimeoutException as error:
                 if on_event:
                     on_event({'type': 'api_error', 'code': 'timeout'})
-                raise RuntimeError(f'Gemini request timed out ({timeout} ms)') from error
+                raise GeminiError(f'Gemini request timed out ({timeout} ms)', code='timeout') from error
     finally:
         client.close()
