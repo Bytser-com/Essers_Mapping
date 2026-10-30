@@ -4,18 +4,31 @@ This uses openpyxl in the user's Python environment. The layout is read from
 row 2 of 'Mapping Proposal', and row 1 of the other worksheets.
 """
 from copy import copy
+import logging
 from pathlib import Path
 from openpyxl import load_workbook
 
+logger = logging.getLogger(__name__)
+
+# Excel allows 32,767 characters per cell; keep a safety margin.
+MAX_CELL_CHARS = 32000
+
 
 def _text(value):
-    """Prevent generated text from being interpreted as an Excel formula."""
+    """Convert to a string that fits in one Excel cell."""
     if value is None:
         return None
-    text = str(value)
-    if text.lstrip().startswith(('=', '+', '-', '@')):
-        return "'" + text
-    return text[:32000]
+    return str(value)[:MAX_CELL_CHARS]
+
+
+# Reads the column names from the template itself, so adding or removing a
+# column in mapping_template.xlsx no longer requires changing this code.
+def _headers(sheet, row):
+    """Header names of one row, up to the last non-empty header cell."""
+    values = [cell.value for cell in sheet[row]]
+    while values and values[-1] in (None, ''):
+        values.pop()
+    return values
 
 
 def _clear_old_rows(sheet, start_row):
@@ -36,7 +49,15 @@ def _write_records(sheet, headers, records, start_row):
                     cell._style = copy(model_cell._style)
                 cell.alignment = copy(model_cell.alignment)
             value = record.get(header)
-            cell.value = value if isinstance(value, (int, float, bool)) else _text(value)
+            # Numbers stay numbers; everything else is written as plain text.
+            if isinstance(value, (int, float, bool)):
+                cell.value = value
+            else:
+                cell.value = _text(value)
+                # openpyxl turns text starting with '=' into a formula. Generated text
+                # is never a formula, so always store it as plain text.
+                if cell.value is not None:
+                    cell.data_type = 's'
 
 
 def export_excel(mappings, source_inventory, source_files, target_files,
@@ -55,7 +76,7 @@ def export_excel(mappings, source_inventory, source_files, target_files,
         _clear_old_rows(sheet, first_data_row)
 
     main = wb['Mapping Proposal']
-    headers = [main.cell(2, col).value for col in range(1, 31)]
+    headers = _headers(main, 2)
     records = []
     questions = []
     for i, m in enumerate(mappings, 1):
@@ -111,11 +132,11 @@ def export_excel(mappings, source_inventory, source_files, target_files,
     _write_records(main, headers, records, 3)
 
     qsheet = wb['Review Questions']
-    qheaders = [qsheet.cell(1, c).value for c in range(1, 15)]
+    qheaders = _headers(qsheet, 1)
     _write_records(qsheet, qheaders, questions, 2)
 
     invsheet = wb['Runtime Field Inventory']
-    iheaders = [invsheet.cell(1, c).value for c in range(1, 7)]
+    iheaders = _headers(invsheet, 1)
     inventory_records = [{
         'Source full path': f['path'],
         'Source field name': f['field'],
@@ -127,7 +148,7 @@ def export_excel(mappings, source_inventory, source_files, target_files,
     _write_records(invsheet, iheaders, inventory_records, 2)
 
     csheet = wb['File Classification']
-    cheaders = [csheet.cell(1, c).value for c in range(1, 6)]
+    cheaders = _headers(csheet, 1)
     file_records = [
         {
             'File': p.name, 'Classification': 'Runtime Original',
@@ -181,7 +202,7 @@ def export_excel(mappings, source_inventory, source_files, target_files,
     # Record only which historical paired documents were supplied to Gemini.
     # Do not fabricate field-level historical mappings or claim expert verification.
     reference_sheet = wb['Reference Evidence']
-    reference_headers = [reference_sheet.cell(1, c).value for c in range(1, 10)]
+    reference_headers = _headers(reference_sheet, 1)
     reference_records = [{
         'Reference pair': f"{item['company']} / {item['pair_id']}",
         'Historical Original': item['original_filename'],
@@ -213,6 +234,6 @@ def export_excel(mappings, source_inventory, source_files, target_files,
         # Avoid losing the finished package if the original is open in Excel.
         backup_path = output_path.with_name(output_path.stem + '_new.xlsx')
         wb.save(backup_path)
-        print(f'Original Excel file is locked. Saved to: {backup_path}')
+        logger.warning('Original Excel file is locked. Saved to: %s', backup_path)
         output_path = backup_path
     return output_path

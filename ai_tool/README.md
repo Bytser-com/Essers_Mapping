@@ -17,16 +17,21 @@ This is a **proposal generator**, not an executable XML converter. No AI proposa
 
 ```text
 ai_tool/
-├── main.py                 Runs the complete workflow
+├── main.py                 Command line: reads the options and calls scripts/pipeline.py
 ├── prompt.txt              Explains the mapping task and rules to Gemini
-├── .env.example            API key configuration example
+├── .env                    Your local API key configuration (not in Git)
 ├── requirements.txt        Python packages to install
 ├── scripts/
 │   ├── __init__.py
+│   ├── pipeline.py         The complete workflow: preview_mapping() and run_mapping()
+│   ├── config.py           Project paths and settings from .env (read in one place)
+│   ├── models.py           Settings and result data structures
+│   ├── errors.py           Clear error types instead of crashes/tracebacks
 │   ├── xml_parser.py       Reads XML, discovers valid paths, matches historical pairs
 │   ├── readprompt.py       Builds Gemini's request; handles API calls, quota/retries
 │   ├── mapping_validator.py  Flags unknown source/target paths or invalid rule types
-│   └── excel_generator.py  Fills the original mapping Excel template
+│   ├── excel_generator.py  Fills the original mapping Excel template
+│   └── experiment_tracker.py  Writes the experiment log
 ├── data/
 │   ├── source/             Original XML files from the NEW customer (currently Nouryon)
 │   └── historical/
@@ -49,7 +54,9 @@ ai_tool/
 
 | File | What it does | What it does **not** do |
 |---|---|---|
-| **main.py** | Finds the data, chooses how many examples to send, runs batches, and saves results | Does not decide which business fields should map |
+| **main.py** | Reads the command-line options and prints the result | Contains no workflow logic (that is in `scripts/pipeline.py`) |
+| **scripts/pipeline.py** | Finds the data, chooses how many examples to send, runs batches, and saves results. Can also be called from an API | Does not decide which business fields should map |
+| **scripts/config.py**, **models.py**, **errors.py** | Central settings from `.env`, the settings/result structures, and readable error types | Contain no mapping logic |
 | **scripts/xml_parser.py** | Reads XML files, remembers field paths, matches each historic original to its converted partner, selects complete examples | Does not infer mapping rules |
 | **scripts/readprompt.py** | Sends the selected raw XML examples and valid path lists to Gemini; requests structured JSON; handles temporary API failures | Does not secretly train a new model |
 | **scripts/mapping_validator.py** | Checks that paths and rule types are valid; flags suspicious structural output | Cannot prove a mapping is correct for Essers |
@@ -74,10 +81,12 @@ ai_tool/
    python -m pip install -r requirements.txt
    ```
 
-5. Make a local `.env` file from `.env.example`:
+5. Make sure there is a local `.env` file in the `ai_tool` folder. It is not stored in Git, so create it yourself if it is missing:
 
-   ```powershell
-   Copy-Item .env.example .env
+   ```text
+   GEMINI_API_KEY=replace_with_your_key
+   GEMINI_MODEL=gemini-3.5-flash-lite
+   GEMINI_TIMEOUT_MS=120000
    ```
 
 6. Open `.env` and replace `replace_with_your_key` with a **valid Gemini API key**. You can also change `GEMINI_MODEL` to another model available to your account. **Never commit or share `.env`.**
