@@ -28,7 +28,7 @@ runs:
         ANSIBLE_LINT_VERSION: ${{ inputs.ansible-lint-version }}
       run: |
         set -euo pipefail
-                # Include python binary path & version in cache key to invalidate if host Python updates
+        # Include python binary path & version in cache key to invalidate if host Python updates
         PY_VER=$(python3 -V 2>&1 | tr ' ' '_')
         KEY=$(printf '%s|%s|%s' "$PY_VER" "$ANSIBLE_CORE_VERSION" "$ANSIBLE_LINT_VERSION" | sha256sum | cut -c1-16)
         
@@ -42,8 +42,9 @@ runs:
         exec 200>"$LOCKFILE"
         flock -x 200
 
-        if [ ! -x "$VENV/bin/ansible-playbook" ]; then
-          echo "Building Ansible virtualenv at $VENV..."
+        # Check not just that the file exists, but that it can actually execute
+        if [ ! -x "$VENV/bin/ansible-playbook" ] || ! "$VENV/bin/ansible-playbook" --version > /dev/null 2>&1; then
+          echo "Building or rebuilding broken Ansible virtualenv at $VENV..."
           TMP_DIR=$(mktemp -d "${CACHE_BASE}/venv_tmp_XXXXXX")
           
           python3 -m venv "$TMP_DIR"
