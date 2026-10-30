@@ -36,7 +36,12 @@ runs:
         "$VENV/bin/pip" install --no-cache-dir --upgrade pip wheel
         "$VENV/bin/pip" install --no-cache-dir \
           "ansible-core${ANSIBLE_CORE_VERSION}" \
-          "ansible-lint${ANSIBLE_LINT_VERSION}"
+          "ansible-lint${ANSIBLE_LINT_VERSION}" \
+          netaddr \
+          jmespath \
+          cryptography \
+          kubernetes \
+          requests
 
         echo "$VENV/bin" >> "$GITHUB_PATH"
 
