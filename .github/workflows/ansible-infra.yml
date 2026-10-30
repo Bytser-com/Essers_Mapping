@@ -7,14 +7,14 @@ name: Ansible - Infra Config
 #  - Manual                             -> choose check / apply
 on:
   pull_request:
-    branches: [main, testing]
+    branches: [main, Testing]
     paths:
       - "Infra/Config/**"
       - ".github/workflows/ansible-infra.yml"
       - ".github/actions/setup-ansible/**"
 
   push:
-    branches: [main, testing]
+    branches: [main, Testing]
     paths:
       - "Infra/Config/**"
       - ".github/workflows/ansible-infra.yml"
