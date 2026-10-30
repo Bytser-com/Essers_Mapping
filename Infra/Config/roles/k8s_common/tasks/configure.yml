@@ -1,0 +1,29 @@
+---
+# ==============================================================================
+# K8S_COMMON TASKS: KUBELET & CRICTL CONFIGURATION
+# ==============================================================================
+
+- name: Configure crictl to use containerd runtime endpoint
+  ansible.builtin.template:
+    src: crictl.yaml.j2
+    dest: /etc/crictl.yaml
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Configure kubelet node IP in /etc/default/kubelet
+  ansible.builtin.template:
+    src: kubelet.default.j2
+    dest: /etc/default/kubelet
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart kubelet
+
+- name: Ensure kubelet service is enabled
+  ansible.builtin.systemd:
+    name: kubelet
+    enabled: true
+
+- name: Flush kubelet handlers
+  ansible.builtin.meta: flush_handlers

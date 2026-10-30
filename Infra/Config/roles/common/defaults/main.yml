@@ -1,0 +1,58 @@
+---
+# ==============================================================================
+# ROLE DEFAULTS: common
+# ==============================================================================
+
+common_apt_cache_valid_time: 3600
+common_apt_lock_timeout: 120
+common_upgrade_packages: true
+
+common_base_packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg
+  - lsb-release
+  - locales
+  - jq
+  - git
+  - vim
+  - htop
+  - iotop
+  - net-tools
+  - dnsutils
+  - bash-completion
+  - unzip
+  - tar
+  - sudo
+  - systemd-timesyncd
+  - fail2ban
+  - unattended-upgrades
+  - apt-listchanges
+
+# Proxmox Guest Integration
+proxmox_qemu_guest_agent_enabled: true
+proxmox_fstrim_timer_enabled: true
+
+# Time & Locale
+system_timezone: "Europe/Brussels"
+system_locale: "en_US.UTF-8"
+ntp_servers:
+  - "0.debian.pool.ntp.org"
+  - "1.debian.pool.ntp.org"
+ntp_fallback_servers:
+  - "time.cloudflare.com"
+  - "time.google.com"
+
+# Security & Hardening
+security_ssh_port: 22
+security_ssh_permit_root_login: "no"
+security_ssh_password_authentication: "no"
+security_ssh_max_auth_tries: 4
+security_ssh_x11_forwarding: "no"
+security_passwordless_sudo: true
+security_fail2ban_enabled: true
+security_fail2ban_bantime: "1h"
+security_fail2ban_findtime: "10m"
+security_fail2ban_maxretry: 5
+security_unattended_upgrades_enabled: true

@@ -1,0 +1,217 @@
+name: Ansible - Infra Config
+
+# When does this run?
+#  - Pull request with Ansible changes  -> dry-run (--check --diff)
+#  - Push with Ansible changes          -> configure the VMs
+#  - Called by the Terraform workflow   -> configure the VMs after an apply
+#  - Manual                             -> choose check / apply
+on:
+  pull_request:
+    branches: [main, testing]
+    paths:
+      - "Infra/Config/**"
+      - ".github/workflows/ansible-infra.yml"
+      - ".github/actions/setup-ansible/**"
+
+  push:
+    branches: [main, testing]
+    paths:
+      - "Infra/Config/**"
+      - ".github/workflows/ansible-infra.yml"
+      - ".github/actions/setup-ansible/**"
+
+  workflow_call:
+    inputs:
+      mode:
+        type: string
+        default: apply
+
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "check = dry-run (--check --diff), apply = configure the VMs"
+        type: choice
+        options: [check, apply]
+        default: check
+      limit:
+        description: "Optional --limit host pattern (e.g. k8s_cluster, pipeline-runner)"
+        type: string
+        default: ""
+      tags:
+        description: "Optional --tags (comma separated)"
+        type: string
+        default: ""
+
+# One Ansible run per environment at a time
+concurrency:
+  group: ansible-infra-config-${{ github.base_ref || github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  WORKDIR: "Infra/Config"
+  PLAYBOOK: "site.yml"
+  # Pull requests always dry-run, Pushes always apply, otherwise use the given mode (default: check)
+  MODE: ${{ github.event_name == 'pull_request' && 'check' || github.event_name == 'push' && 'apply' || inputs.mode || 'check' }}
+
+  ANSIBLE_FORCE_COLOR: "true"
+  ANSIBLE_RETRY_FILES_ENABLED: "false"
+  ANSIBLE_CALLBACK_RESULT_FORMAT: "yaml"
+
+jobs:
+  ansible:
+    name: ${{ (github.event_name == 'pull_request' && 'Dry-run') || (github.event_name == 'push' && 'Configure') || (inputs.mode == 'apply' && 'Configure') || 'Dry-run' }}
+    runs-on: [self-hosted, linux, "${{ vars.RUNNER_LABEL }}"]
+    environment: ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
+    defaults:
+      run:
+        working-directory: ${{ env.WORKDIR }}
+    env:
+      # --- Secrets ---
+      SSH_PRIVATE_KEY: ${{ secrets.PIPELINE_SSH_PRIVATE_KEY }}
+      ANSIBLE_BECOME_PASS: ${{ secrets.DEBIAN_VM_USER_PASSWORD }}
+
+      # --- Variables ---
+      INVENTORY_FILE: "inventories/${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}/hosts.yml"
+      DEBIAN_VM_USERNAME: ${{ vars.DEBIAN_VM_USERNAME || 'sysadmin' }}
+      DEBIAN_VM_USER_PASSWORD: ${{ secrets.DEBIAN_VM_USER_PASSWORD }}
+      IPV4_GATEWAY: ${{ vars.IPV4_GATEWAY }}
+      PIPELINE_RUNNER_VM_IPV4_ADDRESS: ${{ vars.PIPELINE_RUNNER_VM_IPV4_ADDRESS }}
+      K8S_MASTER_VM_IPV4_ADDRESS: ${{ vars.K8S_MASTER_VM_IPV4_ADDRESS }}
+      K8S_WORKER_VM_IPV4_ADDRESS: ${{ vars.K8S_WORKER_VM_IPV4_ADDRESS }}
+      PIPELINE_RUNNER_VM_DNS_DOMAIN: ${{ vars.PIPELINE_RUNNER_VM_DNS_DOMAIN || 'pipeline-runner.essers.lan' }}
+      K8S_MASTER_VM_DNS_DOMAIN: ${{ vars.K8S_MASTER_VM_DNS_DOMAIN || 'k8s-masterserver.essers.lan' }}
+      K8S_WORKER_VM_DNS_DOMAIN: ${{ vars.K8S_WORKER_VM_DNS_DOMAIN || 'k8s-workerserver.essers.lan' }}
+      RUNNER_LABEL: ${{ vars.RUNNER_LABEL }}
+
+      # --- Manual options ---
+      LIMIT: ${{ inputs.limit }}
+      TAGS: ${{ inputs.tags }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check playbook exists
+        id: playbook
+        shell: bash
+        run: |
+          if [ -f "$PLAYBOOK" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::No playbook found at $WORKDIR/$PLAYBOOK - skipping Ansible execution."
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Ansible
+        if: steps.playbook.outputs.exists == 'true'
+        uses: ./.github/actions/setup-ansible
+        with:
+          working-directory: ${{ env.WORKDIR }}
+
+      - name: Lint
+        if: steps.playbook.outputs.exists == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          ansible-playbook --syntax-check -i "$INVENTORY_FILE" "$PLAYBOOK"
+          ansible-lint --project-dir "$PWD" .
+
+      # SSH key is written to the runner's temp dir and removed at the end
+      - name: Prepare SSH key and validate inventory
+        if: steps.playbook.outputs.exists == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # 1. Validate required connection variables
+          : "${SSH_PRIVATE_KEY:?Error: PIPELINE_SSH_PRIVATE_KEY is missing or empty}"
+          : "${DEBIAN_VM_USERNAME:?Error: DEBIAN_VM_USERNAME is not set}"
+          : "${IPV4_GATEWAY:?Error: IPV4_GATEWAY is missing}"
+          : "${PIPELINE_RUNNER_VM_IPV4_ADDRESS:?Error: PIPELINE_RUNNER_VM_IPV4_ADDRESS is missing}"
+          : "${K8S_MASTER_VM_IPV4_ADDRESS:?Error: K8S_MASTER_VM_IPV4_ADDRESS is missing}"
+          : "${K8S_WORKER_VM_IPV4_ADDRESS:?Error: K8S_WORKER_VM_IPV4_ADDRESS is missing}"
+
+          # 2. Setup isolated SSH environment
+          SSH_DIR="$RUNNER_TEMP/ansible-ssh"
+          rm -rf "$SSH_DIR"
+          install -d -m 700 "$SSH_DIR"
+          printf '%s\n' "$SSH_PRIVATE_KEY" > "$SSH_DIR/id_pipeline"
+          chmod 600 "$SSH_DIR/id_pipeline"
+
+          echo "ANSIBLE_PRIVATE_KEY_FILE=${SSH_DIR}/id_pipeline" >> "$GITHUB_ENV"
+          echo "ANSIBLE_SSH_COMMON_ARGS=-o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=${SSH_DIR}/known_hosts" >> "$GITHUB_ENV"
+
+          # 3. Verify committed inventory syntax, group hierarchy & variables
+          ansible-inventory -i "$INVENTORY_FILE" --graph
+
+      # Freshly created VMs may still be booting / running cloud-init
+      - name: Wait for VMs
+        if: steps.playbook.outputs.exists == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          ansible all -i "$INVENTORY_FILE" -m ansible.builtin.wait_for_connection -a "timeout=300"
+          ansible all -i "$INVENTORY_FILE" -m ansible.builtin.raw -a "cloud-init status --wait > /dev/null 2>&1 || true"
+
+      - name: Run playbook (${{ env.MODE }})
+        id: run
+        if: steps.playbook.outputs.exists == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          LOG_FILE="$RUNNER_TEMP/ansible.log"
+          rm -f "$LOG_FILE"
+
+          ARGS=(-i "$INVENTORY_FILE" "$PLAYBOOK" --diff)
+          [ "$MODE" = "check" ] && ARGS+=(--check)
+          [ -n "${LIMIT:-}" ]   && ARGS+=(--limit "$LIMIT")
+          [ -n "${TAGS:-}" ]    && ARGS+=(--tags "$TAGS")
+
+          # Run and stream output while capturing the true exit status
+          set +e
+          ansible-playbook "${ARGS[@]}" 2>&1 | tee "$LOG_FILE"
+          PLAYBOOK_EXIT="${PIPESTATUS[0]}"
+          set -e
+
+          exit "$PLAYBOOK_EXIT"
+
+      - name: Summary
+        if: always() && steps.playbook.outputs.exists == 'true'
+        shell: bash
+        run: |
+          STATUS="${{ steps.run.outcome == 'success' && '✅ Succeeded' || '❌ Failed' }}"
+          {
+            echo "### Ansible (${MODE}):${STATUS}"
+            if [ -f "$RUNNER_TEMP/ansible.log" ]; then
+              echo '```text'
+              # Strip ANSI escape codes thoroughly
+              sed -E 's/\x1B\[[0-9;]*[a-zA-Z]//g' "$RUNNER_TEMP/ansible.log" | sed -n '/PLAY RECAP/,$p'
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Secure Cleanup
+        if: always()
+        shell: bash
+        run: |
+          # Overwrite SSH private key data if shred is available, otherwise delete
+          if [ -d "$RUNNER_TEMP/ansible-ssh" ]; then
+            find "$RUNNER_TEMP/ansible-ssh" -type f -exec shred -u {} + 2>/dev/null || rm -rf "$RUNNER_TEMP/ansible-ssh"
+          fi
+          rm -f "$RUNNER_TEMP/inventory.yml" "$RUNNER_TEMP/ansible.log"
+
+  # Deploy Kubernetes manifests after Ansible configured the VMs (not after a dry-run)
+  deploy:
+    name: Deploy (Kubernetes)
+    needs: ansible
+    if: >-
+      github.event_name == 'push' ||
+      inputs.mode == 'apply'
+    uses: ./.github/workflows/kubernetes-deploy.yml
+    with:
+      mode: apply
+    secrets: inherit

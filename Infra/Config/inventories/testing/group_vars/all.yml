@@ -1,0 +1,39 @@
+---
+# ==============================================================================
+# GLOBAL GROUP VARIABLES - TESTING ENVIRONMENT
+# Applied to all Debian 13 (Trixie) hosts in the Testing inventory
+# ==============================================================================
+
+env_name: testing
+
+# --- Connection & Authentication (Matches Infra/Setup/terraform.tfvars) ---
+ansible_user: "{{ lookup('env', 'DEBIAN_VM_USERNAME') | default('sysadmin', true) }}"
+ansible_ssh_private_key_file: "{{ lookup('env', 'ANSIBLE_PRIVATE_KEY_FILE') | default(lookup('env', 'SSH_PRIVATE_KEY_FILE'), true) | default(omit, true) }}"
+ansible_become_password: "{{ lookup('env', 'DEBIAN_VM_USER_PASSWORD') | default(omit, true) }}"
+ansible_python_interpreter: /usr/bin/python3
+
+# --- Network & DNS Baseline ---
+network_gateway: "{{ lookup('env', 'IPV4_GATEWAY') | default(undef('IPV4_GATEWAY is required in .env'), true) }}"
+dns_domain: "essers.lan"
+dns_nameservers:
+  - "192.168.100.1"
+  - "1.1.1.1"
+
+# --- System & Timezone Settings ---
+system_timezone: "Europe/Brussels"
+system_locale: "en_US.UTF-8"
+ntp_servers:
+  - "0.debian.pool.ntp.org"
+  - "1.debian.pool.ntp.org"
+
+# --- Security & Baseline Hardening ---
+security_ssh_port: 22
+security_ssh_permit_root_login: "no"
+security_ssh_password_authentication: "no"
+security_passwordless_sudo: true
+security_fail2ban_enabled: true
+security_unattended_upgrades_enabled: true
+
+# --- Proxmox Guest Integration ---
+proxmox_qemu_guest_agent_enabled: true
+proxmox_fstrim_timer_enabled: true

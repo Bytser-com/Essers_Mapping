@@ -1,0 +1,51 @@
+# ==============================================================================
+# PREPARATION STAGE: KUBERNETES INGRESS (HTTP 80 -> HTTPS 443 + TLS TERMINATION)
+# - Edge Ingress Controller (`ingress-nginx`) listens on MetalLB IP:
+#     * Testing:    192.168.100.101 (Ports 80 & 443)
+#     * Production: 192.168.100.201 (Ports 80 & 443)
+# - Permanently redirects HTTP (80) -> HTTPS (443)
+# - Terminates SSL/TLS at the cluster edge using cert-manager (`letsencrypt-prod`
+#   or `selfsigned-cluster-issuer` in private LAN testing)
+# - Forwards decrypted traffic as plain HTTP to `frontend:8080` inside the cluster
+# ==============================================================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: essers-frontend-ingress
+  labels:
+    app.kubernetes.io/name: frontend
+    app.kubernetes.io/component: ingress
+    app.kubernetes.io/tier: frontend
+    essers.io/zone: preparation
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - your-domain.example.com
+      secretName: essers-frontend-tls # Automatically created & renewed by cert-manager
+  rules:
+    - host: your-domain.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 8080
+    # Fallback default rule (allows accessing via https://192.168.100.101 or .201 directly on LAN)
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 8080

@@ -1,0 +1,95 @@
+{
+  "type": "object",
+  "properties": {
+    "mappings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "source_path": {
+            "type": "string"
+          },
+          "target_path": {
+            "type": "string"
+          },
+          "rule_type": {
+            "type": "string",
+            "enum": [
+              "DIRECT",
+              "FIXED",
+              "DEFAULT_IF_EMPTY",
+              "DERIVED",
+              "CONDITIONAL",
+              "LOOKUP",
+              "LOOP",
+              "FORMAT_DATE",
+              "REVIEW_REQUIRED",
+              "NOT_MAPPED"
+            ]
+          },
+          "confidence": {
+            "type": "integer"
+          },
+          "requires_review": {
+            "type": "boolean"
+          },
+          "review_priority": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "string"
+          },
+          "fixed_value": {
+            "type": "string"
+          },
+          "transformation": {
+            "type": "string"
+          },
+          "condition": {
+            "type": "string"
+          },
+          "lookup": {
+            "type": "string"
+          },
+          "loop": {
+            "type": "string"
+          },
+          "review_question": {
+            "type": "string"
+          },
+          "risk_category": {
+            "type": "string",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH"
+            ]
+          }
+        },
+        "required": [
+          "source_path",
+          "target_path",
+          "rule_type",
+          "confidence",
+          "requires_review",
+          "review_priority",
+          "reason",
+          "evidence",
+          "fixed_value",
+          "transformation",
+          "condition",
+          "lookup",
+          "loop",
+          "review_question",
+          "risk_category"
+        ]
+      }
+    }
+  },
+  "required": [
+    "mappings"
+  ]
+}

@@ -1,0 +1,6 @@
+google-genai
+python-dotenv
+openpyxl
+httpx
+pytest
+pytest-mock

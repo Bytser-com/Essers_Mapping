@@ -1,0 +1,8 @@
+# Test configuration for the ai_tool folder. Run the tests from ai_tool/ with: pytest
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Lets the tests import the code as "from scripts.xxx import ..." and "import main".
+pythonpath = ["."]
+markers = [
+    "integration: slower tests that need extra services such as Docker (run with: pytest -m integration)",
+]

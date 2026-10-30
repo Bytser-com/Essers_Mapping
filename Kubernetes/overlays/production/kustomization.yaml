@@ -1,0 +1,89 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: essers-mapping-production
+
+labels:
+  - includeSelectors: false
+    pairs:
+      environment: production
+
+resources:
+  - ../../base
+  - hpa.yaml
+
+# ==============================================================================
+# REPLICA SCALING (PRODUCTION WITH +1 HOT SPARE)
+# - Preparation Services: 2 min + 1 hot spare = 3 baseline replicas (max 4 via HPA)
+# - Shared SFTPGo:        2 min + 1 hot spare = 3 baseline replicas (max 4 via HPA)
+# - Runtime Services:     2 min + 1 hot spare = 3 baseline replicas (max 5 via HPA)
+# ==============================================================================
+replicas:
+  - name: frontend
+    count: 3
+  - name: mapping-converter
+    count: 3
+  - name: mapping-proposal
+    count: 3
+  - name: version-control-backend
+    count: 3
+  - name: sftp-shared
+    count: 3
+  - name: runtime-backend
+    count: 3
+  - name: sftp-runtime
+    count: 3
+
+# ==============================================================================
+# CONTAINER IMAGES (PRODUCTION: Independent Version Pinning per Microservice)
+# Each service has its own `newTag` entry below, so you can release and pin
+# versions independently (e.g. frontend on v1.2.0 while mapping-proposal runs v2.0.0).
+# ==============================================================================
+images:
+  # 1. Preparation Stage — NGINX Frontend
+  - name: ghcr.io/bytser-com/essers_mapping/frontend
+    newTag: v1.0.0
+
+  # 2. Preparation Stage — Python Mapping Converter Backend
+  - name: ghcr.io/bytser-com/essers_mapping/mapping-converter
+    newTag: v1.0.0
+
+  # 3. Preparation Stage — Python Mapping Proposal Backend
+  - name: ghcr.io/bytser-com/essers_mapping/mapping-proposal
+    newTag: v1.0.0
+
+  # 4. Preparation Stage — Java Spring Boot Version Control Backend
+  - name: ghcr.io/bytser-com/essers_mapping/version-control-backend
+    newTag: v1.0.0
+
+  # 5. Runtime Stage — Java Spring Boot Runtime Backend
+  - name: ghcr.io/bytser-com/essers_mapping/runtime-backend
+    newTag: v1.0.0
+
+# ==============================================================================
+# ENVIRONMENT-SPECIFIC CONFIGMAP OVERRIDES
+# ==============================================================================
+configMapGenerator:
+  - name: common-config
+    behavior: merge
+    literals:
+      - ENVIRONMENT=production
+      - LOG_LEVEL=WARN
+      - SPRING_PROFILES_ACTIVE=production
+      - PUBLIC_FRONTEND_IP=192.168.100.201
+      - PUBLIC_SFTP_SHARED_IP=192.168.100.202
+      - PUBLIC_SFTP_RUNTIME_IP=192.168.100.203
+
+# ==============================================================================
+# STRATEGIC MERGE PATCHES FOR PRODUCTION
+# ==============================================================================
+patches:
+  - path: patches/resources-patch.yaml
+  - path: patches/loadbalancer-ips-patch.yaml
+  - target:
+      kind: Namespace
+      name: essers-mapping
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: essers-mapping-production

@@ -1,0 +1,33 @@
+# ==============================================================================
+# PRODUCTION ENVIRONMENT: DEDICATED PUBLIC LOADBALANCER IPs & INGRESS PATCH
+#   - 192.168.100.201 -> ingress-nginx-controller (Ports 80, 443 -> frontend:8080)
+#   - 192.168.100.202 -> sftp-shared (Port 22, 8080)
+#   - 192.168.100.203 -> sftp-runtime (Port 22, 8080)
+# ==============================================================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: essers-frontend-ingress
+  annotations:
+    # Uses Let's Encrypt production ACME HTTP-01 solver (or switch to "selfsigned-cluster-issuer" if private LAN only)
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sftp-shared
+  annotations:
+    metallb.universe.tf/loadBalancerIPs: "192.168.100.202"
+spec:
+  type: LoadBalancer
+  loadBalancerIP: "192.168.100.202"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sftp-runtime
+  annotations:
+    metallb.universe.tf/loadBalancerIPs: "192.168.100.203"
+spec:
+  type: LoadBalancer
+  loadBalancerIP: "192.168.100.203"
