@@ -49,15 +49,15 @@ env:
   TF_VAR_proxmox_api_url: ${{ vars.PROXMOX_API_URL }}
   TF_VAR_pipeline_ssh_public_key: ${{ vars.PIPELINE_SSH_PUBLIC_KEY }}
   TF_VAR_node01_name: ${{ vars.NODE01_NAME }}
-  TF_VAR_cloud_image_url: ${{ vars.CLOUD_IMAGE_URL }}
-  TF_VAR_cloud_image_checksum: ${{ vars.CLOUD_IMAGE_CHECKSUM }}
+  TF_VAR_debian_cloud_image_url: ${{ vars.CLOUD_IMAGE_URL }}
+  TF_VAR_debian_cloud_image_checksum: ${{ vars.CLOUD_IMAGE_CHECKSUM }}
   TF_VAR_ipv4_gateway: ${{ vars.IPV4_GATEWAY }}
-  TF_VAR_pipeline-runner_vm_dns_domain: ${{ vars.PIPELINE_RUNNER_VM_DNS_DOMAIN }}
-  TF_VAR_pipeline-runner_vm_ipv4_address: ${{ vars.PIPELINE_RUNNER_VM_IPV4_ADDRESS }}
-  TF_VAR_k8s-master_vm_dns_domain: ${{ vars.K8S_MASTER_VM_DNS_DOMAIN }}
-  TF_VAR_k8s-master_vm_ipv4_address: ${{ vars.K8S_MASTER_VM_IPV4_ADDRESS }}
-  TF_VAR_k8s-worker_vm_dns_domain: ${{ vars.K8S_WORKER_VM_DNS_DOMAIN }}
-  TF_VAR_k8s-worker_vm_ipv4_address: ${{ vars.K8S_WORKER_VM_IPV4_ADDRESS }}
+  TF_VAR_pipeline_runner_vm_dns_domain: ${{ vars.PIPELINE_RUNNER_VM_DNS_DOMAIN }}
+  TF_VAR_pipeline_runner_vm_ipv4_address: ${{ vars.PIPELINE_RUNNER_VM_IPV4_ADDRESS }}
+  TF_VAR_k8s_master_vm_dns_domain: ${{ vars.K8S_MASTER_VM_DNS_DOMAIN }}
+  TF_VAR_k8s_master_vm_ipv4_address: ${{ vars.K8S_MASTER_VM_IPV4_ADDRESS }}
+  TF_VAR_k8s_worker_vm_dns_domain: ${{ vars.K8S_WORKER_VM_DNS_DOMAIN }}
+  TF_VAR_k8s_worker_vm_ipv4_address: ${{ vars.K8S_WORKER_VM_IPV4_ADDRESS }}
 
 jobs:
   plan:
