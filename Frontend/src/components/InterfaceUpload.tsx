@@ -7,18 +7,19 @@ type InterfaceUploadProps = {
   onUpload?: (file: File) => void
 }
 
+type UploadError = 'customer' | 'file' | null
+
 // Upload card on the Home page (user story 60)
 function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
   const fileInput = useRef<HTMLInputElement>(null)
-  // Customer name is only kept in the field for now, saving it is another user story
   const [customerName, setCustomerName] = useState('')
   const [file, setFile] = useState<File | null>(null)
-  const [showError, setShowError] = useState(false)
+  const [uploadError, setUploadError] = useState<UploadError>(null)
 
   function chooseFile(chosen: File | undefined) {
     if (!chosen) return
     setFile(chosen)
-    setShowError(false)
+    setUploadError(null)
   }
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
@@ -31,10 +32,15 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
   }
 
   function handleUpload() {
+    if (!customerName.trim()) {
+      setUploadError('customer')
+      return
+    }
+
     if (!file) return
     // Only XML files are allowed
     if (!file.name.toLowerCase().endsWith('.xml')) {
-      setShowError(true)
+      setUploadError('file')
       return
     }
     // TODO: send the file to the backend when the upload endpoint is ready
@@ -53,7 +59,10 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
             id="customer-name"
             type="text"
             value={customerName}
-            onChange={(event) => setCustomerName(event.target.value)}
+            onChange={(event) => {
+              setCustomerName(event.target.value)
+              setUploadError(null)
+            }}
             className="w-full rounded-lg border border-[#e3e3e8] bg-white px-3 py-[10px] text-[13px]"
           />
         </div>
@@ -95,12 +104,21 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
         </div>
       </section>
 
-      {showError && (
+      {uploadError && (
         <div role="alert" className="flex items-center gap-3 rounded-lg border border-[#1c1c1f] bg-white px-4 py-3">
           <img src={iconError} alt="" width={18} height={18} />
           <div className="flex flex-col gap-[2px]">
-            <p className="text-[13px] font-semibold">Upload mislukt: dit is geen XML-bestand.</p>
-            <p className="text-[12px] text-[#6b6b73]">Kies een XML-bestand van de klant en probeer opnieuw.</p>
+            {uploadError === 'customer' ? (
+              <>
+                <p className="text-[13px] font-semibold">Upload mislukt: Vul eerst een klant in.</p>
+                <p className="text-[12px] text-[#6b6b73]">Vul de klantnaam in en probeer opnieuw.</p>
+              </>
+            ) : (
+              <>
+                <p className="text-[13px] font-semibold">Upload mislukt: dit is geen XML-bestand.</p>
+                <p className="text-[12px] text-[#6b6b73]">Kies een XML-bestand van de klant en probeer opnieuw.</p>
+              </>
+            )}
           </div>
         </div>
       )}
