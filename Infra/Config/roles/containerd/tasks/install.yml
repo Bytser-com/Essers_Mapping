@@ -12,6 +12,7 @@
     lock_timeout: 120
   environment:
     DEBIAN_FRONTEND: noninteractive
+  register: containerd_pkg
 
 - name: Ensure /etc/containerd configuration directory exists
   ansible.builtin.file:
@@ -35,6 +36,7 @@
     name: containerd
     enabled: true
     state: started
+  when: not (ansible_check_mode and (containerd_pkg.changed | default(false)))
 
 - name: Flush containerd handlers so CRI runtime restarts immediately
   ansible.builtin.meta: flush_handlers
