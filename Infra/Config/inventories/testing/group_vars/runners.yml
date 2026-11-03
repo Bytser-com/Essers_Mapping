@@ -26,7 +26,7 @@ terraform_state_environments:
 
 # --- CI/CD Tooling to Install on Runner ---
 runner_install_terraform: true
-runner_terraform_version: "1.9.*"
+runner_terraform_version: ""
 runner_install_ansible: true
 runner_install_kubectl: true
 runner_k8s_version_minor: "{{ hostvars[groups['k8s_masters'][0]]['k8s_version_minor'] | default('1.37') }}"

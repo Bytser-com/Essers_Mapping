@@ -3,18 +3,19 @@
 # ROLE DEFAULTS: common
 # ==============================================================================
 
-common_apt_cache_valid_time: 3600
+common_apt_cache_valid_time: 0
 common_apt_lock_timeout: 120
 common_upgrade_packages: true
 
 common_base_packages:
   - ca-certificates
   - curl
+  - gnupg
   - locales
   - jq
   - git
   - htop
-  - dnsutils
+  - bind9-dnsutils
   - bash-completion
   - unzip
   - tar

@@ -4,7 +4,6 @@ PermitRootLogin {{ security_ssh_permit_root_login }}
 PasswordAuthentication {{ security_ssh_password_authentication }}
 PubkeyAuthentication yes
 KbdInteractiveAuthentication no
-ChallengeResponseAuthentication no
 MaxAuthTries {{ security_ssh_max_auth_tries }}
 X11Forwarding {{ security_ssh_x11_forwarding }}
 PermitEmptyPasswords no
