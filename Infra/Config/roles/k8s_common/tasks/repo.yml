@@ -39,9 +39,18 @@
     mode: "0644"
   when: not ansible_check_mode or k8s_keyring_stat.stat.exists
 
+- name: Remove legacy Kubernetes APT repository list file if present
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/kubernetes.list
+    state: absent
+
 - name: Add official Kubernetes APT repository
-  ansible.builtin.apt_repository:
-    repo: "deb [signed-by={{ k8s_apt_keyring_path }}] {{ k8s_apt_repo_url }} /"
-    filename: kubernetes
+  ansible.builtin.deb822_repository:
+    name: kubernetes
+    types: deb
+    uris: "{{ k8s_apt_repo_url }}"
+    suites: /
+    components: ""
+    signed_by: "{{ k8s_apt_keyring_path }}"
     state: present
-    update_cache: "{{ not ansible_check_mode or k8s_keyring_stat.stat.exists }}"
+    enabled: true

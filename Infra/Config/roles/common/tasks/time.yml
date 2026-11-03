@@ -26,3 +26,4 @@
     name: systemd-timesyncd
     enabled: true
     state: started
+  when: not (ansible_check_mode and (base_packages_pkg.changed | default(false)))
