@@ -13,3 +13,9 @@ k8s_packages:
   - kubelet
   - kubeadm
   - kubectl
+
+# Longhorn Distributed Block & RWX Storage Prerequisites
+k8s_storage_packages:
+  - open-iscsi
+  - nfs-common
+  - cryptsetup
