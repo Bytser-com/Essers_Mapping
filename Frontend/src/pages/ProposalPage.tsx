@@ -93,7 +93,7 @@ export default function ProposalPage({ onDownload, onUpload, onApprove }: Propos
           <button type="button" className="btn" onClick={onUpload}>
             Aangepaste Excel uploaden
           </button>
-          <button type="button" className="btn btn--primary" onClick={onApprove}>
+          <button type="button" className="btn btn--primary" onClick={onApprove} disabled={ hasReviewFields }>
             Goedkeuren
           </button>
         </div>

@@ -37,17 +37,17 @@
     @apply inline-flex items-center justify-center px-4 py-2.5
       border border-line-grey rounded-small bg-white text-anthracite
       font-text text-sm font-semibold whitespace-nowrap cursor-pointer
-      transition-colors duration-150 hover:bg-background
+      transition-colors duration-150 enabled:hover:bg-background
       disabled:border-line-grey disabled:bg-line-grey disabled:text-mid-grey disabled:cursor-not-allowed;
   }
 
   .btn--primary {
-    @apply border-anthracite bg-anthracite text-white hover:bg-black;
+    @apply border-anthracite bg-anthracite text-white enabled:hover:bg-black;
   }
 
   /* Status (component "Label"): altijd een label met tekst erin */
   .status {
-    @apply inline-flex items-center px-[9px] py-[3px] border border-transparent rounded-full
+    @apply inline-flex items-center px-2.25 py-0.75 border border-transparent rounded-full
       font-text text-xs font-medium whitespace-nowrap;
   }
 
