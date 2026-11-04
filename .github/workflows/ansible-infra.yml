@@ -1,28 +1,13 @@
 name: Ansible - Infra Config
 
 # When does this run?
-#  - Pull request with Ansible changes  -> dry-run (--check --diff)
-#  - Push with Ansible changes          -> configure the VMs
-#  - Called by the Terraform workflow   -> configure the VMs after an apply
-#  - Manual                             -> choose check / apply
+#  - Called by the Infrastructure Pipeline (infra-pipeline.yml) -> dry-run or configure
+#  - Manual (workflow_dispatch)                                -> choose check / apply, limit, tags
 on:
-  pull_request:
-    branches: [main, Testing]
-    paths:
-      - "Infra/Config/**"
-      - ".github/workflows/ansible-infra.yml"
-      - ".github/actions/setup-ansible/**"
-
-  push:
-    branches: [main, Testing]
-    paths:
-      - "Infra/Config/**"
-      - ".github/workflows/ansible-infra.yml"
-      - ".github/actions/setup-ansible/**"
-
   workflow_call:
     inputs:
       mode:
+        description: "check = dry-run (--check --diff), apply = configure the VMs"
         type: string
         default: apply
 
@@ -54,7 +39,7 @@ env:
   WORKDIR: "Infra/Config"
   PLAYBOOK: "site.yml"
   # Pull requests always dry-run, Pushes always apply, otherwise use the given mode (default: check)
-  MODE: ${{ github.event_name == 'pull_request' && 'check' || github.event_name == 'push' && 'apply' || inputs.mode || 'check' }}
+  MODE: ${{ (github.event_name == 'pull_request' && 'check') || inputs.mode || (github.event_name == 'push' && 'apply') || 'check' }}
 
   ANSIBLE_FORCE_COLOR: "true"
   ANSIBLE_RETRY_FILES_ENABLED: "false"
@@ -207,15 +192,3 @@ jobs:
             find "$RUNNER_TEMP/ansible-ssh" -type f -exec shred -u {} + 2>/dev/null || rm -rf "$RUNNER_TEMP/ansible-ssh"
           fi
           rm -f "$RUNNER_TEMP/inventory.yml" "$RUNNER_TEMP/ansible.log"
-
-  # Deploy Kubernetes manifests after Ansible configured the VMs (not after a dry-run)
-  deploy:
-    name: Deploy (Kubernetes)
-    needs: ansible
-    if: >-
-      github.event_name == 'push' ||
-      inputs.mode == 'apply'
-    uses: ./.github/workflows/kubernetes-deploy.yml
-    with:
-      mode: apply
-    secrets: inherit

@@ -1,17 +1,16 @@
 name: Terraform - Infra Setup
 
 on:
-  pull_request:
-    branches: [main, Testing]
-    paths:
-      - "Infra/Setup/**"
-      - ".github/workflows/terraform-infra.yml"
-
-  push:
-    branches: [main, Testing]
-    paths:
-      - "Infra/Setup/**"
-      - ".github/workflows/terraform-infra.yml"
+  workflow_call:
+    inputs:
+      action:
+        description: "Terraform action (plan, apply, destroy)"
+        type: string
+        default: apply
+    outputs:
+      has_changes:
+        description: "Whether Terraform plan detected changes"
+        value: ${{ jobs.plan.outputs.has_changes }}
 
   workflow_dispatch:
     inputs:
@@ -97,8 +96,9 @@ jobs:
       - name: Terraform plan
         id: plan
         run: |
+          ACTION="${{ inputs.action || github.event.inputs.action || 'apply' }}"
           DESTROY_FLAG=""
-          if [ "${{ github.event.inputs.action }}" = "destroy" ]; then
+          if [ "$ACTION" = "destroy" ]; then
             DESTROY_FLAG="-destroy"
           fi
 
@@ -142,14 +142,14 @@ jobs:
           if-no-files-found: error
 
   apply:
-    name: ${{ github.event.inputs.action == 'destroy' && 'Destroy' || 'Apply' }}
+    name: ${{ (inputs.action || github.event.inputs.action) == 'destroy' && 'Destroy' || 'Apply' }}
     needs: plan
     if: >-
       needs.plan.outputs.has_changes == 'true' &&
       (
         (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/Testing')) ||
-        (github.event_name == 'workflow_dispatch' &&
-          (github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy'))
+        ((github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_call') &&
+          ((inputs.action || github.event.inputs.action) == 'apply' || (inputs.action || github.event.inputs.action) == 'destroy'))
       )
     runs-on: 
       - self-hosted
@@ -202,13 +202,3 @@ jobs:
               echo "</details>"
             fi
           } >> "$GITHUB_STEP_SUMMARY"
-
-  # Configure the VMs with Ansible after Terraform applied changes (not after a destroy)
-  configure:
-    name: Configure (Ansible)
-    needs: apply
-    if: github.event.inputs.action != 'destroy'
-    uses: ./.github/workflows/ansible-infra.yml
-    with:
-      mode: apply
-    secrets: inherit
