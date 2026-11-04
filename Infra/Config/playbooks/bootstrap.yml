@@ -153,11 +153,15 @@
       run_once: true
       no_log: true
       when: lookup('env', 'PIPELINE_SSH_PRIVATE_KEY') | length > 0
+      tags:
+        - always
 
     - name: Set ansible_ssh_private_key_file for runner when PIPELINE_SSH_PRIVATE_KEY is used
       ansible.builtin.set_fact:
         ansible_ssh_private_key_file: "{{ playbook_dir }}/../.cache/id_pipeline"
       when: lookup('env', 'PIPELINE_SSH_PRIVATE_KEY') | length > 0
+      tags:
+        - always
 
     - name: Verify required ansible_host IP is provided via .env for runner
       ansible.builtin.assert:
@@ -167,11 +171,15 @@
         fail_msg: "Missing IPv4 address for {{ inventory_hostname }}. Did you run 'source .env'?"
       delegate_to: localhost
       become: false
+      tags:
+        - always
 
     - name: Wait for SSH daemon to become reachable on runner VM
       ansible.builtin.wait_for_connection:
         delay: 2
         timeout: 180
+      tags:
+        - always
 
     - name: Wait for cloud-init to finish initial provisioning on runner VM if present
       ansible.builtin.command:
@@ -184,9 +192,13 @@
         - "'not found' not in (runner_cloud_init_wait.stderr | default(''))"
         - "'No such file' not in (runner_cloud_init_wait.msg | default(''))"
       when: not ansible_check_mode
+      tags:
+        - always
 
     - name: Gather runner host system facts
       ansible.builtin.setup:
+      tags:
+        - always
 
   roles:
     - role: common

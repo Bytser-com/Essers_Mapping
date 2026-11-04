@@ -44,3 +44,49 @@ To block Pull Requests from being merged into `main`, `testing`, or `development
 4. Enable **Require status checks to pass** and add:
    - **`CI Quality Gate`** *(single aggregated gate check that only succeeds when all Frontend, Java, Python, E2E, and SonarQube jobs pass)*
 5. *(Optional)* Enable **Require branches to be up to date before merging**.
+
+---
+
+## 4. End-to-End Infrastructure & Cluster Pipeline ([`infra-pipeline.yml`](./infra-pipeline.yml))
+
+Orchestrates the multi-tier Infrastructure-as-Code (IaC) deployment to ensure determinism, zero race conditions, and complete idempotency.
+
+### Pipeline Execution Flow
+
+```text
+Push / PR to main or Testing
+              │
+              ▼
+┌──────────────────────────────────────────────┐
+│ 1. Terraform (terraform-infra.yml)           │
+│    - PR:   plan (fmt, init, validate, plan)  │
+│    - Push: plan + apply (if changes exist)   │
+└──────────────────────┬───────────────────────┘
+                       │ (Success / No Changes)
+                       ▼
+┌──────────────────────────────────────────────┐
+│ 2. Ansible (ansible-infra.yml)               │
+│    - PR:   syntax-check, inventory & lint    │
+│    - Push: syntax & lint + live configure    │
+└──────────────────────┬───────────────────────┘
+                       │ (Success)
+                       ▼
+┌──────────────────────────────────────────────┐
+│ 3. Kubernetes (kubernetes-deploy.yml)        │
+│    - PR:   syntax & Kustomize build checks   │
+│    - Push: syntax & live overlay CD deploy   │
+└──────────────────────────────────────────────┘
+```
+
+### Best Practices Implemented
+
+1. **Single Entry Point (`infra-pipeline.yml`)**:
+   - Monitors `Infra/**`, `Kubernetes/**`, and workflow directories.
+   - Prevents parallel trigger collisions where Ansible or Kubernetes would start before Terraform finishes creating or updating VMs.
+2. **Modular Reusable Workflows (`workflow_call`)**:
+   - [`terraform-infra.yml`](./terraform-infra.yml), [`ansible-infra.yml`](./ansible-infra.yml), and [`kubernetes-deploy.yml`](./kubernetes-deploy.yml) serve as dedicated, testable reusable workflows.
+   - Each retains direct `workflow_dispatch` support for ad-hoc administrative tasks (e.g. Terraform destroy, Ansible `--limit` / `--tags`, or Kubernetes rollout restart).
+3. **Strict Concurrency Protection**:
+   - Concurrency group `infra-cluster-pipeline-${{ github.base_ref || github.ref_name }}` ensures only one active run per environment (`Testing` or `Production`), queuing subsequent pushes without state corruption.
+4. **Graceful Zero-Drift Handling**:
+   - If Terraform detects no changes (`has_changes=false`), it cleanly passes execution to Ansible and Kubernetes so code changes in playbooks or Kubernetes overlays are always deployed without manual re-runs.
