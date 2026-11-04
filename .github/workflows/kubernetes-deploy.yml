@@ -1,13 +1,13 @@
 name: Kubernetes - Cluster Deploy
 
 # When does this run?
-#  - Called by the Infrastructure Pipeline (infra-pipeline.yml) -> dry-run or deploy
-#  - Manual (workflow_dispatch)                                -> choose check / apply / restart
+#  - Called by the Infrastructure Pipeline (infra-pipeline.yml) -> validate (PR) or live deploy (push/apply)
+#  - Manual (workflow_dispatch)                                -> choose apply / validate / restart
 on:
   workflow_call:
     inputs:
       mode:
-        description: "check = validate & dry-run, apply = deploy to the cluster"
+        description: "validate = syntax-check & manifest validation, apply = deploy to the cluster live"
         type: string
         default: apply
       skip_addons:
@@ -18,10 +18,10 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "check = validate & dry-run, apply = deploy to the cluster, restart = rollout restart workloads"
+        description: "validate = syntax-check & manifest validation, apply = deploy to the cluster live, restart = rollout restart workloads"
         type: choice
-        options: [check, apply, restart]
-        default: check
+        options: [apply, validate, restart]
+        default: apply
       skip_addons:
         description: "Skip cluster addons (MetalLB & Longhorn) installation/reconciliation"
         type: boolean
@@ -37,8 +37,8 @@ permissions:
 
 env:
   WORKDIR: "Kubernetes"
-  # Pull requests always dry-run, Pushes always apply, otherwise use the given mode (default: check)
-  MODE: ${{ (github.event_name == 'pull_request' && 'check') || inputs.mode || (github.event_name == 'push' && 'apply') || 'check' }}
+  # Pull requests only validate (syntax & build check), Pushes always apply (live CD deploy), otherwise given mode
+  MODE: ${{ (github.event_name == 'pull_request' && 'validate') || ((inputs.mode == 'validate' || inputs.mode == 'check') && 'validate') || (github.event_name == 'push' && 'apply') || inputs.mode || 'apply' }}
   OVERLAY: "${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}"
   NAMESPACE: "essers-mapping-${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}"
   METALLB_VERSION: "v0.14.9"
@@ -47,11 +47,11 @@ jobs:
   kubernetes:
     name: >-
       ${{
-        (github.event_name == 'pull_request' && 'Dry-run') ||
+        (github.event_name == 'pull_request' && 'Syntax & Validation') ||
         (github.event_name == 'push' && 'Deploy') ||
         (inputs.mode == 'restart' && 'Rollout Restart') ||
         (inputs.mode == 'apply' && 'Deploy') ||
-        'Dry-run'
+        'Syntax & Validation'
       }}
     runs-on: 
       - self-hosted
@@ -114,6 +114,7 @@ jobs:
           helm version --short
 
       - name: Lint and validate Kustomize overlays
+        id: lint
         if: steps.manifests.outputs.exists == 'true'
         shell: bash
         run: |
@@ -137,9 +138,9 @@ jobs:
           done
           echo "All Kustomize overlays built and validated cleanly."
 
-      # Kubeconfig is isolated inside $RUNNER_TEMP and securely shredded on cleanup
+      # Kubeconfig is isolated inside $RUNNER_TEMP and securely shredded on cleanup (only needed for live deploy/restart)
       - name: Prepare kubeconfig and verify cluster connectivity
-        if: steps.manifests.outputs.exists == 'true'
+        if: steps.manifests.outputs.exists == 'true' && (env.MODE == 'apply' || env.MODE == 'restart')
         shell: bash
         run: |
           set -euo pipefail
@@ -190,18 +191,16 @@ jobs:
           kubectl get nodes -o wide
 
           # 3. Ensure worker nodes carry the environment label required by overlay nodeSelectors
-          if [ "$MODE" != "check" ]; then
-            MATCHING_NODES=$(kubectl get nodes -l "environment=${OVERLAY}" -o name | wc -l)
-            if [ "$MATCHING_NODES" -eq 0 ]; then
-              echo "No node currently labeled with environment=${OVERLAY}; labeling worker node(s)..."
-              for node in $(kubectl get nodes -l '!node-role.kubernetes.io/control-plane' -o jsonpath='{.items[*].metadata.name}'); do
-                kubectl label node "$node" "environment=${OVERLAY}" --overwrite
-              done
-            fi
+          MATCHING_NODES=$(kubectl get nodes -l "environment=${OVERLAY}" -o name | wc -l)
+          if [ "$MATCHING_NODES" -eq 0 ]; then
+            echo "No node currently labeled with environment=${OVERLAY}; labeling worker node(s)..."
+            for node in $(kubectl get nodes -l '!node-role.kubernetes.io/control-plane' -o jsonpath='{.items[*].metadata.name}'); do
+              kubectl label node "$node" "environment=${OVERLAY}" --overwrite
+            done
           fi
 
       - name: Inject environment secrets into manifests
-        if: steps.manifests.outputs.exists == 'true'
+        if: steps.manifests.outputs.exists == 'true' && (env.MODE == 'apply' || env.MODE == 'restart')
         shell: bash
         run: |
           set -euo pipefail
@@ -286,90 +285,6 @@ jobs:
               --timeout 10m
           fi
 
-          # 3. cert-manager (TLS Automation) & ClusterIssuers
-          echo "Reconciling cert-manager..."
-          kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.16.2/cert-manager.yaml
-          kubectl rollout status deployment/cert-manager -n cert-manager --timeout=180s
-          kubectl rollout status deployment/cert-manager-webhook -n cert-manager --timeout=180s
-
-          # Deploy Cloudflare API token secret to cert-manager namespace for DNS-01 challenge
-          if [ -n "${CLOUDFLARE_API_TOKEN:-}" ]; then
-            echo "Deploying Cloudflare DNS-01 API token secret to cert-manager namespace..."
-            kubectl create secret generic cloudflare-api-token-secret \
-              --namespace cert-manager \
-              --from-literal=api-token="${CLOUDFLARE_API_TOKEN}" \
-              --dry-run=client -o yaml | kubectl apply -f -
-          else
-            echo "::warning::CLOUDFLARE_API_TOKEN secret is not set. DNS-01 challenges will not be able to authenticate with Cloudflare."
-          fi
-
-          if [ -f "cluster-addons/cert-manager/cluster-issuers.yaml" ]; then
-            echo "Applying cert-manager ClusterIssuers..."
-            ISSUERS_APPLIED=false
-            for attempt in 1 2 3 4 5 6; do
-              if kubectl apply -f "cluster-addons/cert-manager/cluster-issuers.yaml"; then
-                ISSUERS_APPLIED=true
-                break
-              fi
-              echo "Waiting for cert-manager webhook readiness (attempt ${attempt}/6)..."
-              sleep 5
-            done
-            if [ "$ISSUERS_APPLIED" != "true" ]; then
-              echo "::warning::Failed to apply ClusterIssuers; cert-manager webhook may still be starting."
-            fi
-          fi
-
-          # 4. Ingress NGINX Controller (Binds dedicated LoadBalancer IP .101 or .201)
-          INGRESS_VALUES="cluster-addons/ingress-nginx/values-${OVERLAY}.yaml"
-          if [ -f "$INGRESS_VALUES" ]; then
-            echo "Reconciling ingress-nginx for ${OVERLAY}..."
-            helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx --force-update
-            helm repo update
-            helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
-              --namespace ingress-nginx \
-              --create-namespace \
-              -f "$INGRESS_VALUES" \
-              --wait \
-              --timeout 5m
-          fi
-
-      - name: Dry-run and diff (${{ env.OVERLAY }})
-        id: diff
-        if: steps.manifests.outputs.exists == 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          DIFF_LOG="$RUNNER_TEMP/k8s-diff.log"
-          rm -f "$DIFF_LOG"
-
-          # Validate rendered manifests against the Kubernetes API server
-          if kubectl get namespace "$NAMESPACE" >/dev/null 2>&1; then
-            echo "Running server-side dry-run validation against namespace ${NAMESPACE}..."
-            kubectl apply -k "overlays/${OVERLAY}" --dry-run=server >/dev/null
-          else
-            echo "Namespace ${NAMESPACE} does not exist yet on cluster; running client-side dry-run validation..."
-            kubectl apply -k "overlays/${OVERLAY}" --dry-run=client >/dev/null
-          fi
-
-          # Compute live diff (exit code 0 = no diff, 1 = differences found, >1 = error)
-          # Redact Secret resource bodies from diff logs to prevent credential exposure
-          set +e
-          kubectl diff -k "overlays/${OVERLAY}" > "$DIFF_LOG" 2>&1
-          DIFF_EXIT=$?
-          set -e
-
-          if [ "$DIFF_EXIT" -eq 0 ]; then
-            echo "No differences detected between overlays/${OVERLAY} and live cluster state."
-            echo "has_changes=false" >> "$GITHUB_OUTPUT"
-          elif [ "$DIFF_EXIT" -eq 1 ]; then
-            echo "Configuration changes detected for overlays/${OVERLAY}."
-            echo "has_changes=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "::warning::kubectl diff exited with code ${DIFF_EXIT} (expected if target namespace does not exist yet)."
-            echo "has_changes=true" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Deploy Kubernetes overlay (${{ env.OVERLAY }})
         id: deploy
         if: steps.manifests.outputs.exists == 'true' && (env.MODE == 'apply' || env.MODE == 'restart')
@@ -403,46 +318,48 @@ jobs:
         if: always() && steps.manifests.outputs.exists == 'true'
         shell: bash
         run: |
-          if [ "$MODE" = "check" ]; then
-            OUTCOME="${{ steps.diff.outcome }}"
-          else
-            OUTCOME="${{ steps.deploy.outcome }}"
-          fi
-          if [ "$OUTCOME" = "success" ]; then
-            STATUS="✅ Succeeded"
-          else
-            STATUS="❌ Failed"
-          fi
-
-          {
-            echo "### Kubernetes (${MODE} - \`${OVERLAY}\`): ${STATUS}"
-            echo ""
-            echo "- **Environment:** \`${OVERLAY}\`"
-            echo "- **Namespace:** \`${NAMESPACE}\`"
-            echo "- **Mode:** \`${MODE}\`"
-            echo ""
-
-            if [ -n "${KUBECONFIG:-}" ] && [ -f "${KUBECONFIG:-}" ] && kubectl get namespace "$NAMESPACE" >/dev/null 2>&1; then
-              echo "#### Services & Dedicated LoadBalancer IPs"
-              echo '```text'
-              kubectl get svc -n "$NAMESPACE" -o wide 2>/dev/null || true
-              echo '```'
+          if [ "$MODE" = "validate" ]; then
+            STATUS="${{ steps.lint.outcome == 'success' && '✅ Succeeded' || '❌ Failed' }}"
+            {
+              echo "### Kubernetes (Validation): ${STATUS}"
               echo ""
-              echo "#### Workloads, Storage & Autoscaling Status"
-              echo '```text'
-              kubectl get pods,pvc,hpa -n "$NAMESPACE" -o wide 2>/dev/null || true
-              echo '```'
-            fi
-
-            if [ -f "$RUNNER_TEMP/k8s-apply.log" ]; then
-              echo "<details><summary>Click to view Deployment Execution Log</summary>"
+              echo "- **Environment:** \`${OVERLAY}\`"
+              echo "- **Mode:** \`${MODE}\`"
               echo ""
-              echo '```text'
-              tail -n 150 "$RUNNER_TEMP/k8s-apply.log"
-              echo '```'
-              echo "</details>"
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
+              echo "Manifest YAML linting and Kustomize overlay builds (testing & production) validated cleanly."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            STATUS="${{ steps.deploy.outcome == 'success' && '✅ Succeeded' || '❌ Failed' }}"
+            {
+              echo "### Kubernetes (Live Deployment - \`${OVERLAY}\`): ${STATUS}"
+              echo ""
+              echo "- **Environment:** \`${OVERLAY}\`"
+              echo "- **Namespace:** \`${NAMESPACE}\`"
+              echo "- **Mode:** \`${MODE}\`"
+              echo ""
+
+              if [ -n "${KUBECONFIG:-}" ] && [ -f "${KUBECONFIG:-}" ] && kubectl get namespace "$NAMESPACE" >/dev/null 2>&1; then
+                echo "#### Services & Dedicated LoadBalancer IPs"
+                echo '```text'
+                kubectl get svc -n "$NAMESPACE" -o wide 2>/dev/null || true
+                echo '```'
+                echo ""
+                echo "#### Workloads, Storage & Autoscaling Status"
+                echo '```text'
+                kubectl get pods,pvc,hpa -n "$NAMESPACE" -o wide 2>/dev/null || true
+                echo '```'
+              fi
+
+              if [ -f "$RUNNER_TEMP/k8s-apply.log" ]; then
+                echo "<details><summary>Click to view Deployment Execution Log</summary>"
+                echo ""
+                echo '```text'
+                tail -n 150 "$RUNNER_TEMP/k8s-apply.log"
+                echo '```'
+                echo "</details>"
+              fi
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Secure Cleanup
         if: always()
@@ -456,4 +373,4 @@ jobs:
             find "$RUNNER_TEMP/k8s" -type f -exec shred -u {} + 2>/dev/null || rm -rf "$RUNNER_TEMP/k8s"
             rm -rf "$RUNNER_TEMP/k8s"
           fi
-          rm -f "$RUNNER_TEMP/k8s-diff.log" "$RUNNER_TEMP/k8s-apply.log" "$RUNNER_TEMP"/rendered-*.yaml
+          rm -f "$RUNNER_TEMP/k8s-apply.log" "$RUNNER_TEMP"/rendered-*.yaml

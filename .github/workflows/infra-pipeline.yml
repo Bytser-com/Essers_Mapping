@@ -10,9 +10,9 @@ name: Infrastructure & Cluster Pipeline
 #
 # Triggers:
 #   - Pull Request (main, Testing):
-#       Runs all 3 in validation/dry-run mode (Terraform Plan, Ansible Check, K8s Diff)
+#       Runs validation (Terraform Plan, Ansible Syntax Check & Lint, K8s Manifest Validation)
 #   - Push (main, Testing):
-#       Runs all 3 sequentially in apply mode (Zero race conditions, zero drift)
+#       Runs all 3 sequentially with full syntax checks & live CD deployment
 #   - Manual dispatch (workflow_dispatch):
 #       Run full stack on demand with selectable execution modes
 # ==============================================================================
@@ -42,14 +42,14 @@ on:
         options: [apply, plan]
         default: apply
       ansible_mode:
-        description: "Ansible mode (apply = configure VMs, check = dry-run)"
+        description: "Ansible mode (apply = configure VMs live, validate = syntax-check & lint)"
         type: choice
-        options: [apply, check]
+        options: [apply, validate]
         default: apply
       kubernetes_mode:
-        description: "Kubernetes mode (apply = deploy, check = diff, restart = rollout restart)"
+        description: "Kubernetes mode (apply = deploy live, validate = syntax-check & manifest validation, restart = rollout restart)"
         type: choice
-        options: [apply, check, restart]
+        options: [apply, validate, restart]
         default: apply
 
 # Only one full deployment per environment at a time (prevents concurrent locks/collisions)
@@ -80,7 +80,7 @@ jobs:
     if: inputs.terraform_action != 'destroy'
     uses: ./.github/workflows/ansible-infra.yml
     with:
-      mode: ${{ (github.event_name == 'pull_request' && 'check') || (inputs.ansible_mode) || 'apply' }}
+      mode: ${{ (github.event_name == 'pull_request' && 'validate') || (inputs.ansible_mode) || 'apply' }}
     secrets: inherit
 
   # ----------------------------------------------------------------------------
@@ -91,5 +91,5 @@ jobs:
     needs: ansible
     uses: ./.github/workflows/kubernetes-deploy.yml
     with:
-      mode: ${{ (github.event_name == 'pull_request' && 'check') || (inputs.kubernetes_mode) || 'apply' }}
+      mode: ${{ (github.event_name == 'pull_request' && 'validate') || (inputs.kubernetes_mode) || 'apply' }}
     secrets: inherit

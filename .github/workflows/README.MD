@@ -66,15 +66,15 @@ Push / PR to main or Testing
                        ▼
 ┌──────────────────────────────────────────────┐
 │ 2. Ansible (ansible-infra.yml)               │
-│    - PR:   dry-run (--check --diff)          │
-│    - Push: configure VMs (site.yml)          │
+│    - PR:   syntax-check, inventory & lint    │
+│    - Push: syntax & lint + live configure    │
 └──────────────────────┬───────────────────────┘
                        │ (Success)
                        ▼
 ┌──────────────────────────────────────────────┐
 │ 3. Kubernetes (kubernetes-deploy.yml)        │
-│    - PR:   validate + diff (kubectl diff)    │
-│    - Push: reconcile addons & deploy overlay │
+│    - PR:   syntax & Kustomize build checks   │
+│    - Push: syntax & live overlay CD deploy   │
 └──────────────────────────────────────────────┘
 ```
 
