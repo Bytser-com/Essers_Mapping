@@ -158,6 +158,7 @@ jobs:
           set -euo pipefail
           ansible all -i "$INVENTORY_FILE" -m ansible.builtin.wait_for_connection -a "timeout=300"
           ansible all -i "$INVENTORY_FILE" -m ansible.builtin.raw -a "cloud-init status --wait > /dev/null 2>&1 || true"
+          ansible all -i "$INVENTORY_FILE" -m ansible.builtin.raw -a "apt-get update > /dev/null 2>&1 || true"
 
       - name: Run playbook (${{ env.MODE }})
         id: run

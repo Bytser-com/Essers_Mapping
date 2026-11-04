@@ -24,6 +24,7 @@
   ansible.builtin.systemd:
     name: kubelet
     enabled: true
+  when: not ansible_check_mode or (k8s_keyring_stat.stat.exists | default(false))
 
 - name: Flush kubelet handlers
   ansible.builtin.meta: flush_handlers

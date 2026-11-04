@@ -90,6 +90,11 @@ jobs:
       SFTP_RUNTIME_USER: ${{ vars.SFTP_RUNTIME_USER || 'runtimeuser' }}
       SFTP_RUNTIME_PASSWORD: ${{ secrets.SFTP_RUNTIME_PASSWORD }}
 
+      # --- TLS & DNS-01 Challenge Configuration ---
+      ACME_EMAIL: ${{ vars.ACME_EMAIL || 'admin@example.com' }}
+      DOMAIN_NAME: ${{ vars.DOMAIN_NAME || 'your-domain.example.com' }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
       # --- Manual Options ---
       SKIP_ADDONS: ${{ inputs.skip_addons || false }}
 
@@ -216,29 +221,39 @@ jobs:
             exit 0
           fi
 
-          # Inject GHCR credentials if token is available
+          # Safe string substitution via perl $ENV{} to avoid sed delimiter / '&' replacement issues
           if [ -n "${GHCR_TOKEN:-}" ]; then
-            sed -i "s|GITHUB_USERNAME_OR_ACTOR|${GHCR_USERNAME}|g" "$SECRETS_FILE"
-            sed -i "s|CHANGE_ME_GITHUB_TOKEN_OR_PAT|${GHCR_TOKEN}|g" "$SECRETS_FILE"
+            perl -pi -e '$u = $ENV{GHCR_USERNAME}; s/GITHUB_USERNAME_OR_ACTOR/$u/g' "$SECRETS_FILE"
+            perl -pi -e '$t = $ENV{GHCR_TOKEN}; s/CHANGE_ME_GITHUB_TOKEN_OR_PAT/$t/g' "$SECRETS_FILE"
           fi
 
-          # Inject Shared SFTPGo credentials if configured in GitHub Secrets
           if [ -n "${SFTP_SHARED_ADMIN_PASSWORD:-}" ]; then
-            sed -i "s|CHANGE_ME_SHARED_ADMIN_PASSWORD|${SFTP_SHARED_ADMIN_PASSWORD}|g" "$SECRETS_FILE"
+            perl -pi -e '$p = $ENV{SFTP_SHARED_ADMIN_PASSWORD}; s/CHANGE_ME_SHARED_ADMIN_PASSWORD/$p/g' "$SECRETS_FILE"
           fi
           if [ -n "${SFTP_SHARED_PASSWORD:-}" ]; then
-            sed -i "s|CHANGE_ME_SHARED_PASSWORD|${SFTP_SHARED_PASSWORD}|g" "$SECRETS_FILE"
+            perl -pi -e '$p = $ENV{SFTP_SHARED_PASSWORD}; s/CHANGE_ME_SHARED_PASSWORD/$p/g' "$SECRETS_FILE"
           fi
 
-          # Inject Runtime SFTPGo credentials if configured in GitHub Secrets
           if [ -n "${SFTP_RUNTIME_ADMIN_PASSWORD:-}" ]; then
-            sed -i "s|CHANGE_ME_RUNTIME_ADMIN_PASSWORD|${SFTP_RUNTIME_ADMIN_PASSWORD}|g" "$SECRETS_FILE"
+            perl -pi -e '$p = $ENV{SFTP_RUNTIME_ADMIN_PASSWORD}; s/CHANGE_ME_RUNTIME_ADMIN_PASSWORD/$p/g' "$SECRETS_FILE"
           fi
           if [ -n "${SFTP_RUNTIME_PASSWORD:-}" ]; then
-            sed -i "s|CHANGE_ME_RUNTIME_PASSWORD|${SFTP_RUNTIME_PASSWORD}|g" "$SECRETS_FILE"
+            perl -pi -e '$p = $ENV{SFTP_RUNTIME_PASSWORD}; s/CHANGE_ME_RUNTIME_PASSWORD/$p/g' "$SECRETS_FILE"
           fi
 
-      - name: Reconcile cluster addons (MetalLB & Longhorn)
+          # Inject ACME / Let's Encrypt email into ClusterIssuers
+          ISSUERS_FILE="cluster-addons/cert-manager/cluster-issuers.yaml"
+          if [ -f "$ISSUERS_FILE" ] && [ -n "${ACME_EMAIL:-}" ]; then
+            perl -pi -e '$e = $ENV{ACME_EMAIL}; s/your-email\@example\.com/$e/g' "$ISSUERS_FILE"
+          fi
+
+          # Inject public Domain Name into Ingress manifests
+          INGRESS_FILE="base/preparation/ingress.yaml"
+          if [ -f "$INGRESS_FILE" ] && [ -n "${DOMAIN_NAME:-}" ]; then
+            perl -pi -e '$d = $ENV{DOMAIN_NAME}; s/your-domain\.example\.com/$d/g' "$INGRESS_FILE"
+          fi
+
+      - name: Reconcile cluster addons (MetalLB, Longhorn, cert-manager, ingress-nginx)
         if: steps.manifests.outputs.exists == 'true' && env.MODE == 'apply' && env.SKIP_ADDONS != 'true'
         shell: bash
         run: |
@@ -247,21 +262,25 @@ jobs:
           # 1. MetalLB LoadBalancer Controller & Speaker
           echo "Reconciling MetalLB (${METALLB_VERSION})..."
           kubectl apply -f "https://raw.githubusercontent.com/metallb/metallb/${METALLB_VERSION}/config/manifests/metallb-native.yaml"
-          kubectl wait --namespace metallb-system \
-            --for=condition=Ready pod \
-            --selector=app=metallb \
-            --timeout=180s
+          # Avoid race conditions where pods have not yet been scheduled by tracking rollout status
+          kubectl rollout status deployment/controller -n metallb-system --timeout=180s
+          kubectl rollout status daemonset/speaker -n metallb-system --timeout=180s
 
           if [ -f "overlays/${OVERLAY}/metallb-ippool.yaml" ]; then
             echo "Applying MetalLB L2 IPAddressPool for ${OVERLAY}..."
-            # Retry briefly in case the MetalLB validating webhook endpoint is still warming up
-            for attempt in 1 2 3 4 5; do
+            POOL_APPLIED=false
+            for attempt in 1 2 3 4 5 6; do
               if kubectl apply -f "overlays/${OVERLAY}/metallb-ippool.yaml"; then
+                POOL_APPLIED=true
                 break
               fi
-              echo "Waiting for MetalLB webhook readiness (attempt ${attempt}/5)..."
+              echo "Waiting for MetalLB webhook readiness (attempt ${attempt}/6)..."
               sleep 5
             done
+            if [ "$POOL_APPLIED" != "true" ]; then
+              echo "::error::Failed to apply MetalLB IPAddressPool for ${OVERLAY} after 6 attempts"
+              exit 1
+            fi
           fi
 
           # 2. Longhorn Distributed Block/RWX Storage
@@ -275,6 +294,53 @@ jobs:
               -f "cluster-addons/longhorn/values-single-worker.yaml" \
               --wait \
               --timeout 10m
+          fi
+
+          # 3. cert-manager (TLS Automation) & ClusterIssuers
+          echo "Reconciling cert-manager..."
+          kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.16.2/cert-manager.yaml
+          kubectl rollout status deployment/cert-manager -n cert-manager --timeout=180s
+          kubectl rollout status deployment/cert-manager-webhook -n cert-manager --timeout=180s
+
+          # Deploy Cloudflare API token secret to cert-manager namespace for DNS-01 challenge
+          if [ -n "${CLOUDFLARE_API_TOKEN:-}" ]; then
+            echo "Deploying Cloudflare DNS-01 API token secret to cert-manager namespace..."
+            kubectl create secret generic cloudflare-api-token-secret \
+              --namespace cert-manager \
+              --from-literal=api-token="${CLOUDFLARE_API_TOKEN}" \
+              --dry-run=client -o yaml | kubectl apply -f -
+          else
+            echo "::warning::CLOUDFLARE_API_TOKEN secret is not set. DNS-01 challenges will not be able to authenticate with Cloudflare."
+          fi
+
+          if [ -f "cluster-addons/cert-manager/cluster-issuers.yaml" ]; then
+            echo "Applying cert-manager ClusterIssuers..."
+            ISSUERS_APPLIED=false
+            for attempt in 1 2 3 4 5 6; do
+              if kubectl apply -f "cluster-addons/cert-manager/cluster-issuers.yaml"; then
+                ISSUERS_APPLIED=true
+                break
+              fi
+              echo "Waiting for cert-manager webhook readiness (attempt ${attempt}/6)..."
+              sleep 5
+            done
+            if [ "$ISSUERS_APPLIED" != "true" ]; then
+              echo "::warning::Failed to apply ClusterIssuers; cert-manager webhook may still be starting."
+            fi
+          fi
+
+          # 4. Ingress NGINX Controller (Binds dedicated LoadBalancer IP .101 or .201)
+          INGRESS_VALUES="cluster-addons/ingress-nginx/values-${OVERLAY}.yaml"
+          if [ -f "$INGRESS_VALUES" ]; then
+            echo "Reconciling ingress-nginx for ${OVERLAY}..."
+            helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx --force-update
+            helm repo update
+            helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
+              --namespace ingress-nginx \
+              --create-namespace \
+              -f "$INGRESS_VALUES" \
+              --wait \
+              --timeout 5m
           fi
 
       - name: Dry-run and diff (${{ env.OVERLAY }})
@@ -392,8 +458,8 @@ jobs:
         if: always()
         shell: bash
         run: |
-          # Restore secrets template so injected credentials never remain in the working tree
-          git checkout -- base/common/secrets.yaml 2>/dev/null || true
+          # Restore manifests template so injected credentials never remain in the working tree
+          git checkout -- base/common/secrets.yaml base/preparation/ingress.yaml cluster-addons/cert-manager/cluster-issuers.yaml 2>/dev/null || true
 
           # Shred and remove isolated kubeconfig & temporary SSH key material
           if [ -d "$RUNNER_TEMP/k8s" ]; then

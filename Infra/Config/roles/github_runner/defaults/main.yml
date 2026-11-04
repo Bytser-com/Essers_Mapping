@@ -35,21 +35,10 @@ terraform_state_environments:
 
 # CI/CD Tooling Toggles & Versions
 runner_install_terraform: true
-runner_terraform_version: "1.9.*"
+runner_terraform_version: ""
 runner_install_ansible: true
 runner_install_kubectl: true
 runner_k8s_version_minor: "{{ hostvars[groups['k8s_masters'][0]]['k8s_version_minor'] | default('1.37') }}"
-runner_configure_kubeconfig: true
-runner_kubeconfig_users:
-  - user: "{{ github_runner_user }}"
-    group: "{{ github_runner_group }}"
-    home: "/home/{{ github_runner_user }}"
-  - user: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-    home: "/home/{{ ansible_user }}"
-  - user: "root"
-    group: "root"
-    home: "/root"
 runner_install_helm: true
 runner_install_docker: true
 runner_docker_packages:
