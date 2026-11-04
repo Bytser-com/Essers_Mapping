@@ -9,9 +9,8 @@ kind: Ingress
 metadata:
   name: essers-frontend-ingress
   annotations:
-    # Use "selfsigned-cluster-issuer" when testing on private LAN (192.168.100.101) without public DNS,
-    # or switch to "letsencrypt-prod" / "letsencrypt-staging" when a public domain points to .101.
-    cert-manager.io/cluster-issuer: "selfsigned-cluster-issuer"
+    # Uses Let's Encrypt Staging via Cloudflare DNS-01 (avoids production rate limits during CI/CD test runs)
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
 ---
 apiVersion: v1
 kind: Service
