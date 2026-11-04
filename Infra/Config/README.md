@@ -89,7 +89,7 @@ ansible-playbook -i inventories/testing/hosts.yml site.yml --tags runner
 ansible-playbook -i inventories/testing/hosts.yml playbooks/runner.yml --tags runner
 
 # Run ONLY the kubectl kubeconfig setup on the runner VM
-ansible-playbook -i inventories/testing/hosts.yml playbooks/runner.yml --tags runner_kubeconfig
+ansible-playbook -i inventories/testing/hosts.yml playbooks/kubernetes.yml --tags runner_kubeconfig
 
 # Run EVERYTHING (Kubernetes cluster + CI/CD Runner VM) in a single run
 ansible-playbook -i inventories/testing/hosts.yml site.yml --tags all,runner
