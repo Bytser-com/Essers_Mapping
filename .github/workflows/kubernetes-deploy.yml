@@ -1,29 +1,19 @@
 name: Kubernetes - Cluster Deploy
 
 # When does this run?
-#  - Pull request with Kubernetes changes -> validate & dry-run (kustomize build + kubectl diff / dry-run)
-#  - Push with Kubernetes changes         -> reconcile addons & deploy Kustomize overlay to the cluster
-#  - Called by the Ansible workflow       -> deploy to the cluster after Ansible configures the VMs
-#  - Manual (workflow_dispatch)           -> choose check / apply / restart
+#  - Called by the Infrastructure Pipeline (infra-pipeline.yml) -> dry-run or deploy
+#  - Manual (workflow_dispatch)                                -> choose check / apply / restart
 on:
-  pull_request:
-    branches: [main, Testing]
-    paths:
-      - "Kubernetes/**"
-      - ".github/workflows/kubernetes-deploy.yml"
-
-  push:
-    branches: [main, Testing]
-    paths:
-      - "Kubernetes/**"
-      - ".github/workflows/kubernetes-deploy.yml"
-
   workflow_call:
     inputs:
       mode:
         description: "check = validate & dry-run, apply = deploy to the cluster"
         type: string
         default: apply
+      skip_addons:
+        description: "Skip cluster addons (MetalLB & Longhorn) installation/reconciliation"
+        type: boolean
+        default: false
 
   workflow_dispatch:
     inputs:
@@ -48,7 +38,7 @@ permissions:
 env:
   WORKDIR: "Kubernetes"
   # Pull requests always dry-run, Pushes always apply, otherwise use the given mode (default: check)
-  MODE: ${{ github.event_name == 'pull_request' && 'check' || github.event_name == 'push' && 'apply' || inputs.mode || 'check' }}
+  MODE: ${{ (github.event_name == 'pull_request' && 'check') || inputs.mode || (github.event_name == 'push' && 'apply') || 'check' }}
   OVERLAY: "${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}"
   NAMESPACE: "essers-mapping-${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}"
   METALLB_VERSION: "v0.14.9"
