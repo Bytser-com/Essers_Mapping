@@ -4,7 +4,6 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import ProposalPage from '../../pages/ProposalPage'
 import { useProposalStore } from '../../stores/proposalStore'
-import { error } from 'console'
 
 const PROPOSAL = {
   klant: 'brunos',

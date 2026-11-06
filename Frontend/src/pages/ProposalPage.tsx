@@ -30,7 +30,7 @@ function formatUploadDate(isoDate: string): string {
   return `${day}/${month}/${date.getFullYear()} om ${hours}:${minutes}`;
 }
 
-function Confidence({ value }: ConfidenceProps) {
+function Confidence({ value }: Readonly<ConfidenceProps>) {
   if (value === null || value === undefined) {
     return null;
   }
@@ -45,7 +45,7 @@ function Confidence({ value }: ConfidenceProps) {
   );
 }
 
-export default function ProposalPage({ onDownload, onUpload, onApprove }: ProposalPageProps) {
+export default function ProposalPage({ onDownload, onUpload, onApprove }: Readonly<ProposalPageProps>) {
   const { company } = useParams();
   const proposal = useProposalStore((state) => state.proposal);
   const loading = useProposalStore((state) => state.loading);
@@ -54,7 +54,7 @@ export default function ProposalPage({ onDownload, onUpload, onApprove }: Propos
 
   useEffect(() => {
     if (company) {
-      fetchProposal(company);
+      void fetchProposal(company);
     }
   }, [company, fetchProposal]);
 
@@ -104,7 +104,7 @@ export default function ProposalPage({ onDownload, onUpload, onApprove }: Propos
           <span className="inline-flex justify-center items-center size-4.5 shrink-0 rounded-full bg-anthracite text-white text-[11px] font-bold">
             i
           </span>
-          Velden met REVIEW_REQUIRED kon de AI niet invullen. Pas ze aan in de Excel en upload die opnieuw.
+          <span>Velden met REVIEW_REQUIRED kon de AI niet invullen. Pas ze aan in de Excel en upload die opnieuw.</span>
         </div>
       )}
 

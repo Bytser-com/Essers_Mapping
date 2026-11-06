@@ -3,7 +3,7 @@ from services import proposal_service
 
 router = APIRouter(prefix="/proposals")
 
-@router.get("/{company}")
+@router.get("/{company}", responses={404: {"description": "No proposal found for this company"}})
 def get_proposal(company: str):
     mappings, version, uploaded, edited = proposal_service.get_list_from_excel(company)
     if mappings is None:
