@@ -126,7 +126,7 @@ jobs:
           echo "Validating inventory graph & hierarchy..."
           ansible-inventory -i "$INVENTORY_FILE" --graph
           echo "Running ansible-lint..."
-          ansible-lint --project-dir "$PWD" .
+          ansible-lint --project-dir "$PWD" site.yml playbooks roles
 
       # Live-run setup: SSH key is written to the runner's temp dir and removed at the end
       - name: Prepare SSH key and validate connection variables

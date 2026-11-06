@@ -249,6 +249,11 @@ validation; select `apply` for live changes. No Ansible check-mode execution or
 Kubernetes apply/diff dry-run is required. Client-side object serialization is
 used only during live reconciliation to preserve released image digests.
 
+Ansible lint explicitly includes `site.yml`, `playbooks/` and `roles/`, rather
+than relying on directory discovery. The existing shared variable prefixes are
+reported as visible `var-naming[no-role-prefix]` warnings to retain the inventory
+configuration API; other lint failures block CI. Task-name style is enforced.
+
 The existing order is Terraform plan/apply -> Ansible -> Kubernetes. Ansible
 also runs when an authorized apply request produces a successful no-change plan;
 failed/cancelled applies, destroy requests and PR plans do not deploy downstream.

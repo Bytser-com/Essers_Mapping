@@ -3,7 +3,7 @@
 # COMMON TASKS: ADMINISTRATIVE USER & SUDOERS
 # ==============================================================================
 
-- name: Ensure administrative user '{{ ansible_user }}' exists and is in sudo group
+- name: Ensure administrative user exists and is in sudo group
   ansible.builtin.user:
     name: "{{ ansible_user }}"
     groups: sudo
