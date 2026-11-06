@@ -23,7 +23,8 @@ networking:
   serviceSubnet: "{{ k8s_service_cidr }}"
 apiServer:
   certSANs:
-{% for san in (['127.0.0.1', 'localhost', ansible_host, (hostname_short | lower), hostname_short, fqdn] | unique) %}
+{% set sans = ['127.0.0.1', 'localhost', ansible_host, (hostname_short | lower), (fqdn | lower)] %}
+{% for san in (sans | map('replace', '_', '-') | unique) %}
     - "{{ san }}"
 {% endfor %}
 ---

@@ -29,4 +29,10 @@ Run the read-only infrastructure/CD tests with:
 
 ```bash
 python3 -m unittest discover -s Scripts/tests -p 'test_*.py'
+node Scripts/tests/test_service_workflows.cjs
 ```
+
+The Node.js scenarios exercise CD's actual selection script with mocked GitHub
+responses: only successful push runs for the current release revision may
+deploy; forks, PRs, failed runs, wrong workflows and expired artifacts fail.
+Superseded runs and services without an artifact do not deploy.

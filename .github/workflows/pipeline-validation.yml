@@ -1,0 +1,59 @@
+name: Pipeline Validation
+
+on:
+  pull_request:
+    branches: [main, Testing, Development]
+    paths: ['.github/**', 'Scripts/**']
+  push:
+    branches: [main, Testing, Development, Feature/CI-Pipelines]
+    paths: ['.github/**', 'Scripts/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pipeline-validation-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Workflow lint and pipeline regression tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Validate workflow syntax and expressions
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location \
+            https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz \
+            --output "$RUNNER_TEMP/actionlint.tar.gz"
+          printf '%s  %s\n' '8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8' "$RUNNER_TEMP/actionlint.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/actionlint.tar.gz" -C "$RUNNER_TEMP" actionlint
+          # v1.7.12 predates GitHub's queue property. Ignore only that parser error.
+          "$RUNNER_TEMP/actionlint" -color \
+            -ignore '^unexpected key "queue" for "concurrency" section'
+
+      - name: Test infrastructure preflight and image reconciliation
+        run: python -m unittest discover -s Scripts/tests -p 'test_*.py'
+
+      - name: Test trusted CI revision selection
+        run: node Scripts/tests/test_service_workflows.cjs
+
+      - name: Check container smoke script syntax
+        run: bash -n Scripts/smoke-service-image.sh

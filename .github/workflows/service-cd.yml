@@ -173,7 +173,8 @@ jobs:
       - ${{ needs.select.outputs.branch == 'main' && 'production' || 'testing' }}
     environment: ${{ needs.select.outputs.environment }}
     concurrency:
-      group: service-deploy-${{ inputs.deployment }}-${{ needs.select.outputs.branch }}
+      group: cluster-write-${{ needs.select.outputs.branch == 'main' && 'production' || 'testing' }}
+      queue: max
       cancel-in-progress: false
     timeout-minutes: 15
     permissions:

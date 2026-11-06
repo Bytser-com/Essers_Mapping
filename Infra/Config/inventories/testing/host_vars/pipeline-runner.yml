@@ -4,4 +4,4 @@
 # ==============================================================================
 
 hostname_short: "pipeline-runner"
-fqdn: "{{ lookup('env', 'PIPELINE_RUNNER_VM_DNS_DOMAIN') | default(undef('PIPELINE_RUNNER_VM_DNS_DOMAIN is required in .env'), true) }}"
+fqdn: "{{ (lookup('env', 'PIPELINE_RUNNER_VM_DNS_DOMAIN') | default(undef('PIPELINE_RUNNER_VM_DNS_DOMAIN is required in .env'), true)) | lower | replace('_', '-') }}"

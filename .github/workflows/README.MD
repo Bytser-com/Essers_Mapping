@@ -156,7 +156,10 @@ python -m pytest tests -ra --junitxml=test-results/pytest-junit.xml --cov=. --co
 
 ### Separate service CD workflows
 
-CI and CD are separate files; the branch for this work is `Feature/service-ci-cd`.
+CI and CD are separate files. The reviewed delivery branch is
+`Feature/CI-Pipelines`, based on `Feature/service-ci-cd` and the latest
+`Development`. Pushes to this review branch run service CI and pipeline
+validation without deploying.
 
 | CD workflow | Successful source CI | GHCR image suffix / Deployment |
 | --- | --- | --- |
@@ -213,17 +216,21 @@ Proxmox and SSH configuration keep the existing environment variable names.
 - [Ansible configuration](./ansible-infra.yml): check and configure VMs.
 - [Kubernetes deployment](./kubernetes-deploy.yml): validate and deploy manifests.
 
-Infrastructure workflows use functional filenames and retain their own triggers
-and runners. They provision/configure the platform independently of service
-image delivery. Local workflow calls and path filters use these same filenames.
+[Infrastructure Pipeline](./infra-pipeline.yml) is the single automatic entry
+point for infrastructure, Kubernetes and their workflow changes on `Testing`
+and `main`. It calls Terraform, Ansible and Kubernetes in sequence. The three
+reusable workflows also support manual dispatch; they do not call one another.
+Changes to service CI/CD files alone do not provision infrastructure.
 
 Full Kubernetes reconciliation preserves digest-pinned images on Deployments
 annotated `essers.io/image-managed-by=service-cd`, so it does not revert app
 releases to bootstrap `latest`/`v1.0.0` manifest tags. Other manifest changes still
 apply. Revert application code and let CI/CD deploy the new revision for a normal
 rollback. To hand image selection back to manifests, remove that annotation
-before reconciling. Kubernetes CD runs all tests in `Scripts/tests` via its
-infrastructure preflight.
+before reconciling. [Pipeline Validation](./pipeline-validation.yml) runs the
+infrastructure/CD helper tests and trusted CI selection scenarios on hosted
+runners, without credentials or a cluster. Live preflight also runs the Python
+helper tests.
 
 Runtime now includes an HTTP server and Actuator health endpoint on port 8080;
 the former non-web startup stub could not satisfy the existing Kubernetes TCP
@@ -235,11 +242,18 @@ Infrastructure workflows target `main` and `Testing`. GitHub environments are
 `Production` and `Testing`; registered runner labels and inventory/overlay
 directories use lowercase `production` and `testing`.
 
+PRs run Terraform plan, Ansible syntax/inventory/lint and offline Kustomize
+builds. Ansible and Kubernetes validation do not query Proxmox, connect over SSH
+or contact the Kubernetes API. Manual Ansible/Kubernetes runs default to
+validation; select `apply` for live changes. No Ansible check-mode execution or
+Kubernetes apply/diff dry-run is required. Client-side object serialization is
+used only during live reconciliation to preserve released image digests.
+
 The existing order is Terraform plan/apply -> Ansible -> Kubernetes. Ansible
 also runs when an authorized apply request produces a successful no-change plan;
 failed/cancelled applies, destroy requests and PR plans do not deploy downstream.
 
-Standalone Ansible and Kubernetes runs first use the read-only
+Live Ansible and Kubernetes deployments first use the read-only
 [infrastructure check](../actions/check-infrastructure/action.yml). It queries
 Proxmox with `PROXMOX_API_URL`, `PROXMOX_API_TOKEN`, and `NODE01_NAME`, and requires
 all three VM IDs from `Infra/Setup/terraform.tfvars` to exist and be running.
@@ -274,3 +288,11 @@ and [vars context](https://docs.github.com/en/actions/reference/workflows-and-ac
 documentation.
 CD follows the official [GHCR publishing](https://docs.github.com/en/actions/tutorials/publish-packages/publish-docker-images)
 and [Docker Build](https://docs.docker.com/build/ci/github-actions/) documentation.
+
+Full Kubernetes reconciliation and service deployments share a
+`cluster-write-<environment>` concurrency group. GitHub's `queue: max` keeps
+independent service updates queued instead of replacing pending jobs. CD checks
+the SHA again after waiting for approval and the lock. See
+[GitHub concurrency](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency).
+Actionlint 1.7.12 does not yet recognize `queue`; validation ignores only that
+specific parser error.

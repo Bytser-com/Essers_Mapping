@@ -23,13 +23,13 @@ binding=$(docker port "$container_id" "$port/tcp")
 base_url="http://127.0.0.1:${binding##*:}"
 ready=false
 for attempt in $(seq 1 60); do
-  if curl --fail --silent "$base_url$health" >/dev/null; then ready=true; break; fi
+  if [[ "$(curl --silent --connect-timeout 2 --max-time 5 --output /dev/null --write-out '%{http_code}' "$base_url$health")" == 200 ]]; then ready=true; break; fi
   [[ "$(docker inspect "$container_id" --format '{{.State.Running}}')" == true ]] || break
   sleep 2
 done
 [[ "$ready" == true ]] || { echo "Container health check failed: $health" >&2; exit 1; }
 if [[ "$SERVICE_PATH" == Frontend ]]; then
-  curl --fail --silent "$base_url/" | grep -q 'id="root"'
-  curl --fail --silent "$base_url/version-control" | grep -q 'id="root"'
+  curl --fail --silent --connect-timeout 2 --max-time 5 "$base_url/" | grep -q 'id="root"'
+  curl --fail --silent --connect-timeout 2 --max-time 5 "$base_url/version-control" | grep -q 'id="root"'
 fi
 echo "Container smoke test passed for $SERVICE_PATH."
