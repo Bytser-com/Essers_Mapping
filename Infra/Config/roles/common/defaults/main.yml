@@ -23,6 +23,8 @@ common_base_packages:
   - systemd-timesyncd
   - fail2ban
   - unattended-upgrades
+  - open-iscsi
+  - nfs-common
 
 # Proxmox Guest Integration
 proxmox_qemu_guest_agent_enabled: true
