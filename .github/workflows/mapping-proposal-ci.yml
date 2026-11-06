@@ -35,6 +35,8 @@ jobs:
           service-path: Mapping_Proposal
           workflow-path: .github/workflows/mapping-proposal-ci.yml
           shared-paths: |
+            .github/actions/dependency-audit
+            Scripts/dependency-inventory.py
             .github/workflows/python-service-ci.yml
             .github/requirements/python-ci.txt
             .github/workflows/mapping-proposal-cd.yml

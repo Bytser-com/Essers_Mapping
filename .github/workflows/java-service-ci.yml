@@ -1,0 +1,102 @@
+name: Java service CI (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      service-path:
+        description: Repository-relative Maven service directory
+        required: true
+        type: string
+      artifact-prefix:
+        description: Unique prefix for service reports and JAR
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Java - tests, coverage, dependency audit and package
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: ${{ inputs.service-path }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: ${{ inputs.service-path }}/pom.xml
+
+      # The service POM configures Surefire, Failsafe and merged JaCoCo coverage.
+      - name: Unit, integration and functional tests with coverage and packaging
+        run: |
+          mvn --batch-mode --no-transfer-progress -Dstyle.color=never -DfailIfNoTests=true clean verify
+          if [[ ! -s target/site/jacoco/jacoco.xml ]]; then
+            echo '::error::Configure JaCoCo in the service POM to generate target/site/jacoco/jacoco.xml.'
+            exit 1
+          fi
+
+      - name: Export resolved dependencies including test scope
+        run: |
+          mvn --batch-mode --no-transfer-progress -Dstyle.color=never \
+            org.apache.maven.plugins:maven-dependency-plugin:3.8.1:tree \
+            -DoutputType=json -DoutputFile=target/dependency-tree.json
+          python3 "$GITHUB_WORKSPACE/Scripts/dependency-inventory.py" \
+            --maven-tree target/dependency-tree.json --output target/dependencies.json
+
+      - name: Audit resolved dependencies
+        uses: ./.github/actions/dependency-audit
+        with:
+          lockfile: osv-scanner:${{ inputs.service-path }}/target/dependencies.json
+          report-path: ${{ inputs.service-path }}/target/dependency-audit.json
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build container for validation
+        uses: docker/build-push-action@v7
+        with:
+          context: ${{ inputs.service-path }}
+          load: true
+          push: false
+          tags: service-ci:local
+
+      - name: Validate container startup and health
+        working-directory: ${{ github.workspace }}
+        env:
+          IMAGE: service-ci:local
+          SERVICE_PATH: ${{ inputs.service-path }}
+        run: bash Scripts/smoke-service-image.sh
+
+      - name: Upload tests, coverage and dependency reports
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ inputs.artifact-prefix }}-test-reports
+          path: |
+            ${{ inputs.service-path }}/target/surefire-reports/
+            ${{ inputs.service-path }}/target/failsafe-reports/
+            ${{ inputs.service-path }}/target/site/jacoco/
+            ${{ inputs.service-path }}/target/dependency-tree.json
+            ${{ inputs.service-path }}/target/dependencies.json
+            ${{ inputs.service-path }}/target/dependency-audit.json
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload application JAR
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ inputs.artifact-prefix }}-jar
+          path: ${{ inputs.service-path }}/target/*.jar
+          if-no-files-found: error
+          retention-days: 7

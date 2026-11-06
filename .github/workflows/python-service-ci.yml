@@ -65,6 +65,11 @@ jobs:
       - name: Install CI tools and service dependencies
         if: steps.readiness.outputs.enabled == 'true'
         run: |
+          # Keep the audited set independent of preinstalled runner packages.
+          python -m venv "$RUNNER_TEMP/service-python"
+          echo "$RUNNER_TEMP/service-python/bin" >> "$GITHUB_PATH"
+          source "$RUNNER_TEMP/service-python/bin/activate"
+          python -m pip install --upgrade pip
           python -m pip install -r "$GITHUB_WORKSPACE/.github/requirements/python-ci.txt"
           if [[ -f requirements.txt ]]; then
             python -m pip install -r requirements.txt
@@ -75,6 +80,19 @@ jobs:
             python -m pip install -r requirements-dev.txt
           fi
           python -m pip check
+
+      - name: Export installed application and test dependencies
+        if: steps.readiness.outputs.enabled == 'true'
+        run: >-
+          python "$GITHUB_WORKSPACE/Scripts/dependency-inventory.py"
+          --python --output test-results/dependencies.json
+
+      - name: Audit installed dependencies
+        if: steps.readiness.outputs.enabled == 'true'
+        uses: ./.github/actions/dependency-audit
+        with:
+          lockfile: osv-scanner:${{ inputs.service-path }}/test-results/dependencies.json
+          report-path: ${{ inputs.service-path }}/test-results/dependency-audit.json
 
       - name: Lint Python
         if: steps.readiness.outputs.enabled == 'true'

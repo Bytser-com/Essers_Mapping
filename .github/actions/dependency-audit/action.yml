@@ -1,0 +1,28 @@
+name: Dependency vulnerability audit
+description: Scan resolved service dependencies against OSV; findings and scan errors fail CI.
+inputs:
+  lockfile:
+    description: Repository-relative lockfile, optionally prefixed with an OSV parser name
+    required: true
+  report-path:
+    description: Repository-relative JSON report path
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Prepare dependency report directory
+      shell: bash
+      env:
+        REPORT_PATH: ${{ inputs.report-path }}
+      run: mkdir -p "$(dirname "$REPORT_PATH")"
+
+    # Pin the scanner action as well as its bundled scanner image version.
+    # No token, NVD database or paid GitHub code-scanning feature is required.
+    - name: Scan dependencies for known vulnerabilities
+      uses: google/osv-scanner-action/osv-scanner-action@0a65f82af05cd58cf587827b0bb0489548c18346 # v2.7.0
+      with:
+        scan-args: |
+          --format=json
+          --all-packages
+          --output-file=${{ inputs.report-path }}
+          --lockfile=${{ inputs.lockfile }}

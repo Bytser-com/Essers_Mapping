@@ -15,6 +15,30 @@ Service workflows run on pull requests and pushes to `main`, `Testing`, and
 `Development`. They can also be started manually from Actions.
 They use GitHub-hosted Ubuntu runners and need no repository secrets.
 
+### Dependency vulnerability checks
+
+All implemented services use the shared [dependency audit action](../actions/dependency-audit/action.yml)
+with [OSV-Scanner](https://google.github.io/osv-scanner/). It requires no API token,
+paid code-scanning subscription or hosted server. Any known vulnerability fails
+the service CI gate, including existing findings; scanner/network errors also
+fail. There are no blanket exclusions or severity exceptions. CD only accepts a
+successful CI run, so failed audits prevent publication and deployment.
+
+Frontend scans its committed `package-lock.json`, including development tools.
+Java exports Maven's resolved dependency tree, including test dependencies, then
+converts it with [dependency-inventory.py](../../Scripts/dependency-inventory.py).
+Python inventories application and test dependencies installed in an isolated virtual environment,
+so transitive and resolved versions are checked even with a `pyproject.toml` or
+version ranges. Its package installer is upgraded before installing CI tools and
+service dependencies. The locally installed Python service itself is omitted from the
+published-package inventory. Maven build plugins, base images and OS packages
+are outside this dependency audit's scope.
+
+JSON audit reports and Java/Python dependency inventories are included in service
+test-report artifacts, also on scan failure. Update vulnerable packages and rerun
+CI to unblock delivery. A passing scan concerns vulnerabilities known at scan
+time; it does not replace future scans as advisories change.
+
 The shared [service change action](../actions/service-changes/action.yml) checks
 for changes in the service directory, its workflow, the shared action,
 `.gitattributes`, and any shared service dependencies. Unrelated changes skip the expensive checks, while each workflow
@@ -57,7 +81,15 @@ root privileges, accept a read-only root filesystem with writable `/tmp`, listen
 on port 8000 and return HTTP 200 at `/health`. CI validates the image whenever a
 Dockerfile is present; CD requires it. Placeholder services publish no image.
 
-The architecture's Version Control API has no implementation directory yet.
+### Shared Java CI
+
+[Runtime CI](./runtime-ci.yml) calls [shared Java CI](./java-service-ci.yml), keeping
+Java setup, Maven tests, coverage, dependency audit, container validation and
+artifact upload in one place. The service wrapper retains its own triggers,
+change detection and required gate. Other Java services can reuse this workflow
+once their actual directory structure is known. Java CI requires a Maven service
+with automated tests and JaCoCo XML at `target/site/jacoco/jacoco.xml`; it fails
+if Maven runs no tests or the coverage report is missing.
 
 ### Required pull request checks
 
@@ -140,6 +172,19 @@ mvn --batch-mode --no-transfer-progress clean verify
 Use installed Maven until `Runtime/.mvn/wrapper/maven-wrapper.properties` is
 restored; the checked-in wrapper scripts cannot run without that file.
 
+With [OSV-Scanner 2.7.0](https://github.com/google/osv-scanner/releases/tag/v2.7.0)
+installed, run the dependency checks from the repository root:
+
+```bash
+osv-scanner scan source --lockfile=Frontend/package-lock.json
+mvn -f Runtime/pom.xml --batch-mode --no-transfer-progress org.apache.maven.plugins:maven-dependency-plugin:3.8.1:tree -DoutputType=json -DoutputFile=target/dependency-tree.json
+python Scripts/dependency-inventory.py --maven-tree Runtime/target/dependency-tree.json --output Runtime/target/dependencies.json
+osv-scanner scan source --lockfile=osv-scanner:Runtime/target/dependencies.json
+# From an activated Python service environment, after installing its dependencies:
+python Scripts/dependency-inventory.py --python --output .cache/python-dependencies.json
+osv-scanner scan source --lockfile=osv-scanner:.cache/python-dependencies.json
+```
+
 Python (Python 3.12, from either service directory after activation):
 
 ```bash
@@ -179,8 +224,8 @@ repository's default branch. Merge these workflow definitions there before
 expecting automatic CD from `Testing`.
 
 CD verifies the workflow/repository/branch and current SHA, then downloads the
-build artifact from that exact CI run. Frontend packages CI's `dist/` and Runtime
-packages CI's JAR. Python images build from the tested source revision. Container
+build artifact from that exact CI run. Frontend packages CI's `dist/` and Java
+services package CI's JAR. Python images build from the tested source revision. Container
 startup and HTTP health checks pass before publication. Images use
 `ghcr.io/<owner>/<repository>/<service>:sha-<full-commit>`; Kubernetes deploys the
 returned immutable registry digest. Unchanged/placeholder services without

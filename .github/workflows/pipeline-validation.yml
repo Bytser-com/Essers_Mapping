@@ -49,7 +49,7 @@ jobs:
           "$RUNNER_TEMP/actionlint" -color \
             -ignore '^unexpected key "queue" for "concurrency" section'
 
-      - name: Test infrastructure preflight and image reconciliation
+      - name: Test infrastructure helpers and dependency inventory
         run: python -m unittest discover -s Scripts/tests -p 'test_*.py'
 
       - name: Test trusted CI revision selection
