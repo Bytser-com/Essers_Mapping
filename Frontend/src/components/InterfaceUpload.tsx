@@ -21,10 +21,11 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
   // Customer name shown in the success message after a successful upload
   const [uploadedFor, setUploadedFor] = useState<string | null>(null)
 
-  // More than one file can be chosen at the same time
+  // New files are added to the list, so files can also be chosen one by one
   function chooseFiles(chosen: FileList | null) {
     if (!chosen || chosen.length === 0) return
-    setFiles(Array.from(chosen))
+    const newFiles = Array.from(chosen)
+    setFiles((current) => [...current, ...newFiles])
     setUploadError(null)
     setUploadedFor(null)
   }
