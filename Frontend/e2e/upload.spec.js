@@ -5,6 +5,10 @@ import { expect, test } from '@playwright/test'
 // User story 60: upload an XML file via the dashboard (TC-60-01 and TC-60-03)
 // The upload API (POST /upload) is replaced by a fake response with page.route,
 // so these tests run without the Mapping Proposal API.
+// Each test has the key of its Test issue in Jira (Xray), so the results can be imported.
+
+// Links a test to its Test issue in Xray
+const xrayTest = (key) => ({ annotation: { type: 'test_key', description: key } })
 
 const xmlFile = {
   name: 'ostavel_levering_001.xml',
@@ -41,7 +45,7 @@ test.describe('E2E - Upload card on the Home page', () => {
     await page.goto('/')
   })
 
-  test('TC-48-01 upload is not possible with an empty customer name', async ({ page }) => {
+  test('TC-48-01 upload is not possible with an empty customer name', xrayTest('IT2627T06-94'), async ({ page }) => {
     await page.getByTestId('file-input').setInputFiles(xmlFile)
     await page.getByRole('button', { name: 'Uploaden' }).click()
 
@@ -49,14 +53,14 @@ test.describe('E2E - Upload card on the Home page', () => {
     expect(uploadRequests).toBe(0)
   })
 
-  test('TC-48-02 the missing customer name is shown', async ({ page }) => {
+  test('TC-48-02 the missing customer name is shown', xrayTest('IT2627T06-95'), async ({ page }) => {
     await page.getByTestId('file-input').setInputFiles(xmlFile)
     await page.getByRole('button', { name: 'Uploaden' }).click()
 
     await expect(page.getByRole('alert')).toContainText('Vul eerst een klant in.')
   })
 
-  test('TC-48-03 upload works with a customer name and an XML file', async ({ page }) => {
+  test('TC-48-03 upload works with a customer name and an XML file', xrayTest('IT2627T06-96'), async ({ page }) => {
     await page.getByLabel('Klantnaam').fill('Ostavel')
     await page.getByTestId('file-input').setInputFiles(xmlFile)
     await page.getByRole('button', { name: 'Uploaden' }).click()
@@ -65,7 +69,7 @@ test.describe('E2E - Upload card on the Home page', () => {
     expect(uploadRequests).toBe(1)
   })
 
-  test('TC-60-01 a message is shown after a successful XML upload', async ({ page }) => {
+  test('TC-60-01 a message is shown after a successful XML upload', xrayTest('IT2627T06-90'), async ({ page }) => {
     await page.getByLabel('Klantnaam').fill('Ostavel')
     // Two XML files are uploaded at the same time
     await page.getByTestId('file-input').setInputFiles([xmlFile, secondXmlFile])
@@ -78,7 +82,7 @@ test.describe('E2E - Upload card on the Home page', () => {
     expect(uploadRequests).toBe(2)
   })
 
-  test('TC-60-03 a file that is not XML is rejected', async ({ page }) => {
+  test('TC-60-03 a file that is not XML is rejected', xrayTest('IT2627T06-93'), async ({ page }) => {
     await page.getByLabel('Klantnaam').fill('Ostavel')
 
     // No file chosen yet
