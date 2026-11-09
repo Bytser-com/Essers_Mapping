@@ -1,0 +1,95 @@
+name: Infrastructure & Cluster Pipeline
+
+# ==============================================================================
+# End-to-End Infrastructure & Cluster Deployment Pipeline (Industry Standard)
+#
+# Execution Architecture:
+#   Stage 1: Terraform  (Infra Provisioning - Proxmox VMs, Cloud-Init, Network)
+#   Stage 2: Ansible    (Infra Config - OS, Security, Containerd, K8s Bootstrap)
+#   Stage 3: Kubernetes (Cluster Deploy - MetalLB, Longhorn, Addons & Workloads)
+#
+# Triggers:
+#   - Pull Request (main, Testing):
+#       Runs validation (Terraform Plan, Ansible Syntax Check & Lint, K8s Manifest Validation)
+#   - Push (main, Testing):
+#       Runs all 3 sequentially with full syntax checks & live CD deployment
+#   - Manual dispatch (workflow_dispatch):
+#       Run full stack on demand with selectable execution modes
+# ==============================================================================
+
+on:
+  pull_request:
+    branches: [main, Testing]
+    paths:
+      - "Infra/**"
+      - "Kubernetes/**"
+      - ".github/workflows/**"
+      - ".github/actions/**"
+
+  push:
+    branches: [main, Testing]
+    paths:
+      - "Infra/**"
+      - "Kubernetes/**"
+      - ".github/workflows/**"
+      - ".github/actions/**"
+
+  workflow_dispatch:
+    inputs:
+      terraform_action:
+        description: "Terraform action"
+        type: choice
+        options: [apply, plan]
+        default: apply
+      ansible_mode:
+        description: "Ansible mode (apply = configure VMs live, validate = syntax-check & lint)"
+        type: choice
+        options: [apply, validate]
+        default: apply
+      kubernetes_mode:
+        description: "Kubernetes mode (apply = deploy live, validate = syntax-check & manifest validation, restart = rollout restart)"
+        type: choice
+        options: [apply, validate, restart]
+        default: apply
+
+# Only one full deployment per environment at a time (prevents concurrent locks/collisions)
+concurrency:
+  group: infra-cluster-pipeline-${{ github.base_ref || github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  # ----------------------------------------------------------------------------
+  # Stage 1: Terraform (Provision Infrastructure)
+  # ----------------------------------------------------------------------------
+  terraform:
+    name: 1. Provision Infrastructure
+    uses: ./.github/workflows/terraform-infra.yml
+    with:
+      action: ${{ (github.event_name == 'pull_request' && 'plan') || (inputs.terraform_action) || 'apply' }}
+    secrets: inherit
+
+  # ----------------------------------------------------------------------------
+  # Stage 2: Ansible (Configure Infrastructure & Bootstrap Kubernetes)
+  # ----------------------------------------------------------------------------
+  ansible:
+    name: 2. Configure Infrastructure
+    needs: terraform
+    if: inputs.terraform_action != 'destroy'
+    uses: ./.github/workflows/ansible-infra.yml
+    with:
+      mode: ${{ (github.event_name == 'pull_request' && 'validate') || (inputs.ansible_mode) || 'apply' }}
+    secrets: inherit
+
+  # ----------------------------------------------------------------------------
+  # Stage 3: Kubernetes (Deploy Cluster Addons & Workloads)
+  # ----------------------------------------------------------------------------
+  kubernetes:
+    name: 3. Deploy Cluster Workloads
+    needs: ansible
+    uses: ./.github/workflows/kubernetes-deploy.yml
+    with:
+      mode: ${{ (github.event_name == 'pull_request' && 'validate') || (inputs.kubernetes_mode) || 'apply' }}
+    secrets: inherit

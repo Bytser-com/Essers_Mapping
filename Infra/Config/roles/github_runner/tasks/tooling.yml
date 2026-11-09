@@ -86,6 +86,7 @@
   ansible.builtin.apt:
     name: "{{ ('terraform=' ~ runner_terraform_version) if (runner_terraform_version | default('') | length > 0 and '*' not in runner_terraform_version) else 'terraform' }}"
     state: present
+    update_cache: true
     allow_change_held_packages: true
     allow_downgrade: true
     lock_timeout: 120
@@ -161,6 +162,7 @@
   ansible.builtin.apt:
     name: kubectl
     state: present
+    update_cache: true
     lock_timeout: 120
   environment:
     DEBIAN_FRONTEND: noninteractive
@@ -226,6 +228,7 @@
   ansible.builtin.apt:
     name: helm
     state: present
+    update_cache: true
     lock_timeout: 120
   environment:
     DEBIAN_FRONTEND: noninteractive

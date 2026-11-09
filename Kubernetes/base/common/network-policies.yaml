@@ -139,13 +139,10 @@ spec:
           port: 2022
         - protocol: TCP
           port: 8080
-    # External/Public access via Dedicated LoadBalancer IP (192.168.100.103 / 192.168.100.203)
-    # Note: Pod CIDR (10.244.0.0/16) is excluded from external ipBlock so Preparation pods cannot spoof access
+    # External/Public access via Dedicated LoadBalancer IP (192.168.100.103 / 192.168.100.203) & NodePort
     - from:
         - ipBlock:
             cidr: 0.0.0.0/0
-            except:
-              - 10.244.0.0/16
       ports:
         - protocol: TCP
           port: 2022
