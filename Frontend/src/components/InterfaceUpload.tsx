@@ -5,8 +5,8 @@ import iconError from '../assets/home/icon-error.svg'
 import iconSuccess from '../assets/home/icon-success.svg'
 
 type InterfaceUploadProps = {
-  // Sends one file to the backend, called once per chosen file (see services/uploadService.ts)
-  onUpload?: (file: File) => void | Promise<void>
+  // Sends all chosen files of one customer to the backend in one request (see services/uploadService.ts)
+  onUpload?: (customerName: string, files: File[]) => void | Promise<void>
 }
 
 type UploadError = 'customer' | 'noFile' | 'file' | 'server' | null
@@ -66,12 +66,12 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
       return
     }
 
-    // Send the files to the backend one by one and show the result
+    // Send all files together: the AI makes one proposal for this upload
     try {
-      for (const file of files) {
-        await onUpload?.(file)
-      }
+      await onUpload?.(customerName.trim(), files)
       setUploadedFor(customerName.trim())
+      // The files are sent: empty the list, so the same files are not uploaded twice by accident
+      setFiles([])
     } catch (error) {
       setServerMessage(error instanceof Error ? error.message : 'Upload mislukt.')
       setUploadError('server')
@@ -184,9 +184,12 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
       {uploadedFor && (
         <div role="status" className="flex items-center gap-3 rounded-lg border border-[#1c1c1f] bg-white px-4 py-3">
           <img src={iconSuccess} alt="" width={18} height={18} />
-          <p className="text-[13px] font-semibold">
-            Upload gelukt. Er is een nieuwe proposal aangemaakt voor {uploadedFor}.
-          </p>
+          <div className="flex flex-col gap-[2px]">
+            <p className="text-[13px] font-semibold">
+              Upload gelukt. De AI is bezig met een mapping proposal voor {uploadedFor}.
+            </p>
+            <p className="text-[12px] text-[#6b6b73]">De status volg je hieronder bij Proposals.</p>
+          </div>
         </div>
       )}
     </>

@@ -39,7 +39,7 @@ test.describe('E2E - Upload card on the Home page', () => {
       return route.fulfill({
         status: 201,
         headers: { 'Access-Control-Allow-Origin': '*' },
-        json: { file_name: xmlFile.name },
+        json: { upload_id: 'test-upload', customer: 'Ostavel', files: [xmlFile.name] },
       })
     })
     await page.goto('/')
@@ -76,10 +76,11 @@ test.describe('E2E - Upload card on the Home page', () => {
     await expect(page.getByRole('listitem')).toContainText([xmlFile.name, secondXmlFile.name])
     await page.getByRole('button', { name: 'Uploaden' }).click()
 
-    await expect(page.getByRole('status')).toHaveText(
-      'Upload gelukt. Er is een nieuwe proposal aangemaakt voor Ostavel.',
+    await expect(page.getByRole('status')).toContainText(
+      'Upload gelukt. De AI is bezig met een mapping proposal voor Ostavel.',
     )
-    expect(uploadRequests).toBe(2)
+    // Both files go in one request: one upload gives one proposal
+    expect(uploadRequests).toBe(1)
   })
 
   test('TC-60-03 a file that is not XML is rejected', xrayTest('IT2627T06-93'), async ({ page }) => {

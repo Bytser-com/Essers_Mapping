@@ -117,9 +117,9 @@ def test_fc1_ai_makes_a_mapping_proposal_for_each_upload_for_the_entered_custome
     assert sorted(p.customer for p in sftp.list_proposals()) == ['Klant B', 'Ostavel']
     # The AI analysed exactly the XML file(s) of that upload: both files of the first upload together.
     assert sorted(ai.received_xml_files) == [['order_klant_b.xml'], ['order_ostavel.xml', 'order_ostavel_2.xml']]
-    # Handled uploads are moved away, so they never start a second time.
+    # Handled uploads are deleted, so they never start a second time.
     assert watcher.run_once() == 0
-    assert sorted(p.name for p in (incoming / 'processed').iterdir()) == ['upload-1', 'upload-2']
+    assert list(incoming.iterdir()) == []
 
 
 def test_fc1_upload_starts_only_when_complete(incoming, sftp, watcher):
@@ -190,3 +190,61 @@ def test_tc_new_row_after_upload_with_name_version_date_and_ai_maakt_voorstel(tm
 ])
 def test_fc2_excel_file_name_follows_the_naming_convention(customer, version, expected):
     assert workbook_name(customer, version) == expected
+
+
+def test_queue_upload_that_arrives_while_the_ai_is_busy_is_handled_next(tmp_path, incoming, sftp, ai, watcher):
+    """Several uploads: the AI handles them one by one, a new upload joins the end of the queue."""
+    late = xml_variant(tmp_path, 'order_late.xml', 'SO-LATE-0001')
+    arrived = []
+
+    def upload_during_first_run():
+        if not arrived:
+            arrived.append(upload(incoming, 'upload-late', 'Laatkomer', late))
+    ai.on_call = upload_during_first_run
+    upload(incoming, 'upload-1', 'Ostavel', OSTAVEL_XML)
+
+    assert watcher.run_once() == 2
+
+    # One AI run at a time, in order of arrival
+    assert ai.received_xml_files == [['order_ostavel.xml'], ['order_late.xml']]
+    assert {p.customer: p.status for p in sftp.list_proposals()} == {
+        'Ostavel': ProposalStatus.READY_FOR_REVIEW, 'Laatkomer': ProposalStatus.READY_FOR_REVIEW}
+    assert list(incoming.iterdir()) == []  # both uploads deleted after their proposal was made
+
+
+def test_upload_waits_when_the_sftp_server_is_unreachable(incoming, sftp, watcher, monkeypatch):
+    from scripts.errors import StorageError
+
+    real_create = sftp.create_proposal
+    server = {'up': False}
+
+    def create_proposal(customer):
+        if not server['up']:
+            raise StorageError('Cannot connect to SFTP sftp-shared:22')
+        return real_create(customer)
+    monkeypatch.setattr(sftp, 'create_proposal', create_proposal)
+    upload(incoming, 'upload-1', 'Ostavel', OSTAVEL_XML)
+
+    assert watcher.run_once() == 0
+    # The upload stays in the source folder and is tried again on the next check
+    assert (incoming / 'upload-1' / 'upload.json').is_file()
+
+    server['up'] = True
+    assert watcher.run_once() == 1
+    assert [p.customer for p in sftp.list_proposals()] == ['Ostavel']
+
+
+def test_uploaded_files_are_deleted_after_success_and_kept_after_a_failure(incoming, sftp, ai, watcher):
+    upload(incoming, 'upload-ok', 'Ostavel', OSTAVEL_XML)
+    assert watcher.run_once() == 1
+    assert list(incoming.iterdir()) == []  # the proposal is on SFTP: the XML is not kept
+
+    def overloaded():
+        raise RuntimeError('Gemini is overloaded (503).')
+    ai.on_call = overloaded
+    upload(incoming, 'upload-fail', 'Klant B', OSTAVEL_XML)
+    assert watcher.run_once() == 1
+
+    failed = incoming / 'failed' / 'upload-fail'
+    assert (failed / 'order_ostavel.xml').is_file()  # kept, so the analist can check or retry it
+    assert 'overloaded' in (failed / 'error.txt').read_text(encoding='utf-8')

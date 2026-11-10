@@ -28,7 +28,7 @@ Mapping_Proposal/
 │   ├── proposals.py        Read/write proposals on the shared storage (SFTP share)
 │   ├── proposal_runner.py  Run the AI for one proposal and keep its status up to date
 │   ├── incoming_watcher.py Start the AI automatically for every complete upload
-│   ├── storage.py          (to do) SFTP upload
+│   ├── storage.py          Connection to the shared SFTP server (or a local stand-in folder)
 │   └── jobs.py             (to do) job status for API runs
 ├── scripts/                The AI pipeline and the shared basics (config, errors, models)
 │   ├── __init__.py
@@ -281,8 +281,26 @@ One proposal in the response:
 <shared storage>/proposals/<customer-folder>/v<version>/proposal.json
 ```
 
-- In Kubernetes the SFTP share is mounted at `SHARED_MOUNT_PATH` (`/mnt/sftp-shared`), so no SFTP client is needed.
-- Locally, without an SFTP server, `data/sftp-shared/` is used. Fill it with example data: `python -m scripts.dev_seed`.
+- The proposals are stored on the shared SFTPGo server of the infrastructure (`sftp-shared`, see `Kubernetes/base/shared-storage/sftp-shared.yaml`). This service connects to it directly over SFTP (`services/storage.py`, with paramiko), under `<SFTP_SHARED_REMOTE_DIR>/proposals/`.
+- Settings: in Kubernetes from the `common-config` ConfigMap and the `sftp-shared-credentials` Secret (`SFTP_SHARED_HOST=sftp-shared`). The cluster's server is not reachable from outside the Proxmox network, so **locally a SFTP server runs in Docker** (`docker-compose.sftp.yml`, same user and folder):
+
+  ```powershell
+  docker compose -f docker-compose.sftp.yml up -d
+  ```
+
+  and in `.env`:
+
+  ```text
+  SFTP_SHARED_HOST=localhost
+  SFTP_SHARED_PORT=2222
+  SFTP_SHARED_USER=shareduser
+  SFTP_SHARED_PASSWORD=devpassword
+  SFTP_SHARED_REMOTE_DIR=/upload
+  ```
+
+  The files on that server are visible in `data/sftp-server/proposals/`. `pytest -m integration` tests against it (skipped when it is not running).
+- Without `SFTP_SHARED_HOST` (no Docker) the local folder `data/sftp-shared/proposals/` is used instead. Fill it with example data: `python -m scripts.dev_seed`.
+- When the SFTP server cannot be reached, `GET /proposals` answers 503 and uploads wait in the source folder until it is back.
 
 **Run locally** (from `Mapping_Proposal/`):
 
@@ -306,11 +324,15 @@ python main.py --customer "Voorbeeldbedrijf A"
 - Success: `READY_FOR_REVIEW` ("Klaar om na te kijken"); the Excel is saved next to it as `MProposal-<Klant>_V<N>.xlsx` (e.g. `MProposal-Brunos_V2.xlsx`).
 - Failure or Ctrl+C: `ai_status` becomes `FAILED` ("Mislukt"), with a short `error` in `proposal.json`.
 
-The frontend refreshes the list every 5 seconds while a proposal is "Bezig". Only the Excel goes to SFTP; the XML files are not copied there. See `services/proposal_runner.py`.
+The frontend refreshes the list every 2 seconds while a proposal is "Bezig" and for 30 seconds after an upload. Only the Excel goes to SFTP; the XML files are not copied there. See `services/proposal_runner.py`.
+
+### Uploading (POST /upload)
+
+The Home page sends the customer name and all chosen XML files in one request (`customer_name` + `files`, multipart). `routers/upload.py` stores them together in a new folder in the source folder (`data/source/<YYYYMMDD-HHMMSS>_<customer>_<random>/`) and writes `upload.json` last, so the watcher below starts the AI.
 
 ### Automatic AI start for uploads
 
-While the API runs (`uvicorn api:app`), a watcher checks the source folder (`data/source/`) every 5 seconds and starts the AI for every complete upload, without any command. Agreement with the upload story:
+While the API runs (`uvicorn api:app`), a watcher checks the source folder (`data/source/`) every second and starts the AI for every complete upload, without any command. Agreement with the upload story:
 
 ```text
 data/source/<upload-id>/           one new folder per upload (INCOMING_DIR overrides data/source/)
@@ -318,12 +340,12 @@ data/source/<upload-id>/           one new folder per upload (INCOMING_DIR overr
     upload.json                    written LAST: {"customer": "Ostavel"}
 ```
 
-- All XML files of one upload together give one proposal for that customer. The row appears on Home at once ("AI maakt voorstel"); the AI handles uploads one after another.
-- Afterwards the upload is moved to `processed/`, or to `failed/` with an `error.txt` (no XML, no customer name, AI error).
+- All XML files of one upload together give one proposal for that customer. The row appears on Home at once ("AI maakt voorstel"); the AI handles uploads one after another (a queue, oldest first). Uploads that arrive while the AI is busy get their row right away and join the end of the queue.
+- When the proposal is ready, the uploaded files are deleted (the Excel is on SFTP). A failed upload is moved to `failed/` with an `error.txt` (no XML, no customer name, AI error), so it can be checked.
 - After a restart, an upload that was still being processed gets AI status "Mislukt", so no row stays on "Bezig".
-- Settings in `.env`: `INCOMING_DIR`, `WATCH_INCOMING=0` (turn off), `INCOMING_POLL_SECONDS` (default 5), `AI_LIMIT_TARGETS` (target fields per proposal, default 10, 0 = all).
+- Settings in `.env`: `INCOMING_DIR`, `WATCH_INCOMING=0` (turn off), `INCOMING_POLL_SECONDS` (default 1), `AI_LIMIT_TARGETS` (target fields per proposal, default 10, 0 = all).
 - Without the API: `python -m services.incoming_watcher` (keep watching) or `--once`.
 
-**Kubernetes:** the container's root filesystem is read-only, so set `INCOMING_DIR` to a writable folder such as `/tmp/source`.
+**Kubernetes:** the container's root filesystem is read-only, so `INCOMING_DIR` is set to `/tmp/source` in `mapping-proposal.yaml`.
 
 `python main.py` only reads the XML files directly in `data/source/`, not the uploads in its subfolders. The upload must be written by this same service (the folder is local to each pod).

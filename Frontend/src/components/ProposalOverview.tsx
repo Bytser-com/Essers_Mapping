@@ -6,7 +6,15 @@ type ProposalOverviewProps = {
   // Tests pass a fake loader and a short interval; the app uses the real API.
   loadProposals?: (signal: AbortSignal) => Promise<ProposalList>
   pollIntervalMs?: number
+  // Changes after every successful upload: the list reloads and keeps checking for a while,
+  // because the backend creates the new row a few seconds after the upload.
+  refreshKey?: number
+  // How long the list keeps checking after an upload (tests use a short time).
+  waitAfterUploadMs?: number
 }
+
+// How long the list keeps checking for the new row after an upload.
+const WAIT_FOR_NEW_UPLOAD_MS = 30_000
 
 type LoadState =
   | { kind: 'loading' }
@@ -17,9 +25,20 @@ type LoadState =
 function ProposalOverview({
   loadProposals = fetchProposals,
   pollIntervalMs = POLL_INTERVAL_MS,
+  refreshKey = 0,
+  waitAfterUploadMs = WAIT_FOR_NEW_UPLOAD_MS,
 }: ProposalOverviewProps) {
   const [state, setState] = useState<LoadState>({ kind: 'loading' })
   const [attempt, setAttempt] = useState(0)
+  // Until when the list keeps refreshing after an upload (0 = not waiting for an upload)
+  const [waitUntil, setWaitUntil] = useState(0)
+
+  // After an upload: reload now (quietly, the current table stays visible) and keep checking.
+  useEffect(() => {
+    if (refreshKey === 0) return
+    setWaitUntil(Date.now() + waitAfterUploadMs)
+    setAttempt((count) => count + 1)
+  }, [refreshKey, waitAfterUploadMs])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -41,10 +60,10 @@ function ProposalOverview({
   const aiBusy =
     state.kind === 'loaded' && state.data.proposals.some((proposal) => proposal.ai_status === 'RUNNING')
   useEffect(() => {
-    if (!aiBusy) return
+    if (!aiBusy && Date.now() >= waitUntil) return
     const timer = setTimeout(() => setAttempt((count) => count + 1), pollIntervalMs)
     return () => clearTimeout(timer)
-  }, [aiBusy, pollIntervalMs, state])
+  }, [aiBusy, pollIntervalMs, state, waitUntil])
 
   function retry() {
     setState({ kind: 'loading' })

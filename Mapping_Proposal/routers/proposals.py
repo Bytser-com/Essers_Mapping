@@ -2,11 +2,12 @@
 from datetime import datetime
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
-from scripts.config import proposals_dir
+from scripts.errors import StorageError
 from services.proposals import AiStatus, ProposalStatus, ProposalStore
+from services.storage import proposal_storage
 
 router = APIRouter(prefix='/proposals', tags=['proposals'])
 
@@ -31,7 +32,7 @@ class ProposalListOut(BaseModel):
 
 # Dependency: tests replace this with a store on a temporary folder.
 def get_proposal_store() -> ProposalStore:
-    return ProposalStore(proposals_dir())
+    return ProposalStore(proposal_storage())
 
 
 @router.get('', response_model=ProposalListOut)
@@ -40,7 +41,11 @@ def list_proposals(
     store: ProposalStore = Depends(get_proposal_store),
 ) -> ProposalListOut:
     """Proposals on the shared storage, newest upload first (the Home overview)."""
-    proposals = store.list_proposals(all_versions=all_versions)
+    try:
+        proposals = store.list_proposals(all_versions=all_versions)
+    except StorageError as error:
+        # SFTP server unreachable: the frontend shows its error message with a retry button.
+        raise HTTPException(status_code=503, detail=str(error)) from error
     return ProposalListOut(
         total=len(proposals),
         proposals=[ProposalOut(**proposal.to_dict()) for proposal in proposals],

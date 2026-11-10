@@ -15,8 +15,10 @@ What the watcher does with a complete upload:
        picked up only once),
     2. creates the proposal on SFTP straight away: a new row "AI maakt voorstel",
     3. runs the AI; the Excel goes to SFTP and the row becomes "Klaar om na te kijken",
-    4. moves the upload to processed/ (or failed/ with an error.txt).
-Uploads are registered all at once but handled by the AI one after another.
+    4. deletes the uploaded files when the proposal is ready (the Excel is on SFTP);
+       a failed upload is moved to failed/ with an error.txt, so it can be checked.
+Uploads are registered all at once but handled by the AI one after another (a queue,
+oldest first); uploads that arrive while the AI is busy join the end of the queue.
 
 Runs inside the API (started in api.py), or separately:
     python -m services.incoming_watcher          keep watching
@@ -29,14 +31,16 @@ from dataclasses import dataclass
 import json
 import logging
 import os
+import shutil
 from pathlib import Path
 import threading
 from typing import Callable
 
-from scripts.config import ai_limit_targets, incoming_dir, incoming_poll_seconds, proposals_dir
+from scripts.config import ai_limit_targets, incoming_dir, incoming_poll_seconds
 from scripts.models import MappingSettings
 from .proposal_runner import RunMapping, generate_proposal, start_proposal
 from .proposals import AiStatus, ProposalRef, ProposalStatus, ProposalStore
+from .storage import proposal_storage
 
 logger = logging.getLogger(__name__)
 
@@ -64,11 +68,16 @@ class IncomingWatcher:
     # -- One pass ------------------------------------------------------------------
 
     def run_once(self) -> int:
-        """Register every complete upload, then let the AI handle them. Returns the count."""
-        claimed = self.register_new_uploads()
-        for upload in claimed:
-            self.process(upload)
-        return len(claimed)
+        """Handle the queue: register every complete upload, then let the AI handle them one
+        by one (oldest first). Uploads that arrive meanwhile get their row on Home right away
+        and join the end of the queue. Returns the number of uploads handled."""
+        queue = self.register_new_uploads()
+        handled = 0
+        while queue:
+            self.process(queue.pop(0))
+            handled += 1
+            queue.extend(self.register_new_uploads())
+        return handled
 
     def register_new_uploads(self) -> list[ClaimedUpload]:
         """Claim complete uploads (oldest first) and give each its row on Home right away."""
@@ -92,9 +101,15 @@ class IncomingWatcher:
                 logger.warning(f'Upload {folder.name} rejected: {error}')
                 self._finish(claimed_folder, FAILED_DIR, error=str(error))
                 continue
-            ref = start_proposal(customer, self.store)
+            try:
+                ref = start_proposal(customer, self.store)
+            except Exception as error:
+                # Storage (SFTP) not reachable: give the upload back, it is retried next time.
+                logger.warning(f'Upload {folder.name} waits: proposal could not be created: {error}')
+                os.rename(claimed_folder, folder)
+                continue
             (claimed_folder / PROPOSAL_REF).write_text(json.dumps(
-                {'customer': ref.customer, 'version': ref.version, 'folder': str(ref.folder)}), encoding='utf-8')
+                {'customer': ref.customer, 'version': ref.version, 'folder': ref.folder}), encoding='utf-8')
             claimed.append(ClaimedUpload(claimed_folder, ref))
         return claimed
 
@@ -106,7 +121,8 @@ class IncomingWatcher:
             logger.warning(f'Upload {upload.folder.name}: {type(error).__name__}: {error}')
             self._finish(upload.folder, FAILED_DIR, error=f'{type(error).__name__}: {error}')
             return False
-        self._finish(upload.folder, PROCESSED_DIR)
+        # Done: the proposal is on SFTP, so the uploaded source files are not needed anymore.
+        shutil.rmtree(upload.folder, ignore_errors=True)
         return True
 
     def recover_interrupted(self) -> int:
@@ -118,11 +134,14 @@ class IncomingWatcher:
         for folder in self.incoming.glob('*' + PROCESSING_SUFFIX):
             ref_file = folder / PROPOSAL_REF
             if ref_file.is_file():
-                data = json.loads(ref_file.read_text(encoding='utf-8'))
-                ref = ProposalRef(customer=data['customer'], version=data['version'], folder=Path(data['folder']))
-                if (ref.folder / 'proposal.json').is_file():
-                    self.store.set_status(ref, ProposalStatus.AI_GENERATING, AiStatus.FAILED,
-                                          error='Interrupted: the service restarted during the AI run.')
+                try:
+                    data = json.loads(ref_file.read_text(encoding='utf-8'))
+                    ref = ProposalRef(customer=data['customer'], version=data['version'], folder=str(data['folder']))
+                    if self.store.exists(ref):
+                        self.store.set_status(ref, ProposalStatus.AI_GENERATING, AiStatus.FAILED,
+                                              error='Interrupted: the service restarted during the AI run.')
+                except Exception as error:  # e.g. SFTP unreachable: still move the upload away
+                    logger.warning(f'Could not mark {folder.name} as failed on the storage: {error}')
             self._finish(folder, FAILED_DIR, error='Interrupted: the service restarted during the AI run.')
             count += 1
         return count
@@ -169,8 +188,8 @@ def _read_customer(folder: Path) -> str:
 
 
 def default_watcher(run: RunMapping | None = None) -> IncomingWatcher:
-    """Watcher with the configured folders (INCOMING_DIR, SHARED_MOUNT_PATH, AI_LIMIT_TARGETS)."""
-    return IncomingWatcher(incoming_dir(), ProposalStore(proposals_dir()),
+    """Watcher with the configured folder and storage (INCOMING_DIR, SFTP_SHARED_*, AI_LIMIT_TARGETS)."""
+    return IncomingWatcher(incoming_dir(), ProposalStore(proposal_storage()),
                            MappingSettings(limit_targets=ai_limit_targets()), run)
 
 

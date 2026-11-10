@@ -38,9 +38,9 @@ export const AI_STATUS_LABELS: Record<AiStatus, string> = {
   FAILED: 'Mislukt',
 }
 
-// How often the overview is refreshed while the AI is busy with a proposal.
-// Fit criterion: a status change is visible within 10 seconds without reloading the page.
-export const POLL_INTERVAL_MS = 5000
+// How often the overview is refreshed while the AI is busy with a proposal (and right after
+// an upload). Fit criterion: a status change is visible within 10 seconds without reloading.
+export const POLL_INTERVAL_MS = 2000
 
 // Page of one customer's mapping proposal, opened with "Openen" (built in another user story,
 // which loads the latest version from SFTP). Uses the customer's folder name on SFTP,

@@ -1,8 +1,8 @@
-"""Reading mapping proposals from the shared storage (the SFTP share).
+"""Reading and writing mapping proposals on the shared storage (the SFTP server).
 
-Layout on the share: one folder per customer, one subfolder per version.
+Layout on the storage: one folder per customer, one subfolder per version.
 
-    <SHARED_MOUNT_PATH>/proposals/
+    <SFTP_SHARED_REMOTE_DIR>/proposals/
         voorbeeldbedrijf-a/
             v1/
                 proposal.json        metadata shown in the overview (required)
@@ -10,10 +10,10 @@ Layout on the share: one folder per customer, one subfolder per version.
             v2/
                 proposal.json
 
-In Kubernetes the SFTP share is mounted into this container as a normal folder
-(SHARED_MOUNT_PATH=/mnt/sftp-shared, see Kubernetes/base/preparation/mapping-proposal.yaml),
-so no SFTP client is needed to read it. Locally, while there is no SFTP server yet,
-the same layout lives in data/sftp-shared/ (see scripts/dev_seed.py for example data).
+The files live on the shared SFTPGo server of the infrastructure (sftp-shared, see
+Kubernetes/base/shared-storage/sftp-shared.yaml); this service connects to it directly
+over SFTP (services/storage.py). Locally, when SFTP_SHARED_HOST is not set, the same
+layout lives in data/sftp-shared/proposals/ (see scripts/dev_seed.py for example data).
 
 Example proposal.json:
     {
@@ -30,10 +30,11 @@ from datetime import datetime, timezone
 from enum import Enum
 import json
 import logging
-import os
 from pathlib import Path
 import re
 import unicodedata
+
+from .storage import LocalStorage, Storage, StorageSession
 
 logger = logging.getLogger(__name__)
 
@@ -96,11 +97,11 @@ class ProposalRef:
 
     customer: str
     version: int
-    folder: Path            # <root>/<customer folder>/v<version>
+    folder: str             # "<customer folder>/v<version>", relative to the proposals root
 
     @property
     def id(self) -> str:
-        return f'{self.folder.parent.name}/v{self.version}'
+        return self.folder
 
 
 def customer_folder_name(customer: str) -> str:
@@ -111,10 +112,19 @@ def customer_folder_name(customer: str) -> str:
 
 
 class ProposalStore:
-    """Reads and writes proposal metadata in a folder with the layout described above."""
+    """Reads and writes proposals with the layout described above.
 
-    def __init__(self, root: Path):
-        self.root = Path(root)
+    ``storage`` is the SFTP server (services/storage.SftpStorage) or, locally and in the
+    tests, a folder: a Path is wrapped in a LocalStorage.
+    """
+
+    def __init__(self, storage: Storage | Path | str):
+        self.storage = LocalStorage(Path(storage)) if isinstance(storage, (str, Path)) else storage
+
+    @property
+    def root(self):
+        """Root of the proposals (a Path for a local folder, a remote path for SFTP)."""
+        return self.storage.root
 
     # -- Writing (used by the AI run, see services/proposal_runner.py) -----------------
 
@@ -126,41 +136,48 @@ class ProposalStore:
         customer = customer.strip()
         if not customer:
             raise ValueError('customer name is empty')
-        customer_dir = self.root / customer_folder_name(customer)
-        customer_dir.mkdir(parents=True, exist_ok=True)
-        existing = [int(m.group(1)) for p in customer_dir.iterdir()
-                    if (m := _VERSION_FOLDER.fullmatch(p.name))]
-        version = max(existing, default=0) + 1
-        # mkdir without exist_ok is atomic: if another run took this number, try the next.
-        while True:
-            folder = customer_dir / f'v{version}'
-            try:
-                folder.mkdir()
-                break
-            except FileExistsError:
+        customer_dir = customer_folder_name(customer)
+        with self.storage.session() as s:
+            s.make_dirs(customer_dir)
+            existing = [int(m.group(1)) for name in s.list_dirs(customer_dir)
+                        if (m := _VERSION_FOLDER.fullmatch(name))]
+            version = max(existing, default=0) + 1
+            # Creating a folder that exists fails: if another run took this number, try the next.
+            while not s.make_dir(f'{customer_dir}/v{version}'):
                 version += 1
-        now = datetime.now(timezone.utc).isoformat(timespec='seconds')
-        _write_metadata(folder, {
-            'customer': customer, 'uploaded_at': now, 'updated_at': now,
-            'status': ProposalStatus.AI_GENERATING.value, 'ai_status': AiStatus.RUNNING.value,
-        })
+            folder = f'{customer_dir}/v{version}'
+            now = datetime.now(timezone.utc).isoformat(timespec='seconds')
+            _write_metadata(s, folder, {
+                'customer': customer, 'uploaded_at': now, 'updated_at': now,
+                'status': ProposalStatus.AI_GENERATING.value, 'ai_status': AiStatus.RUNNING.value,
+            })
         return ProposalRef(customer=customer, version=version, folder=folder)
 
     def set_status(self, ref: ProposalRef, status: ProposalStatus,
                    ai_status: AiStatus | None, *, error: str = '') -> None:
         """Update status and AI status, keeping the other metadata (customer, upload time)."""
-        path = ref.folder / METADATA_FILE
-        data = json.loads(path.read_text(encoding='utf-8-sig'))
-        data.update({
-            'status': status.value,
-            'ai_status': ai_status.value if ai_status else None,
-            'updated_at': datetime.now(timezone.utc).isoformat(timespec='seconds'),
-        })
-        if error:
-            data['error'] = error  # short message for analysts/logs; not shown in the overview yet
-        else:
-            data.pop('error', None)
-        _write_metadata(ref.folder, data)
+        with self.storage.session() as s:
+            data = json.loads(s.read_text(f'{ref.folder}/{METADATA_FILE}'))
+            data.update({
+                'status': status.value,
+                'ai_status': ai_status.value if ai_status else None,
+                'updated_at': datetime.now(timezone.utc).isoformat(timespec='seconds'),
+            })
+            if error:
+                data['error'] = error  # short message for analysts/logs; not shown in the overview yet
+            else:
+                data.pop('error', None)
+            _write_metadata(s, ref.folder, data)
+
+    def save_file(self, ref: ProposalRef, local_path: Path, name: str) -> None:
+        """Upload a file (the Excel proposal) into the version folder of ``ref``."""
+        with self.storage.session() as s:
+            s.upload_file(Path(local_path), f'{ref.folder}/{name}')
+
+    def exists(self, ref: ProposalRef) -> bool:
+        """Whether the proposal.json of ``ref`` exists on the storage."""
+        with self.storage.session() as s:
+            return s.exists(f'{ref.folder}/{METADATA_FILE}')
 
     # -- Reading ----------------------------------------------------------------------
 
@@ -172,44 +189,44 @@ class ProposalStore:
         Folders with missing or invalid metadata are skipped with a warning, so one
         broken upload never breaks the whole overview.
         """
-        if not self.root.is_dir():
-            # Nothing has been uploaded yet: an empty overview, not an error.
-            logger.info('Proposals folder does not exist yet: %s', self.root)
-            return []
-
         proposals = []
-        for customer_dir in sorted(p for p in self.root.iterdir() if p.is_dir()):
-            versions = self._read_customer(customer_dir)
-            if not versions:
-                continue
-            if all_versions:
-                proposals.extend(versions)
-            else:
-                proposals.append(max(versions, key=lambda p: p.version))
+        with self.storage.session() as s:
+            customers = s.list_dirs('')
+            if not customers:
+                # Nothing has been uploaded yet: an empty overview, not an error.
+                logger.info('No proposals yet on %s', self.storage.describe())
+            for customer_dir in customers:
+                versions = self._read_customer(s, customer_dir)
+                if not versions:
+                    continue
+                if all_versions:
+                    proposals.extend(versions)
+                else:
+                    proposals.append(max(versions, key=lambda p: p.version))
 
         # Newest first; customer name and version make the order stable.
         proposals.sort(key=lambda p: (p.uploaded_at, p.customer.casefold(), p.version), reverse=True)
         return proposals
 
-    def _read_customer(self, customer_dir: Path) -> list[ProposalSummary]:
+    def _read_customer(self, s: StorageSession, customer_dir: str) -> list[ProposalSummary]:
         result = []
-        for version_dir in sorted(customer_dir.iterdir()):
-            match = _VERSION_FOLDER.fullmatch(version_dir.name)
-            if not version_dir.is_dir() or not match:
-                continue  # other files/folders next to the versions are ignored
+        for name in s.list_dirs(customer_dir):
+            match = _VERSION_FOLDER.fullmatch(name)
+            if not match:
+                continue  # other folders next to the versions are ignored
             try:
-                result.append(_read_metadata(customer_dir.name, int(match.group(1)), version_dir))
+                path = f'{customer_dir}/{name}/{METADATA_FILE}'
+                if not s.exists(path):
+                    raise ValueError(f'{METADATA_FILE} is missing')
+                result.append(_read_metadata(customer_dir, int(match.group(1)), s.read_text(path)))
             except (OSError, ValueError, TypeError) as error:
-                logger.warning('Skipping proposal %s/%s: %s', customer_dir.name, version_dir.name, error)
+                logger.warning('Skipping proposal %s/%s: %s', customer_dir, name, error)
         return result
 
 
-def _read_metadata(customer_folder: str, version: int, version_dir: Path) -> ProposalSummary:
-    """Parse proposal.json of one version folder. Raises ValueError when invalid."""
-    path = version_dir / METADATA_FILE
-    if not path.is_file():
-        raise ValueError(f'{METADATA_FILE} is missing')
-    data = json.loads(path.read_text(encoding='utf-8-sig'))  # -sig: tolerate a Windows BOM
+def _read_metadata(customer_folder: str, version: int, text: str) -> ProposalSummary:
+    """Parse the proposal.json of one version folder. Raises ValueError when invalid."""
+    data = json.loads(text)
     if not isinstance(data, dict):
         raise ValueError(f'{METADATA_FILE} must contain a JSON object')
 
@@ -251,8 +268,6 @@ def _parse_timestamp(value) -> datetime:
     return moment
 
 
-def _write_metadata(version_dir: Path, data: dict) -> None:
+def _write_metadata(s: StorageSession, folder: str, data: dict) -> None:
     """Write proposal.json atomically, so the API never reads a half-written file."""
-    temp = version_dir / f'.{METADATA_FILE}.tmp'
-    temp.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding='utf-8')
-    os.replace(temp, version_dir / METADATA_FILE)
+    s.write_text(f'{folder}/{METADATA_FILE}', json.dumps(data, indent=2, ensure_ascii=False))

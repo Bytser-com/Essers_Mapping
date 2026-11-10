@@ -61,22 +61,43 @@ def load_settings() -> Settings:
 
 
 # ---------------------------------------------------------------------------
-# Shared storage (the SFTP share). In Kubernetes it is mounted into the container
-# at SHARED_MOUNT_PATH; locally, while no SFTP server is available, data/sftp-shared/
-# is used instead (data/ is not in Git).
+# Shared storage: the SFTPGo server of the infrastructure (sftp-shared). This service
+# connects to it directly over SFTP (services/storage.py). The SFTP_SHARED_* variables
+# come from the common-config ConfigMap and the sftp-shared-credentials Secret in
+# Kubernetes (Kubernetes/base/kustomization.yaml); locally put them in .env.
+# Without SFTP_SHARED_HOST a local stand-in folder is used: data/sftp-shared/
+# (data/ is not in Git).
 # ---------------------------------------------------------------------------
 LOCAL_SHARED_DIR = DATA_DIR / 'sftp-shared'
 
 
-def shared_storage_dir() -> Path:
-    """Root of the shared storage: SHARED_MOUNT_PATH if set, else the local stand-in."""
+def sftp_shared_config() -> dict | None:
+    """Connection settings for the shared SFTP server, or None when SFTP_SHARED_HOST is empty."""
     _load_env()
-    value = os.getenv('SHARED_MOUNT_PATH', '').strip()
-    return Path(value) if value else LOCAL_SHARED_DIR
+    host = os.getenv('SFTP_SHARED_HOST', '').strip()
+    if not host:
+        return None
+    try:
+        port = int(os.getenv('SFTP_SHARED_PORT', '22'))
+    except ValueError:
+        port = 22
+    return {
+        'host': host,
+        'port': port,
+        'user': os.getenv('SFTP_SHARED_USER', '').strip(),
+        'password': os.getenv('SFTP_SHARED_PASSWORD', ''),
+        # Folder on the server; the proposals go in <SFTP_SHARED_REMOTE_DIR>/proposals.
+        'base_dir': os.getenv('SFTP_SHARED_REMOTE_DIR', '').strip() or '/',
+    }
+
+
+def shared_storage_dir() -> Path:
+    """Local stand-in for the SFTP server (used when SFTP_SHARED_HOST is not set)."""
+    return LOCAL_SHARED_DIR
 
 
 def proposals_dir() -> Path:
-    """Folder with one subfolder per customer (layout: see services/proposals.py)."""
+    """Local folder with one subfolder per customer (layout: see services/proposals.py)."""
     return shared_storage_dir() / 'proposals'
 
 
@@ -112,12 +133,12 @@ def watch_incoming_enabled() -> bool:
 
 
 def incoming_poll_seconds() -> float:
-    """How often the incoming folder is checked (INCOMING_POLL_SECONDS, default 5)."""
+    """How often the incoming folder is checked (INCOMING_POLL_SECONDS, default 1)."""
     _load_env()
     try:
-        return max(0.5, float(os.getenv('INCOMING_POLL_SECONDS', '5')))
+        return max(0.5, float(os.getenv('INCOMING_POLL_SECONDS', '1')))
     except ValueError:
-        return 5.0
+        return 1.0
 
 
 def ai_limit_targets() -> int:

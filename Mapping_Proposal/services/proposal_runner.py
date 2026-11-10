@@ -3,7 +3,7 @@
 While the AI works, the proposals overview shows "AI maakt voorstel" + "Bezig".
 Afterwards it shows "Klaar om na te kijken", or "Mislukt" when the run failed.
 
-Only the result goes to the shared storage (the SFTP share, see services/proposals.py);
+Only the result goes to the shared storage (the SFTP server, see services/proposals.py);
 the uploaded XML files stay local and are not copied to SFTP:
 
     <customer folder>/v<N>/
@@ -22,14 +22,14 @@ from dataclasses import replace
 import logging
 from pathlib import Path
 import re
-import shutil
 import unicodedata
 from typing import Callable
 
-from scripts.config import SOURCE_DIR, proposals_dir
+from scripts.config import SOURCE_DIR
 from scripts.errors import InputDataError
 from scripts.models import MappingResult, MappingSettings
 from .proposals import AiStatus, ProposalRef, ProposalStatus, ProposalStore
+from .storage import proposal_storage
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +76,7 @@ def generate_proposal(
         if not any(Path(source_dir).glob('*.xml')):
             raise InputDataError(f'No customer XML files in {source_dir}.')
         result = run(replace(settings, source_dir=Path(source_dir)))
-        shutil.copy2(result.workbook_path, ref.folder / workbook_name(ref.customer, ref.version))
+        store.save_file(ref, result.workbook_path, workbook_name(ref.customer, ref.version))
     except BaseException as error:
         store.set_status(ref, ProposalStatus.AI_GENERATING, AiStatus.FAILED,
                          error=f'{type(error).__name__}: {error}'[:300])
@@ -101,7 +101,7 @@ def run_for_customer(
 
     ``store`` and ``run`` can be replaced in tests, so no real Gemini call or SFTP share is needed.
     """
-    store = store or ProposalStore(proposals_dir())
+    store = store or ProposalStore(proposal_storage())
     if not any(Path(source_dir).glob('*.xml')):
         raise InputDataError(f'No customer XML files in {source_dir}.')  # no row for an empty upload
     ref = start_proposal(customer, store)

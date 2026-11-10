@@ -6,7 +6,7 @@ Run from the Mapping_Proposal folder:
 
 It writes the six example proposals from the Home design into
 data/sftp-shared/proposals/ (data/ is not in Git). It always writes to that local
-folder, never to SHARED_MOUNT_PATH, so it cannot touch the real SFTP share.
+folder, never to the SFTP server, so it cannot touch the real shared storage.
 Existing proposal.json files are left alone; delete the folder to start over.
 """
 from __future__ import annotations

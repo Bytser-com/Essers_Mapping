@@ -147,4 +147,5 @@ playwright-report/
 .scannerwork/
 .coverage
 coverage.xml
+htmlcov/
 .pytest_cache/
