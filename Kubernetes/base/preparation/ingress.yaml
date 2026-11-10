@@ -27,7 +27,7 @@ spec:
   tls:
     - hosts:
         - your-domain.example.com
-      secretName: essers-frontend-tls # Automatically created & renewed by cert-manager
+      secretName: essers-frontend-tls  # Automatically created & renewed by cert-manager
   rules:
     - host: your-domain.example.com
       http:

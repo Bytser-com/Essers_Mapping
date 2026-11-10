@@ -18,7 +18,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import proposals
+from routers import proposals, upload
 from services import incoming_watcher
 from scripts.config import cors_origins, watch_incoming_enabled
 
@@ -39,9 +39,10 @@ app = FastAPI(title='Mapping Proposal API', version='0.1.0', lifespan=lifespan)
 # Only needed when a browser calls this API directly (local frontend development).
 _origins = cors_origins()
 if _origins:
-    app.add_middleware(CORSMiddleware, allow_origins=_origins, allow_methods=['GET'], allow_headers=['*'])
+    app.add_middleware(CORSMiddleware, allow_origins=_origins, allow_methods=['GET', 'POST'], allow_headers=['*'])
 
 app.include_router(proposals.router)
+app.include_router(upload.router)
 
 
 @app.get('/health')

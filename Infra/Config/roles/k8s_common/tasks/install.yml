@@ -25,3 +25,19 @@
     selection: hold
   loop: "{{ k8s_packages }}"
   when: not ansible_check_mode or (k8s_keyring_stat.stat.exists | default(false))
+
+- name: Install storage prerequisites for Longhorn (open-iscsi, nfs-common, cryptsetup)
+  ansible.builtin.apt:
+    name: "{{ k8s_storage_packages }}"
+    state: present
+    lock_timeout: 120
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  when: not ansible_check_mode or (k8s_keyring_stat.stat.exists | default(false))
+
+- name: Ensure iscsid service is enabled and started for Longhorn CSI
+  ansible.builtin.systemd:
+    name: iscsid
+    enabled: true
+    state: started
+  when: not ansible_check_mode or (k8s_keyring_stat.stat.exists | default(false))
