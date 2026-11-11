@@ -35,9 +35,12 @@ jobs:
           service-path: Mapping_Converter
           workflow-path: .github/workflows/mapping-converter-ci.yml
           shared-paths: |
+            Scripts/detect-service-changes.py
             .github/actions/dependency-audit
             Scripts/dependency-inventory.py
             .github/workflows/python-service-ci.yml
+            .github/actions/setup-python-service
+            Scripts/python-service-readiness.py
             .github/requirements/python-ci.txt
             .github/workflows/mapping-converter-cd.yml
             .github/workflows/service-cd.yml
@@ -60,17 +63,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Require successful service checks
+      - name: Require successful change detection
         env:
-          CHANGES_RESULT: ${{ needs.changes.result }}
-          CHANGED: ${{ needs.changes.outputs.changed }}
-          CHECKS_RESULT: ${{ needs.checks.result }}
-        run: |
-          if [[ "$CHANGES_RESULT" == "success" ]] &&
-             { [[ "$CHANGED" == "false" && "$CHECKS_RESULT" == "skipped" ]] ||
-               [[ "$CHANGED" == "true" && "$CHECKS_RESULT" == "success" ]]; }; then
-            echo "Mapping Converter CI passed." >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "::error::Mapping Converter CI failed or was cancelled."
-            exit 1
-          fi
+          RESULT: ${{ needs.changes.result }}
+        run: test "$RESULT" = success
+
+      - name: Require successful checks when the service changed
+        if: needs.changes.outputs.changed != 'false'
+        env:
+          RESULT: ${{ needs.checks.result }}
+        run: test "$RESULT" = success

@@ -32,75 +32,19 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Check service readiness
-        id: readiness
-        run: |
-          if [[ ! -f requirements.txt && ! -f pyproject.toml ]]; then
-            if [[ -d tests || -n "$(find . -type f -name '*.py' -print -quit)" ]]; then
-              echo "::error::Add requirements.txt or an installable pyproject.toml for this Python service."
-              exit 1
-            fi
-            echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "### Python service CI deferred" >> "$GITHUB_STEP_SUMMARY"
-            echo "This directory is a placeholder. Add a dependency manifest and tests/ to activate its checks." >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          if [[ ! -d tests ]]; then
-            echo "::error::Add the service's automated tests under tests/."
-            exit 1
-          fi
-          echo "enabled=true" >> "$GITHUB_OUTPUT"
-
-      - name: Setup Python
-        if: steps.readiness.outputs.enabled == 'true'
-        uses: actions/setup-python@v6
+      - name: Setup service and dependencies
+        id: setup
+        uses: ./.github/actions/setup-python-service
         with:
-          python-version: '3.12'
-          cache: pip
-          cache-dependency-path: |
-            ${{ inputs.service-path }}/requirements*.txt
-            ${{ inputs.service-path }}/pyproject.toml
-            .github/requirements/python-ci.txt
-
-      - name: Install CI tools and service dependencies
-        if: steps.readiness.outputs.enabled == 'true'
-        run: |
-          # Keep the audited set independent of preinstalled runner packages.
-          python -m venv "$RUNNER_TEMP/service-python"
-          echo "$RUNNER_TEMP/service-python/bin" >> "$GITHUB_PATH"
-          source "$RUNNER_TEMP/service-python/bin/activate"
-          python -m pip install --upgrade pip
-          python -m pip install -r "$GITHUB_WORKSPACE/.github/requirements/python-ci.txt"
-          if [[ -f requirements.txt ]]; then
-            python -m pip install -r requirements.txt
-          else
-            python -m pip install .
-          fi
-          if [[ -f requirements-dev.txt ]]; then
-            python -m pip install -r requirements-dev.txt
-          fi
-          python -m pip check
-
-      - name: Export installed application and test dependencies
-        if: steps.readiness.outputs.enabled == 'true'
-        run: >-
-          python "$GITHUB_WORKSPACE/Scripts/dependency-inventory.py"
-          --python --output test-results/dependencies.json
-
-      - name: Audit installed dependencies
-        if: steps.readiness.outputs.enabled == 'true'
-        uses: ./.github/actions/dependency-audit
-        with:
-          lockfile: osv-scanner:${{ inputs.service-path }}/test-results/dependencies.json
-          report-path: ${{ inputs.service-path }}/test-results/dependency-audit.json
+          service-path: ${{ inputs.service-path }}
 
       - name: Lint Python
-        if: steps.readiness.outputs.enabled == 'true'
+        if: steps.setup.outputs.enabled == 'true'
         run: python -m ruff check .
 
       # All test categories under tests/ run together; pytest fails if none exist.
       - name: Unit, integration and functional tests with coverage
-        if: steps.readiness.outputs.enabled == 'true'
+        if: steps.setup.outputs.enabled == 'true'
         run: >-
           python -m pytest tests -ra
           --junitxml=test-results/pytest-junit.xml
@@ -109,12 +53,25 @@ jobs:
           --cov-report=xml:coverage.xml
           --cov-report=html:coverage
 
+      - name: Export installed application and test dependencies
+        if: steps.setup.outputs.enabled == 'true'
+        run: >-
+          python "$GITHUB_WORKSPACE/Scripts/dependency-inventory.py"
+          --python --output test-results/dependencies.json
+
+      - name: Audit installed dependencies
+        if: steps.setup.outputs.enabled == 'true'
+        uses: ./.github/actions/dependency-audit
+        with:
+          lockfile: osv-scanner:${{ inputs.service-path }}/test-results/dependencies.json
+          report-path: ${{ inputs.service-path }}/test-results/dependency-audit.json
+
       - name: Setup Docker Buildx
-        if: steps.readiness.outputs.enabled == 'true' && hashFiles(format('{0}/Dockerfile', inputs.service-path)) != ''
+        if: steps.setup.outputs.enabled == 'true' && hashFiles(format('{0}/Dockerfile', inputs.service-path)) != ''
         uses: docker/setup-buildx-action@v4
 
       - name: Build container for validation
-        if: steps.readiness.outputs.enabled == 'true' && hashFiles(format('{0}/Dockerfile', inputs.service-path)) != ''
+        if: steps.setup.outputs.enabled == 'true' && hashFiles(format('{0}/Dockerfile', inputs.service-path)) != ''
         uses: docker/build-push-action@v7
         with:
           context: ${{ inputs.service-path }}
@@ -123,7 +80,7 @@ jobs:
           tags: service-ci:local
 
       - name: Validate container startup and health
-        if: steps.readiness.outputs.enabled == 'true' && hashFiles(format('{0}/Dockerfile', inputs.service-path)) != ''
+        if: steps.setup.outputs.enabled == 'true' && hashFiles(format('{0}/Dockerfile', inputs.service-path)) != ''
         working-directory: ${{ github.workspace }}
         env:
           IMAGE: service-ci:local
@@ -131,7 +88,7 @@ jobs:
         run: bash Scripts/smoke-service-image.sh
 
       - name: Upload test results and coverage
-        if: always() && steps.readiness.outputs.enabled == 'true'
+        if: always() && steps.setup.outputs.enabled == 'true'
         uses: actions/upload-artifact@v6
         with:
           name: ${{ inputs.artifact-prefix }}-test-reports

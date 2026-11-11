@@ -1,5 +1,7 @@
 # GitHub Actions workflows
 
+Voor een korte Nederlandstalige uitleg van de stappen: [Uitleg CI/CD](./UITLEG.md).
+
 ## Service CI
 
 Each application service has its own workflow:
@@ -39,11 +41,14 @@ test-report artifacts, also on scan failure. Update vulnerable packages and reru
 CI to unblock delivery. A passing scan concerns vulnerabilities known at scan
 time; it does not replace future scans as advisories change.
 
-The shared [service change action](../actions/service-changes/action.yml) checks
+The shared [service change action](../actions/service-changes/action.yml) uses
+[detect-service-changes.py](../../Scripts/detect-service-changes.py) to check
 for changes in the service directory, its workflow, the shared action,
 `.gitattributes`, and any shared service dependencies. Unrelated changes skip the expensive checks, while each workflow
 still publishes its final status. Manual runs always execute all service checks.
-New branches or unavailable comparison commits also execute all checks. Pull
+New branches or unavailable comparison commits also execute all checks. Pushes
+to `Testing` and `main` always check every service, so the latest release revision
+has its own artifacts even after an unrelated follow-up commit. Pull
 requests compare the target commit with GitHub's checked-out merge commit;
 pushes compare the previous commit with the new head.
 
@@ -56,7 +61,9 @@ the Kubernetes environment.
 ### Future Python services
 
 `Mapping_Proposal` and `Mapping_Converter` currently contain only empty READMEs.
-Their workflows use [shared Python CI](./python-service-ci.yml). Placeholder
+Their workflows use [shared Python CI](./python-service-ci.yml) and the
+[shared Python setup](../actions/setup-python-service/action.yml), also used by
+SonarQube. Placeholder
 directories report that checks are deferred and skip dependency installation,
 linting and tests. They do not claim that Python tests passed.
 

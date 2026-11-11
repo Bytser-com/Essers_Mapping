@@ -12,6 +12,7 @@ runs:
   steps:
     - name: Prepare dependency report directory
       shell: bash
+      working-directory: ${{ github.workspace }}
       env:
         REPORT_PATH: ${{ inputs.report-path }}
       run: mkdir -p "$(dirname "$REPORT_PATH")"

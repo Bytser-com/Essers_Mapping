@@ -37,17 +37,24 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Validate workflow syntax and expressions
+      - name: Download actionlint 1.7.12
+        run: >-
+          curl --fail --silent --show-error --location
+          https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz
+          --output "$RUNNER_TEMP/actionlint.tar.gz"
+
+      - name: Verify the actionlint download
         run: |
-          set -euo pipefail
-          curl --fail --silent --show-error --location \
-            https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz \
-            --output "$RUNNER_TEMP/actionlint.tar.gz"
           printf '%s  %s\n' '8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8' "$RUNNER_TEMP/actionlint.tar.gz" | sha256sum --check
-          tar -xzf "$RUNNER_TEMP/actionlint.tar.gz" -C "$RUNNER_TEMP" actionlint
-          # v1.7.12 predates GitHub's queue property. Ignore only that parser error.
-          "$RUNNER_TEMP/actionlint" -color \
-            -ignore '^unexpected key "queue" for "concurrency" section'
+
+      - name: Extract actionlint
+        run: tar -xzf "$RUNNER_TEMP/actionlint.tar.gz" -C "$RUNNER_TEMP" actionlint
+
+      # v1.7.12 predates GitHub's queue property. Ignore only that parser error.
+      - name: Validate workflow syntax and expressions
+        run: >-
+          "$RUNNER_TEMP/actionlint" -color
+          -ignore '^unexpected key "queue" for "concurrency" section'
 
       - name: Test infrastructure helpers and dependency inventory
         run: python -m unittest discover -s Scripts/tests -p 'test_*.py'

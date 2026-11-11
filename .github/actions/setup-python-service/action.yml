@@ -1,0 +1,70 @@
+name: Setup Python service
+description: Check implementation readiness and install dependencies in an isolated environment.
+inputs:
+  service-path:
+    description: Repository-relative service directory
+    required: true
+outputs:
+  enabled:
+    description: Whether the service is implemented and ready for checks
+    value: ${{ steps.readiness.outputs.enabled }}
+runs:
+  using: composite
+  steps:
+    - name: Check service readiness
+      id: readiness
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      env:
+        SERVICE_PATH: ${{ inputs.service-path }}
+      run: python3 Scripts/python-service-readiness.py "$SERVICE_PATH"
+
+    - name: Setup Python 3.12
+      if: steps.readiness.outputs.enabled == 'true'
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+        cache: pip
+        cache-dependency-path: |
+          ${{ inputs.service-path }}/requirements*.txt
+          ${{ inputs.service-path }}/pyproject.toml
+          .github/requirements/python-ci.txt
+
+    - name: Create an isolated environment
+      if: steps.readiness.outputs.enabled == 'true'
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      env:
+        SERVICE_PATH: ${{ inputs.service-path }}
+      run: |
+        python -m venv "$RUNNER_TEMP/python/$SERVICE_PATH"
+        echo "$RUNNER_TEMP/python/$SERVICE_PATH/bin" >> "$GITHUB_PATH"
+
+    - name: Install CI tools
+      if: steps.readiness.outputs.enabled == 'true'
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      run: python -m pip install --upgrade pip -r .github/requirements/python-ci.txt
+
+    - name: Install application dependencies
+      if: steps.readiness.outputs.enabled == 'true'
+      shell: bash
+      working-directory: ${{ github.workspace }}/${{ inputs.service-path }}
+      run: |
+        if [[ -f requirements.txt ]]; then
+          python -m pip install -r requirements.txt
+        else
+          python -m pip install .
+        fi
+
+    - name: Install optional development dependencies
+      if: steps.readiness.outputs.enabled == 'true' && hashFiles(format('{0}/requirements-dev.txt', inputs.service-path)) != ''
+      shell: bash
+      working-directory: ${{ github.workspace }}/${{ inputs.service-path }}
+      run: python -m pip install -r requirements-dev.txt
+
+    - name: Check dependency compatibility
+      if: steps.readiness.outputs.enabled == 'true'
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      run: python -m pip check

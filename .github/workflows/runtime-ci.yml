@@ -35,6 +35,7 @@ jobs:
           service-path: Runtime
           workflow-path: .github/workflows/runtime-ci.yml
           shared-paths: |
+            Scripts/detect-service-changes.py
             .github/workflows/java-service-ci.yml
             .github/actions/dependency-audit
             Scripts/dependency-inventory.py
@@ -59,17 +60,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Require successful runtime checks
+      - name: Require successful change detection
         env:
-          CHANGES_RESULT: ${{ needs.changes.result }}
-          CHANGED: ${{ needs.changes.outputs.changed }}
-          CHECKS_RESULT: ${{ needs.checks.result }}
-        run: |
-          if [[ "$CHANGES_RESULT" == "success" ]] &&
-             { [[ "$CHANGED" == "false" && "$CHECKS_RESULT" == "skipped" ]] ||
-               [[ "$CHANGED" == "true" && "$CHECKS_RESULT" == "success" ]]; }; then
-            echo "Runtime CI passed." >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "::error::Runtime CI failed or was cancelled."
-            exit 1
-          fi
+          RESULT: ${{ needs.changes.result }}
+        run: test "$RESULT" = success
+
+      - name: Require successful checks when the service changed
+        if: needs.changes.outputs.changed != 'false'
+        env:
+          RESULT: ${{ needs.checks.result }}
+        run: test "$RESULT" = success

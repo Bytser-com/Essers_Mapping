@@ -39,20 +39,21 @@ jobs:
 
       # The service POM configures Surefire, Failsafe and merged JaCoCo coverage.
       - name: Unit, integration and functional tests with coverage and packaging
-        run: |
-          mvn --batch-mode --no-transfer-progress -Dstyle.color=never -DfailIfNoTests=true clean verify
-          if [[ ! -s target/site/jacoco/jacoco.xml ]]; then
-            echo '::error::Configure JaCoCo in the service POM to generate target/site/jacoco/jacoco.xml.'
-            exit 1
-          fi
+        run: mvn --batch-mode --no-transfer-progress -DfailIfNoTests=true clean verify
+
+      - name: Require the JaCoCo coverage report
+        run: test -s target/site/jacoco/jacoco.xml
 
       - name: Export resolved dependencies including test scope
-        run: |
-          mvn --batch-mode --no-transfer-progress -Dstyle.color=never \
-            org.apache.maven.plugins:maven-dependency-plugin:3.8.1:tree \
-            -DoutputType=json -DoutputFile=target/dependency-tree.json
-          python3 "$GITHUB_WORKSPACE/Scripts/dependency-inventory.py" \
-            --maven-tree target/dependency-tree.json --output target/dependencies.json
+        run: >-
+          mvn --batch-mode --no-transfer-progress
+          org.apache.maven.plugins:maven-dependency-plugin:3.8.1:tree
+          -DoutputType=json -DoutputFile=target/dependency-tree.json
+
+      - name: Convert the Maven inventory for OSV
+        run: >-
+          python3 "$GITHUB_WORKSPACE/Scripts/dependency-inventory.py"
+          --maven-tree target/dependency-tree.json --output target/dependencies.json
 
       - name: Audit resolved dependencies
         uses: ./.github/actions/dependency-audit
