@@ -31,7 +31,7 @@ function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
 }
 
-// Fake backend: GET /api/proposal/proposals returns the current list; POST /upload adds a row.
+// Fake backend: GET /api/version-control/proposals returns the current list; POST /upload adds a row.
 function fakeBackend(initial: Proposal[]) {
   let proposals = [...initial]
   const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
@@ -63,7 +63,7 @@ describe('Home – proposals overview', () => {
     expect(within(row).getByText('v1')).toBeInTheDocument()
     expect(within(row).getByText('Klaar om na te kijken')).toBeInTheDocument()
     expect(screen.getByTestId('proposal-count')).toHaveTextContent('1')
-    expect(fetchMock).toHaveBeenCalledWith('/api/proposal/proposals', expect.anything())
+    expect(fetchMock).toHaveBeenCalledWith('/api/version-control/proposals', expect.anything())
   })
 
   it('TC-57-08 after an upload the new proposal appears in the list without reloading the page', async () => {

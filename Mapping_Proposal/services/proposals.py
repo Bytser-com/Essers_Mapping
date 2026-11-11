@@ -148,8 +148,13 @@ class ProposalStore:
             folder = f'{customer_dir}/v{version}'
             now = datetime.now(timezone.utc).isoformat(timespec='seconds')
             _write_metadata(s, folder, {
-                'customer': customer, 'uploaded_at': now, 'updated_at': now,
-                'status': ProposalStatus.AI_GENERATING.value, 'ai_status': AiStatus.RUNNING.value,
+                'customer': customer,
+                'company': customer,
+                'version': f'v{version}',
+                'uploaded_at': now,
+                'createdDate': now,
+                'status': ProposalStatus.AI_GENERATING.value,
+                'ai_status': AiStatus.RUNNING.value,
             })
         return ProposalRef(customer=customer, version=version, folder=folder)
 
@@ -173,6 +178,14 @@ class ProposalStore:
         """Upload a file (the Excel proposal) into the version folder of ``ref``."""
         with self.storage.session() as s:
             s.upload_file(Path(local_path), f'{ref.folder}/{name}')
+            try:
+                meta_path = f'{ref.folder}/{METADATA_FILE}'
+                if s.exists(meta_path):
+                    data = json.loads(s.read_text(meta_path))
+                    data['filename'] = name
+                    _write_metadata(s, ref.folder, data)
+            except Exception as e:
+                logger.warning('Failed to update filename in metadata: %s', e)
 
     def exists(self, ref: ProposalRef) -> bool:
         """Whether the proposal.json of ``ref`` exists on the storage."""

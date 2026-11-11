@@ -8,6 +8,7 @@ export default defineConfig({
   // Local development: send /api/proposal/* and /api/proposals/* to the Mapping_Proposal backend
   // (uvicorn on port 8000), like the frontend proxy does in Kubernetes.
   server: {
+    host: true,
     proxy: {
       '/api/proposal': {
         target: 'http://localhost:8000',
@@ -16,6 +17,10 @@ export default defineConfig({
       '/api/proposals': {
         target: 'http://localhost:8000',
         rewrite: (path) => (path === '/api/proposals' ? '/proposals' : path.replace(/^\/api\/proposals/, '')),
+      },
+      '/api/version-control': {
+        target: 'http://localhost:8085',
+        rewrite: (path) => path.replace(/^\/api\/version-control/, ''),
       },
     },
   },

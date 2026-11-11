@@ -18,7 +18,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import proposals, upload
+from routers import upload
 from services import incoming_watcher
 from scripts.config import cors_origins, watch_incoming_enabled
 
@@ -41,7 +41,6 @@ _origins = cors_origins()
 if _origins:
     app.add_middleware(CORSMiddleware, allow_origins=_origins, allow_methods=['GET', 'POST'], allow_headers=['*'])
 
-app.include_router(proposals.router)
 app.include_router(upload.router)
 
 

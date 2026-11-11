@@ -1,4 +1,4 @@
-// Proposals overview: data from the Mapping_Proposal backend (GET /proposals).
+// Proposals overview: data retrieved from Version_Control backend (GET /api/version-control/proposals).
 
 export type ProposalStatus =
   | 'AI_GENERATING'
@@ -17,6 +17,28 @@ export type Proposal = {
   status: ProposalStatus
   ai_status: AiStatus | null
   can_open: boolean
+}
+
+export type CompanyProposalOverview = {
+  company: string
+  latestVersion: string
+  filename?: string | null
+  fullPath?: string | null
+  createdDate?: string | null
+  createdBy?: string | null
+  description?: string | null
+  status?: ProposalStatus | string | null
+  aiStatus?: AiStatus | string | null
+}
+
+export type ProposalFileDetails = {
+  company: string
+  version: string
+  filename: string
+  fullPath: string
+  contentType: string
+  fileBase64: string
+  metadata?: Record<string, unknown> | null
 }
 
 export type ProposalList = {
@@ -50,16 +72,55 @@ export function proposalPath(proposal: Pick<Proposal, 'id'>): string {
   return `/proposals/${encodeURIComponent(customerFolder)}`
 }
 
-// In Kubernetes the frontend proxies /api/proposal/* to the backend; during local
-// development vite.config.js does the same.
-const API_BASE = '/api/proposal'
+export function toProposal(item: CompanyProposalOverview | Proposal): Proposal {
+  if ('customer' in item && typeof item.customer === 'string' && 'version' in item && typeof item.version === 'number') {
+    return item as Proposal
+  }
+  const ov = item as CompanyProposalOverview
+  const versionNum = parseInt(String(ov.latestVersion ?? '').replace(/^v/i, ''), 10) || 1
+  const status: ProposalStatus = (ov.status as ProposalStatus) || 'READY_FOR_REVIEW'
+  const aiStatus: AiStatus | null = (ov.aiStatus as AiStatus) || null
+  const canOpen = status !== 'AI_GENERATING'
+
+  return {
+    id: `${ov.company}/${ov.latestVersion}`,
+    customer: ov.company,
+    version: versionNum,
+    uploaded_at: ov.createdDate || new Date().toISOString(),
+    status,
+    ai_status: aiStatus,
+    can_open: canOpen,
+  }
+}
+
+// Version_Control API endpoint (proxied in Kubernetes by NGINX and in dev by Vite).
+export const VERSION_CONTROL_API = '/api/version-control'
 
 export async function fetchProposals(signal?: AbortSignal): Promise<ProposalList> {
-  const response = await fetch(`${API_BASE}/proposals`, { signal: signal ?? null })
+  const response = await fetch(`${VERSION_CONTROL_API}/proposals`, { signal: signal ?? null })
   if (!response.ok) {
     throw new Error(`Loading proposals failed (HTTP ${response.status})`)
   }
-  return (await response.json()) as ProposalList
+  const data = await response.json()
+  const rawList: (CompanyProposalOverview | Proposal)[] = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.proposals)
+      ? data.proposals
+      : []
+  const proposals = rawList.map(toProposal)
+  return {
+    total: proposals.length,
+    proposals,
+  }
+}
+
+export async function fetchProposalFile(company: string, version: string): Promise<ProposalFileDetails> {
+  const params = new URLSearchParams({ company, version })
+  const response = await fetch(`${VERSION_CONTROL_API}/proposals/file?${params.toString()}`)
+  if (!response.ok) {
+    throw new Error(`Loading proposal file failed (HTTP ${response.status})`)
+  }
+  return (await response.json()) as ProposalFileDetails
 }
 
 // "22/10/2026 14:05" in the browser's timezone (or the given one, used by tests).

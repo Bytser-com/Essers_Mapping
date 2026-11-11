@@ -15,7 +15,7 @@ const xrayTest = (key: string) => ({ annotation: { type: 'test_key', description
 // Dates are shown in the browser's timezone: use the one of the analisten.
 test.use({ timezoneId: 'Europe/Brussels', locale: 'nl-BE' })
 
-const PROPOSALS_API = '**/api/proposal/proposals'
+const PROPOSALS_API = '**/proposals*'
 const UPLOAD_API = '**/api/proposal/upload'
 
 type Proposal = {

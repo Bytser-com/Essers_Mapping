@@ -23,6 +23,7 @@ public class SftpProposalStorageService implements ProposalStorageService {
 
     private static final Logger log = LoggerFactory.getLogger(SftpProposalStorageService.class);
     private static final String METADATA_FILENAME = "metadata.json";
+    private static final String FALLBACK_METADATA_FILENAME = "proposal.json";
     private static final String EXCEL_XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     private static final String EXCEL_XLS_MIME = "application/vnd.ms-excel";
 
@@ -214,6 +215,8 @@ public class SftpProposalStorageService implements ProposalStorageService {
                 : (excelEntry != null ? extractFileTimestamp(excelEntry) : null);
         String createdBy = (metadata != null) ? metadata.createdBy() : null;
         String description = (metadata != null) ? metadata.description() : null;
+        String status = (metadata != null) ? metadata.status() : null;
+        String aiStatus = (metadata != null) ? metadata.aiStatus() : null;
 
         return new CompanyProposalOverviewDto(
                 companyName,
@@ -222,26 +225,19 @@ public class SftpProposalStorageService implements ProposalStorageService {
                 fullPath,
                 createdDate,
                 createdBy,
-                description
+                description,
+                status,
+                aiStatus
         );
     }
 
     private ProposalMetadata readMetadata(String versionPath, SftpClient.DirEntry[] versionEntries) {
-        boolean hasMetadataFile = false;
-        if (versionEntries != null) {
-            for (SftpClient.DirEntry entry : versionEntries) {
-                if (METADATA_FILENAME.equalsIgnoreCase(entry.getFilename()) && !isDirectory(entry)) {
-                    hasMetadataFile = true;
-                    break;
-                }
-            }
-        }
-
-        String metadataPath = versionPath + "/" + METADATA_FILENAME;
-        if (!hasMetadataFile && !template.exists(metadataPath)) {
+        String metadataFile = resolveMetadataFilename(versionPath, versionEntries);
+        if (metadataFile == null) {
             return null;
         }
 
+        String metadataPath = versionPath + "/" + metadataFile;
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             boolean success = template.get(metadataPath, in -> in.transferTo(baos));
@@ -249,7 +245,30 @@ public class SftpProposalStorageService implements ProposalStorageService {
                 return objectMapper.readValue(baos.toByteArray(), ProposalMetadata.class);
             }
         } catch (Exception e) {
-            log.warn("Failed to parse {} at {}: {}", METADATA_FILENAME, metadataPath, e.getMessage());
+            log.warn("Failed to parse metadata file at {}: {}", metadataPath, e.getMessage());
+        }
+        return null;
+    }
+
+    private String resolveMetadataFilename(String versionPath, SftpClient.DirEntry[] versionEntries) {
+        if (versionEntries != null && versionEntries.length > 0) {
+            for (SftpClient.DirEntry entry : versionEntries) {
+                if (METADATA_FILENAME.equalsIgnoreCase(entry.getFilename()) && !isDirectory(entry)) {
+                    return entry.getFilename();
+                }
+            }
+            for (SftpClient.DirEntry entry : versionEntries) {
+                if (FALLBACK_METADATA_FILENAME.equalsIgnoreCase(entry.getFilename()) && !isDirectory(entry)) {
+                    return entry.getFilename();
+                }
+            }
+            return null;
+        }
+        if (template.exists(versionPath + "/" + METADATA_FILENAME)) {
+            return METADATA_FILENAME;
+        }
+        if (template.exists(versionPath + "/" + FALLBACK_METADATA_FILENAME)) {
+            return FALLBACK_METADATA_FILENAME;
         }
         return null;
     }

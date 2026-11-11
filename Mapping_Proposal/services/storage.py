@@ -137,7 +137,10 @@ class SftpSettings:
 class SftpStorage:
     def __init__(self, settings: SftpSettings):
         self.settings = settings
-        self.root = posixpath.join(settings.base_dir or '/', settings.proposals_dir)
+        if settings.proposals_dir:
+            self.root = posixpath.join(settings.base_dir or '/', settings.proposals_dir)
+        else:
+            self.root = settings.base_dir or '/'
 
     def describe(self) -> str:
         s = self.settings

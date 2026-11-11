@@ -73,6 +73,8 @@ spec:
           env:
             - name: SERVICE_NAME
               value: "version-control-backend"
+            - name: SERVER_PORT
+              value: "8080"
             - name: JAVA_TOOL_OPTIONS
               value: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
             - name: SFTP_SHARED_PASSWORD

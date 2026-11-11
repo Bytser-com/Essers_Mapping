@@ -6,6 +6,7 @@ import {
   AI_STATUS_LABELS,
   POLL_INTERVAL_MS,
   STATUS_LABELS,
+  fetchProposalFile,
   fetchProposals,
   formatUploadedAt,
   proposalPath,
@@ -16,24 +17,37 @@ afterEach(() => {
 })
 
 describe('fetchProposals', () => {
-  it('TC-57-02 loads the list from GET /api/proposal/proposals', async () => {
-    const list = { total: 0, proposals: [] }
-    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify(list), { status: 200 }))
+  it('TC-57-02 loads the list from GET /api/version-control/proposals', async () => {
+    const vcList = [
+      {
+        company: 'Ostavel',
+        latestVersion: 'v1',
+        filename: 'MProposal-Ostavel_V1.xlsx',
+        createdDate: '2026-10-30T13:30:00+01:00',
+        status: 'READY_FOR_REVIEW',
+        aiStatus: null,
+      },
+    ]
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify(vcList), { status: 200 }))
     vi.stubGlobal('fetch', fetchMock)
     const controller = new AbortController()
 
-    await expect(fetchProposals(controller.signal)).resolves.toEqual(list)
+    const result = await fetchProposals(controller.signal)
+    expect(result.total).toBe(1)
+    expect(result.proposals[0].customer).toBe('Ostavel')
+    expect(result.proposals[0].version).toBe(1)
+    expect(result.proposals[0].status).toBe('READY_FOR_REVIEW')
 
-    expect(fetchMock).toHaveBeenCalledWith('/api/proposal/proposals', { signal: controller.signal })
+    expect(fetchMock).toHaveBeenCalledWith('/api/version-control/proposals', { signal: controller.signal })
   })
 
   it('TC-57-02 works without an abort signal', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(new Response('{"total":0,"proposals":[]}', { status: 200 }))
+    const fetchMock = vi.fn().mockResolvedValue(new Response('[]', { status: 200 }))
     vi.stubGlobal('fetch', fetchMock)
 
     await fetchProposals()
 
-    expect(fetchMock).toHaveBeenCalledWith('/api/proposal/proposals', { signal: null })
+    expect(fetchMock).toHaveBeenCalledWith('/api/version-control/proposals', { signal: null })
   })
 
   it('TC-57-10 throws when the backend answers with an error (e.g. 503: SFTP unreachable)', async () => {
@@ -97,5 +111,24 @@ describe('refresh interval', () => {
   it('TC-57-07 a status change is visible within 10 seconds (refresh at most every 10 s)', () => {
     expect(POLL_INTERVAL_MS).toBeGreaterThan(0)
     expect(POLL_INTERVAL_MS).toBeLessThanOrEqual(10_000)
+  })
+})
+
+describe('fetchProposalFile', () => {
+  it('loads proposal file details from GET /api/version-control/proposals/file', async () => {
+    const fileDetails = {
+      company: 'Ostavel',
+      version: 'v1',
+      filename: 'MProposal-Ostavel_V1.xlsx',
+      fullPath: '/Proposals/Ostavel/v1/MProposal-Ostavel_V1.xlsx',
+      contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      fileBase64: 'UEsDBBQAAAAIA...',
+    }
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify(fileDetails), { status: 200 }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const result = await fetchProposalFile('Ostavel', 'v1')
+    expect(result).toEqual(fileDetails)
+    expect(fetchMock).toHaveBeenCalledWith('/api/version-control/proposals/file?company=Ostavel&version=v1')
   })
 })

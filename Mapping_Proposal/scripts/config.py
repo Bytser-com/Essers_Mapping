@@ -17,7 +17,12 @@ ROOT = Path(__file__).resolve().parent.parent
 
 DATA_DIR = ROOT / 'data'
 SOURCE_DIR = DATA_DIR / 'source'
-HISTORICAL_DIR = DATA_DIR / 'historical'
+HISTORICAL_DIR = (
+    Path(os.getenv('HISTORICAL_DIR')) if os.getenv('HISTORICAL_DIR')
+    else (DATA_DIR / 'historical' if (DATA_DIR / 'historical').is_dir() and any((DATA_DIR / 'historical').iterdir())
+          else (ROOT / 'tests' / 'fixtures' / 'historical' if (ROOT / 'tests' / 'fixtures' / 'historical').is_dir()
+                else DATA_DIR / 'historical'))
+)
 OUTPUT_DIR = ROOT / 'output'
 RUNS_DIR = OUTPUT_DIR / 'runs'
 TEMPLATE_PATH = ROOT / 'templates' / 'mapping_template.xlsx'
@@ -81,6 +86,15 @@ def sftp_shared_config() -> dict | None:
         port = int(os.getenv('SFTP_SHARED_PORT', '22'))
     except ValueError:
         port = 22
+    base = os.getenv('SFTP_SHARED_REMOTE_DIR', '').strip() or '/'
+    explicit_prop = os.getenv('SFTP_SHARED_PROPOSALS_DIR')
+    if explicit_prop is not None and explicit_prop.strip():
+        proposals_dir = explicit_prop.strip().strip('/')
+    elif base.rstrip('/').endswith('Proposals'):
+        proposals_dir = ''
+    else:
+        proposals_dir = 'Proposals'
+
     return {
         'host': host,
         'port': port,
@@ -88,8 +102,8 @@ def sftp_shared_config() -> dict | None:
         'password': os.getenv('SFTP_SHARED_PASSWORD', ''),
         # Folder on the server; the proposals go in <SFTP_SHARED_REMOTE_DIR>/<SFTP_SHARED_PROPOSALS_DIR>,
         # by default /Proposals: the folder the Version_Control service reads (SFTP_BASE_PATH).
-        'base_dir': os.getenv('SFTP_SHARED_REMOTE_DIR', '').strip() or '/',
-        'proposals_dir': os.getenv('SFTP_SHARED_PROPOSALS_DIR', '').strip().strip('/') or 'Proposals',
+        'base_dir': base,
+        'proposals_dir': proposals_dir,
     }
 
 

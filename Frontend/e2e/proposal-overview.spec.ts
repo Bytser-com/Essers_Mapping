@@ -9,14 +9,14 @@
 //        Techniek: equivalence partitioning (geldig bestand). Voorwaarde: TC-60-01 net uitgevoerd.
 //        Testdata: order_ostavel.xml, klantnaam Ostavel.
 //
-// No backend is needed: page.route answers GET /api/proposal/proposals the way the
-// Mapping_Proposal backend does.
+// No backend is needed: page.route answers GET /api/version-control/proposals the way the
+// backend does.
 import { expect, test, type Page } from '@playwright/test'
 
 // Dates are shown in the browser's timezone: use the one of the analisten.
 test.use({ timezoneId: 'Europe/Brussels', locale: 'nl-BE' })
 
-const PROPOSALS_API = '**/api/proposal/proposals'
+const PROPOSALS_API = '**/proposals*'
 
 // The row the backend returns right after Ostavel uploaded order_ostavel.xml.
 const ostavelBusy = {

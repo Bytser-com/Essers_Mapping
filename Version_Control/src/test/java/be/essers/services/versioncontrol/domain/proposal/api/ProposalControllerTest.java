@@ -47,12 +47,14 @@ class ProposalControllerTest {
         CompanyProposalOverviewDto p1 = new CompanyProposalOverviewDto(
                 "VanRoey", "v3", "mappingproposal.xlsx",
                 "/Proposals/VanRoey/v3/mappingproposal.xlsx",
-                "2026-11-10T14:30:00Z", "Jane Doe", "Initial proposal"
+                "2026-11-10T14:30:00Z", "Jane Doe", "Initial proposal",
+                "READY_FOR_REVIEW", null
         );
         CompanyProposalOverviewDto p2 = new CompanyProposalOverviewDto(
                 "Google", "v1", "google_proposal.xlsx",
                 "/Proposals/Google/v1/google_proposal.xlsx",
-                "2026-11-09T10:00:00Z", "John Smith", null
+                "2026-11-09T10:00:00Z", "John Smith", null,
+                "AI_GENERATING", "RUNNING"
         );
 
         when(proposalStorageService.listProposals(null)).thenReturn(List.of(p1, p2));
@@ -66,8 +68,11 @@ class ProposalControllerTest {
                 .andExpect(jsonPath("$[0].filename").value("mappingproposal.xlsx"))
                 .andExpect(jsonPath("$[0].createdDate").value("2026-11-10T14:30:00Z"))
                 .andExpect(jsonPath("$[0].createdBy").value("Jane Doe"))
+                .andExpect(jsonPath("$[0].status").value("READY_FOR_REVIEW"))
                 .andExpect(jsonPath("$[1].company").value("Google"))
-                .andExpect(jsonPath("$[1].latestVersion").value("v1"));
+                .andExpect(jsonPath("$[1].latestVersion").value("v1"))
+                .andExpect(jsonPath("$[1].status").value("AI_GENERATING"))
+                .andExpect(jsonPath("$[1].aiStatus").value("RUNNING"));
     }
 
     @Test
@@ -76,7 +81,8 @@ class ProposalControllerTest {
         CompanyProposalOverviewDto p1 = new CompanyProposalOverviewDto(
                 "VanRoey", "v3", "mappingproposal.xlsx",
                 "/Proposals/VanRoey/v3/mappingproposal.xlsx",
-                "2026-11-10T14:30:00Z", "Jane Doe", null
+                "2026-11-10T14:30:00Z", "Jane Doe", null,
+                "READY_FOR_REVIEW", null
         );
 
         when(proposalStorageService.listProposals(null)).thenReturn(List.of(p1));
@@ -93,7 +99,8 @@ class ProposalControllerTest {
         CompanyProposalOverviewDto p1 = new CompanyProposalOverviewDto(
                 "VanRoey", "v3", "mappingproposal.xlsx",
                 "/Proposals/VanRoey/v3/mappingproposal.xlsx",
-                "2026-11-10T14:30:00Z", "Jane Doe", null
+                "2026-11-10T14:30:00Z", "Jane Doe", null,
+                "READY_FOR_REVIEW", null
         );
 
         when(proposalStorageService.listProposals("VanRoey")).thenReturn(List.of(p1));

@@ -34,6 +34,7 @@ test.describe('E2E - Upload card on the Home page', () => {
 
   test.beforeEach(async ({ page }) => {
     uploadRequests = 0
+    await page.route('**/proposals*', (route) => route.fulfill({ status: 200, json: [] }))
     await page.route('**/upload', (route) => {
       uploadRequests++
       return route.fulfill({
