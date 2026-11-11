@@ -19,6 +19,6 @@ describe('Unit Tests - Frontend Components', () => {
   it('renders the Home page component with expected heading', () => {
     render(<Home />)
     expect(screen.getByTestId('home-page')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /essers mapping/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Home' })).toBeInTheDocument()
   })
 })

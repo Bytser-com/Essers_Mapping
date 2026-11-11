@@ -12,7 +12,8 @@ export default defineConfig({
   workers: process.env.CI ? 2 : undefined,
   reporter: [
     ['list'],
-    ['junit', { outputFile: 'test-results/playwright-junit.xml' }],
+    // Annotations (e.g. the Xray test_key) are written as properties, so Xray can link the results
+    ['junit', { outputFile: 'test-results/playwright-junit.xml', embedAnnotationsAsProperties: true }],
     ['html', { outputFolder: 'playwright-report', open: 'never' }],
   ],
   use: {

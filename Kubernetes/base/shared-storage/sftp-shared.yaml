@@ -159,10 +159,9 @@ metadata:
     essers.io/zone: shared-storage
   annotations:
     # Overridden per environment in overlays/testing (192.168.100.102) & overlays/production (192.168.100.202)
-    metallb.universe.tf/loadBalancerIPs: "192.168.100.102"
+    metallb.io/loadBalancerIPs: "192.168.100.102"
 spec:
   type: LoadBalancer
-  loadBalancerIP: "192.168.100.102"
   ports:
     # External & internal SFTP port 22 mapped cleanly to SFTPGo's non-root container port 2022
     - name: sftp

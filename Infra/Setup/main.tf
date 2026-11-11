@@ -158,7 +158,7 @@ resource "proxmox_virtual_environment_vm" "basic_vm" {
   timeout_reboot                       = 120
   timeout_start_vm                     = 120
   timeout_stop_vm                      = 120
-  reboot_after_update                  = true
+  reboot_after_update                  = false
   stop_on_destroy                      = false
   purge_on_destroy                     = true
   delete_unreferenced_disks_on_destroy = false

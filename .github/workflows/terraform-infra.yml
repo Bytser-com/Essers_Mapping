@@ -73,10 +73,10 @@ jobs:
       has_changes: ${{ steps.plan.outputs.has_changes }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "~1.9"
           terraform_wrapper: false
@@ -134,7 +134,7 @@ jobs:
       # Upload the plan artifact securely to GitHub
       - name: Upload Terraform Plan
         if: steps.plan.outputs.has_changes == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: tfplan-${{ github.run_id }}
           path: ${{ env.WORKDIR }}/tfplan.binary
@@ -179,16 +179,16 @@ jobs:
         working-directory: ${{ env.WORKDIR }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "~1.9"
           terraform_wrapper: false
 
       - name: Download Terraform Plan Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: tfplan-${{ github.run_id }}
           path: ${{ env.WORKDIR }}
