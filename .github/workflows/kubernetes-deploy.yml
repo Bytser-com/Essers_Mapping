@@ -71,8 +71,8 @@ jobs:
       K8S_MASTER_VM_IPV4_ADDRESS: ${{ vars.K8S_MASTER_VM_IPV4_ADDRESS }}
 
       # --- Required Registry Credentials & Optional Application Secrets ---
-      GHCR_USERNAME: ${{ vars.GHCR_USERNAME }}
-      GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+      GHCR_USERNAME: ${{ vars.GHCR_USERNAME || github.actor }}
+      GHCR_TOKEN: ${{ secrets.GHCR_TOKEN || secrets.GITHUB_TOKEN }}
       SFTP_SHARED_ADMIN_USER: ${{ vars.SFTP_SHARED_ADMIN_USER || 'admin' }}
       SFTP_SHARED_ADMIN_PASSWORD: ${{ secrets.SFTP_SHARED_ADMIN_PASSWORD }}
       SFTP_SHARED_USER: ${{ vars.SFTP_SHARED_USER || 'shareduser' }}

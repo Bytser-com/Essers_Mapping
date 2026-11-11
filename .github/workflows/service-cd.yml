@@ -183,9 +183,9 @@ jobs:
       # --- Secrets ---
       KUBECONFIG_SECRET: ${{ secrets.KUBECONFIG }}
       SSH_PRIVATE_KEY: ${{ secrets.PIPELINE_SSH_PRIVATE_KEY }}
-      GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+      GHCR_TOKEN: ${{ secrets.GHCR_TOKEN || secrets.GITHUB_TOKEN }}
       # --- Variables ---
-      GHCR_USERNAME: ${{ vars.GHCR_USERNAME }}
+      GHCR_USERNAME: ${{ vars.GHCR_USERNAME || github.actor }}
       DEBIAN_VM_USERNAME: ${{ vars.DEBIAN_VM_USERNAME || 'sysadmin' }}
       K8S_MASTER_VM_IPV4_ADDRESS: ${{ vars.K8S_MASTER_VM_IPV4_ADDRESS }}
       NAMESPACE: ${{ needs.select.outputs.namespace }}
@@ -217,8 +217,9 @@ jobs:
       - name: Prepare isolated Kubernetes connection
         run: |
           set -euo pipefail
-          : "${GHCR_USERNAME:?Set GHCR_USERNAME to the owner of the registry read token}"
-          : "${GHCR_TOKEN:?Set GHCR_TOKEN to a durable read:packages token for Kubernetes image pulls}"
+          GHCR_USERNAME="${GHCR_USERNAME:-${{ github.actor }}}"
+          GHCR_TOKEN="${GHCR_TOKEN:-${{ secrets.GITHUB_TOKEN }}}"
+          export GHCR_USERNAME GHCR_TOKEN
           install -d -m 700 "$RUNNER_TEMP/k8s"
           kubeconfig_path="$RUNNER_TEMP/k8s/config"
           master_ip="${K8S_MASTER_VM_IPV4_ADDRESS%%/*}"
