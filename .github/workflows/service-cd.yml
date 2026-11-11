@@ -251,7 +251,13 @@ jobs:
           python3 Scripts/registry-pull-secret.py | kubectl apply -f -
           patch=$(python3 -c 'import json,os; print(json.dumps({"metadata":{"annotations":{"essers.io/image-managed-by":"service-cd","essers.io/source-sha":os.environ["SOURCE_SHA"]}},"spec":{"template":{"spec":{"containers":[{"name":os.environ["DEPLOYMENT"],"image":os.environ["IMAGE"]}]}}}}))')
           kubectl patch deployment "$DEPLOYMENT" -n "$NAMESPACE" --type=strategic --patch "$patch"
-          kubectl rollout status "deployment/$DEPLOYMENT" -n "$NAMESPACE" --timeout=300s
+          if ! kubectl rollout status "deployment/$DEPLOYMENT" -n "$NAMESPACE" --timeout=300s; then
+            echo "::error::Rollout failed or timed out for deployment/$DEPLOYMENT in $NAMESPACE. Triggering automatic rollback..."
+            kubectl rollout undo "deployment/$DEPLOYMENT" -n "$NAMESPACE"
+            kubectl rollout status "deployment/$DEPLOYMENT" -n "$NAMESPACE" --timeout=180s || true
+            echo "⚠️ Rollout failed: $DEPLOYMENT was automatically rolled back to the previous stable revision." >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
           echo "Deployed $DEPLOYMENT at $IMAGE in $NAMESPACE." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Clean temporary connection material

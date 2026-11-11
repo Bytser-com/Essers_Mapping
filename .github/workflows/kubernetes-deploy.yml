@@ -387,7 +387,12 @@ jobs:
           echo "Waiting for deployments in ${NAMESPACE} to become ready..."
           for deploy in $(kubectl get deployments -n "$NAMESPACE" -o jsonpath='{.items[*].metadata.name}'); do
             echo "Waiting for rollout of deployment/${deploy}..."
-            kubectl rollout status "deployment/${deploy}" -n "$NAMESPACE" --timeout=300s 2>&1 | tee -a "$APPLY_LOG"
+            if ! kubectl rollout status "deployment/${deploy}" -n "$NAMESPACE" --timeout=300s 2>&1 | tee -a "$APPLY_LOG"; then
+              echo "::error::Rollout failed or timed out for deployment/${deploy} in ${NAMESPACE}. Triggering automatic rollback..."
+              kubectl rollout undo "deployment/${deploy}" -n "$NAMESPACE" 2>&1 | tee -a "$APPLY_LOG"
+              kubectl rollout status "deployment/${deploy}" -n "$NAMESPACE" --timeout=180s 2>&1 | tee -a "$APPLY_LOG" || true
+              exit 1
+            fi
           done
 
           # Display assigned LoadBalancer IPs and workload status
