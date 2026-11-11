@@ -39,6 +39,17 @@ class ProposalsRouterTests(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
 
     @patch("services.proposal_service.get_list_from_excel")
+    def test_returns_503_when_sftp_is_unavailable(self, mock_get_list):
+        # Arrange
+        mock_get_list.side_effect = OSError
+        
+        # Act
+        response = client.get("/proposals/brunos")
+        
+        # Assert
+        self.assertEqual(response.status_code, 503)
+
+    @patch("services.proposal_service.get_list_from_excel")
     def test_status_in_review_when_edited(self, mock_get_list):
         # Arrange
         mock_get_list.return_value = (MAPPINGS, 1, "2026-10-30T10:00:00", True)

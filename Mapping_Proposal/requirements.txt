@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+paramiko
+openpyxl
+python-dotenv
+httpx

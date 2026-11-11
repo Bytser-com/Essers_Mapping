@@ -4,6 +4,9 @@ const API_URL = import.meta.env.VITE_API_URL
 
 export async function getProposal(company: string): Promise<Proposal> {
   const res = await fetch(`${API_URL}/proposals/${company}`);
+  if (res.status === 503) {
+    throw new Error(`De bestanden zijn tijdelijk niet bereikbaar (status ${res.status})`);
+  }
   if (!res.ok) {
     throw new Error(`geen mapping gevonden (status ${res.status})`);
   }

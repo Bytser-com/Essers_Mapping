@@ -55,4 +55,16 @@ describe('ProposalPage integration', () => {
     expect(await screen.findByText('geen mapping gevonden (status 404)')).toBeInTheDocument()
     expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/proposals/brunos'))
   })
+
+  it('shows the error when the API returns 503', async () => {
+    // Arrange
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 503 }))
+
+    // Act
+    renderPage()
+
+    // Assert
+    expect(await screen.findByText('De bestanden zijn tijdelijk niet bereikbaar (status 503)')).toBeInTheDocument()
+    expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/proposals/brunos'))
+  })
 })
