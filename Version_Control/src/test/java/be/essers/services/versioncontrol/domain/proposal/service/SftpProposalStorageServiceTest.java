@@ -80,7 +80,9 @@ class SftpProposalStorageServiceTest {
                   "filename": "mappingproposal.xlsx",
                   "createdDate": "2026-11-10T14:30:00Z",
                   "createdBy": "Jane Doe",
-                  "description": "Warehouse update"
+                  "description": "Warehouse update",
+                  "status": "READY_FOR_REVIEW",
+                  "ai_status": null
                 }
                 """;
 
@@ -103,6 +105,53 @@ class SftpProposalStorageServiceTest {
         assertEquals("2026-11-10T14:30:00Z", dto.createdDate());
         assertEquals("Jane Doe", dto.createdBy());
         assertEquals("Warehouse update", dto.description());
+        assertEquals("READY_FOR_REVIEW", dto.status());
+        assertNull(dto.aiStatus());
+    }
+
+    @Test
+    @DisplayName("listProposals supports proposal.json fallback with Python fields")
+    void listProposals_supportsProposalJsonFallback() {
+        String company = "Ostavel";
+        String companyPath = "/Proposals/Ostavel";
+
+        when(template.exists(companyPath)).thenReturn(true);
+
+        SftpClient.DirEntry v1 = createEntry("v1", true);
+        when(template.list(companyPath)).thenReturn(new SftpClient.DirEntry[]{v1});
+
+        String v1Path = "/Proposals/Ostavel/v1";
+        SftpClient.DirEntry excelFile = createEntry("MProposal-Ostavel_V1.xlsx", false);
+        SftpClient.DirEntry proposalFile = createEntry("proposal.json", false);
+        when(template.list(v1Path)).thenReturn(new SftpClient.DirEntry[]{excelFile, proposalFile});
+
+        String proposalJson = """
+                {
+                  "customer": "Ostavel",
+                  "uploaded_at": "2026-10-30T13:30:00+01:00",
+                  "status": "AI_GENERATING",
+                  "ai_status": "RUNNING"
+                }
+                """;
+
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(proposalJson.getBytes(StandardCharsets.UTF_8))) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq("/Proposals/Ostavel/v1/proposal.json"), any(InputStreamCallback.class));
+
+        List<CompanyProposalOverviewDto> results = service.listProposals(company);
+
+        assertEquals(1, results.size());
+        CompanyProposalOverviewDto dto = results.get(0);
+        assertEquals("Ostavel", dto.company());
+        assertEquals("v1", dto.latestVersion());
+        assertEquals("MProposal-Ostavel_V1.xlsx", dto.filename());
+        assertEquals("2026-10-30T13:30:00+01:00", dto.createdDate());
+        assertEquals("AI_GENERATING", dto.status());
+        assertEquals("RUNNING", dto.aiStatus());
     }
 
     @Test
@@ -119,7 +168,6 @@ class SftpProposalStorageServiceTest {
         String v1Path = "/Proposals/VanRoey/v1";
         SftpClient.DirEntry excelFile = createEntry("proposal.xlsx", false);
         when(template.list(v1Path)).thenReturn(new SftpClient.DirEntry[]{excelFile});
-        when(template.exists(v1Path + "/metadata.json")).thenReturn(false);
 
         List<CompanyProposalOverviewDto> results = service.listProposals(company);
 
@@ -147,14 +195,12 @@ class SftpProposalStorageServiceTest {
         when(template.list("/Proposals/VanRoey")).thenReturn(new SftpClient.DirEntry[]{v1, v10});
         SftpClient.DirEntry vanRoeyExcel = createEntry("vanroey_v10.xlsx", false);
         when(template.list("/Proposals/VanRoey/v10")).thenReturn(new SftpClient.DirEntry[]{vanRoeyExcel});
-        when(template.exists("/Proposals/VanRoey/v10/metadata.json")).thenReturn(false);
 
         // Google has v2 -> v2 is latest
         SftpClient.DirEntry v2 = createEntry("v2", true);
         when(template.list("/Proposals/Google")).thenReturn(new SftpClient.DirEntry[]{v2});
         SftpClient.DirEntry googleExcel = createEntry("google_v2.xlsx", false);
         when(template.list("/Proposals/Google/v2")).thenReturn(new SftpClient.DirEntry[]{googleExcel});
-        when(template.exists("/Proposals/Google/v2/metadata.json")).thenReturn(false);
 
         List<CompanyProposalOverviewDto> results = service.listProposals(null);
 
@@ -261,7 +307,6 @@ class SftpProposalStorageServiceTest {
 
         SftpClient.DirEntry excel = createEntry("test.xls", false);
         when(template.list("/Proposals/VanRoey/V3")).thenReturn(new SftpClient.DirEntry[]{excel});
-        when(template.exists("/Proposals/VanRoey/V3/metadata.json")).thenReturn(false);
 
         doAnswer(invocation -> {
             InputStreamCallback callback = invocation.getArgument(1);
@@ -319,7 +364,6 @@ class SftpProposalStorageServiceTest {
 
         SftpClient.DirEntry txtFile = createEntry("notes.txt", false);
         when(template.list("/Proposals/VanRoey/v1")).thenReturn(new SftpClient.DirEntry[]{txtFile});
-        when(template.exists("/Proposals/VanRoey/v1/metadata.json")).thenReturn(false);
 
         assertThrows(EntityNotFoundException.class, () -> service.getProposalFile("VanRoey", "v1"));
     }
@@ -332,7 +376,6 @@ class SftpProposalStorageServiceTest {
 
         SftpClient.DirEntry excel = createEntry("plan.xlsx", false);
         when(template.list("/Proposals/VanRoey/v1")).thenReturn(new SftpClient.DirEntry[]{excel});
-        when(template.exists("/Proposals/VanRoey/v1/metadata.json")).thenReturn(false);
 
         when(template.get(eq("/Proposals/VanRoey/v1/plan.xlsx"), any(InputStreamCallback.class))).thenReturn(false);
 
@@ -373,5 +416,45 @@ class SftpProposalStorageServiceTest {
         assertThrows(IllegalArgumentException.class, () -> service.getProposalFile("VanRoey", ""));
         assertThrows(IllegalArgumentException.class, () -> service.getProposalFile("../etc", "v1"));
         assertThrows(IllegalArgumentException.class, () -> service.getProposalFile("VanRoey", "../etc"));
+    }
+
+    @Test
+    @DisplayName("readMetadata falls back to template.exists when versionEntries is null")
+    void readMetadata_fallsBackToTemplateExistsWhenVersionEntriesNull() {
+        when(template.exists("/Proposals/VanRoey")).thenReturn(true);
+        SftpClient.DirEntry v1 = createEntry("v1", true);
+        when(template.list("/Proposals/VanRoey")).thenReturn(new SftpClient.DirEntry[]{v1});
+
+        when(template.list("/Proposals/VanRoey/v1")).thenReturn(null);
+        when(template.exists("/Proposals/VanRoey/v1/metadata.json")).thenReturn(true);
+
+        String metaJson = """
+                {
+                  "company": "VanRoey",
+                  "version": "v1",
+                  "filename": "mappingproposal.xlsx",
+                  "status": "APPROVED"
+                }
+                """;
+
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(metaJson.getBytes(StandardCharsets.UTF_8))) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq("/Proposals/VanRoey/v1/metadata.json"), any(InputStreamCallback.class));
+
+        List<CompanyProposalOverviewDto> results = service.listProposals("VanRoey");
+        assertEquals(1, results.size());
+        assertEquals("APPROVED", results.get(0).status());
+    }
+
+    @Test
+    @DisplayName("listProposals handles general exception with StorageException")
+    void listProposals_generalException_throwsStorageException() {
+        when(template.exists("/Proposals")).thenThrow(new RuntimeException("Connection failed"));
+        assertThrows(be.essers.services.versioncontrol.shared.exception.StorageException.class,
+                () -> service.listProposals(null));
     }
 }

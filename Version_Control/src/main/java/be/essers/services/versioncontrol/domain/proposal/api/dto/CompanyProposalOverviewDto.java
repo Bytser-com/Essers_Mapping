@@ -7,6 +7,8 @@ public record CompanyProposalOverviewDto(
         String fullPath,
         String createdDate,
         String createdBy,
-        String description
+        String description,
+        String status,
+        String aiStatus
 ) {
 }
