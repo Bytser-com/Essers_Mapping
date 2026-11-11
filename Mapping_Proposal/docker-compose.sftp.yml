@@ -1,26 +1,30 @@
-# Local SFTP server for development, used instead of the shared SFTPGo server of the
-# cluster (which is not reachable from outside the Proxmox network).
+# Local SFTP server for development, used instead of the real SFTP server (the cluster's
+# sftp-shared and later the server at Essers are not always reachable).
 #
 #   docker compose -f docker-compose.sftp.yml up -d      start
 #   docker compose -f docker-compose.sftp.yml down       stop
 #
-# Same user and folder as in Kubernetes (shareduser, /upload), so only host and port differ.
+# The proposals are stored in /Proposals/<customer>/v<N>/ on this server: the same folder
+# that the Version_Control service reads by default (SFTP_BASE_PATH=/Proposals).
+#
 # Settings for Mapping_Proposal/.env:
 #   SFTP_SHARED_HOST=localhost
 #   SFTP_SHARED_PORT=2222
 #   SFTP_SHARED_USER=shareduser
 #   SFTP_SHARED_PASSWORD=devpassword
-#   SFTP_SHARED_REMOTE_DIR=/upload
+#   SFTP_SHARED_REMOTE_DIR=/
+# Settings for Version_Control:
+#   SFTP_HOST=localhost  SFTP_PORT=2222  SFTP_USER=shareduser  SFTP_PASSWORD=devpassword
 #
 # The files on the server are visible in data/sftp-server/ (data/ is not in Git).
 services:
   sftp:
     image: atmoz/sftp:alpine
     container_name: essers-sftp
-    # user:password:uid:gid:folder  -> /home/shareduser/upload (shown as /upload after login)
-    command: shareduser:devpassword:1000:1000:upload
+    # user:password:uid:gid:folder  -> /home/shareduser/Proposals (shown as /Proposals after login)
+    command: shareduser:devpassword:1000:1000:Proposals
     ports:
       - "2222:22"
     volumes:
-      - ./data/sftp-server:/home/shareduser/upload
+      - ./data/sftp-server:/home/shareduser/Proposals
     restart: unless-stopped

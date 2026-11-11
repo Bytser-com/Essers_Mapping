@@ -2,7 +2,7 @@
 
 Layout on the storage: one folder per customer, one subfolder per version.
 
-    <SFTP_SHARED_REMOTE_DIR>/proposals/
+    <SFTP_SHARED_REMOTE_DIR>/Proposals/
         voorbeeldbedrijf-a/
             v1/
                 proposal.json        metadata shown in the overview (required)

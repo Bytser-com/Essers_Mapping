@@ -110,8 +110,18 @@ def test_with_sftp_host_the_sftp_server_is_used(monkeypatch):
     assert isinstance(storage, SftpStorage)
     assert storage.settings == SftpSettings(host='sftp-shared', port=22, user='shareduser',
                                             password='secret', base_dir='/upload')
-    assert storage.root == '/upload/proposals'
-    assert storage.describe() == 'sftp://shareduser@sftp-shared:22/upload/proposals'
+    assert storage.root == '/upload/Proposals'
+    assert storage.describe() == 'sftp://shareduser@sftp-shared:22/upload/Proposals'
+
+
+def test_proposals_folder_can_be_changed(monkeypatch):
+    monkeypatch.setenv('SFTP_SHARED_HOST', 'sftp-shared')
+    monkeypatch.setenv('SFTP_SHARED_REMOTE_DIR', '/')
+    monkeypatch.setenv('SFTP_SHARED_PROPOSALS_DIR', '/mappings/')
+    assert proposal_storage().root == '/mappings'
+
+    monkeypatch.setenv('SFTP_SHARED_PROPOSALS_DIR', '')
+    assert proposal_storage().root == '/Proposals'
 
 
 def test_invalid_port_falls_back_to_22(monkeypatch):
@@ -168,7 +178,7 @@ def test_sftp_connection_is_closed_after_the_session(monkeypatch):
     storage = SftpStorage(SftpSettings(host='sftp-shared', port=22, user='shareduser', password='pw'))
 
     with storage.session() as session:
-        assert session.root == '/proposals'
+        assert session.root == '/Proposals'  # the folder Version_Control reads by default
 
     assert events == [('connect-to', ('sftp-shared', 22)), ('login', 'shareduser', 'pw'),
                       'client-closed', 'transport-closed']
@@ -192,7 +202,7 @@ def test_new_proposal_is_written_in_the_customer_folder_on_sftp(disk):
     ref = store.create_proposal('Ostavel')
 
     assert ref.folder == 'ostavel/v1'
-    assert (disk / 'upload' / 'proposals' / 'ostavel' / 'v1' / 'proposal.json').is_file()
+    assert (disk / 'upload' / 'Proposals' / 'ostavel' / 'v1' / 'proposal.json').is_file()
     [row] = store.list_proposals()
     assert (row.customer, row.version, row.status, row.ai_status) == (
         'Ostavel', 1, ProposalStatus.AI_GENERATING, AiStatus.RUNNING)
@@ -217,7 +227,7 @@ def test_excel_and_status_are_stored_on_sftp(disk, tmp_path):
     store.save_file(ref, excel, 'MProposal-Ostavel_V1.xlsx')
     store.set_status(ref, ProposalStatus.READY_FOR_REVIEW, None)
 
-    folder = disk / 'upload' / 'proposals' / 'ostavel' / 'v1'
+    folder = disk / 'upload' / 'Proposals' / 'ostavel' / 'v1'
     assert (folder / 'MProposal-Ostavel_V1.xlsx').read_bytes() == b'excel-bytes'
     # No temporary files are left behind
     assert sorted(p.name for p in folder.iterdir()) == ['MProposal-Ostavel_V1.xlsx', 'proposal.json']
@@ -247,13 +257,13 @@ def test_missing_folders_are_created_on_the_server(tmp_path):
 
     store.create_proposal('Ostavel')
 
-    assert (disk / 'upload' / 'proposals' / 'ostavel' / 'v1').is_dir()
+    assert (disk / 'upload' / 'Proposals' / 'ostavel' / 'v1').is_dir()
 
 
 def test_files_and_broken_versions_next_to_the_versions_are_ignored(disk):
     store = ProposalStore(FakeSftpStorage(disk))
     store.create_proposal('Ostavel')
-    customer = disk / 'upload' / 'proposals' / 'ostavel'
+    customer = disk / 'upload' / 'Proposals' / 'ostavel'
     (customer / 'notes.txt').write_text('x')
     (customer / 'v2').mkdir()  # broken: no proposal.json
 

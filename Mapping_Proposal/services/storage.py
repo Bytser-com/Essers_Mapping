@@ -129,14 +129,15 @@ class SftpSettings:
     port: int = 22
     user: str = ''
     password: str = ''
-    base_dir: str = '/'          # folder on the server; proposals go in <base_dir>/proposals
+    base_dir: str = '/'          # folder on the server where we may write
+    proposals_dir: str = 'Proposals'  # <base_dir>/Proposals, same folder as Version_Control reads
     timeout: float = 15.0
 
 
 class SftpStorage:
-    def __init__(self, settings: SftpSettings, root: str = 'proposals'):
+    def __init__(self, settings: SftpSettings):
         self.settings = settings
-        self.root = posixpath.join(settings.base_dir or '/', root)
+        self.root = posixpath.join(settings.base_dir or '/', settings.proposals_dir)
 
     def describe(self) -> str:
         s = self.settings

@@ -281,8 +281,8 @@ One proposal in the response:
 <shared storage>/proposals/<customer-folder>/v<version>/proposal.json
 ```
 
-- The proposals are stored on the shared SFTPGo server of the infrastructure (`sftp-shared`, see `Kubernetes/base/shared-storage/sftp-shared.yaml`). This service connects to it directly over SFTP (`services/storage.py`, with paramiko), under `<SFTP_SHARED_REMOTE_DIR>/proposals/`.
-- Settings: in Kubernetes from the `common-config` ConfigMap and the `sftp-shared-credentials` Secret (`SFTP_SHARED_HOST=sftp-shared`). The cluster's server is not reachable from outside the Proxmox network, so **locally a SFTP server runs in Docker** (`docker-compose.sftp.yml`, same user and folder):
+- The proposals are stored on an SFTP server, in `<SFTP_SHARED_REMOTE_DIR>/Proposals/<customer>/v<N>/`. This service connects to it directly over SFTP (`services/storage.py`, with paramiko). `/Proposals` is also the folder the Version_Control service reads, so both services find the same files. The folder name can be changed with `SFTP_SHARED_PROPOSALS_DIR`.
+- In Kubernetes the settings come from the `common-config` ConfigMap and the `sftp-shared-credentials` Secret (`SFTP_SHARED_HOST=sftp-shared`). Later the SFTP server at Essers will be used: then only these settings change. Because those servers are not always reachable, **locally an SFTP server runs in Docker** (`docker-compose.sftp.yml`):
 
   ```powershell
   docker compose -f docker-compose.sftp.yml up -d
@@ -295,10 +295,10 @@ One proposal in the response:
   SFTP_SHARED_PORT=2222
   SFTP_SHARED_USER=shareduser
   SFTP_SHARED_PASSWORD=devpassword
-  SFTP_SHARED_REMOTE_DIR=/upload
+  SFTP_SHARED_REMOTE_DIR=/
   ```
 
-  The files on that server are visible in `data/sftp-server/proposals/`. `pytest -m integration` tests against it (skipped when it is not running).
+  The files on that server are visible in `data/sftp-server/`. `pytest -m integration` tests against it (skipped when it is not running).
 - Without `SFTP_SHARED_HOST` (no Docker) the local folder `data/sftp-shared/proposals/` is used instead. Fill it with example data: `python -m scripts.dev_seed`.
 - When the SFTP server cannot be reached, `GET /proposals` answers 503 and uploads wait in the source folder until it is back.
 

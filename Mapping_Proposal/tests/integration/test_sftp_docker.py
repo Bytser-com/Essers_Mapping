@@ -17,7 +17,7 @@ from services.storage import SftpSettings, SftpStorage
 pytestmark = pytest.mark.integration
 
 SETTINGS = SftpSettings(host='localhost', port=2222, user='shareduser', password='devpassword',
-                        base_dir='/upload')
+                        base_dir='/')  # -> /Proposals, as in docker-compose.sftp.yml
 
 
 def _server_running() -> bool:

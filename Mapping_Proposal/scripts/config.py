@@ -86,8 +86,10 @@ def sftp_shared_config() -> dict | None:
         'port': port,
         'user': os.getenv('SFTP_SHARED_USER', '').strip(),
         'password': os.getenv('SFTP_SHARED_PASSWORD', ''),
-        # Folder on the server; the proposals go in <SFTP_SHARED_REMOTE_DIR>/proposals.
+        # Folder on the server; the proposals go in <SFTP_SHARED_REMOTE_DIR>/<SFTP_SHARED_PROPOSALS_DIR>,
+        # by default /Proposals: the folder the Version_Control service reads (SFTP_BASE_PATH).
         'base_dir': os.getenv('SFTP_SHARED_REMOTE_DIR', '').strip() or '/',
+        'proposals_dir': os.getenv('SFTP_SHARED_PROPOSALS_DIR', '').strip().strip('/') or 'Proposals',
     }
 
 
