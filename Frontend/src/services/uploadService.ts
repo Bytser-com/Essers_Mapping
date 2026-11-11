@@ -5,8 +5,7 @@
 //
 // Like services/proposals.ts the request goes through /api/proposal: in Kubernetes the
 // frontend proxies it to the backend, locally vite.config.js does the same.
-// Override with VITE_API_URL (then also set CORS_ORIGINS in the backend .env).
-const API_URL: string = import.meta.env.VITE_API_URL ?? '/api/proposal'
+const API_URL = '/api/proposal'
 
 export async function uploadInterface(customerName: string, files: File[]): Promise<void> {
   const body = new FormData()

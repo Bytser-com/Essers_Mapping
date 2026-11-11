@@ -60,18 +60,14 @@ Modern React single-page application (SPA) for the **H.Essers AI Mapping Engine*
 
 ## 🌐 Environment Variables
 
-Environment variables can be configured using a `.env` file in the `Frontend/` root:
+The frontend communicates with backend APIs using relative paths (`/api/*`), proxied by Vite during local development and by NGINX in Kubernetes. No API environment variables are required.
+
+For Playwright E2E testing, optional variables can be configured in `Frontend/.env`:
 
 | Variable | Default Value | Description |
 |---|---|---|
-| `VITE_API_URL` | `http://localhost:8000` | Base URL for the Mapping Proposal API backend |
 | `PLAYWRIGHT_BASE_URL` | `http://127.0.0.1:4173` | Target URL used by Playwright E2E tests |
 | `PLAYWRIGHT_SKIP_WEBSERVER` | _undefined_ | If set to `1` or `true`, Playwright skips launching the preview webserver |
-
-Example `.env`:
-```env
-VITE_API_URL=http://localhost:8000
-```
 
 ---
 
@@ -345,6 +341,6 @@ In production (Kubernetes `preparation` zone), the compiled frontend is packaged
 - **SPA Routing**: Configured with `try_files $uri $uri/ /index.html` to allow direct access to deep links without 404 errors.
 - **Reverse Proxy**: NGINX proxies `/api/*` endpoints to backend microservices:
   - `/api/converter/*` → `http://mapping-converter:8000/`
-  - `/api/proposal/*` → `http://mapping-proposal:8000/`
+  - `/api/proposal/*` & `/api/proposals/*` → `http://mapping-proposal:8000/`
   - `/api/version-control/*` → `http://version-control-backend:8080/`
 - **Health Check**: Kubernetes liveness/readiness probes check `/healthz`.

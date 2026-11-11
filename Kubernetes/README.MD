@@ -94,7 +94,7 @@ The `frontend` Deployment includes a pre-configured `frontend-nginx-config` Conf
 - Listens on plain HTTP port `8080` inside the private Kubernetes network and serves your SPA static files on `/`.
 - Proxies all `/api/*` calls internally over Kubernetes DNS (forwarding `X-Forwarded-Proto $http_x_forwarded_proto`) so your backends stay completely private (`ClusterIP`):
   - `/api/converter/*` $\rightarrow$ `http://mapping-converter:8000/`
-  - `/api/proposal/*` $\rightarrow$ `http://mapping-proposal:8000/`
+  - `/api/proposal/*` & `/api/proposals/*` $\rightarrow$ `http://mapping-proposal:8000/`
   - `/api/version-control/*` $\rightarrow$ `http://version-control-backend:8080/`
 - Has full Read/Write access to `sftp-shared` (both via SFTP at `sftp-shared:22` and mounted PVC at `/mnt/sftp-shared`).
 

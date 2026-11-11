@@ -5,7 +5,7 @@
 # - Listens on plain HTTP port 8080 inside the private Kubernetes network
 # - Serves static frontend assets AND proxies `/api/*` requests internally to:
 #     * /api/converter/*       -> http://mapping-converter:8000/
-#     * /api/proposal/*        -> http://mapping-proposal:8000/
+#     * /api/proposal/* & /api/proposals/* -> http://mapping-proposal:8000/
 #     * /api/version-control/* -> http://version-control-backend:8080/
 # - Strictly proxied: No direct access to SFTP (requests files via backend APIs).
 # ==============================================================================
@@ -61,6 +61,25 @@ data:
 
         # Proxy /api/proposal/* -> Python Backend 2 (mapping-proposal)
         location /api/proposal/ {
+            proxy_pass http://mapping-proposal:8000/;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+        }
+
+        # Proxy /api/proposals and /api/proposals/* -> Python Backend 2 (mapping-proposal)
+        location = /api/proposals {
+            proxy_pass http://mapping-proposal:8000/proposals;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+        }
+
+        location /api/proposals/ {
             proxy_pass http://mapping-proposal:8000/;
             proxy_http_version 1.1;
             proxy_set_header Host $host;

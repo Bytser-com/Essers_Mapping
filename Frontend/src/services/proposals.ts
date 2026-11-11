@@ -51,8 +51,8 @@ export function proposalPath(proposal: Pick<Proposal, 'id'>): string {
 }
 
 // In Kubernetes the frontend proxies /api/proposal/* to the backend; during local
-// development vite.config.js does the same. Override with VITE_PROPOSAL_API_URL.
-const API_BASE: string = import.meta.env.VITE_PROPOSAL_API_URL ?? '/api/proposal'
+// development vite.config.js does the same.
+const API_BASE = '/api/proposal'
 
 export async function fetchProposals(signal?: AbortSignal): Promise<ProposalList> {
   const response = await fetch(`${API_BASE}/proposals`, { signal: signal ?? null })
