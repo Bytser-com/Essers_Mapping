@@ -1,0 +1,97 @@
+# ==============================================================================
+# Local SFTPGo servers for development (matching Kubernetes sftp-shared & sftp-runtime).
+# Powered by drakkan/sftpgo:v2.6 for 100% development-to-production parity.
+#
+# Start SFTP Servers:
+#   docker compose -f Scripts/docker-compose.sftp.yml up -d
+# Stop SFTP Servers:
+#   docker compose -f Scripts/docker-compose.sftp.yml down
+# Stop SFTP Servers & Delete Volumes:
+#   docker compose -f Scripts/docker-compose.sftp.yml down -v
+#
+# ------------------------------------------------------------------------------
+# Folder Structure on SFTP:
+# ------------------------------------------------------------------------------
+# - Shared Server (sftp-shared):
+#     /Proposals/<customer>/v<N>/mappingproposal.xlsx
+#     /Proposals/<customer>/v<N>/metadata.json (or proposal.json)
+# - Runtime Server (sftp-runtime):
+#     /Packages/<customer>/v<N>/mappingpackage.json
+#
+# ------------------------------------------------------------------------------
+# WebClient UI (Browse files & verify proposals in your web browser):
+# ------------------------------------------------------------------------------
+# - Shared SFTP:  http://localhost:8081 (user: shareduser, pass: devpassword)
+# - Runtime SFTP: http://localhost:8082 (user: runtimeuser, pass: devpassword)
+#
+# ------------------------------------------------------------------------------
+# Environment Variables for application services:
+# ------------------------------------------------------------------------------
+# Mapping_Proposal / Version_Control (Shared SFTP):
+#   SFTP_SHARED_HOST=localhost
+#   SFTP_SHARED_PORT=2222
+#   SFTP_SHARED_USER=shareduser
+#   SFTP_SHARED_PASSWORD=devpassword
+#   SFTP_SHARED_REMOTE_DIR=/
+#
+# Runtime Backend (Runtime SFTP):
+#   SFTP_RUNTIME_HOST=localhost
+#   SFTP_RUNTIME_PORT=2223
+#   SFTP_RUNTIME_USER=runtimeuser
+#   SFTP_RUNTIME_PASSWORD=devpassword
+#   SFTP_RUNTIME_REMOTE_DIR=/
+#
+# The server files live in ../data/shared-sftp/ and ../data/runtime-sftp/ (data/ is ignored by Git).
+# ==============================================================================
+services:
+  shared-sftp:
+    image: drakkan/sftpgo:v2.6
+    container_name: essers-sftp-shared
+    user: "0:0"
+    command:
+      - sftpgo
+      - portable
+      - -u
+      - shareduser
+      - -p
+      - devpassword
+      - -s
+      - "2022"
+      - --httpd-port
+      - "8080"
+      - -d
+      - /srv/sftpgo/data
+      - -g
+      - "*"
+    ports:
+      - "2222:2022"
+      - "8081:8080"
+    volumes:
+      - ../data/shared-sftp:/srv/sftpgo/data
+    restart: unless-stopped
+
+  runtime-sftp:
+    image: drakkan/sftpgo:v2.6
+    container_name: essers-sftp-runtime
+    user: "0:0"
+    command:
+      - sftpgo
+      - portable
+      - -u
+      - runtimeuser
+      - -p
+      - devpassword
+      - -s
+      - "2022"
+      - --httpd-port
+      - "8080"
+      - -d
+      - /srv/sftpgo/data
+      - -g
+      - "*"
+    ports:
+      - "2223:2022"
+      - "8082:8080"
+    volumes:
+      - ../data/runtime-sftp:/srv/sftpgo/data
+    restart: unless-stopped

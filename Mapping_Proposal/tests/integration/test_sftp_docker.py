@@ -1,6 +1,6 @@
-"""Proposals on a real SFTP server: the local Docker server from docker-compose.sftp.yml.
+"""Proposals on a real SFTP server: the local Docker SFTPGo server from Scripts/docker-compose.sftp.yml.
 
-Start it first:  docker compose -f docker-compose.sftp.yml up -d
+Start it first:  docker compose -f Scripts/docker-compose.sftp.yml up -d
 Run:             pytest -m integration
 The tests are skipped when the server is not running, so a normal ``pytest`` never fails on it.
 """

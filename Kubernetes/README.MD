@@ -73,7 +73,7 @@ Kubernetes/
 
 | Workload | GHCR Container Image | Zone (`essers.io/zone`) | Service Type | Testing Replicas (`Min+Spare .. Max`) | Production Replicas (`Min+Spare .. Max`) | Publicly Reachable? | Reachable by `frontend`? | `sftp-shared` Access | `sftp-runtime` Access |
 | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **`frontend`** (NGINX) | `ghcr.io/bytser-com/essers_mapping/frontend` | `preparation` | `ClusterIP` (`:8080`) | **`2`** (`1+1` .. max `3`) | **`3`** (`2+1` .. max `4`) | **YES (via Ingress `.101` / `.201`)** | — | **Read / Write** | **BLOCKED** |
+| **`frontend`** (NGINX) | `ghcr.io/bytser-com/essers_mapping/frontend` | `preparation` | `ClusterIP` (`:8080`) | **`2`** (`1+1` .. max `3`) | **`3`** (`2+1` .. max `4`) | **YES (via Ingress `.101` / `.201`)** | — | **BLOCKED** | **BLOCKED** |
 | **`mapping-converter`** (Python) | `ghcr.io/bytser-com/essers_mapping/mapping-converter` | `preparation` | `ClusterIP` (`:8000`) | **`2`** (`1+1` .. max `3`) | **`3`** (`2+1` .. max `4`) | **NO** (`/api/converter/`) | **YES** | **Read / Write** | **BLOCKED** |
 | **`mapping-proposal`** (Python) | `ghcr.io/bytser-com/essers_mapping/mapping-proposal` | `preparation` | `ClusterIP` (`:8000`) | **`2`** (`1+1` .. max `3`) | **`3`** (`2+1` .. max `4`) | **NO** (`/api/proposal/`) | **YES** | **Read / Write** | **BLOCKED** |
 | **`version-control-backend`** (Java) | `ghcr.io/bytser-com/essers_mapping/version-control-backend` | `preparation` | `ClusterIP` (`:8080`) | **`2`** (`1+1` .. max `3`) | **`3`** (`2+1` .. max `4`) | **NO** (`/api/version-control/`) | **YES** | **Read / Write** | **BLOCKED** |
@@ -102,8 +102,9 @@ The `frontend` Deployment includes a pre-configured `frontend-nginx-config` Conf
 Enforced automatically by **Calico CNI**:
 - **`allow-ingress-to-frontend`**: Allows TCP `8080` on `frontend` exclusively from the `ingress-nginx` namespace.
 - **`allow-frontend-to-preparation-backends`**: Ensures `mapping-converter`, `mapping-proposal`, and `version-control-backend` ONLY accept traffic from `frontend` (and fellow `preparation` backends)—never from outside or from the `runtime` zone.
-- **`restrict-preparation-zone-egress`**: Strict Egress policy on the `preparation` zone so `frontend`, `mapping-converter`, `mapping-proposal`, and `version-control-backend` can ONLY talk to CoreDNS, each other, and `sftp-shared`—making it impossible for them to connect to `sftp-runtime` or `runtime-backend`.
-- **`allow-all-authorized-and-public-to-sftp-shared`**: Allows external SFTP connections on `.102`/`.202` (port `22`) plus internal connections from all 5 workloads (`frontend`, `mapping-converter`, `mapping-proposal`, `version-control-backend`, and `runtime-backend`).
+- **`restrict-frontend-egress`**: Strict Egress policy on `frontend` allowing it to talk ONLY to CoreDNS and Preparation backends (`mapping-converter`, `mapping-proposal`, `version-control-backend`). Direct access to SFTP (`sftp-shared` / `sftp-runtime`) is completely BLOCKED.
+- **`restrict-preparation-backends-egress`**: Egress policy allowing Preparation backends to talk to CoreDNS, each other, and `sftp-shared`—never to `runtime` zone.
+- **`allow-all-authorized-and-public-to-sftp-shared`**: Allows external SFTP connections on `.102`/`.202` (port `22`) plus internal connections from authorized backends (`mapping-converter`, `mapping-proposal`, `version-control-backend`, and `runtime-backend`). Frontend is strictly BLOCKED.
 - **`allow-runtime-backend-and-public-to-sftp-runtime`**: Allows external SFTP connections on `.103`/`.203` (port `22`), while restricting internal cluster connections (`10.244.0.0/16`) exclusively to `runtime-backend`.
 
 ---

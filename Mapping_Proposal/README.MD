@@ -282,10 +282,10 @@ One proposal in the response:
 ```
 
 - The proposals are stored on an SFTP server, in `<SFTP_SHARED_REMOTE_DIR>/Proposals/<customer>/v<N>/`. This service connects to it directly over SFTP (`services/storage.py`, with paramiko). `/Proposals` is also the folder the Version_Control service reads, so both services find the same files. The folder name can be changed with `SFTP_SHARED_PROPOSALS_DIR`.
-- In Kubernetes the settings come from the `common-config` ConfigMap and the `sftp-shared-credentials` Secret (`SFTP_SHARED_HOST=sftp-shared`). Later the SFTP server at Essers will be used: then only these settings change. Because those servers are not always reachable, **locally an SFTP server runs in Docker** (`docker-compose.sftp.yml`):
+- In Kubernetes the settings come from the `common-config` ConfigMap and the `sftp-shared-credentials` Secret (`SFTP_SHARED_HOST=sftp-shared`). Later the SFTP server at Essers will be used: then only these settings change. Because those servers are not always reachable, **locally SFTPGo runs in Docker** (`Scripts/docker-compose.sftp.yml` from repo root):
 
   ```powershell
-  docker compose -f docker-compose.sftp.yml up -d
+  docker compose -f ../Scripts/docker-compose.sftp.yml up -d
   ```
 
   and in `.env`:
