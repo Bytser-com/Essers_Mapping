@@ -1,6 +1,7 @@
 package be.essers.services.versioncontrol.domain.proposal.api;
 
-import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalFileDto;
+import be.essers.services.versioncontrol.domain.proposal.api.dto.CompanyProposalOverviewDto;
+import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalFileDetailsDto;
 import be.essers.services.versioncontrol.domain.proposal.service.ProposalStorageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,28 +24,30 @@ public class ProposalController {
     /**
      * GET /proposals
      * GET /proposals?company=VanRoey
+     * GET /Proposals
      *
-     * Retrieves all proposal files from the SFTP server, optionally filtered by company.
+     * Retrieves all companies with their latest proposal version, creation date, and creator.
      */
     @GetMapping
-    public ResponseEntity<List<ProposalFileDto>> getProposals(
+    public ResponseEntity<List<CompanyProposalOverviewDto>> getProposals(
             @RequestParam(required = false) String company
     ) {
-        List<ProposalFileDto> files = proposalStorageService.listProposals(company);
-        return ResponseEntity.ok(files);
+        List<CompanyProposalOverviewDto> proposals = proposalStorageService.listProposals(company);
+        return ResponseEntity.ok(proposals);
     }
 
     /**
-     * GET /proposals/filenames
-     * GET /proposals/filenames?company=VanRoey
+     * GET /proposals/file?company=vanroey&version=v3
+     * GET /Proposals/file?company=vanroey&version=v3
      *
-     * Returns purely a list of filename strings from the SFTP server.
+     * Retrieves the Excel proposal file (Base64) and metadata as a JSON response.
      */
-    @GetMapping("/filenames")
-    public ResponseEntity<List<String>> getProposalFilenames(
-            @RequestParam(required = false) String company
+    @GetMapping("/file")
+    public ResponseEntity<ProposalFileDetailsDto> getProposalFile(
+            @RequestParam String company,
+            @RequestParam String version
     ) {
-        List<String> filenames = proposalStorageService.listProposalFilenames(company);
-        return ResponseEntity.ok(filenames);
+        ProposalFileDetailsDto fileDetails = proposalStorageService.getProposalFile(company, version);
+        return ResponseEntity.ok(fileDetails);
     }
 }

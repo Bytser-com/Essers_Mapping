@@ -1,8 +1,10 @@
 package be.essers.services.versioncontrol.domain.proposal.service;
 
-import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalFileDto;
+import be.essers.services.versioncontrol.domain.proposal.api.dto.CompanyProposalOverviewDto;
+import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalFileDetailsDto;
 import be.essers.services.versioncontrol.infrastructure.sftp.SftpProperties;
 import be.essers.services.versioncontrol.shared.exception.EntityNotFoundException;
+import tools.jackson.databind.ObjectMapper;
 import org.apache.sshd.sftp.client.SftpClient;
 import org.apache.sshd.sftp.common.SftpConstants;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,11 +13,21 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.integration.file.remote.InputStreamCallback;
 import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.attribute.FileTime;
+import java.time.Instant;
+import java.util.Base64;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,92 +37,223 @@ class SftpProposalStorageServiceTest {
     private SftpRemoteFileTemplate template;
 
     private SftpProperties properties;
+    private ObjectMapper objectMapper;
     private SftpProposalStorageService service;
 
     @BeforeEach
     void setUp() {
         properties = new SftpProperties("localhost", 22, "sftpuser", "sftppass", null, null, "/Proposals", true);
-        service = new SftpProposalStorageService(template, properties);
+        objectMapper = new ObjectMapper();
+        service = new SftpProposalStorageService(template, properties, objectMapper);
     }
 
     private SftpClient.DirEntry createEntry(String name, boolean isDir) {
         SftpClient.Attributes attrs = new SftpClient.Attributes();
         attrs.setType(isDir ? SftpConstants.SSH_FILEXFER_TYPE_DIRECTORY : SftpConstants.SSH_FILEXFER_TYPE_REGULAR);
         attrs.setPermissions(isDir ? 0040755 : 0100644);
+        attrs.setModifyTime(FileTime.from(Instant.parse("2026-11-10T12:00:00Z")));
         return new SftpClient.DirEntry(name, name, attrs);
     }
 
     @Test
-    @DisplayName("listProposals for specific company returns files in company folder")
-    void listProposals_forCompany_returnsFiles() {
+    @DisplayName("listProposals for company returns latest version and metadata")
+    void listProposals_forCompany_returnsLatestVersionWithMetadata() {
         String company = "VanRoey";
         String companyPath = "/Proposals/VanRoey";
 
         when(template.exists(companyPath)).thenReturn(true);
 
-        SftpClient.DirEntry file1 = createEntry("proposal_vanroey_1.json", false);
-        SftpClient.DirEntry dotDir = createEntry(".", true);
-        SftpClient.DirEntry subDir = createEntry("archive", true);
+        SftpClient.DirEntry v1 = createEntry("v1", true);
+        SftpClient.DirEntry v2 = createEntry("v2", true);
+        SftpClient.DirEntry v3 = createEntry("v3", true);
+        when(template.list(companyPath)).thenReturn(new SftpClient.DirEntry[]{v1, v2, v3});
 
-        when(template.list(companyPath)).thenReturn(new SftpClient.DirEntry[]{file1, dotDir, subDir});
+        String v3Path = "/Proposals/VanRoey/v3";
+        SftpClient.DirEntry excelFile = createEntry("mappingproposal.xlsx", false);
+        SftpClient.DirEntry metaFile = createEntry("metadata.json", false);
+        when(template.list(v3Path)).thenReturn(new SftpClient.DirEntry[]{excelFile, metaFile});
 
-        List<ProposalFileDto> results = service.listProposals(company);
+        String metaJson = """
+                {
+                  "company": "VanRoey",
+                  "version": "v3",
+                  "filename": "mappingproposal.xlsx",
+                  "createdDate": "2026-11-10T14:30:00Z",
+                  "createdBy": "Jane Doe",
+                  "description": "Warehouse update"
+                }
+                """;
+
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(metaJson.getBytes(StandardCharsets.UTF_8))) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq("/Proposals/VanRoey/v3/metadata.json"), any(InputStreamCallback.class));
+
+        List<CompanyProposalOverviewDto> results = service.listProposals(company);
 
         assertEquals(1, results.size());
-        assertEquals("VanRoey", results.get(0).company());
-        assertEquals("proposal_vanroey_1.json", results.get(0).filename());
-        assertEquals("/Proposals/VanRoey/proposal_vanroey_1.json", results.get(0).fullPath());
+        CompanyProposalOverviewDto dto = results.get(0);
+        assertEquals("VanRoey", dto.company());
+        assertEquals("v3", dto.latestVersion());
+        assertEquals("mappingproposal.xlsx", dto.filename());
+        assertEquals("/Proposals/VanRoey/v3/mappingproposal.xlsx", dto.fullPath());
+        assertEquals("2026-11-10T14:30:00Z", dto.createdDate());
+        assertEquals("Jane Doe", dto.createdBy());
+        assertEquals("Warehouse update", dto.description());
     }
 
     @Test
-    @DisplayName("listProposals for non-existent company throws EntityNotFoundException")
+    @DisplayName("listProposals falls back to file modify time when metadata.json is absent")
+    void listProposals_fallbackWhenMetadataMissing() {
+        String company = "VanRoey";
+        String companyPath = "/Proposals/VanRoey";
+
+        when(template.exists(companyPath)).thenReturn(true);
+
+        SftpClient.DirEntry v1 = createEntry("v1", true);
+        when(template.list(companyPath)).thenReturn(new SftpClient.DirEntry[]{v1});
+
+        String v1Path = "/Proposals/VanRoey/v1";
+        SftpClient.DirEntry excelFile = createEntry("proposal.xlsx", false);
+        when(template.list(v1Path)).thenReturn(new SftpClient.DirEntry[]{excelFile});
+        when(template.exists(v1Path + "/metadata.json")).thenReturn(false);
+
+        List<CompanyProposalOverviewDto> results = service.listProposals(company);
+
+        assertEquals(1, results.size());
+        CompanyProposalOverviewDto dto = results.get(0);
+        assertEquals("VanRoey", dto.company());
+        assertEquals("v1", dto.latestVersion());
+        assertEquals("proposal.xlsx", dto.filename());
+        assertEquals("2026-11-10T12:00:00Z", dto.createdDate());
+        assertNull(dto.createdBy());
+    }
+
+    @Test
+    @DisplayName("listProposals without company returns all companies with latest versions")
+    void listProposals_allCompanies_returnsLatestVersionForEach() {
+        when(template.exists("/Proposals")).thenReturn(true);
+
+        SftpClient.DirEntry compA = createEntry("VanRoey", true);
+        SftpClient.DirEntry compB = createEntry("Google", true);
+        when(template.list("/Proposals")).thenReturn(new SftpClient.DirEntry[]{compA, compB});
+
+        // VanRoey has v1 and v10 -> v10 is latest
+        SftpClient.DirEntry v1 = createEntry("v1", true);
+        SftpClient.DirEntry v10 = createEntry("v10", true);
+        when(template.list("/Proposals/VanRoey")).thenReturn(new SftpClient.DirEntry[]{v1, v10});
+        SftpClient.DirEntry vanRoeyExcel = createEntry("vanroey_v10.xlsx", false);
+        when(template.list("/Proposals/VanRoey/v10")).thenReturn(new SftpClient.DirEntry[]{vanRoeyExcel});
+        when(template.exists("/Proposals/VanRoey/v10/metadata.json")).thenReturn(false);
+
+        // Google has v2 -> v2 is latest
+        SftpClient.DirEntry v2 = createEntry("v2", true);
+        when(template.list("/Proposals/Google")).thenReturn(new SftpClient.DirEntry[]{v2});
+        SftpClient.DirEntry googleExcel = createEntry("google_v2.xlsx", false);
+        when(template.list("/Proposals/Google/v2")).thenReturn(new SftpClient.DirEntry[]{googleExcel});
+        when(template.exists("/Proposals/Google/v2/metadata.json")).thenReturn(false);
+
+        List<CompanyProposalOverviewDto> results = service.listProposals(null);
+
+        assertEquals(2, results.size());
+        // Ordered alphabetically: Google, VanRoey
+        assertEquals("Google", results.get(0).company());
+        assertEquals("v2", results.get(0).latestVersion());
+        assertEquals("VanRoey", results.get(1).company());
+        assertEquals("v10", results.get(1).latestVersion());
+    }
+
+    @Test
+    @DisplayName("listProposals with non-existent company throws EntityNotFoundException")
     void listProposals_companyNotFound_throwsEntityNotFound() {
-        when(template.exists("/Proposals/NonExisting")).thenReturn(false);
+        when(template.exists("/Proposals/UnknownCompany")).thenReturn(false);
+        when(template.list("/Proposals")).thenReturn(new SftpClient.DirEntry[0]);
 
-        assertThrows(EntityNotFoundException.class, () -> service.listProposals("NonExisting"));
+        assertThrows(EntityNotFoundException.class, () -> service.listProposals("UnknownCompany"));
     }
 
     @Test
-    @DisplayName("listProposals with path traversal characters throws IllegalArgumentException")
+    @DisplayName("listProposals with path traversal throws IllegalArgumentException")
     void listProposals_pathTraversal_throwsIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class, () -> service.listProposals("../etc"));
         assertThrows(IllegalArgumentException.class, () -> service.listProposals("VanRoey/sub"));
     }
 
     @Test
-    @DisplayName("listProposals without company parameter returns files from all company folders")
-    void listProposals_noCompany_returnsAllCompanyFiles() {
-        when(template.exists("/Proposals")).thenReturn(true);
+    @DisplayName("getProposalFile returns file content encoded as Base64 with metadata")
+    void getProposalFile_success() {
+        String company = "VanRoey";
+        String version = "v3";
+        String versionPath = "/Proposals/VanRoey/v3";
 
-        SftpClient.DirEntry compVanRoey = createEntry("VanRoey", true);
-        SftpClient.DirEntry compGoogle = createEntry("Google", true);
-        SftpClient.DirEntry dotDir = createEntry(".", true);
+        when(template.exists("/Proposals/VanRoey")).thenReturn(true);
+        when(template.exists("/Proposals/VanRoey/v3")).thenReturn(true);
 
-        when(template.list("/Proposals")).thenReturn(new SftpClient.DirEntry[]{compVanRoey, compGoogle, dotDir});
+        SftpClient.DirEntry excelEntry = createEntry("mappingproposal.xlsx", false);
+        SftpClient.DirEntry metaEntry = createEntry("metadata.json", false);
+        when(template.list(versionPath)).thenReturn(new SftpClient.DirEntry[]{excelEntry, metaEntry});
 
-        SftpClient.DirEntry fileVanRoey = createEntry("vanroey_map.xml", false);
-        when(template.list("/Proposals/VanRoey")).thenReturn(new SftpClient.DirEntry[]{fileVanRoey});
+        String metaJson = """
+                {
+                  "company": "VanRoey",
+                  "version": "v3",
+                  "filename": "mappingproposal.xlsx",
+                  "createdDate": "2026-11-10T14:30:00Z",
+                  "createdBy": "Jane Doe",
+                  "description": "Warehouse update"
+                }
+                """;
 
-        SftpClient.DirEntry fileGoogle = createEntry("google_map.json", false);
-        when(template.list("/Proposals/Google")).thenReturn(new SftpClient.DirEntry[]{fileGoogle});
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(metaJson.getBytes(StandardCharsets.UTF_8))) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq("/Proposals/VanRoey/v3/metadata.json"), any(InputStreamCallback.class));
 
-        List<ProposalFileDto> results = service.listProposals(null);
+        byte[] fakeExcelBytes = "FAKE_EXCEL_DATA_CONTENT".getBytes(StandardCharsets.UTF_8);
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(fakeExcelBytes)) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq("/Proposals/VanRoey/v3/mappingproposal.xlsx"), any(InputStreamCallback.class));
 
-        assertEquals(2, results.size());
-        assertTrue(results.stream().anyMatch(f -> "VanRoey".equals(f.company()) && "vanroey_map.xml".equals(f.filename())));
-        assertTrue(results.stream().anyMatch(f -> "Google".equals(f.company()) && "google_map.json".equals(f.filename())));
+        ProposalFileDetailsDto result = service.getProposalFile(company, version);
+
+        assertNotNull(result);
+        assertEquals("VanRoey", result.company());
+        assertEquals("v3", result.version());
+        assertEquals("mappingproposal.xlsx", result.filename());
+        assertEquals("/Proposals/VanRoey/v3/mappingproposal.xlsx", result.fullPath());
+        assertEquals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", result.contentType());
+        assertEquals(fakeExcelBytes.length, result.sizeBytes());
+        assertEquals("2026-11-10T14:30:00Z", result.createdDate());
+        assertEquals("Jane Doe", result.createdBy());
+        assertEquals("Warehouse update", result.description());
+        assertEquals(Base64.getEncoder().encodeToString(fakeExcelBytes), result.fileContentBase64());
     }
 
     @Test
-    @DisplayName("listProposalFilenames returns only filename strings")
-    void listProposalFilenames_returnsFilenames() {
-        when(template.exists("/Proposals/VanRoey")).thenReturn(true);
-        SftpClient.DirEntry file1 = createEntry("file_a.txt", false);
-        SftpClient.DirEntry file2 = createEntry("file_b.txt", false);
-        when(template.list("/Proposals/VanRoey")).thenReturn(new SftpClient.DirEntry[]{file1, file2});
+    @DisplayName("getProposalFile throws EntityNotFoundException when company or version does not exist")
+    void getProposalFile_notFound_throwsEntityNotFound() {
+        when(template.exists("/Proposals/VanRoey")).thenReturn(false);
+        when(template.list("/Proposals")).thenReturn(new SftpClient.DirEntry[0]);
 
-        List<String> filenames = service.listProposalFilenames("VanRoey");
+        assertThrows(EntityNotFoundException.class, () -> service.getProposalFile("VanRoey", "v1"));
+    }
 
-        assertEquals(List.of("file_a.txt", "file_b.txt"), filenames);
+    @Test
+    @DisplayName("getProposalFile throws IllegalArgumentException for empty parameters or path traversal")
+    void getProposalFile_invalidParams_throwsException() {
+        assertThrows(IllegalArgumentException.class, () -> service.getProposalFile("", "v1"));
+        assertThrows(IllegalArgumentException.class, () -> service.getProposalFile("VanRoey", ""));
+        assertThrows(IllegalArgumentException.class, () -> service.getProposalFile("../etc", "v1"));
+        assertThrows(IllegalArgumentException.class, () -> service.getProposalFile("VanRoey", "../etc"));
     }
 }

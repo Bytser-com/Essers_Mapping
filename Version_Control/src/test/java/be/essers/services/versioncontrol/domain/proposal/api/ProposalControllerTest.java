@@ -1,6 +1,7 @@
 package be.essers.services.versioncontrol.domain.proposal.api;
 
-import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalFileDto;
+import be.essers.services.versioncontrol.domain.proposal.api.dto.CompanyProposalOverviewDto;
+import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalFileDetailsDto;
 import be.essers.services.versioncontrol.domain.proposal.service.ProposalStorageService;
 import be.essers.services.versioncontrol.shared.exception.EntityNotFoundException;
 import be.essers.services.versioncontrol.shared.exception.GlobalExceptionHandler;
@@ -41,29 +42,44 @@ class ProposalControllerTest {
     }
 
     @Test
-    @DisplayName("GET /proposals returns HTTP 200 with all files across companies")
+    @DisplayName("GET /proposals returns HTTP 200 with all companies and their latest versions")
     void getAllProposals_returnsList() throws Exception {
-        ProposalFileDto f1 = new ProposalFileDto("VanRoey", "route1.xml", "/Proposals/VanRoey/route1.xml");
-        ProposalFileDto f2 = new ProposalFileDto("Google", "route2.json", "/Proposals/Google/route2.json");
+        CompanyProposalOverviewDto p1 = new CompanyProposalOverviewDto(
+                "VanRoey", "v3", "mappingproposal.xlsx",
+                "/Proposals/VanRoey/v3/mappingproposal.xlsx",
+                "2026-11-10T14:30:00Z", "Jane Doe", "Initial proposal"
+        );
+        CompanyProposalOverviewDto p2 = new CompanyProposalOverviewDto(
+                "Google", "v1", "google_proposal.xlsx",
+                "/Proposals/Google/v1/google_proposal.xlsx",
+                "2026-11-09T10:00:00Z", "John Smith", null
+        );
 
-        when(proposalStorageService.listProposals(null)).thenReturn(List.of(f1, f2));
+        when(proposalStorageService.listProposals(null)).thenReturn(List.of(p1, p2));
 
         mockMvc.perform(get("/proposals")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].company").value("VanRoey"))
-                .andExpect(jsonPath("$[0].filename").value("route1.xml"))
-                .andExpect(jsonPath("$[0].fullPath").value("/Proposals/VanRoey/route1.xml"))
-                .andExpect(jsonPath("$[1].company").value("Google"));
+                .andExpect(jsonPath("$[0].latestVersion").value("v3"))
+                .andExpect(jsonPath("$[0].filename").value("mappingproposal.xlsx"))
+                .andExpect(jsonPath("$[0].createdDate").value("2026-11-10T14:30:00Z"))
+                .andExpect(jsonPath("$[0].createdBy").value("Jane Doe"))
+                .andExpect(jsonPath("$[1].company").value("Google"))
+                .andExpect(jsonPath("$[1].latestVersion").value("v1"));
     }
 
     @Test
-    @DisplayName("GET /Proposals (capitalized) also maps correctly")
+    @DisplayName("GET /Proposals (capitalized) maps correctly")
     void getProposals_capitalizedPath_returnsList() throws Exception {
-        ProposalFileDto f1 = new ProposalFileDto("VanRoey", "route1.xml", "/Proposals/VanRoey/route1.xml");
+        CompanyProposalOverviewDto p1 = new CompanyProposalOverviewDto(
+                "VanRoey", "v3", "mappingproposal.xlsx",
+                "/Proposals/VanRoey/v3/mappingproposal.xlsx",
+                "2026-11-10T14:30:00Z", "Jane Doe", null
+        );
 
-        when(proposalStorageService.listProposals(null)).thenReturn(List.of(f1));
+        when(proposalStorageService.listProposals(null)).thenReturn(List.of(p1));
 
         mockMvc.perform(get("/Proposals")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -73,10 +89,14 @@ class ProposalControllerTest {
 
     @Test
     @DisplayName("GET /proposals?company=VanRoey filters by company")
-    void getProposals_filteredByCompany_returnsCompanyFiles() throws Exception {
-        ProposalFileDto f1 = new ProposalFileDto("VanRoey", "route1.xml", "/Proposals/VanRoey/route1.xml");
+    void getProposals_filteredByCompany_returnsCompanyOverview() throws Exception {
+        CompanyProposalOverviewDto p1 = new CompanyProposalOverviewDto(
+                "VanRoey", "v3", "mappingproposal.xlsx",
+                "/Proposals/VanRoey/v3/mappingproposal.xlsx",
+                "2026-11-10T14:30:00Z", "Jane Doe", null
+        );
 
-        when(proposalStorageService.listProposals("VanRoey")).thenReturn(List.of(f1));
+        when(proposalStorageService.listProposals("VanRoey")).thenReturn(List.of(p1));
 
         mockMvc.perform(get("/proposals")
                         .param("company", "VanRoey")
@@ -84,31 +104,46 @@ class ProposalControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].company").value("VanRoey"))
-                .andExpect(jsonPath("$[0].filename").value("route1.xml"));
+                .andExpect(jsonPath("$[0].latestVersion").value("v3"));
     }
 
     @Test
-    @DisplayName("GET /proposals/filenames?company=VanRoey returns list of filename strings")
-    void getProposalFilenames_returnsFilenameStrings() throws Exception {
-        when(proposalStorageService.listProposalFilenames("VanRoey")).thenReturn(List.of("route1.xml", "route2.xml"));
+    @DisplayName("GET /proposals/file returns Excel file and metadata")
+    void getProposalFile_validParams_returnsFileDetails() throws Exception {
+        ProposalFileDetailsDto details = new ProposalFileDetailsDto(
+                "VanRoey", "v3", "mappingproposal.xlsx",
+                "/Proposals/VanRoey/v3/mappingproposal.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                1024L, "2026-11-10T14:30:00Z", "Jane Doe", "Version 3 update",
+                "UEsDBBQAAAAIA..."
+        );
 
-        mockMvc.perform(get("/proposals/filenames")
+        when(proposalStorageService.getProposalFile("VanRoey", "v3")).thenReturn(details);
+
+        mockMvc.perform(get("/proposals/file")
                         .param("company", "VanRoey")
+                        .param("version", "v3")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0]").value("route1.xml"))
-                .andExpect(jsonPath("$[1]").value("route2.xml"));
+                .andExpect(jsonPath("$.company").value("VanRoey"))
+                .andExpect(jsonPath("$.version").value("v3"))
+                .andExpect(jsonPath("$.filename").value("mappingproposal.xlsx"))
+                .andExpect(jsonPath("$.contentType").value("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .andExpect(jsonPath("$.sizeBytes").value(1024))
+                .andExpect(jsonPath("$.createdDate").value("2026-11-10T14:30:00Z"))
+                .andExpect(jsonPath("$.createdBy").value("Jane Doe"))
+                .andExpect(jsonPath("$.fileContentBase64").value("UEsDBBQAAAAIA..."));
     }
 
     @Test
-    @DisplayName("GET /proposals with unknown company returns 404 Not Found")
-    void getProposals_unknownCompany_returnsNotFound() throws Exception {
-        when(proposalStorageService.listProposals("NonExisting"))
+    @DisplayName("GET /proposals/file with unknown company or version returns 404")
+    void getProposalFile_notFound_returns404() throws Exception {
+        when(proposalStorageService.getProposalFile("NonExisting", "v1"))
                 .thenThrow(new EntityNotFoundException("Company directory 'NonExisting' does not exist"));
 
-        mockMvc.perform(get("/proposals")
+        mockMvc.perform(get("/proposals/file")
                         .param("company", "NonExisting")
+                        .param("version", "v1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.title").value("Entity Not Found"));
