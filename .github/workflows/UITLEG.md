@@ -82,3 +82,10 @@ De bestaande infrastructuurvolgorde is Terraform → Ansible → Kubernetes.
 Een wijziging aan alleen service-CI start die infrastructuurketen niet.
 De Proxmox-voorcontrole kijkt alleen of de vereiste VM's bestaan en draaien;
 die controle maakt geen infrastructuur aan.
+De hulptests draaien in `Pipeline Validation`, niet opnieuw bij elke deployment.
+Bij een eerste installatie moet de infrastructuurketen klaar zijn vóór service-CD;
+draaiende VM's betekenen nog niet dat Ansible en Kubernetes al klaar zijn.
+
+Live Kubernetes-deployments vereisen `GHCR_USERNAME` en `GHCR_TOKEN`, zodat een
+ontbrekende instelling geen werkend image-pull-secret met voorbeeldwaarden vervangt.
+De validatiemodus heeft die credentials niet nodig.

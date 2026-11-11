@@ -70,7 +70,7 @@ jobs:
       DEBIAN_VM_USERNAME: ${{ vars.DEBIAN_VM_USERNAME || 'sysadmin' }}
       K8S_MASTER_VM_IPV4_ADDRESS: ${{ vars.K8S_MASTER_VM_IPV4_ADDRESS }}
 
-      # --- Registry & Application Secrets (Optional Overrides for base/common/secrets.yaml) ---
+      # --- Required Registry Credentials & Optional Application Secrets ---
       GHCR_USERNAME: ${{ vars.GHCR_USERNAME }}
       GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
       SFTP_SHARED_ADMIN_USER: ${{ vars.SFTP_SHARED_ADMIN_USER || 'admin' }}
@@ -104,6 +104,13 @@ jobs:
             echo "::error::Required Kustomize overlay is missing at $WORKDIR/overlays/$OVERLAY/kustomization.yaml."
             exit 1
           fi
+
+      - name: Require registry credentials before live deployment
+        if: steps.manifests.outputs.exists == 'true' && (env.MODE == 'apply' || env.MODE == 'restart')
+        shell: bash
+        run: |
+          : "${GHCR_USERNAME:?Set GHCR_USERNAME to the owner of the registry read token}"
+          : "${GHCR_TOKEN:?Set GHCR_TOKEN to a durable read:packages token for Kubernetes image pulls}"
 
       - name: Verify infrastructure is deployed
         if: steps.manifests.outputs.exists == 'true' && (env.MODE == 'apply' || env.MODE == 'restart')
@@ -221,11 +228,8 @@ jobs:
           fi
 
           # Safe string substitution via perl $ENV{} to avoid sed delimiter / '&' replacement issues
-          if [ -n "${GHCR_TOKEN:-}" ]; then
-            : "${GHCR_USERNAME:?Set GHCR_USERNAME to the owner of GHCR_TOKEN}"
-            perl -pi -e '$u = $ENV{GHCR_USERNAME}; s/GITHUB_USERNAME_OR_ACTOR/$u/g' "$SECRETS_FILE"
-            perl -pi -e '$t = $ENV{GHCR_TOKEN}; s/CHANGE_ME_GITHUB_TOKEN_OR_PAT/$t/g' "$SECRETS_FILE"
-          fi
+          perl -pi -e '$u = $ENV{GHCR_USERNAME}; s/GITHUB_USERNAME_OR_ACTOR/$u/g' "$SECRETS_FILE"
+          perl -pi -e '$t = $ENV{GHCR_TOKEN}; s/CHANGE_ME_GITHUB_TOKEN_OR_PAT/$t/g' "$SECRETS_FILE"
 
           if [ -n "${SFTP_SHARED_ADMIN_PASSWORD:-}" ]; then
             perl -pi -e '$p = $ENV{SFTP_SHARED_ADMIN_PASSWORD}; s/CHANGE_ME_SHARED_ADMIN_PASSWORD/$p/g' "$SECRETS_FILE"

@@ -21,10 +21,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Validate infrastructure check
-      shell: bash
-      run: python3 -m unittest discover -s "$GITHUB_WORKSPACE/Scripts/tests" -p 'test_*.py'
-
     - name: Verify Proxmox VMs
       shell: bash
       env:
