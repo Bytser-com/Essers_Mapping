@@ -67,6 +67,7 @@ lerna-debug.log*
 tmp/
 temp/
 .swp
+data/
 
 ### BlueJ files ###
 *.ctxt
@@ -147,4 +148,5 @@ playwright-report/
 .scannerwork/
 .coverage
 coverage.xml
+htmlcov/
 .pytest_cache/
