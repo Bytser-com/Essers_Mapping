@@ -45,6 +45,21 @@ class VersionComparatorTest {
     }
 
     @Test
+    @DisplayName("Handles versions with different separators and lengths")
+    void handlesDifferentSeparatorsAndLengths() {
+        List<String> versions = new ArrayList<>(List.of("v1-0", "v1.1", "v1_0_1"));
+        versions.sort(comparator);
+        assertEquals(List.of("v1-0", "v1_0_1", "v1.1"), versions);
+    }
+
+    @Test
+    @DisplayName("Handles alphanumeric suffix comparison")
+    void handlesAlphanumericSuffix() {
+        assertTrue(comparator.compare("v1-alpha", "v1-beta") < 0);
+        assertTrue(comparator.compare("v1-beta", "v1-alpha") > 0);
+    }
+
+    @Test
     @DisplayName("Null handling")
     void nullHandling() {
         assertTrue(comparator.compare(null, "v1") < 0);

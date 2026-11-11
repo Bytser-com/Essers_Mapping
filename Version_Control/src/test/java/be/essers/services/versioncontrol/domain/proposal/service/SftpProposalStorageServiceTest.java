@@ -249,6 +249,124 @@ class SftpProposalStorageServiceTest {
     }
 
     @Test
+    @DisplayName("getProposalFile resolves company and version case-insensitively")
+    void getProposalFile_caseInsensitiveResolution() {
+        when(template.exists("/Proposals/vanroey")).thenReturn(false);
+        SftpClient.DirEntry vanRoeyDir = createEntry("VanRoey", true);
+        when(template.list("/Proposals")).thenReturn(new SftpClient.DirEntry[]{vanRoeyDir});
+
+        when(template.exists("/Proposals/VanRoey/v3")).thenReturn(false);
+        SftpClient.DirEntry v3Dir = createEntry("V3", true);
+        when(template.list("/Proposals/VanRoey")).thenReturn(new SftpClient.DirEntry[]{v3Dir});
+
+        SftpClient.DirEntry excel = createEntry("test.xls", false);
+        when(template.list("/Proposals/VanRoey/V3")).thenReturn(new SftpClient.DirEntry[]{excel});
+        when(template.exists("/Proposals/VanRoey/V3/metadata.json")).thenReturn(false);
+
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream("XLS_CONTENT".getBytes(StandardCharsets.UTF_8))) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq("/Proposals/VanRoey/V3/test.xls"), any(InputStreamCallback.class));
+
+        ProposalFileDetailsDto result = service.getProposalFile("vanroey", "v3");
+
+        assertEquals("VanRoey", result.company());
+        assertEquals("V3", result.version());
+        assertEquals("test.xls", result.filename());
+        assertEquals("application/vnd.ms-excel", result.contentType());
+    }
+
+    @Test
+    @DisplayName("listAllProposals returns empty list when rootPath does not exist")
+    void listAllProposals_rootNotExists_returnsEmptyList() {
+        when(template.exists("/Proposals")).thenReturn(false);
+
+        List<CompanyProposalOverviewDto> list = service.listProposals(null);
+
+        assertTrue(list.isEmpty());
+    }
+
+    @Test
+    @DisplayName("listAllProposals ignores non-directory entries in root")
+    void listAllProposals_ignoresNonDirectoryEntriesInRoot() {
+        when(template.exists("/Proposals")).thenReturn(true);
+        SftpClient.DirEntry fileInRoot = createEntry("readme.txt", false);
+        SftpClient.DirEntry dotDir = createEntry(".", true);
+        when(template.list("/Proposals")).thenReturn(new SftpClient.DirEntry[]{fileInRoot, dotDir});
+
+        List<CompanyProposalOverviewDto> list = service.listProposals(null);
+
+        assertTrue(list.isEmpty());
+    }
+
+    @Test
+    @DisplayName("listProposals for company with no versions throws EntityNotFoundException")
+    void listProposals_companyWithNoVersions_throwsEntityNotFound() {
+        when(template.exists("/Proposals/EmptyCompany")).thenReturn(true);
+        when(template.list("/Proposals/EmptyCompany")).thenReturn(new SftpClient.DirEntry[0]);
+
+        assertThrows(EntityNotFoundException.class, () -> service.listProposals("EmptyCompany"));
+    }
+
+    @Test
+    @DisplayName("getProposalFile throws EntityNotFoundException when no Excel file exists in version folder")
+    void getProposalFile_noExcelInVersion_throwsEntityNotFound() {
+        when(template.exists("/Proposals/VanRoey")).thenReturn(true);
+        when(template.exists("/Proposals/VanRoey/v1")).thenReturn(true);
+
+        SftpClient.DirEntry txtFile = createEntry("notes.txt", false);
+        when(template.list("/Proposals/VanRoey/v1")).thenReturn(new SftpClient.DirEntry[]{txtFile});
+        when(template.exists("/Proposals/VanRoey/v1/metadata.json")).thenReturn(false);
+
+        assertThrows(EntityNotFoundException.class, () -> service.getProposalFile("VanRoey", "v1"));
+    }
+
+    @Test
+    @DisplayName("getProposalFile throws StorageException when SFTP read fails")
+    void getProposalFile_sftpReadFails_throwsStorageException() {
+        when(template.exists("/Proposals/VanRoey")).thenReturn(true);
+        when(template.exists("/Proposals/VanRoey/v1")).thenReturn(true);
+
+        SftpClient.DirEntry excel = createEntry("plan.xlsx", false);
+        when(template.list("/Proposals/VanRoey/v1")).thenReturn(new SftpClient.DirEntry[]{excel});
+        when(template.exists("/Proposals/VanRoey/v1/metadata.json")).thenReturn(false);
+
+        when(template.get(eq("/Proposals/VanRoey/v1/plan.xlsx"), any(InputStreamCallback.class))).thenReturn(false);
+
+        assertThrows(be.essers.services.versioncontrol.shared.exception.StorageException.class,
+                () -> service.getProposalFile("VanRoey", "v1"));
+    }
+
+    @Test
+    @DisplayName("Handles corrupted metadata.json gracefully by logging warning and falling back")
+    void readMetadata_corruptedJson_fallsBackGracefully() {
+        when(template.exists("/Proposals/VanRoey")).thenReturn(true);
+        SftpClient.DirEntry v1 = createEntry("v1", true);
+        when(template.list("/Proposals/VanRoey")).thenReturn(new SftpClient.DirEntry[]{v1});
+
+        SftpClient.DirEntry excel = createEntry("plan.xlsx", false);
+        SftpClient.DirEntry meta = createEntry("metadata.json", false);
+        when(template.list("/Proposals/VanRoey/v1")).thenReturn(new SftpClient.DirEntry[]{excel, meta});
+
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream("INVALID_JSON_@@@".getBytes(StandardCharsets.UTF_8))) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq("/Proposals/VanRoey/v1/metadata.json"), any(InputStreamCallback.class));
+
+        List<CompanyProposalOverviewDto> result = service.listProposals("VanRoey");
+
+        assertEquals(1, result.size());
+        assertEquals("plan.xlsx", result.get(0).filename());
+        assertNull(result.get(0).createdBy());
+    }
+
+    @Test
     @DisplayName("getProposalFile throws IllegalArgumentException for empty parameters or path traversal")
     void getProposalFile_invalidParams_throwsException() {
         assertThrows(IllegalArgumentException.class, () -> service.getProposalFile("", "v1"));
