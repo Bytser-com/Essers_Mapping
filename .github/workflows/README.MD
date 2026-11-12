@@ -241,7 +241,7 @@ artifacts skip CD; expired artifacts require CI to be rerun.
 `essers-mapping-production`. Environment protection rules apply before deploying.
 The self-hosted runner must already have Kubernetes connectivity and the target
 namespace/Deployment from infrastructure CD. Service CD changes only the chosen
-Deployment and shared registry pull credentials, and waits for its rollout. A
+Deployment and its credentials, and waits for its rollout. A
 second SHA check after environment approval rejects obsolete deployments.
 
 ### Registry credentials required for CD
@@ -259,6 +259,26 @@ CD fails clearly if either is missing. It creates/updates `ghcr-pull-secret`
 without writing credentials to the repository. Full Kubernetes CD uses the same
 durable credentials; an expiring `GITHUB_TOKEN` is not used for cluster pulls.
 Proxmox and SSH configuration keep the existing environment variable names.
+
+### Gemini credentials for Mapping Proposal
+
+Developers copy `Mapping_Proposal/.env.example` to their own ignored `.env`
+and enter a personal key there. The example must never contain a real key.
+The service's `.dockerignore` also excludes `.env` files from image builds.
+
+Configure **repository secret `GEMINI_API_KEY`** for a shared deployment key.
+Alternatively, configure a secret with that name in GitHub environments
+**Testing** and **Production** to use separate keys. The environment value takes
+precedence. Service CD and full Kubernetes CD write it into the namespace's
+`gemini-api` Secret. Mapping Proposal receives it through `secretKeyRef`;
+Frontend, Runtime and Mapping Converter do not receive the key.
+
+Full live Kubernetes deployment and Mapping Proposal service CD fail when the
+key is missing. CI and validation modes need no key and use mocked Gemini calls.
+Service CD restarts Mapping Proposal so a changed key is loaded even when the
+image is unchanged. Use full Kubernetes CD's `restart` mode for a key-only
+rotation there. Mapping Proposal still needs a Dockerfile before service CD
+can publish its image.
 
 ### Infrastructure CD
 

@@ -92,7 +92,7 @@ class FakeSftpStorage(SftpStorage):
 @pytest.fixture
 def disk(tmp_path):
     root = tmp_path / 'server'
-    (root / 'upload').mkdir(parents=True)  # SFTP_SHARED_REMOTE_DIR exists on the server
+    (root / 'Proposals').mkdir(parents=True)  # SFTP_SHARED_PROPOSALS_DIR exists on the server
     return root
 
 
@@ -109,24 +109,23 @@ def test_with_sftp_host_the_sftp_server_is_used(monkeypatch):
     monkeypatch.setenv('SFTP_SHARED_PORT', '22')
     monkeypatch.setenv('SFTP_SHARED_USER', 'shareduser')
     monkeypatch.setenv('SFTP_SHARED_PASSWORD', 'secret')
-    monkeypatch.setenv('SFTP_SHARED_REMOTE_DIR', '/upload')
+    monkeypatch.setenv('SFTP_SHARED_PROPOSALS_DIR', '/upload/Proposals')
 
     storage = proposal_storage()
 
     assert isinstance(storage, SftpStorage)
     assert storage.settings == SftpSettings(host='sftp-shared', port=22, user='shareduser',
-                                            password='secret', base_dir='/upload')
+                                            password='secret', base_dir='/upload/Proposals', proposals_dir='')
     assert storage.root == '/upload/Proposals'
     assert storage.describe() == 'sftp://shareduser@sftp-shared:22/upload/Proposals'
 
 
 def test_proposals_folder_can_be_changed(monkeypatch):
     monkeypatch.setenv('SFTP_SHARED_HOST', 'sftp-shared')
-    monkeypatch.setenv('SFTP_SHARED_REMOTE_DIR', '/')
-    monkeypatch.setenv('SFTP_SHARED_PROPOSALS_DIR', '/mappings/')
+    monkeypatch.setenv('SFTP_SHARED_PROPOSALS_DIR', '/mappings')
     assert proposal_storage().root == '/mappings'
 
-    monkeypatch.setenv('SFTP_SHARED_PROPOSALS_DIR', '')
+    monkeypatch.delenv('SFTP_SHARED_PROPOSALS_DIR', raising=False)
     assert proposal_storage().root == '/Proposals'
 
 
