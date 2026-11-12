@@ -104,7 +104,7 @@ describe('ProposalPage', () => {
         expect(screen.queryByText(/kon de AI niet invullen/)).not.toBeInTheDocument()
     })
 
-    it('disables approving when a field needs review', () => {
+    it('allows approving even when a field needs review', () => {
         // Arrange
         useProposalStore.setState({ proposal: { ...PROPOSAL, mappings: [REVIEW_MAPPING] } })
 
@@ -112,7 +112,7 @@ describe('ProposalPage', () => {
         renderPage()
 
         // Assert
-        expect(screen.getByRole('button', { name: 'Goedkeuren' })).toBeDisabled()
+        expect(screen.getByRole('button', { name: 'Goedkeuren' })).toBeEnabled()
     })
 
     it('enables approving when all fields are filled', () => {

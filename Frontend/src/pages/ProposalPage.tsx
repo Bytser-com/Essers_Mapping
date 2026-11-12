@@ -243,7 +243,7 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
           <button type="button" className="btn" onClick={() => { onUpload?.(); setShowUploadDialog(true); }}>
             Aangepaste Excel uploaden
           </button>
-          <button type="button" className="btn btn--primary" onClick={handleApprove} disabled={hasReviewFields}>
+          <button type="button" className="btn btn--primary" onClick={handleApprove}>
             Goedkeuren
           </button>
           <button
