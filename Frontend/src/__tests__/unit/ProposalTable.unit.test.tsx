@@ -59,10 +59,13 @@ describe('ProposalTable', () => {
     ['AI_GENERATING', 'AI maakt voorstel'],
     ['READY_FOR_REVIEW', 'Klaar om na te kijken'],
     ['IN_REVIEW', 'In review'],
+    ['In review', 'In review'],
+    ['in review', 'In review'],
+    ['Klaar om na te kijken', 'Klaar om na te kijken'],
     ['AI_CHECKING_REVIEW', 'AI controleert review van analist'],
     ['RETURNED', 'Teruggestuurd'],
   ] as const)('TC-57-05 status %s is shown as "%s"', (status, label) => {
-    render(<ProposalTable proposals={[proposal({ status })]} />)
+    render(<ProposalTable proposals={[proposal({ status: status as any })]} />)
 
     expect(within(rows()[0]!).getByText(label)).toBeInTheDocument()
   })

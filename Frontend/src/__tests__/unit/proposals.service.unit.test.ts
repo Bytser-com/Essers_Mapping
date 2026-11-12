@@ -10,6 +10,8 @@ import {
   fetchProposals,
   formatUploadedAt,
   proposalPath,
+  normalizeStatus,
+  toProposal,
 } from '../../services/proposals'
 
 afterEach(() => {
@@ -67,6 +69,29 @@ describe('labels', () => {
       RETURNED: 'Teruggestuurd',
     })
     expect(AI_STATUS_LABELS).toEqual({ RUNNING: 'Bezig', FAILED: 'Mislukt' })
+  })
+
+  it('normalizes various status representations correctly', () => {
+    expect(normalizeStatus('In review')).toBe('IN_REVIEW')
+    expect(normalizeStatus('in review')).toBe('IN_REVIEW')
+    expect(normalizeStatus('IN_REVIEW')).toBe('IN_REVIEW')
+    expect(normalizeStatus('Klaar om na te kijken')).toBe('READY_FOR_REVIEW')
+    expect(normalizeStatus('READY_FOR_REVIEW')).toBe('READY_FOR_REVIEW')
+    expect(normalizeStatus('AI maakt voorstel')).toBe('AI_GENERATING')
+    expect(normalizeStatus(null)).toBe('READY_FOR_REVIEW')
+  })
+
+  it('toProposal converts raw CompanyProposalOverview with In review status to Proposal', () => {
+    const raw = {
+      company: 'vanroey',
+      latestVersion: 'v2',
+      status: 'In review',
+      createdDate: '2026-10-30T10:00:00Z',
+    }
+    const prop = toProposal(raw)
+    expect(prop.status).toBe('IN_REVIEW')
+    expect(prop.customer).toBe('vanroey')
+    expect(prop.version).toBe(2)
   })
 })
 
