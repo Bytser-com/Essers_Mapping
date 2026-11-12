@@ -152,10 +152,58 @@ def incoming_poll_seconds() -> float:
         return 1.0
 
 
-def ai_limit_targets() -> int:
-    """Number of target fields the AI maps per upload (AI_LIMIT_TARGETS, default 10, 0 = all)."""
+def _int_env(name: str, default: int, minimum: int) -> int:
+    """Read a bounded integer setting without breaking on invalid .env values."""
     _load_env()
     try:
-        return max(0, int(os.getenv('AI_LIMIT_TARGETS', '10')))
+        return max(minimum, int(os.getenv(name, str(default))))
     except ValueError:
-        return 10
+        return default
+
+
+def ai_limit_targets() -> int:
+    """Number of target fields per frontend upload (default 0 = all)."""
+    return _int_env('AI_LIMIT_TARGETS', 0, 0)
+
+
+def ai_source_samples() -> int:
+    """Requested complete customer XML examples per upload (default 5)."""
+    return _int_env('AI_SOURCE_SAMPLES', 5, 1)
+
+
+def ai_history_pairs() -> int:
+    """Historical original/converted pairs per company (default 3)."""
+    return _int_env('AI_HISTORY_PAIRS', 3, 0)
+
+
+def ai_batch_size() -> int:
+    """Number of target fields per Gemini request for uploads (default 10)."""
+    return _int_env('AI_BATCH_SIZE', 10, 1)
+
+
+def gemini_max_attempts() -> int:
+    """Maximum attempts for one Gemini API request (default 20)."""
+    return _int_env('GEMINI_MAX_ATTEMPTS', 20, 1)
+
+
+def ai_retry_max_attempts() -> int:
+    """Maximum whole-job attempts by the upload watcher (default 3)."""
+    return _int_env('AI_RETRY_MAX_ATTEMPTS', 3, 1)
+
+
+def ai_retry_delay_seconds() -> float:
+    """Delay before first whole-job retry (default 90 seconds)."""
+    _load_env()
+    try:
+        return max(0.0, float(os.getenv('AI_RETRY_DELAY_SECONDS', '90')))
+    except ValueError:
+        return 90.0
+
+
+def ai_retry_max_delay_seconds() -> float:
+    """Maximum whole-job retry delay (default 600 seconds)."""
+    _load_env()
+    try:
+        return max(0.0, float(os.getenv('AI_RETRY_MAX_DELAY_SECONDS', '600')))
+    except ValueError:
+        return 600.0

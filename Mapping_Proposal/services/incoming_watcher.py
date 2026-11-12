@@ -31,15 +31,27 @@ import json
 import logging
 import os
 import shutil
+import sys
 import threading
+import time
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
-from scripts.config import ai_limit_targets, incoming_dir, incoming_poll_seconds
+from scripts.config import (
+    ai_batch_size,
+    ai_history_pairs,
+    ai_limit_targets,
+    ai_retry_delay_seconds,
+    ai_retry_max_attempts,
+    ai_retry_max_delay_seconds,
+    ai_source_samples,
+    incoming_dir,
+    incoming_poll_seconds,
+)
 from scripts.models import MappingSettings
 
-from .proposal_runner import RunMapping, generate_proposal, start_proposal
+from .proposal_runner import RunMapping, generate_proposal, is_retryable_gemini_error, start_proposal
 from .proposals import AiStatus, ProposalRef, ProposalStatus, ProposalStore
 from .storage import proposal_storage
 
@@ -50,6 +62,18 @@ PROPOSAL_REF = 'proposal_ref.json'
 PROCESSING_SUFFIX = '.processing'
 PROCESSED_DIR = 'processed'
 FAILED_DIR = 'failed'
+RETRY_STATE = 'retry_state.json'
+
+
+def configure_ai_logging() -> None:
+    """Enable AI batch INFO messages in Uvicorn without noisy dependency logs."""
+    for name in ('scripts', 'services'):
+        component = logging.getLogger(name)
+        component.setLevel(logging.INFO)
+        if not component.hasHandlers():
+            handler = logging.StreamHandler(sys.stdout)
+            handler.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
+            component.addHandler(handler)
 
 
 @dataclass
@@ -72,7 +96,10 @@ class IncomingWatcher:
         """Handle the queue: register every complete upload, then let the AI handle them one
         by one (oldest first). Uploads that arrive meanwhile get their row on Home right away
         and join the end of the queue. Returns the number of uploads handled."""
-        queue = self.register_new_uploads()
+        # Check previously interrupted uploads BEFORE claiming new ones, to avoid
+        # enqueueing each newly claimed .processing folder twice.
+        queue = self.ready_retries()
+        queue.extend(self.register_new_uploads())
         handled = 0
         while queue:
             self.process(queue.pop(0))
@@ -115,42 +142,87 @@ class IncomingWatcher:
         return claimed
 
     def process(self, upload: ClaimedUpload) -> bool:
-        """Run the AI for one registered upload. Returns True when the proposal is ready."""
+        """Run one upload, preserving its proposal version on temporary failures."""
         try:
-            generate_proposal(upload.ref, self.settings, upload.folder, self.store, self.run)
-        except Exception as error:  # the status is already "Mislukt"; keep watching
-            logger.warning(f'Upload {upload.folder.name}: {type(error).__name__}: {error}')
-            self._finish(upload.folder, FAILED_DIR, error=f'{type(error).__name__}: {error}')
+            generate_proposal(upload.ref, self.settings, upload.folder, self.store,
+                              self.run, retry_temporary=True)
+        except Exception as error:
+            if is_retryable_gemini_error(error):
+                state = self._read_retry_state(upload.folder)
+                attempts = int(state.get('attempts', 0)) + 1
+                maximum = ai_retry_max_attempts()
+                if attempts < maximum:
+                    delay = min(ai_retry_delay_seconds() * (2 ** (attempts - 1)),
+                                ai_retry_max_delay_seconds())
+                    state = {'attempts': attempts, 'next_retry_at': time.time() + delay,
+                             'last_error': f'{type(error).__name__}: {error}'[:300]}
+                    self._write_retry_state(upload.folder, state)
+                    logger.warning('Proposal %s: temporary Gemini failure (%s); '
+                                   'scheduled attempt %d/%d in %.0f seconds. '
+                                   'Same proposal and checkpoints retained.',
+                                   upload.ref.id, error, attempts + 1, maximum, delay)
+                    return False
+                self.store.set_status(upload.ref, ProposalStatus.AI_GENERATING, AiStatus.FAILED,
+                                      error=f'Gemini failed after {maximum} job attempts: {error}'[:300])
+                logger.warning('Proposal %s: maximum %d upload attempts exhausted.',
+                               upload.ref.id, maximum)
+            logger.warning('Upload %s: %s: %s', upload.folder.name,
+                           type(error).__name__, error)
+            self._finish(upload.folder, FAILED_DIR,
+                         error=f'{type(error).__name__}: {error}')
             return False
         # Done: the proposal is on SFTP, so the uploaded source files are not needed anymore.
         shutil.rmtree(upload.folder, ignore_errors=True)
         return True
 
-    def recover_interrupted(self) -> int:
-        """After a restart: uploads that were still being processed are marked "Mislukt",
-        so no row stays on "Bezig". Call once at start-up, before watching."""
+    @staticmethod
+    def _read_retry_state(folder: Path) -> dict:
+        file = folder / RETRY_STATE
+        if not file.is_file():
+            return {}
+        return json.loads(file.read_text(encoding='utf-8'))
+
+    @staticmethod
+    def _write_retry_state(folder: Path, data: dict) -> None:
+        file = folder / RETRY_STATE
+        temp = file.with_suffix('.json.tmp')
+        temp.write_text(json.dumps(data, indent=2), encoding='utf-8')
+        os.replace(temp, file)
+
+    def ready_retries(self) -> list[ClaimedUpload]:
+        """Resume due uploads, including those interrupted by an API restart."""
         if not self.incoming.is_dir():
-            return 0
-        count = 0
-        for folder in self.incoming.glob('*' + PROCESSING_SUFFIX):
+            return []
+        ready = []
+        for folder in sorted(self.incoming.glob('*' + PROCESSING_SUFFIX)):
             ref_file = folder / PROPOSAL_REF
-            if ref_file.is_file():
-                try:
-                    data = json.loads(ref_file.read_text(encoding='utf-8'))
-                    ref = ProposalRef(customer=data['customer'], version=data['version'], folder=str(data['folder']))
-                    if self.store.exists(ref):
-                        self.store.set_status(ref, ProposalStatus.AI_GENERATING, AiStatus.FAILED,
-                                              error='Interrupted: the service restarted during the AI run.')
-                except Exception as error:  # e.g. SFTP unreachable: still move the upload away
-                    logger.warning(f'Could not mark {folder.name} as failed on the storage: {error}')
-            self._finish(folder, FAILED_DIR, error='Interrupted: the service restarted during the AI run.')
-            count += 1
-        return count
+            if not ref_file.is_file():
+                continue
+            try:
+                state = self._read_retry_state(folder)
+                if float(state.get('next_retry_at', 0)) > time.time():
+                    continue
+                data = json.loads(ref_file.read_text(encoding='utf-8'))
+                ref = ProposalRef(customer=data['customer'], version=data['version'],
+                                  folder=str(data['folder']))
+                ready.append(ClaimedUpload(folder, ref))
+            except (ValueError, TypeError, KeyError, OSError) as error:
+                logger.warning('Cannot resume upload %s: %s', folder.name, error)
+        return ready
+
+    def recover_interrupted(self) -> int:
+        """Keep interrupted uploads and their checkpoints available after restart."""
+        pending = sum(1 for folder in self.incoming.glob('*' + PROCESSING_SUFFIX)
+                      if (folder / PROPOSAL_REF).is_file()) if self.incoming.is_dir() else 0
+        if pending:
+            logger.info('Found %d interrupted/in-progress upload(s); resuming when due.', pending)
+        return pending
 
     # -- Keep watching -------------------------------------------------------------
 
     def watch(self, stop: threading.Event, interval: float) -> None:
         """Check the folder every ``interval`` seconds until ``stop`` is set."""
+        configure_ai_logging()
         self.recover_interrupted()
         logger.info(f'Watching {self.incoming} for uploads (every {interval:g} s).')
         while not stop.is_set():
@@ -191,7 +263,10 @@ def _read_customer(folder: Path) -> str:
 def default_watcher(run: RunMapping | None = None) -> IncomingWatcher:
     """Watcher with the configured folder and storage (INCOMING_DIR, SFTP_SHARED_*, AI_LIMIT_TARGETS)."""
     return IncomingWatcher(incoming_dir(), ProposalStore(proposal_storage()),
-                           MappingSettings(limit_targets=ai_limit_targets()), run)
+                           MappingSettings(limit_targets=ai_limit_targets(),
+                                           source_samples=ai_source_samples(),
+                                           history_pairs=ai_history_pairs(),
+                                           batch_size=ai_batch_size()), run)
 
 
 def start_in_background(watcher_factory: Callable[[], IncomingWatcher] = default_watcher
@@ -208,7 +283,7 @@ def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description='Start the AI for every complete upload in INCOMING_DIR.')
     parser.add_argument('--once', action='store_true', help='Handle the uploads that are there now, then stop.')
     args = parser.parse_args(argv)
-    logging.basicConfig(level=logging.INFO, format='%(message)s')
+    configure_ai_logging()
     watcher = default_watcher()
     if args.once:
         watcher.recover_interrupted()
