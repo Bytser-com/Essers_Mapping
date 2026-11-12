@@ -8,6 +8,9 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 
+# Personal backups made while refactoring (never shared)
+.revert_backup/
+
 # Customer datasets and generated output (including experiment logs)
 /data/
 /output/

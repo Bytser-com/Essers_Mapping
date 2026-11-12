@@ -3,9 +3,10 @@
 This uses openpyxl in the user's Python environment. The layout is read from
 row 2 of 'Mapping Proposal', and row 1 of the other worksheets.
 """
-from copy import copy
 import logging
+from copy import copy
 from pathlib import Path
+
 from openpyxl import load_workbook
 
 logger = logging.getLogger(__name__)

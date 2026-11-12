@@ -1,38 +1,23 @@
 name: Ansible - Infra Config
 
 # When does this run?
-#  - Pull request with Ansible changes  -> dry-run (--check --diff)
-#  - Push with Ansible changes          -> configure the VMs
-#  - Called by the Terraform workflow   -> configure the VMs after an apply
-#  - Manual                             -> choose check / apply
+#  - Called by the Infrastructure Pipeline (infra-pipeline.yml) -> validate (PR) or live configure (push/apply)
+#  - Manual (workflow_dispatch)                                -> choose apply / validate, limit, tags
 on:
-  pull_request:
-    branches: [main, testing]
-    paths:
-      - "Infra/Config/**"
-      - ".github/workflows/ansible-infra.yml"
-      - ".github/actions/setup-ansible/**"
-
-  push:
-    branches: [main, testing]
-    paths:
-      - "Infra/Config/**"
-      - ".github/workflows/ansible-infra.yml"
-      - ".github/actions/setup-ansible/**"
-
   workflow_call:
     inputs:
       mode:
+        description: "validate = syntax-check & lint, apply = configure the VMs live"
         type: string
         default: apply
 
   workflow_dispatch:
     inputs:
       mode:
-        description: "check = dry-run (--check --diff), apply = configure the VMs"
+        description: "validate = syntax-check & lint, apply = configure the VMs live"
         type: choice
-        options: [check, apply]
-        default: check
+        options: [apply, validate]
+        default: validate
       limit:
         description: "Optional --limit host pattern (e.g. k8s_cluster, pipeline-runner)"
         type: string
@@ -53,8 +38,8 @@ permissions:
 env:
   WORKDIR: "Infra/Config"
   PLAYBOOK: "site.yml"
-  # Pull requests always dry-run, Pushes always apply, otherwise use the given mode (default: check)
-  MODE: ${{ github.event_name == 'pull_request' && 'check' || github.event_name == 'push' && 'apply' || inputs.mode || 'check' }}
+  # Pull requests only validate (syntax check), Pushes always apply (live run), otherwise given mode (fallback: apply)
+  MODE: ${{ (github.event_name == 'pull_request' && 'validate') || ((inputs.mode == 'validate' || inputs.mode == 'check') && 'validate') || (github.event_name == 'push' && 'apply') || inputs.mode || 'apply' }}
 
   ANSIBLE_FORCE_COLOR: "true"
   ANSIBLE_RETRY_FILES_ENABLED: "false"
@@ -62,8 +47,17 @@ env:
 
 jobs:
   ansible:
-    name: ${{ (github.event_name == 'pull_request' && 'Dry-run') || (github.event_name == 'push' && 'Configure') || (inputs.mode == 'apply' && 'Configure') || 'Dry-run' }}
-    runs-on: [self-hosted, linux, "${{ vars.RUNNER_LABEL }}"]
+    name: >-
+      ${{
+        (github.event_name == 'pull_request' && 'Syntax & Validation') ||
+        (github.event_name == 'push' && 'Configure') ||
+        (inputs.mode == 'apply' && 'Configure') ||
+        'Syntax & Validation'
+      }}
+    runs-on:
+      - self-hosted
+      - linux
+      - ${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}
     environment: ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
     defaults:
       run:
@@ -72,11 +66,12 @@ jobs:
       # --- Secrets ---
       SSH_PRIVATE_KEY: ${{ secrets.PIPELINE_SSH_PRIVATE_KEY }}
       ANSIBLE_BECOME_PASS: ${{ secrets.DEBIAN_VM_USER_PASSWORD }}
+      DEBIAN_VM_USER_PASSWORD: ${{ secrets.DEBIAN_VM_USER_PASSWORD }}
+      RUNNER_REGISTRATION_PAT: ${{ secrets.RUNNER_REGISTRATION_PAT }}
 
       # --- Variables ---
       INVENTORY_FILE: "inventories/${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}/hosts.yml"
       DEBIAN_VM_USERNAME: ${{ vars.DEBIAN_VM_USERNAME || 'sysadmin' }}
-      DEBIAN_VM_USER_PASSWORD: ${{ secrets.DEBIAN_VM_USER_PASSWORD }}
       IPV4_GATEWAY: ${{ vars.IPV4_GATEWAY }}
       PIPELINE_RUNNER_VM_IPV4_ADDRESS: ${{ vars.PIPELINE_RUNNER_VM_IPV4_ADDRESS }}
       K8S_MASTER_VM_IPV4_ADDRESS: ${{ vars.K8S_MASTER_VM_IPV4_ADDRESS }}
@@ -84,7 +79,8 @@ jobs:
       PIPELINE_RUNNER_VM_DNS_DOMAIN: ${{ vars.PIPELINE_RUNNER_VM_DNS_DOMAIN || 'pipeline-runner.essers.lan' }}
       K8S_MASTER_VM_DNS_DOMAIN: ${{ vars.K8S_MASTER_VM_DNS_DOMAIN || 'k8s-masterserver.essers.lan' }}
       K8S_WORKER_VM_DNS_DOMAIN: ${{ vars.K8S_WORKER_VM_DNS_DOMAIN || 'k8s-workerserver.essers.lan' }}
-      RUNNER_LABEL: ${{ vars.RUNNER_LABEL }}
+      RUNNER_LABEL: ${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}
+      GH_REPO_URL: ${{ vars.GH_REPO_URL || format('{0}/{1}', github.server_url, github.repository) }}
 
       # --- Manual options ---
       LIMIT: ${{ inputs.limit }}
@@ -92,7 +88,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Check playbook exists
         id: playbook
@@ -101,9 +97,17 @@ jobs:
           if [ -f "$PLAYBOOK" ]; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
           else
-            echo "::warning::No playbook found at $WORKDIR/$PLAYBOOK - skipping Ansible execution."
-            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::error::Required playbook is missing at $WORKDIR/$PLAYBOOK."
+            exit 1
           fi
+
+      - name: Verify infrastructure is deployed
+        if: steps.playbook.outputs.exists == 'true' && env.MODE == 'apply'
+        uses: ./.github/actions/check-infrastructure
+        with:
+          api-url: ${{ vars.PROXMOX_API_URL }}
+          api-token: ${{ secrets.PROXMOX_API_TOKEN }}
+          node-name: ${{ vars.NODE01_NAME }}
 
       - name: Setup Ansible
         if: steps.playbook.outputs.exists == 'true'
@@ -111,17 +115,22 @@ jobs:
         with:
           working-directory: ${{ env.WORKDIR }}
 
-      - name: Lint
+      - name: Syntax check, inventory graph & lint
+        id: lint
         if: steps.playbook.outputs.exists == 'true'
         shell: bash
         run: |
           set -euo pipefail
+          echo "Running syntax check on playbook..."
           ansible-playbook --syntax-check -i "$INVENTORY_FILE" "$PLAYBOOK"
-          ansible-lint --project-dir "$PWD" .
+          echo "Validating inventory graph & hierarchy..."
+          ansible-inventory -i "$INVENTORY_FILE" --graph
+          echo "Running ansible-lint..."
+          ansible-lint --project-dir "$PWD" site.yml playbooks roles
 
-      # SSH key is written to the runner's temp dir and removed at the end
-      - name: Prepare SSH key and validate inventory
-        if: steps.playbook.outputs.exists == 'true'
+      # Live-run setup: SSH key is written to the runner's temp dir and removed at the end
+      - name: Prepare SSH key and validate connection variables
+        if: steps.playbook.outputs.exists == 'true' && env.MODE == 'apply'
         shell: bash
         run: |
           set -euo pipefail
@@ -144,21 +153,19 @@ jobs:
           echo "ANSIBLE_PRIVATE_KEY_FILE=${SSH_DIR}/id_pipeline" >> "$GITHUB_ENV"
           echo "ANSIBLE_SSH_COMMON_ARGS=-o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=${SSH_DIR}/known_hosts" >> "$GITHUB_ENV"
 
-          # 3. Verify committed inventory syntax, group hierarchy & variables
-          ansible-inventory -i "$INVENTORY_FILE" --graph
-
       # Freshly created VMs may still be booting / running cloud-init
       - name: Wait for VMs
-        if: steps.playbook.outputs.exists == 'true'
+        if: steps.playbook.outputs.exists == 'true' && env.MODE == 'apply'
         shell: bash
         run: |
           set -euo pipefail
           ansible all -i "$INVENTORY_FILE" -m ansible.builtin.wait_for_connection -a "timeout=300"
           ansible all -i "$INVENTORY_FILE" -m ansible.builtin.raw -a "cloud-init status --wait > /dev/null 2>&1 || true"
+          ansible all -i "$INVENTORY_FILE" -m ansible.builtin.raw -a "apt-get update > /dev/null 2>&1 || true"
 
-      - name: Run playbook (${{ env.MODE }})
+      - name: Run playbook (Live Deployment)
         id: run
-        if: steps.playbook.outputs.exists == 'true'
+        if: steps.playbook.outputs.exists == 'true' && env.MODE == 'apply'
         shell: bash
         run: |
           set -euo pipefail
@@ -167,11 +174,10 @@ jobs:
           rm -f "$LOG_FILE"
 
           ARGS=(-i "$INVENTORY_FILE" "$PLAYBOOK" --diff)
-          [ "$MODE" = "check" ] && ARGS+=(--check)
           [ -n "${LIMIT:-}" ]   && ARGS+=(--limit "$LIMIT")
           [ -n "${TAGS:-}" ]    && ARGS+=(--tags "$TAGS")
 
-          # Run and stream output while capturing the true exit status
+          # Run live deployment and stream output while capturing the true exit status
           set +e
           ansible-playbook "${ARGS[@]}" 2>&1 | tee "$LOG_FILE"
           PLAYBOOK_EXIT="${PIPESTATUS[0]}"
@@ -183,16 +189,24 @@ jobs:
         if: always() && steps.playbook.outputs.exists == 'true'
         shell: bash
         run: |
-          STATUS="${{ steps.run.outcome == 'success' && '✅ Succeeded' || '❌ Failed' }}"
-          {
-            echo "### Ansible (${MODE}):${STATUS}"
-            if [ -f "$RUNNER_TEMP/ansible.log" ]; then
-              echo '```text'
-              # Strip ANSI escape codes thoroughly
-              sed -E 's/\x1B\[[0-9;]*[a-zA-Z]//g' "$RUNNER_TEMP/ansible.log" | sed -n '/PLAY RECAP/,$p'
-              echo '```'
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$MODE" = "validate" ]; then
+            STATUS="${{ steps.lint.outcome == 'success' && '✅ Succeeded' || '❌ Failed' }}"
+            {
+              echo "### Ansible (Validation): ${STATUS}"
+              echo "Playbook syntax, inventory graph and lint result: ${STATUS}"
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            STATUS="${{ steps.run.outcome == 'success' && '✅ Succeeded' || '❌ Failed' }}"
+            {
+              echo "### Ansible (Live Deployment): ${STATUS}"
+              if [ -f "$RUNNER_TEMP/ansible.log" ]; then
+                echo '```text'
+                # Strip ANSI escape codes thoroughly
+                sed -E 's/\x1B\[[0-9;]*[a-zA-Z]//g' "$RUNNER_TEMP/ansible.log" | sed -n '/PLAY RECAP/,$p'
+                echo '```'
+              fi
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Secure Cleanup
         if: always()
@@ -203,15 +217,3 @@ jobs:
             find "$RUNNER_TEMP/ansible-ssh" -type f -exec shred -u {} + 2>/dev/null || rm -rf "$RUNNER_TEMP/ansible-ssh"
           fi
           rm -f "$RUNNER_TEMP/inventory.yml" "$RUNNER_TEMP/ansible.log"
-
-  # Deploy Kubernetes manifests after Ansible configured the VMs (not after a dry-run)
-  deploy:
-    name: Deploy (Kubernetes)
-    needs: ansible
-    if: >-
-      github.event_name == 'push' ||
-      inputs.mode == 'apply'
-    uses: ./.github/workflows/kubernetes-deploy.yml
-    with:
-      mode: apply
-    secrets: inherit

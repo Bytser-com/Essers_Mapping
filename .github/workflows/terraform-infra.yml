@@ -1,17 +1,16 @@
 name: Terraform - Infra Setup
 
 on:
-  pull_request:
-    branches: [main, testing]
-    paths:
-      - "Infra/Setup/**"
-      - ".github/workflows/terraform-infra.yml"
-
-  push:
-    branches: [main, testing]
-    paths:
-      - "Infra/Setup/**"
-      - ".github/workflows/terraform-infra.yml"
+  workflow_call:
+    inputs:
+      action:
+        description: "Terraform action (plan, apply, destroy)"
+        type: string
+        default: apply
+    outputs:
+      has_changes:
+        description: "Whether Terraform plan detected changes"
+        value: ${{ jobs.plan.outputs.has_changes }}
 
   workflow_dispatch:
     inputs:
@@ -40,30 +39,33 @@ env:
   STATE_DIR: "/opt/terraform-state/essers-infra-setup/${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}"
   WORKDIR: "Infra/Setup"
 
-  # --- Secrets ---
-  TF_VAR_proxmox_api_token: ${{ secrets.PROXMOX_API_TOKEN }}
-  TF_VAR_proxmox_ssh_password: ${{ secrets.PROXMOX_SSH_PASSWORD }}
-  TF_VAR_debian_vm_user_password: ${{ secrets.DEBIAN_VM_USER_PASSWORD }}
-
-  # --- Variables (Loaded from target Environment) ---
-  TF_VAR_proxmox_api_url: ${{ vars.PROXMOX_API_URL }}
-  TF_VAR_pipeline_ssh_public_key: ${{ vars.PIPELINE_SSH_PUBLIC_KEY }}
-  TF_VAR_node01_name: ${{ vars.NODE01_NAME }}
-  TF_VAR_cloud_image_url: ${{ vars.CLOUD_IMAGE_URL }}
-  TF_VAR_cloud_image_checksum: ${{ vars.CLOUD_IMAGE_CHECKSUM }}
-  TF_VAR_ipv4_gateway: ${{ vars.IPV4_GATEWAY }}
-  TF_VAR_pipeline-runner_vm_dns_domain: ${{ vars.PIPELINE_RUNNER_VM_DNS_DOMAIN }}
-  TF_VAR_pipeline-runner_vm_ipv4_address: ${{ vars.PIPELINE_RUNNER_VM_IPV4_ADDRESS }}
-  TF_VAR_k8s-master_vm_dns_domain: ${{ vars.K8S_MASTER_VM_DNS_DOMAIN }}
-  TF_VAR_k8s-master_vm_ipv4_address: ${{ vars.K8S_MASTER_VM_IPV4_ADDRESS }}
-  TF_VAR_k8s-worker_vm_dns_domain: ${{ vars.K8S_WORKER_VM_DNS_DOMAIN }}
-  TF_VAR_k8s-worker_vm_ipv4_address: ${{ vars.K8S_WORKER_VM_IPV4_ADDRESS }}
-
 jobs:
   plan:
     name: Plan
-    runs-on: [self-hosted, linux, "${{ vars.RUNNER_LABEL }}"]
+    runs-on:
+      - self-hosted
+      - linux
+      - ${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}
     environment: ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
+    # Resolve environment-scoped configuration in the job that declares it.
+    env:
+      # --- Secrets ---
+      TF_VAR_proxmox_api_token: ${{ secrets.PROXMOX_API_TOKEN }}
+      TF_VAR_debian_vm_user_password: ${{ secrets.DEBIAN_VM_USER_PASSWORD }}
+
+      # --- Variables (Loaded from target Environment and repository) ---
+      TF_VAR_proxmox_api_url: ${{ vars.PROXMOX_API_URL }}
+      TF_VAR_pipeline_ssh_public_key: ${{ vars.PIPELINE_SSH_PUBLIC_KEY }}
+      TF_VAR_node01_name: ${{ vars.NODE01_NAME }}
+      TF_VAR_debian_cloud_image_url: ${{ vars.CLOUD_IMAGE_URL }}
+      TF_VAR_debian_cloud_image_checksum: ${{ vars.CLOUD_IMAGE_CHECKSUM }}
+      TF_VAR_ipv4_gateway: ${{ vars.IPV4_GATEWAY }}
+      TF_VAR_pipeline_runner_vm_dns_domain: ${{ vars.PIPELINE_RUNNER_VM_DNS_DOMAIN }}
+      TF_VAR_pipeline_runner_vm_ipv4_address: ${{ vars.PIPELINE_RUNNER_VM_IPV4_ADDRESS }}
+      TF_VAR_k8s_master_vm_dns_domain: ${{ vars.K8S_MASTER_VM_DNS_DOMAIN }}
+      TF_VAR_k8s_master_vm_ipv4_address: ${{ vars.K8S_MASTER_VM_IPV4_ADDRESS }}
+      TF_VAR_k8s_worker_vm_dns_domain: ${{ vars.K8S_WORKER_VM_DNS_DOMAIN }}
+      TF_VAR_k8s_worker_vm_ipv4_address: ${{ vars.K8S_WORKER_VM_IPV4_ADDRESS }}
     defaults:
       run:
         working-directory: ${{ env.WORKDIR }}
@@ -71,10 +73,10 @@ jobs:
       has_changes: ${{ steps.plan.outputs.has_changes }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "~1.9"
           terraform_wrapper: false
@@ -94,8 +96,9 @@ jobs:
       - name: Terraform plan
         id: plan
         run: |
+          ACTION="${{ inputs.action || github.event.inputs.action || 'apply' }}"
           DESTROY_FLAG=""
-          if [ "${{ github.event.inputs.action }}" = "destroy" ]; then
+          if [ "$ACTION" = "destroy" ]; then
             DESTROY_FLAG="-destroy"
           fi
 
@@ -131,7 +134,7 @@ jobs:
       # Upload the plan artifact securely to GitHub
       - name: Upload Terraform Plan
         if: steps.plan.outputs.has_changes == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: tfplan-${{ github.run_id }}
           path: ${{ env.WORKDIR }}/tfplan.binary
@@ -139,32 +142,53 @@ jobs:
           if-no-files-found: error
 
   apply:
-    name: ${{ github.event.inputs.action == 'destroy' && 'Destroy' || 'Apply' }}
+    name: ${{ (inputs.action || github.event.inputs.action) == 'destroy' && 'Destroy' || 'Apply' }}
     needs: plan
     if: >-
       needs.plan.outputs.has_changes == 'true' &&
       (
-        (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/testing')) ||
-        (github.event_name == 'workflow_dispatch' &&
-          (github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy'))
+        (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/Testing')) ||
+        ((github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_call') &&
+          ((inputs.action || github.event.inputs.action) == 'apply' || (inputs.action || github.event.inputs.action) == 'destroy'))
       )
-    runs-on: [self-hosted, linux, "${{ vars.RUNNER_LABEL }}"]
+    runs-on:
+      - self-hosted
+      - linux
+      - ${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}
     environment: ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
+    env:
+      # --- Secrets ---
+      TF_VAR_proxmox_api_token: ${{ secrets.PROXMOX_API_TOKEN }}
+      TF_VAR_debian_vm_user_password: ${{ secrets.DEBIAN_VM_USER_PASSWORD }}
+
+      # --- Variables (Loaded from target Environment and repository) ---
+      TF_VAR_proxmox_api_url: ${{ vars.PROXMOX_API_URL }}
+      TF_VAR_pipeline_ssh_public_key: ${{ vars.PIPELINE_SSH_PUBLIC_KEY }}
+      TF_VAR_node01_name: ${{ vars.NODE01_NAME }}
+      TF_VAR_debian_cloud_image_url: ${{ vars.CLOUD_IMAGE_URL }}
+      TF_VAR_debian_cloud_image_checksum: ${{ vars.CLOUD_IMAGE_CHECKSUM }}
+      TF_VAR_ipv4_gateway: ${{ vars.IPV4_GATEWAY }}
+      TF_VAR_pipeline_runner_vm_dns_domain: ${{ vars.PIPELINE_RUNNER_VM_DNS_DOMAIN }}
+      TF_VAR_pipeline_runner_vm_ipv4_address: ${{ vars.PIPELINE_RUNNER_VM_IPV4_ADDRESS }}
+      TF_VAR_k8s_master_vm_dns_domain: ${{ vars.K8S_MASTER_VM_DNS_DOMAIN }}
+      TF_VAR_k8s_master_vm_ipv4_address: ${{ vars.K8S_MASTER_VM_IPV4_ADDRESS }}
+      TF_VAR_k8s_worker_vm_dns_domain: ${{ vars.K8S_WORKER_VM_DNS_DOMAIN }}
+      TF_VAR_k8s_worker_vm_ipv4_address: ${{ vars.K8S_WORKER_VM_IPV4_ADDRESS }}
     defaults:
       run:
         working-directory: ${{ env.WORKDIR }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "~1.9"
           terraform_wrapper: false
 
       - name: Download Terraform Plan Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: tfplan-${{ github.run_id }}
           path: ${{ env.WORKDIR }}
@@ -196,13 +220,3 @@ jobs:
               echo "</details>"
             fi
           } >> "$GITHUB_STEP_SUMMARY"
-
-  # Configure the VMs with Ansible after Terraform applied changes (not after a destroy)
-  configure:
-    name: Configure (Ansible)
-    needs: apply
-    if: github.event.inputs.action != 'destroy'
-    uses: ./.github/workflows/ansible-infra.yml
-    with:
-      mode: apply
-    secrets: inherit

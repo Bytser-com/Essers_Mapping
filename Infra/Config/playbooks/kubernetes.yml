@@ -66,3 +66,96 @@
         - k8s
         - k8s_worker
         - workers
+
+- name: Distribute Kubernetes cluster kubeconfig to CI/CD Runner hosts
+  hosts: runners
+  become: true
+  gather_facts: false
+  ignore_unreachable: true
+  tags:
+    - k8s
+    - kubeconfig
+    - runner_kubeconfig
+  vars:
+    runner_kubeconfig_users:
+      - user: "ghrunner"
+        group: "ghrunner"
+        home: "/home/ghrunner"
+      - user: "{{ ansible_user | default('sysadmin') }}"
+        group: "{{ ansible_user | default('sysadmin') }}"
+        home: "/home/{{ ansible_user | default('sysadmin') }}"
+      - user: "root"
+        group: "root"
+        home: "/root"
+  tasks:
+    - name: Fetch admin.conf from Kubernetes Control Plane '{{ groups['k8s_masters'][0] }}'
+      ansible.builtin.slurp:
+        src: /etc/kubernetes/admin.conf
+      delegate_to: "{{ groups['k8s_masters'][0] }}"
+      register: k8s_slurped_admin_conf
+      run_once: true
+      when:
+        - groups['k8s_masters'] is defined
+        - groups['k8s_masters'] | length > 0
+        - not ansible_check_mode
+
+    - name: Discover existing system users on runner host
+      ansible.builtin.getent:
+        database: passwd
+      when:
+        - k8s_slurped_admin_conf is defined
+        - k8s_slurped_admin_conf.content is defined
+
+    - name: Ensure ~/.kube directory exists for runner users
+      ansible.builtin.file:
+        path: "{{ item.home }}/.kube"
+        state: directory
+        owner: "{{ item.user }}"
+        group: "{{ item.group }}"
+        mode: "0700"
+      loop: "{{ runner_kubeconfig_users }}"
+      loop_control:
+        label: "{{ item.user }} ({{ item.home }}/.kube)"
+      when:
+        - k8s_slurped_admin_conf is defined
+        - k8s_slurped_admin_conf.content is defined
+        - getent_passwd is defined
+        - item.user in getent_passwd
+
+    - name: Deploy Kubernetes cluster kubeconfig to runner users
+      ansible.builtin.copy:
+        content: >-
+          {{
+            (k8s_slurped_admin_conf.content | b64decode)
+            | regex_replace(
+                'server:\s*https://[^\s]+',
+                'server: https://' ~ hostvars[groups['k8s_masters'][0]]['ansible_host'] ~ ':' ~ ((hostvars[groups['k8s_masters'][0]]['k8s_apiserver_bind_port'] | default(6443)) | string)
+              )
+          }}
+        dest: "{{ item.home }}/.kube/config"
+        owner: "{{ item.user }}"
+        group: "{{ item.group }}"
+        mode: "0600"
+      loop: "{{ runner_kubeconfig_users }}"
+      loop_control:
+        label: "{{ item.user }} ({{ item.home }}/.kube/config)"
+      no_log: true
+      when:
+        - k8s_slurped_admin_conf is defined
+        - k8s_slurped_admin_conf.content is defined
+        - getent_passwd is defined
+        - item.user in getent_passwd
+
+    - name: Verify runner VM can reach the Kubernetes cluster via kubectl
+      ansible.builtin.command:
+        cmd: kubectl get nodes
+      become: true
+      become_user: "{{ 'ghrunner' if (getent_passwd is defined and 'ghrunner' in getent_passwd) else (ansible_user | default('sysadmin')) }}"
+      environment:
+        KUBECONFIG: "{{ ('/home/ghrunner/.kube/config') if (getent_passwd is defined and 'ghrunner' in getent_passwd) else (('/home/' ~ (ansible_user | default('sysadmin')) ~ '/.kube/config')) }}"
+      changed_when: false
+      failed_when: false
+      when:
+        - not ansible_check_mode
+        - k8s_slurped_admin_conf is defined
+        - k8s_slurped_admin_conf.content is defined

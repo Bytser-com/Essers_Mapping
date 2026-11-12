@@ -12,7 +12,7 @@ describe('Functional Tests - User Interactions & Workflows', () => {
     render(<RouterProvider router={memoryRouter} />)
 
     expect(screen.getByTestId('home-page')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /essers mapping/i })).toBeInTheDocument()
-    expect(screen.getByText(/welcome to essers mapping platform/i)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Home' })).toBeInTheDocument()
+    expect(screen.getByText(/upload een interface van een klant/i)).toBeInTheDocument()
   })
 })

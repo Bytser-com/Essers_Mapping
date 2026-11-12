@@ -10,9 +10,10 @@ import logging
 import random
 import re
 import time
-from typing import Callable
+from collections.abc import Callable
 
 import httpx
+
 try:
     from google import genai
     from google.genai import errors, types

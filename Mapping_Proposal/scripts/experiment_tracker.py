@@ -11,15 +11,14 @@ from __future__ import annotations
 import csv
 import json
 import os
-from datetime import datetime, timezone
-from pathlib import Path
 import time
+from datetime import UTC, datetime
+from pathlib import Path
 from uuid import uuid4
 
 TOKEN_FIELDS = ('input_tokens', 'output_tokens', 'total_tokens')
 COUNTER_FIELDS = ('api_attempts', 'api_retries', 'api_errors')
 METRIC_FIELDS = (*TOKEN_FIELDS, *COUNTER_FIELDS, 'usage_reports')
-
 COLUMNS = [
     'run_id', 'started_utc', 'finished_utc', 'status', 'model',
     'dataset_version', 'prompt_sha256', 'code_version',
@@ -44,7 +43,7 @@ COLUMNS = [
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec='seconds')
+    return datetime.now(UTC).isoformat(timespec='seconds')
 
 
 def _zero_metrics() -> dict:
@@ -65,8 +64,9 @@ class ExperimentTracker:
                  job_signature: str = '', started_monotonic: float | None = None,
                  started_utc: str | None = None):
         self.started = started_monotonic if started_monotonic is not None else time.perf_counter()
-        self.run_id = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S') + '_' + uuid4().hex[:8]
-        self.run_dir, self.root = run_dir, root
+        self.run_id = datetime.now(UTC).strftime('%Y%m%dT%H%M%S') + '_' + uuid4().hex[:8]
+        self.run_dir = run_dir
+        self.root = root
         self.data = {
             **{column: '' for column in COLUMNS}, **settings,
             'run_id': self.run_id,

@@ -1,0 +1,51 @@
+"""Routes for the proposals overview on the Home page (GET /proposals)."""
+from datetime import datetime
+
+from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel
+
+from scripts.errors import StorageError
+from services.proposals import AiStatus, ProposalStatus, ProposalStore
+from services.storage import proposal_storage
+
+router = APIRouter(prefix='/proposals', tags=['proposals'])
+
+
+# ---------------------------------------------------------------------------
+# Response models: they define the JSON the frontend receives and appear in /docs.
+# ---------------------------------------------------------------------------
+class ProposalOut(BaseModel):
+    id: str                          # "<customer folder>/v<version>", use it to open a proposal later
+    customer: str                    # column KLANT
+    version: int                     # column VERSIE (show as "v1")
+    uploaded_at: datetime            # column GEÜPLOAD OP (ISO 8601 with timezone)
+    status: ProposalStatus           # column STATUS (code; the frontend shows the Dutch label)
+    ai_status: AiStatus | None = None  # column AI-STATUS; null = "—"
+    can_open: bool                   # whether the "Openen" button is enabled
+
+
+class ProposalListOut(BaseModel):
+    total: int                       # number shown in the "Proposals" badge
+    proposals: list[ProposalOut]
+
+
+# Dependency: tests replace this with a store on a temporary folder.
+def get_proposal_store() -> ProposalStore:
+    return ProposalStore(proposal_storage())
+
+
+@router.get('', response_model=ProposalListOut)
+def list_proposals(
+    all_versions: bool = Query(False, description='Return every version instead of only the latest per customer.'),
+    store: ProposalStore = Depends(get_proposal_store),
+) -> ProposalListOut:
+    """Proposals on the shared storage, newest upload first (the Home overview)."""
+    try:
+        proposals = store.list_proposals(all_versions=all_versions)
+    except StorageError as error:
+        # SFTP server unreachable: the frontend shows its error message with a retry button.
+        raise HTTPException(status_code=503, detail=str(error)) from error
+    return ProposalListOut(
+        total=len(proposals),
+        proposals=[ProposalOut(**proposal.to_dict()) for proposal in proposals],
+    )

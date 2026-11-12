@@ -4,13 +4,16 @@ const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:4173'
 
 export default defineConfig({
   testDir: './e2e',
+  // Clean browser output without deleting Vitest and dependency-audit reports.
+  outputDir: './test-results/playwright',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 2 : undefined,
   reporter: [
     ['list'],
-    ['junit', { outputFile: 'test-results/playwright-junit.xml' }],
+    // Annotations (e.g. the Xray test_key) are written as properties, so Xray can link the results
+    ['junit', { outputFile: 'test-results/playwright-junit.xml', embedAnnotationsAsProperties: true }],
     ['html', { outputFolder: 'playwright-report', open: 'never' }],
   ],
   use: {

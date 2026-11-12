@@ -1,9 +1,28 @@
+import { useState } from 'react'
+import InterfaceUpload from '../components/InterfaceUpload'
+import ProposalOverview from '../components/ProposalOverview'
+import { uploadInterface } from '../services/uploadService'
+
 function Home() {
+  // Raised after every successful upload, so the proposals list shows the new proposal
+  const [uploads, setUploads] = useState(0)
+
+  async function upload(customerName: string, files: File[]) {
+    await uploadInterface(customerName, files)
+    setUploads((count) => count + 1)
+  }
+
   return (
-    <main data-testid="home-page" className="p-8">
-      <h1 className="text-3xl font-bold">Essers Mapping</h1>
-      <p className="mt-2 text-zinc-600 dark:text-zinc-400">Welcome to Essers Mapping platform.</p>
-    </main>
+    <div data-testid="home-page" className="flex flex-col gap-4 px-8 py-7">
+      <div className="flex flex-col gap-[6px]">
+        <h1 className="font-['Montserrat',sans-serif] text-[24px] font-bold">Home</h1>
+        <p className="text-[13px] text-[#6b6b73]">
+          Upload een interface van een klant. De AI maakt er een mapping proposal van.
+        </p>
+      </div>
+      <InterfaceUpload onUpload={upload} />
+      <ProposalOverview refreshKey={uploads} />
+    </div>
   )
 }
 

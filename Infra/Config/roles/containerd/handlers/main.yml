@@ -5,3 +5,4 @@
     name: containerd
     state: restarted
     daemon_reload: true
+  when: not (ansible_check_mode and (containerd_pkg.changed | default(false)))

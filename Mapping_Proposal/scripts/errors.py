@@ -5,11 +5,11 @@ used from the command line and (later) from an API without stopping the process.
 """
 from __future__ import annotations
 
-
 # Hierarchy:
 #   MappingError            -> catch this one to handle every expected tool error
 #   ├── ConfigError         -> fix .env or the command-line options
 #   ├── InputDataError      -> fix the files in data/
+#   ├── StorageError        -> SFTP server unreachable or a file could not be stored
 #   └── GeminiError         -> problem on Gemini's side
 #       └── QuotaExceededError -> wait and rerun the same command (resumes)
 
@@ -24,6 +24,10 @@ class ConfigError(MappingError):
 
 class InputDataError(MappingError):
     """Problems with the XML input folders or files."""
+
+
+class StorageError(MappingError):
+    """The shared storage (SFTP server) could not be reached or a file could not be stored."""
 
 
 class GeminiError(MappingError):

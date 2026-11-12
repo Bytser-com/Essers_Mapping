@@ -34,6 +34,8 @@ __pycache__/
 .eggs/
 dist/
 build/
+.venv/
+venv/
 
 ### Ruby ###
 *.gem
@@ -67,6 +69,7 @@ lerna-debug.log*
 tmp/
 temp/
 .swp
+data/
 
 ### BlueJ files ###
 *.ctxt
@@ -147,4 +150,8 @@ playwright-report/
 .scannerwork/
 .coverage
 coverage.xml
+htmlcov/
 .pytest_cache/
+
+# Testbestanden voor de lokale SFTP
+sftp-data/

@@ -4,3 +4,8 @@ openpyxl
 httpx
 pytest
 pytest-mock
+pytest-cov
+fastapi
+uvicorn
+python-multipart
+paramiko

@@ -3,7 +3,7 @@
 # COMMON TASKS: TIMEZONE, LOCALE & NTP SYNCHRONIZATION
 # ==============================================================================
 
-- name: Ensure system locale {{ system_locale }} is generated
+- name: Ensure system locale is generated
   community.general.locale_gen:
     name: "{{ system_locale }}"
     state: present
@@ -26,3 +26,4 @@
     name: systemd-timesyncd
     enabled: true
     state: started
+  when: not (ansible_check_mode and (base_packages_pkg.changed | default(false)))

@@ -16,6 +16,7 @@ class MappingSettings:
     batch_size: int = 10            # target fields per Gemini request
     target_segment: str = ''        # optional target segment filter, e.g. E1BPOBDLVITEM
     model: str = ''                 # optional override of GEMINI_MODEL
+    source_dir: Path | None = None  # folder with the new customer's XML (default: data/source)
 
     def validate(self) -> None:
         # Same rule as the original main.py: counts may be 0 where that has a

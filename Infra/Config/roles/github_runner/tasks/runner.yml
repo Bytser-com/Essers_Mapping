@@ -24,7 +24,9 @@
     owner: "{{ github_runner_user }}"
     group: "{{ github_runner_group }}"
     mode: "0644"
-  when: not runner_config_script.stat.exists
+  when:
+    - not runner_config_script.stat.exists
+    - not ansible_check_mode
 
 - name: Extract GitHub Actions runner installer
   ansible.builtin.unarchive:
@@ -34,12 +36,15 @@
     owner: "{{ github_runner_user }}"
     group: "{{ github_runner_group }}"
     creates: "{{ github_runner_install_dir }}/config.sh"
-  when: not runner_config_script.stat.exists
+  when:
+    - not runner_config_script.stat.exists
+    - not ansible_check_mode
 
 - name: Remove downloaded runner tarball after extraction
   ansible.builtin.file:
     path: "{{ github_runner_install_dir }}/actions-runner-linux-x64-{{ github_runner_version }}.tar.gz"
     state: absent
+  when: not ansible_check_mode
 
 - name: Check if runner is already registered with GitHub
   ansible.builtin.stat:
@@ -92,7 +97,9 @@
         else github_runner_registration_token
       }}
   no_log: true
-  when: not runner_registered.stat.exists
+  when:
+    - not runner_registered.stat.exists
+    - not ansible_check_mode
 
 - name: Configure and register GitHub Actions runner
   ansible.builtin.command:
@@ -110,18 +117,22 @@
   become: true
   become_user: "{{ github_runner_user }}"
   no_log: true
-  when: not runner_registered.stat.exists
+  when:
+    - not runner_registered.stat.exists
+    - not ansible_check_mode
 
 - name: Install GitHub Actions runner systemd service via svc.sh
   ansible.builtin.command:
     cmd: "{{ github_runner_install_dir }}/svc.sh install {{ github_runner_user }}"
     chdir: "{{ github_runner_install_dir }}"
     creates: "{{ github_runner_install_dir }}/.service"
+  when: not ansible_check_mode
 
 - name: Read systemd service unit name from .service file
   ansible.builtin.slurp:
     src: "{{ github_runner_install_dir }}/.service"
   register: runner_service_slurp
+  when: not ansible_check_mode
 
 - name: Ensure GitHub Actions runner service is enabled and running
   ansible.builtin.systemd:
@@ -129,4 +140,7 @@
     enabled: true
     state: started
     daemon_reload: true
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - runner_service_slurp is defined
+    - runner_service_slurp.content is defined
