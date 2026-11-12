@@ -5,6 +5,7 @@ import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalFileDet
 import be.essers.services.versioncontrol.domain.proposal.service.ProposalStorageService;
 import be.essers.services.versioncontrol.shared.exception.EntityNotFoundException;
 import be.essers.services.versioncontrol.shared.exception.GlobalExceptionHandler;
+import be.essers.services.versioncontrol.shared.exception.StorageException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -112,6 +113,29 @@ class ProposalControllerTest {
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].company").value("VanRoey"))
                 .andExpect(jsonPath("$[0].latestVersion").value("v3"));
+    }
+
+    @Test
+    @DisplayName("TC-57-09 GET /proposals without proposals returns HTTP 200 with an empty list")
+    void getProposals_noProposals_returnsEmptyList() throws Exception {
+        when(proposalStorageService.listProposals(null)).thenReturn(List.of());
+
+        mockMvc.perform(get("/proposals")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
+    }
+
+    @Test
+    @DisplayName("TC-57-10 GET /proposals returns 502 when the SFTP server cannot be reached")
+    void getProposals_sftpUnreachable_returns502() throws Exception {
+        when(proposalStorageService.listProposals(null))
+                .thenThrow(new StorageException("Unable to read proposals from SFTP storage: connection refused"));
+
+        mockMvc.perform(get("/proposals")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadGateway())
+                .andExpect(jsonPath("$.title").value("SFTP Storage Error"));
     }
 
     @Test

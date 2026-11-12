@@ -4,6 +4,9 @@ test.use({ timezoneId: 'Europe/Brussels', locale: 'nl-BE' })
 
 const PROPOSAL_API = '**/proposals*'
 
+// Links a test to its Test issue in Jira (Xray), so the results can be imported
+const xrayTest = (key) => ({ annotation: { type: 'test_key', description: key } })
+
 const MAPPING = { id: 'MP-001', bronveld: 'Klant/Nummer', doelveld: 'Klantnummer', zekerheid: 92, opmerking: '' }
 const REVIEW_MAPPING = { id: 'MP-002', bronveld: null, doelveld: 'Leverdatum', zekerheid: null, opmerking: '' }
 
@@ -38,8 +41,8 @@ test.describe('End-to-End (E2E) - Proposal content', () => {
     await expect(page.getByText('Klant/Nummer')).toBeVisible()
   })
 
-  test('blocks approving while a field needs review', async ({ page }) => {
-    // Arrange
+  test('TC-89-03 approving is only possible without REVIEW_REQUIRED', xrayTest('IT2627T06-138'), async ({ page }) => {
+    // Arrange: a proposal with a field that needs review
     await mockProposal(page, { json: { ...PROPOSAL, mappings:[REVIEW_MAPPING] } })
 
     // Act
@@ -48,6 +51,17 @@ test.describe('End-to-End (E2E) - Proposal content', () => {
     // Assert
     await expect(page.getByText('REVIEW_REQUIRED', { exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Goedkeuren' })).toBeDisabled()
+
+    // Arrange: the same proposal with all fields filled in
+    await page.unroute(PROPOSAL_API)
+    await mockProposal(page, { json: PROPOSAL })
+
+    // Act
+    await page.reload()
+
+    // Assert
+    await expect(page.getByText('Klant/Nummer')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Goedkeuren' })).toBeEnabled()
   })
 
   test('shows an error for an unknown company', async ({ page }) => {
