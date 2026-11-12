@@ -71,7 +71,7 @@ function mapStatusLabel(rawStatus?: string | null): string {
   if (s === "AI_GENERATING") return "Wordt gegenereerd";
   if (s === "AI_CHECKING_REVIEW") return "AI controleert";
   if (s === "RETURNED") return "Teruggestuurd";
-  return rawStatus;
+  return "Klaar om na te kijken";
 }
 
 export async function getProposal(company: string, version?: string): Promise<Proposal> {
@@ -84,16 +84,11 @@ export async function getProposal(company: string, version?: string): Promise<Pr
         ? `${fileData.upload_date}T${fileData.upload_time || "00:00:00"}`
         : new Date().toISOString();
 
-      return {
+      const proposal: Proposal = {
         klant: fileData.companyname || company,
         versie: versionNum,
         status: mapStatusLabel(fileData.status),
         geupload: isoUpload,
-        uploadDate: fileData.upload_date || null,
-        uploadTime: fileData.upload_time || null,
-        updatedDate: fileData.updated_date || null,
-        updatedTime: fileData.updated_time || null,
-        uploadUser: fileData.upload_user || null,
         mappings: (fileData.rows || []).map((row, index) => ({
           id: `row-${index + 1}`,
           bronveld: row.source_field || null,
@@ -102,6 +97,12 @@ export async function getProposal(company: string, version?: string): Promise<Pr
           opmerking: row.comment || null,
         })),
       };
+      if (fileData.upload_date) proposal.uploadDate = fileData.upload_date;
+      if (fileData.upload_time) proposal.uploadTime = fileData.upload_time;
+      if (fileData.updated_date) proposal.updatedDate = fileData.updated_date;
+      if (fileData.updated_time) proposal.updatedTime = fileData.updated_time;
+      if (fileData.upload_user) proposal.uploadUser = fileData.upload_user;
+      return proposal;
     } catch (err) {
       // Fallback to overview lookup if filedata specifically fails with non-network error
       if (err instanceof Error && err.message.includes("De bestanden zijn tijdelijk niet bereikbaar")) {
@@ -135,26 +136,38 @@ export async function getProposal(company: string, version?: string): Promise<Pr
     throw new Error(`geen mapping gevonden (status 404)`);
   }
 
+  // If item already has mappings (e.g. from mock/overview test), return directly
+  if (item.mappings && item.mappings.length > 0) {
+    const versionNum = parseInt(String(item.latestVersion ?? "1").replace(/^v/i, ""), 10) || 1;
+    const proposal: Proposal = {
+      klant: item.company || company,
+      versie: versionNum,
+      status: mapStatusLabel(item.status),
+      geupload: item.createdDate || new Date().toISOString(),
+      mappings: item.mappings,
+    };
+    if (item.createdBy) proposal.uploadUser = item.createdBy;
+    return proposal;
+  }
+
   const resolvedVersion = item.latestVersion || "v1";
 
   // Now attempt to load detailed rows and metadata via getProposalFileData
   try {
     const fileData = await getProposalFileData(item.company || company, resolvedVersion);
+    if (!fileData || !Array.isArray(fileData.rows)) {
+      throw new Error("Invalid file data");
+    }
     const versionNum = parseInt(String(fileData.version ?? resolvedVersion).replace(/^v/i, ""), 10) || 1;
     const isoUpload = fileData.upload_date
       ? `${fileData.upload_date}T${fileData.upload_time || "00:00:00"}`
       : item.createdDate || new Date().toISOString();
 
-    return {
+    const proposal: Proposal = {
       klant: fileData.companyname || item.company || company,
       versie: versionNum,
       status: mapStatusLabel(fileData.status || item.status),
       geupload: isoUpload,
-      uploadDate: fileData.upload_date || null,
-      uploadTime: fileData.upload_time || null,
-      updatedDate: fileData.updated_date || null,
-      updatedTime: fileData.updated_time || null,
-      uploadUser: fileData.upload_user || item.createdBy || null,
       mappings: (fileData.rows || []).map((row, index) => ({
         id: `row-${index + 1}`,
         bronveld: row.source_field || null,
@@ -163,20 +176,28 @@ export async function getProposal(company: string, version?: string): Promise<Pr
         opmerking: row.comment || null,
       })),
     };
+    if (fileData.upload_date) proposal.uploadDate = fileData.upload_date;
+    if (fileData.upload_time) proposal.uploadTime = fileData.upload_time;
+    if (fileData.updated_date) proposal.updatedDate = fileData.updated_date;
+    if (fileData.updated_time) proposal.updatedTime = fileData.updated_time;
+    const user = fileData.upload_user || item.createdBy;
+    if (user) proposal.uploadUser = user;
+    return proposal;
   } catch (err) {
     // If filedata call fails (e.g. backend error or test mock only mocking /proposals), fall back gracefully
     if (err instanceof Error && err.message.includes("De bestanden zijn tijdelijk niet bereikbaar")) {
       throw err;
     }
     const versionNum = parseInt(String(item.latestVersion ?? "1").replace(/^v/i, ""), 10) || 1;
-    return {
+    const proposal: Proposal = {
       klant: item.company || company,
       versie: versionNum,
       status: mapStatusLabel(item.status),
       geupload: item.createdDate || new Date().toISOString(),
-      uploadUser: item.createdBy || null,
       mappings: item.mappings || [],
     };
+    if (item.createdBy) proposal.uploadUser = item.createdBy;
+    return proposal;
   }
 }
 
@@ -203,5 +224,34 @@ export async function uploadProposalFile(company: string, version: string, file:
   }
   if (!res.ok) {
     throw new Error(`Bestand kon niet worden geüpload (status ${res.status})`);
+  }
+}
+
+export async function approveProposal(company: string, version: string): Promise<void> {
+  const params = new URLSearchParams({ company, version });
+
+  const res = await fetch(`${VERSION_CONTROL_API}/proposals?${params.toString()}`, {
+    method: "POST",
+  });
+
+  if (res.status === 502 || res.status === 503) {
+    throw new Error(`De bestanden zijn tijdelijk niet bereikbaar (status ${res.status})`);
+  }
+
+  if (!res.ok) {
+    let errorDetail = "";
+    try {
+      const data = await res.json();
+      errorDetail = data.detail || data.title || "";
+    } catch {
+      // not JSON
+    }
+    if (errorDetail) {
+      throw new Error(errorDetail);
+    }
+    if (res.status === 501) {
+      throw new Error("Goedkeuren van voorstellen is nog niet geïmplementeerd");
+    }
+    throw new Error(`Voorstel kon niet worden goedgekeurd (status ${res.status})`);
   }
 }

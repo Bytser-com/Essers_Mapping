@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { getProposal, getProposalFile, VERSION_CONTROL_API } from '../../services/proposalService'
+import { approveProposal, getProposal, getProposalFile, VERSION_CONTROL_API } from '../../services/proposalService'
 
 // Fake fetch response: only the fields proposalService reads
 function respond(status: number, body?: unknown) {
@@ -207,6 +207,57 @@ describe('proposalService', () => {
 
       // Act + Assert
       await expect(getProposalFile('brunos', 'v1')).rejects.toThrow('Bestand kon niet worden opgehaald (status 404)')
+    })
+  })
+
+  describe('approveProposal', () => {
+    it('sends a POST request to approve the proposal', async () => {
+      // Arrange
+      vi.stubGlobal('fetch', respond(200))
+
+      // Act
+      await approveProposal('Brunos', 'v3')
+
+      // Assert
+      expect(fetch).toHaveBeenCalledWith(
+        `${VERSION_CONTROL_API}/proposals?company=Brunos&version=v3`,
+        { method: 'POST' }
+      )
+    })
+
+    it('throws backend problem detail when 501 Not Implemented', async () => {
+      // Arrange
+      const problemDetail = {
+        title: 'Not Implemented',
+        status: 501,
+        detail: "Approving proposal for company 'Brunos' and version 'v3' is not implemented yet",
+      }
+      vi.stubGlobal('fetch', respond(501, problemDetail))
+
+      // Act + Assert
+      await expect(approveProposal('Brunos', 'v3')).rejects.toThrow(
+        "Approving proposal for company 'Brunos' and version 'v3' is not implemented yet"
+      )
+    })
+
+    it('throws generic error when 501 has no detail', async () => {
+      // Arrange
+      vi.stubGlobal('fetch', respond(501))
+
+      // Act + Assert
+      await expect(approveProposal('Brunos', 'v3')).rejects.toThrow(
+        'Goedkeuren van voorstellen is nog niet geïmplementeerd'
+      )
+    })
+
+    it('throws temporary unreachable error on 502 or 503', async () => {
+      // Arrange
+      vi.stubGlobal('fetch', respond(503))
+
+      // Act + Assert
+      await expect(approveProposal('Brunos', 'v3')).rejects.toThrow(
+        'De bestanden zijn tijdelijk niet bereikbaar (status 503)'
+      )
     })
   })
 

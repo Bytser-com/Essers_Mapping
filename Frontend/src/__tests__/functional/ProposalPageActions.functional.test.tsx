@@ -4,13 +4,15 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock, MockInstance } from 'vitest'
 import ProposalPage from '../../pages/ProposalPage'
-import { getProposalFile } from '../../services/proposalService'
+import { approveProposal, getProposalFile } from '../../services/proposalService'
 import { useProposalStore } from '../../stores/proposalStore'
 import type { Proposal } from '../../types/proposal'
 
 vi.mock('../../services/proposalService', () => ({
   getProposal: vi.fn(),
   getProposalFile: vi.fn(),
+  uploadProposalFile: vi.fn(),
+  approveProposal: vi.fn(),
 }))
 
 const PROPOSAL: Proposal = {
@@ -168,6 +170,37 @@ describe('ProposalPage actions', () => {
 
     // Assert
     expect(onApprove).toHaveBeenCalledTimes(1)
+  })
+
+  it('calls approveProposal with company and version when "Goedkeuren" is clicked without onApprove prop', async () => {
+    // Arrange
+    vi.mocked(approveProposal).mockResolvedValue(undefined)
+    renderPage()
+
+    // Act
+    await userEvent.click(screen.getByRole('button', { name: 'Goedkeuren' }))
+
+    // Assert
+    await waitFor(() =>
+      expect(approveProposal).toHaveBeenCalledWith('brunos', 'v2'),
+    )
+  })
+
+  it('displays the error banner when approving fails', async () => {
+    // Arrange
+    const errorMsg = "Approving proposal for company 'brunos' and version 'v2' is not implemented yet"
+    vi.mocked(approveProposal).mockRejectedValue(new Error(errorMsg))
+    renderPage()
+
+    // Act
+    await userEvent.click(screen.getByRole('button', { name: 'Goedkeuren' }))
+
+    // Assert
+    await waitFor(() => {
+      const alert = screen.getByRole('alert')
+      expect(alert).toBeInTheDocument()
+      expect(alert).toHaveTextContent(errorMsg)
+    })
   })
 
   it('shows a dash for an invalid upload date', () => {

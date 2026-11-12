@@ -1,5 +1,6 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import ProposalPage from '../../pages/ProposalPage'
@@ -66,5 +67,54 @@ describe('ProposalPage integration', () => {
     // Assert
     expect(await screen.findByText('De bestanden zijn tijdelijk niet bereikbaar (status 503)')).toBeInTheDocument()
     expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/proposals?company=brunos'))
+  })
+
+  it('displays the 501 error alert banner when clicking Goedkeuren', async () => {
+    // Arrange
+    const problemDetail = {
+      type: 'about:blank',
+      title: 'Not Implemented',
+      status: 501,
+      detail: "Approving proposal for company 'brunos' and version 'v1' is not implemented yet",
+      company: 'brunos',
+      version: 'v1',
+    }
+
+    const fetchMock = vi.fn().mockImplementation((url, options) => {
+      if (options?.method === 'POST') {
+        return Promise.resolve({
+          ok: false,
+          status: 501,
+          json: async () => problemDetail,
+        })
+      }
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        json: async () => PROPOSAL,
+      })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    // Act
+    renderPage()
+    expect(await screen.findByText('brunos · v1')).toBeInTheDocument()
+
+    const button = screen.getByRole('button', { name: 'Goedkeuren' })
+    await userEvent.click(button)
+
+    // Assert
+    await waitFor(() => {
+      const alert = screen.getByRole('alert')
+      expect(alert).toBeInTheDocument()
+      expect(alert).toHaveTextContent(
+        "Approving proposal for company 'brunos' and version 'v1' is not implemented yet"
+      )
+    })
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/proposals?company=brunos&version=v1'),
+      { method: 'POST' }
+    )
   })
 })

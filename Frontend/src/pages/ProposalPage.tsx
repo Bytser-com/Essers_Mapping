@@ -8,6 +8,7 @@ import iconSuccess from "../assets/home/icon-success.svg";
 
 type ProposalPageProps = {
   onDownload?: () => void;
+  onUpload?: () => void;
   onApprove?: () => void;
 };
 
@@ -67,7 +68,7 @@ function Confidence({ value }: Readonly<ConfidenceProps>) {
   );
 }
 
-export default function ProposalPage({ onDownload, onApprove }: Readonly<ProposalPageProps>) {
+export default function ProposalPage({ onDownload, onUpload, onApprove }: Readonly<ProposalPageProps>) {
   const { company } = useParams();
   const proposal = useProposalStore((state) => state.proposal);
   const loading = useProposalStore((state) => state.loading);
@@ -75,6 +76,7 @@ export default function ProposalPage({ onDownload, onApprove }: Readonly<Proposa
   const fetchProposal = useProposalStore((state) => state.fetchProposal);
   const downloadProposal = useProposalStore((state) => state.downloadProposal);
   const uploadProposal = useProposalStore((state) => state.uploadProposal);
+  const approveProposal = useProposalStore((state) => state.approveProposal);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -116,6 +118,15 @@ export default function ProposalPage({ onDownload, onApprove }: Readonly<Proposa
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
+  }
+
+  async function handleApprove() {
+    if (onApprove) {
+      onApprove();
+      return;
+    }
+    if (!proposal || !company) return;
+    await approveProposal(company, `v${proposal.versie}`);
   }
 
   function closeUploadDialog() {
@@ -193,17 +204,17 @@ export default function ProposalPage({ onDownload, onApprove }: Readonly<Proposa
             </span>
           </div>
 
-          <p className="m-0 text-[13px] text-grey">Geüpload op {formatUploadDate(proposal.geupload)} door {proposal.uploadUser ?? "onbekend"}</p>
+          <p className="m-0 text-[13px] text-grey">{`Geüpload op ${formatUploadDate(proposal.geupload)}${proposal.uploadUser ? ` door ${proposal.uploadUser}` : ""}`}</p>
         </div>
 
         <div className="flex items-center gap-2.5">
           <button type="button" className="btn" onClick={handleDownload} title="Download mappingproposal.xlsx">
             Download Excel
           </button>
-          <button type="button" className="btn" onClick={() => setShowUploadDialog(true)}>
+          <button type="button" className="btn" onClick={() => { onUpload?.(); setShowUploadDialog(true); }}>
             Aangepaste Excel uploaden
           </button>
-          <button type="button" className="btn btn--primary" onClick={onApprove} disabled={hasReviewFields}>
+          <button type="button" className="btn btn--primary" onClick={handleApprove} disabled={hasReviewFields}>
             Goedkeuren
           </button>
         </div>

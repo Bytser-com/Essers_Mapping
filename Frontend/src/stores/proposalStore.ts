@@ -1,6 +1,12 @@
 import { create } from "zustand";
 import type { Proposal } from "../types/proposal";
-import { getProposal, getProposalFile, uploadProposalFile, type ProposalFileDetailsDto } from "../services/proposalService";
+import {
+  getProposal,
+  getProposalFile,
+  uploadProposalFile,
+  approveProposal,
+  type ProposalFileDetailsDto,
+} from "../services/proposalService";
 
 type ProposalState = {
   proposal: Proposal | null;
@@ -10,6 +16,7 @@ type ProposalState = {
   fetchProposal: (company: string) => Promise<void>;
   downloadProposal: (company: string, version: string) => Promise<ProposalFileDetailsDto | null>;
   uploadProposal: (company: string, version: string, file: File) => Promise<boolean>;
+  approveProposal: (company: string, version: string) => Promise<boolean>;
 };
 
 export const useProposalStore = create<ProposalState>()((set, get) => ({
@@ -33,6 +40,7 @@ export const useProposalStore = create<ProposalState>()((set, get) => ({
     try {
       return await getProposalFile(company, version);
     } catch (err) {
+      console.error("Failed to download proposal Excel file:", err);
       set({ actionError: err instanceof Error ? err.message : "Onbekende fout" });
       return null;
     }
@@ -42,6 +50,18 @@ export const useProposalStore = create<ProposalState>()((set, get) => ({
     set({ actionError: null });
     try {
       await uploadProposalFile(company, version, file);
+      await get().fetchProposal(company);
+      return true;
+    } catch (err) {
+      set({ actionError: err instanceof Error ? err.message : "Onbekende fout" });
+      return false;
+    }
+  },
+
+  approveProposal: async (company, version) => {
+    set({ actionError: null });
+    try {
+      await approveProposal(company, version);
       await get().fetchProposal(company);
       return true;
     } catch (err) {
