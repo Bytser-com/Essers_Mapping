@@ -11,4 +11,5 @@ public interface ProposalStorageService {
     ProposalFileDetailsDto getProposalFile(String company, String version);
     ProposalFileDataDto getProposalFileData(String company, String version);
     ProposalFileDetailsDto overwriteProposalFile(String company, String version, byte[] fileBytes, String originalFilename);
+    void deleteProposal(String company, String version);
 }

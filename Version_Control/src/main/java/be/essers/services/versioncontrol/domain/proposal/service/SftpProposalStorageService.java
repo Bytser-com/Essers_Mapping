@@ -17,11 +17,13 @@ import org.apache.sshd.sftp.client.SftpClient;
 import org.apache.sshd.sftp.common.SftpConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.integration.file.remote.session.Session;
 import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -383,6 +385,81 @@ public class SftpProposalStorageService implements ProposalStorageService {
             log.error("Failed to overwrite proposal file for company '{}' and version '{}': {}", company, version, e.getMessage(), e);
             throw new StorageException("Unable to overwrite proposal file on SFTP storage: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void deleteProposal(String company, String version) {
+        if (company == null || company.isBlank()) {
+            throw new IllegalArgumentException("Company parameter must not be empty");
+        }
+        if (version == null || version.isBlank()) {
+            throw new IllegalArgumentException("Version parameter must not be empty");
+        }
+
+        String sanitizedCompany = sanitizePathSegment(company);
+        String sanitizedVersion = sanitizePathSegment(version);
+
+        try {
+            String rootPath = normalizePath(properties.basePath());
+            String resolvedCompany = resolveDirectoryName(rootPath, sanitizedCompany);
+            if (resolvedCompany == null) {
+                throw new EntityNotFoundException("Company directory '" + company + "' does not exist");
+            }
+
+            String companyPath = rootPath + "/" + resolvedCompany;
+            String resolvedVersion = resolveDirectoryName(companyPath, sanitizedVersion);
+            if (resolvedVersion == null) {
+                throw new EntityNotFoundException("Version directory '" + version + "' does not exist for company '" + resolvedCompany + "'");
+            }
+
+            String versionPath = companyPath + "/" + resolvedVersion;
+            SftpClient.DirEntry[] versionEntries = template.list(versionPath);
+
+            template.execute(session -> {
+                if (versionEntries != null) {
+                    for (SftpClient.DirEntry entry : versionEntries) {
+                        String name = entry.getFilename();
+                        if (isSpecialDirectory(name)) {
+                            continue;
+                        }
+                        String childPath = versionPath + "/" + name;
+                        if (isDirectory(entry)) {
+                            deleteRecursively(session, childPath);
+                        } else {
+                            session.remove(childPath);
+                        }
+                    }
+                }
+                session.rmdir(versionPath);
+                return null;
+            });
+
+            log.info("Successfully deleted proposal version directory '{}' from SFTP", versionPath);
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Failed to delete proposal for company '{}' and version '{}': {}", company, version, e.getMessage(), e);
+            throw new StorageException("Unable to delete proposal from SFTP storage: " + e.getMessage(), e);
+        }
+    }
+
+    private void deleteRecursively(Session<SftpClient.DirEntry> session, String path) throws IOException {
+        SftpClient.DirEntry[] entries = session.list(path);
+        if (entries != null) {
+            for (SftpClient.DirEntry entry : entries) {
+                String name = entry.getFilename();
+                if (isSpecialDirectory(name)) {
+                    continue;
+                }
+                String childPath = path + "/" + name;
+                if (isDirectory(entry)) {
+                    deleteRecursively(session, childPath);
+                } else {
+                    session.remove(childPath);
+                }
+            }
+        }
+        session.rmdir(path);
     }
 
     private void validateExcelBytes(byte[] fileBytes) {

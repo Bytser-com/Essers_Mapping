@@ -25,7 +25,10 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -462,5 +465,102 @@ class ProposalControllerTest {
                         .param("company", "vanroey"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.title").value("Missing Required Parameter"));
+    }
+
+    @Test
+    @DisplayName("DELETE /Proposals with matching deleteCheck returns 204 No Content")
+    void deleteProposal_validRequest_returns204NoContent() throws Exception {
+        mockMvc.perform(delete("/Proposals")
+                        .param("company", "vanroey")
+                        .param("version", "v2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"deleteCheck\":\"vanroey\"}"))
+                .andExpect(status().isNoContent());
+
+        verify(proposalStorageService).deleteProposal("vanroey", "v2");
+    }
+
+    @Test
+    @DisplayName("DELETE /proposals (lowercase) with matching deleteCheck returns 204 No Content")
+    void deleteProposal_lowercase_returns204NoContent() throws Exception {
+        mockMvc.perform(delete("/proposals")
+                        .param("company", "Google")
+                        .param("version", "v1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"deleteCheck\":\"Google\"}"))
+                .andExpect(status().isNoContent());
+
+        verify(proposalStorageService).deleteProposal("Google", "v1");
+    }
+
+    @Test
+    @DisplayName("DELETE /Proposals returns 400 when deleteCheck does not match company")
+    void deleteProposal_mismatchedDeleteCheck_returns400() throws Exception {
+        mockMvc.perform(delete("/Proposals")
+                        .param("company", "vanroey")
+                        .param("version", "v2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"deleteCheck\":\"wrong-company\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"))
+                .andExpect(jsonPath("$.detail").value("Confirmation check failed: deleteCheck ('wrong-company') must match company name ('vanroey')"));
+    }
+
+    @Test
+    @DisplayName("DELETE /Proposals returns 400 when deleteCheck is blank")
+    void deleteProposal_blankDeleteCheck_returns400() throws Exception {
+        mockMvc.perform(delete("/Proposals")
+                        .param("company", "vanroey")
+                        .param("version", "v2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"deleteCheck\":\"\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("DELETE /Proposals returns 400 when body is missing")
+    void deleteProposal_missingBody_returns400() throws Exception {
+        mockMvc.perform(delete("/Proposals")
+                        .param("company", "vanroey")
+                        .param("version", "v2"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Body"));
+    }
+
+    @Test
+    @DisplayName("DELETE /Proposals returns 400 when company param is missing")
+    void deleteProposal_missingCompany_returns400() throws Exception {
+        mockMvc.perform(delete("/Proposals")
+                        .param("version", "v2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"deleteCheck\":\"vanroey\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Missing Required Parameter"));
+    }
+
+    @Test
+    @DisplayName("DELETE /Proposals returns 400 when version param is missing")
+    void deleteProposal_missingVersion_returns400() throws Exception {
+        mockMvc.perform(delete("/Proposals")
+                        .param("company", "vanroey")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"deleteCheck\":\"vanroey\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Missing Required Parameter"));
+    }
+
+    @Test
+    @DisplayName("DELETE /Proposals returns 404 when company or version does not exist")
+    void deleteProposal_entityNotFound_returns404() throws Exception {
+        doThrow(new EntityNotFoundException("Company directory 'vanroey' does not exist"))
+                .when(proposalStorageService).deleteProposal("vanroey", "v2");
+
+        mockMvc.perform(delete("/Proposals")
+                        .param("company", "vanroey")
+                        .param("version", "v2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"deleteCheck\":\"vanroey\"}"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.title").value("Entity Not Found"));
     }
 }

@@ -933,4 +933,61 @@ class SftpProposalStorageServiceTest {
         assertThrows(EntityNotFoundException.class, () ->
                 service.overwriteProposalFile("NonExisting", "v1", validExcel, null));
     }
+
+    @Test
+    @DisplayName("deleteProposal deletes files and rmdir version directory")
+    void deleteProposal_validParams_deletesFilesAndDirectory() throws Exception {
+        String company = "vanroey";
+        String version = "v2";
+
+        SftpClient.DirEntry compEntry = createEntry("vanroey", true);
+        when(template.list("/Proposals")).thenReturn(new SftpClient.DirEntry[]{compEntry});
+
+        SftpClient.DirEntry v2Entry = createEntry("v2", true);
+        when(template.list("/Proposals/vanroey")).thenReturn(new SftpClient.DirEntry[]{v2Entry});
+
+        SftpClient.DirEntry excelFile = createEntry("mappingproposal.xlsx", false);
+        SftpClient.DirEntry metaFile = createEntry("metadata.json", false);
+        SftpClient.DirEntry dotDir = createEntry(".", true);
+        when(template.list("/Proposals/vanroey/v2")).thenReturn(new SftpClient.DirEntry[]{excelFile, metaFile, dotDir});
+
+        Session<SftpClient.DirEntry> session = org.mockito.Mockito.mock(Session.class);
+        doAnswer(invocation -> {
+            SessionCallback<SftpClient.DirEntry, Object> action = invocation.getArgument(0);
+            return action.doInSession(session);
+        }).when(template).execute(any());
+
+        service.deleteProposal(company, version);
+
+        org.mockito.Mockito.verify(session).remove("/Proposals/vanroey/v2/mappingproposal.xlsx");
+        org.mockito.Mockito.verify(session).remove("/Proposals/vanroey/v2/metadata.json");
+        org.mockito.Mockito.verify(session).rmdir("/Proposals/vanroey/v2");
+    }
+
+    @Test
+    @DisplayName("deleteProposal throws EntityNotFoundException when company does not exist")
+    void deleteProposal_companyNotFound_throwsEntityNotFound() {
+        when(template.list("/Proposals")).thenReturn(new SftpClient.DirEntry[0]);
+
+        assertThrows(EntityNotFoundException.class, () ->
+                service.deleteProposal("NonExisting", "v1"));
+    }
+
+    @Test
+    @DisplayName("deleteProposal throws EntityNotFoundException when version does not exist")
+    void deleteProposal_versionNotFound_throwsEntityNotFound() {
+        SftpClient.DirEntry compEntry = createEntry("vanroey", true);
+        when(template.list("/Proposals")).thenReturn(new SftpClient.DirEntry[]{compEntry});
+        when(template.list("/Proposals/vanroey")).thenReturn(new SftpClient.DirEntry[0]);
+
+        assertThrows(EntityNotFoundException.class, () ->
+                service.deleteProposal("vanroey", "v99"));
+    }
+
+    @Test
+    @DisplayName("deleteProposal throws IllegalArgumentException when parameters are blank")
+    void deleteProposal_blankParams_throwsIllegalArgument() {
+        assertThrows(IllegalArgumentException.class, () -> service.deleteProposal("", "v1"));
+        assertThrows(IllegalArgumentException.class, () -> service.deleteProposal("vanroey", ""));
+    }
 }

@@ -1,13 +1,16 @@
 package be.essers.services.versioncontrol.domain.proposal.api;
 
 import be.essers.services.versioncontrol.domain.proposal.api.dto.CompanyProposalOverviewDto;
+import be.essers.services.versioncontrol.domain.proposal.api.dto.DeleteProposalRequest;
 import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalFileDataDto;
 import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalFileDetailsDto;
 import be.essers.services.versioncontrol.domain.proposal.service.ProposalStorageService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -152,5 +155,39 @@ public class ProposalController {
         problemDetail.setProperty("company", company);
         problemDetail.setProperty("version", version);
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(problemDetail);
+    }
+
+    /**
+     * DELETE /proposals?company=vanroey&version=v2
+     * DELETE /Proposals?company=vanroey&version=v2
+     *
+     * Completely deletes this proposal from the SFTP server.
+     * Both query parameters (company, version) are required.
+     * In the request body, expects a JSON object with a deleteCheck string
+     * which must exactly match the company name to confirm deletion.
+     */
+    @DeleteMapping
+    public ResponseEntity<Void> deleteProposal(
+            @RequestParam String company,
+            @RequestParam String version,
+            @Valid @RequestBody DeleteProposalRequest request
+    ) {
+        if (company == null || company.isBlank()) {
+            throw new IllegalArgumentException("Company parameter must not be empty");
+        }
+        if (version == null || version.isBlank()) {
+            throw new IllegalArgumentException("Version parameter must not be empty");
+        }
+        if (request == null || request.deleteCheck() == null || request.deleteCheck().isBlank()) {
+            throw new IllegalArgumentException("Request body must contain deleteCheck");
+        }
+        if (!company.equals(request.deleteCheck())) {
+            throw new IllegalArgumentException(
+                    "Confirmation check failed: deleteCheck ('" + request.deleteCheck() + "') must match company name ('" + company + "')"
+            );
+        }
+
+        proposalStorageService.deleteProposal(company, version);
+        return ResponseEntity.noContent().build();
     }
 }
