@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent, type DragEvent } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useProposalStore } from "../stores/proposalStore";
 import iconUpload from "../assets/home/icon-upload.svg";
 import iconError from "../assets/home/icon-error.svg";
@@ -10,6 +10,7 @@ type ProposalPageProps = {
   onDownload?: () => void;
   onUpload?: () => void;
   onApprove?: () => void;
+  onDelete?: () => void;
 };
 
 type ConfidenceProps = {
@@ -68,7 +69,8 @@ function Confidence({ value }: Readonly<ConfidenceProps>) {
   );
 }
 
-export default function ProposalPage({ onDownload, onUpload, onApprove }: Readonly<ProposalPageProps>) {
+export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete }: Readonly<ProposalPageProps>) {
+  const navigate = useNavigate();
   const { company } = useParams();
   const proposal = useProposalStore((state) => state.proposal);
   const loading = useProposalStore((state) => state.loading);
@@ -77,9 +79,13 @@ export default function ProposalPage({ onDownload, onUpload, onApprove }: Readon
   const downloadProposal = useProposalStore((state) => state.downloadProposal);
   const uploadProposal = useProposalStore((state) => state.uploadProposal);
   const approveProposal = useProposalStore((state) => state.approveProposal);
+  const deleteProposal = useProposalStore((state) => state.deleteProposal);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
   const actionError = useProposalStore((state) => state.actionError);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -127,6 +133,29 @@ export default function ProposalPage({ onDownload, onUpload, onApprove }: Readon
     }
     if (!proposal || !company) return;
     await approveProposal(company, `v${proposal.versie}`);
+  }
+
+  function openDeleteDialog() {
+    if (onDelete) {
+      onDelete();
+      return;
+    }
+    setDeleteConfirmText("");
+    setShowDeleteDialog(true);
+  }
+
+  async function handleConfirmDelete() {
+    if (!proposal || !company) return;
+    setIsDeleting(true);
+    const success = await deleteProposal(company, `v${proposal.versie}`, deleteConfirmText);
+    setIsDeleting(false);
+    if (success) {
+      setShowDeleteDialog(false);
+      setDeleteConfirmText("");
+      navigate("/");
+    } else {
+      setShowDeleteDialog(false);
+    }
   }
 
   function closeUploadDialog() {
@@ -216,6 +245,14 @@ export default function ProposalPage({ onDownload, onUpload, onApprove }: Readon
           </button>
           <button type="button" className="btn btn--primary" onClick={handleApprove} disabled={hasReviewFields}>
             Goedkeuren
+          </button>
+          <button
+            type="button"
+            className="btn btn--danger"
+            onClick={openDeleteDialog}
+            title="Voorstel verwijderen"
+          >
+            Verwijderen
           </button>
         </div>
       </header>
@@ -408,8 +445,63 @@ export default function ProposalPage({ onDownload, onUpload, onApprove }: Readon
             </div>
           </dialog>
         </div>
-      )
-      }
+      )}
+
+      {showDeleteDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-anthracite/45">
+          <dialog
+            open
+            aria-labelledby="delete-dialog-title"
+            className="static flex flex-col gap-4 w-120 max-w-[calc(100vw-32px)] m-0 p-7 rounded-large bg-white"
+          >
+            <h2 id="delete-dialog-title" className="m-0 font-title text-xl font-bold text-red">
+              Voorstel verwijderen
+            </h2>
+
+            <p className="m-0 text-sm text-grey">
+              Are you sure you want to delete this? Deze actie kan niet ongedaan worden gemaakt.
+            </p>
+
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="delete-check-input" className="text-xs font-semibold text-anthracite">
+                Typ de bedrijfsnaam <strong>{company || proposal.klant}</strong> ter bevestiging:
+              </label>
+              <input
+                id="delete-check-input"
+                type="text"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                placeholder={company || proposal.klant}
+                className="px-3.5 py-2.5 border border-line-grey rounded-small text-sm outline-none focus:border-anthracite"
+                disabled={isDeleting}
+                autoFocus
+              />
+            </div>
+
+            <div className="flex justify-end gap-2.5">
+              <button
+                type="button"
+                className="btn"
+                onClick={() => {
+                  setShowDeleteDialog(false);
+                  setDeleteConfirmText("");
+                }}
+                disabled={isDeleting}
+              >
+                Annuleren
+              </button>
+              <button
+                type="button"
+                className="btn btn--danger"
+                onClick={() => void handleConfirmDelete()}
+                disabled={isDeleting || !deleteConfirmText}
+              >
+                {isDeleting ? "Verwijderen…" : "Proceed"}
+              </button>
+            </div>
+          </dialog>
+        </div>
+      )}
     </main >
   );
 }

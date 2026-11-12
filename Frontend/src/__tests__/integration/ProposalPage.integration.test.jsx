@@ -117,4 +117,94 @@ describe('ProposalPage integration', () => {
       { method: 'POST' }
     )
   })
+
+  it('deletes proposal and navigates home when confirming delete with matching company name', async () => {
+    // Arrange
+    const fetchMock = vi.fn().mockImplementation((url, options) => {
+      if (options?.method === 'DELETE') {
+        return Promise.resolve({
+          ok: true,
+          status: 204,
+        })
+      }
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        json: async () => PROPOSAL,
+      })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    // Act
+    renderPage()
+    expect(await screen.findByText('brunos · v1')).toBeInTheDocument()
+
+    // Click delete button to open modal
+    await userEvent.click(screen.getByRole('button', { name: 'Verwijderen' }))
+    expect(screen.getByText(/Are you sure you want to delete this/i)).toBeInTheDocument()
+
+    // Type company name in input
+    const input = screen.getByPlaceholderText('brunos')
+    await userEvent.type(input, 'brunos')
+
+    // Click proceed
+    await userEvent.click(screen.getByRole('button', { name: 'Proceed' }))
+
+    // Assert
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining('/proposals?company=brunos&version=v1'),
+        {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ deleteCheck: 'brunos' }),
+        }
+      )
+    })
+  })
+
+  it('displays the 400 error alert banner when deleteCheck does not match', async () => {
+    // Arrange
+    const problemDetail = {
+      title: 'Invalid Request Parameter',
+      status: 400,
+      detail: "Confirmation check failed: deleteCheck ('wrong') must match company name ('brunos')",
+    }
+
+    const fetchMock = vi.fn().mockImplementation((url, options) => {
+      if (options?.method === 'DELETE') {
+        return Promise.resolve({
+          ok: false,
+          status: 400,
+          json: async () => problemDetail,
+        })
+      }
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        json: async () => PROPOSAL,
+      })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    // Act
+    renderPage()
+    expect(await screen.findByText('brunos · v1')).toBeInTheDocument()
+
+    // Click delete button to open modal
+    await userEvent.click(screen.getByRole('button', { name: 'Verwijderen' }))
+    const input = screen.getByPlaceholderText('brunos')
+    await userEvent.type(input, 'wrong')
+
+    await userEvent.click(screen.getByRole('button', { name: 'Proceed' }))
+
+    // Assert
+    await waitFor(() => {
+      const alert = screen.getByRole('alert')
+      expect(alert).toBeInTheDocument()
+      expect(alert).toHaveTextContent(
+        "Confirmation check failed: deleteCheck ('wrong') must match company name ('brunos')"
+      )
+    })
+  })
 })

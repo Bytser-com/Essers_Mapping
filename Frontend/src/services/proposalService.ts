@@ -255,3 +255,31 @@ export async function approveProposal(company: string, version: string): Promise
     throw new Error(`Voorstel kon niet worden goedgekeurd (status ${res.status})`);
   }
 }
+
+export async function deleteProposal(company: string, version: string, deleteCheck: string): Promise<void> {
+  const params = new URLSearchParams({ company, version });
+
+  const res = await fetch(`${VERSION_CONTROL_API}/proposals?${params.toString()}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ deleteCheck }),
+  });
+
+  if (res.status === 502 || res.status === 503) {
+    throw new Error(`De bestanden zijn tijdelijk niet bereikbaar (status ${res.status})`);
+  }
+
+  if (!res.ok) {
+    let errorDetail = "";
+    try {
+      const data = await res.json();
+      errorDetail = data.detail || data.title || "";
+    } catch {
+      // not JSON
+    }
+    if (errorDetail) {
+      throw new Error(errorDetail);
+    }
+    throw new Error(`Voorstel kon niet worden verwijderd (status ${res.status})`);
+  }
+}

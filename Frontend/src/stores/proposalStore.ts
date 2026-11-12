@@ -5,6 +5,7 @@ import {
   getProposalFile,
   uploadProposalFile,
   approveProposal,
+  deleteProposal,
   type ProposalFileDetailsDto,
 } from "../services/proposalService";
 
@@ -17,6 +18,7 @@ type ProposalState = {
   downloadProposal: (company: string, version: string) => Promise<ProposalFileDetailsDto | null>;
   uploadProposal: (company: string, version: string, file: File) => Promise<boolean>;
   approveProposal: (company: string, version: string) => Promise<boolean>;
+  deleteProposal: (company: string, version: string, deleteCheck: string) => Promise<boolean>;
 };
 
 export const useProposalStore = create<ProposalState>()((set, get) => ({
@@ -63,6 +65,18 @@ export const useProposalStore = create<ProposalState>()((set, get) => ({
     try {
       await approveProposal(company, version);
       await get().fetchProposal(company);
+      return true;
+    } catch (err) {
+      set({ actionError: err instanceof Error ? err.message : "Onbekende fout" });
+      return false;
+    }
+  },
+
+  deleteProposal: async (company, version, deleteCheck) => {
+    set({ actionError: null });
+    try {
+      await deleteProposal(company, version, deleteCheck);
+      set({ proposal: null });
       return true;
     } catch (err) {
       set({ actionError: err instanceof Error ? err.message : "Onbekende fout" });

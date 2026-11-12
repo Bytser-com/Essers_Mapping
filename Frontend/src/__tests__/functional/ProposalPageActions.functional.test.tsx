@@ -4,7 +4,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock, MockInstance } from 'vitest'
 import ProposalPage from '../../pages/ProposalPage'
-import { approveProposal, getProposalFile } from '../../services/proposalService'
+import { approveProposal, deleteProposal, getProposalFile } from '../../services/proposalService'
 import { useProposalStore } from '../../stores/proposalStore'
 import type { Proposal } from '../../types/proposal'
 
@@ -13,6 +13,7 @@ vi.mock('../../services/proposalService', () => ({
   getProposalFile: vi.fn(),
   uploadProposalFile: vi.fn(),
   approveProposal: vi.fn(),
+  deleteProposal: vi.fn(),
 }))
 
 const PROPOSAL: Proposal = {
@@ -201,6 +202,84 @@ describe('ProposalPage actions', () => {
       expect(alert).toBeInTheDocument()
       expect(alert).toHaveTextContent(errorMsg)
     })
+  })
+
+  it('calls onDelete when "Verwijderen" is clicked with prop', async () => {
+    // Arrange
+    const onDelete = vi.fn()
+    renderPage({ onDelete })
+
+    // Act
+    await userEvent.click(screen.getByRole('button', { name: 'Verwijderen' }))
+
+    // Assert
+    expect(onDelete).toHaveBeenCalledTimes(1)
+  })
+
+  it('opens delete confirmation dialog when "Verwijderen" is clicked', async () => {
+    // Arrange
+    renderPage()
+
+    // Act
+    await userEvent.click(screen.getByRole('button', { name: 'Verwijderen' }))
+
+    // Assert
+    expect(screen.getByText(/Are you sure you want to delete this/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Proceed' })).toBeDisabled()
+  })
+
+  it('sends delete request with entered deleteCheck when Proceed is clicked', async () => {
+    // Arrange
+    vi.mocked(deleteProposal).mockResolvedValue(undefined)
+    renderPage()
+
+    // Act
+    await userEvent.click(screen.getByRole('button', { name: 'Verwijderen' }))
+    const input = screen.getByPlaceholderText('brunos')
+    await userEvent.type(input, 'brunos')
+
+    const proceedBtn = screen.getByRole('button', { name: 'Proceed' })
+    expect(proceedBtn).toBeEnabled()
+    await userEvent.click(proceedBtn)
+
+    // Assert
+    await waitFor(() => {
+      expect(deleteProposal).toHaveBeenCalledWith('brunos', 'v2', 'brunos')
+    })
+  })
+
+  it('displays error banner when delete fails', async () => {
+    // Arrange
+    const errorMsg = "Confirmation check failed: deleteCheck ('wrong') must match company name ('brunos')"
+    vi.mocked(deleteProposal).mockRejectedValue(new Error(errorMsg))
+    renderPage()
+
+    // Act
+    await userEvent.click(screen.getByRole('button', { name: 'Verwijderen' }))
+    const input = screen.getByPlaceholderText('brunos')
+    await userEvent.type(input, 'wrong')
+    await userEvent.click(screen.getByRole('button', { name: 'Proceed' }))
+
+    // Assert
+    await waitFor(() => {
+      const alert = screen.getByRole('alert')
+      expect(alert).toBeInTheDocument()
+      expect(alert).toHaveTextContent(errorMsg)
+    })
+  })
+
+  it('closes delete dialog when Annuleren is clicked', async () => {
+    // Arrange
+    renderPage()
+
+    // Act
+    await userEvent.click(screen.getByRole('button', { name: 'Verwijderen' }))
+    expect(screen.getByText(/Are you sure you want to delete this/i)).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Annuleren' }))
+
+    // Assert
+    expect(screen.queryByText(/Are you sure you want to delete this/i)).not.toBeInTheDocument()
   })
 
   it('shows a dash for an invalid upload date', () => {

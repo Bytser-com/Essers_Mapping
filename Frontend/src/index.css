@@ -45,6 +45,10 @@
     @apply border-anthracite bg-anthracite text-white enabled:hover:bg-black;
   }
 
+  .btn--danger {
+    @apply border-red bg-red text-white enabled:hover:bg-red/90;
+  }
+
   /* Status (component "Label"): altijd een label met tekst erin */
   .status {
     @apply inline-flex items-center px-2.25 py-0.75 border border-transparent rounded-full
