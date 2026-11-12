@@ -303,6 +303,49 @@ Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 
 ---
 
+### 5. POST `/proposals`
+
+Approves a proposal for a given company and version.
+
+> **Note**: This endpoint is currently a placeholder and returns `501 Not Implemented`.
+
+* **URL**: `/proposals` (or `/Proposals`)
+* **Method**: `POST`
+* **Query Parameters**:
+  * `company` *(required, string)*: Company name (e.g. `vanroey`).
+  * `version` *(required, string)*: Proposal version (e.g. `v3`).
+
+#### Response Codes
+
+| Status Code | Description |
+| :--- | :--- |
+| `501 Not Implemented` | The feature is planned and not implemented yet. |
+| `400 Bad Request` | Missing required `company` or `version` parameter. |
+
+#### Example Request
+
+```http
+POST /Proposals?company=vanroey&version=v3 HTTP/1.1
+Host: localhost:8080
+```
+
+#### Example Response (`501 Not Implemented`)
+
+```json
+{
+  "type": "about:blank",
+  "title": "Not Implemented",
+  "status": 501,
+  "detail": "Approving proposal for company 'vanroey' and version 'v3' is not implemented yet",
+  "instance": "/Proposals",
+  "company": "vanroey",
+  "version": "v3",
+  "timestamp": "2026-11-12T13:12:00Z"
+}
+```
+
+---
+
 ## How to Run Locally
 
 ### Prerequisites

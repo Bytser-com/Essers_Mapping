@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -427,5 +428,39 @@ class ProposalControllerTest {
                         .content(new byte[0]))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.title").value("Invalid Request Body"));
+    }
+
+    @Test
+    @DisplayName("POST /Proposals returns 501 Not Implemented")
+    void approveProposal_returns501NotImplemented() throws Exception {
+        mockMvc.perform(post("/Proposals")
+                        .param("company", "vanroey")
+                        .param("version", "v3"))
+                .andExpect(status().isNotImplemented())
+                .andExpect(jsonPath("$.status").value(501))
+                .andExpect(jsonPath("$.title").value("Not Implemented"))
+                .andExpect(jsonPath("$.detail").value("Approving proposal for company 'vanroey' and version 'v3' is not implemented yet"))
+                .andExpect(jsonPath("$.company").value("vanroey"))
+                .andExpect(jsonPath("$.version").value("v3"));
+    }
+
+    @Test
+    @DisplayName("POST /proposals (lowercase) returns 501 Not Implemented")
+    void approveProposal_lowercase_returns501NotImplemented() throws Exception {
+        mockMvc.perform(post("/proposals")
+                        .param("company", "Google")
+                        .param("version", "v1"))
+                .andExpect(status().isNotImplemented())
+                .andExpect(jsonPath("$.status").value(501))
+                .andExpect(jsonPath("$.detail").value("Approving proposal for company 'Google' and version 'v1' is not implemented yet"));
+    }
+
+    @Test
+    @DisplayName("POST /Proposals returns 400 when missing query parameter")
+    void approveProposal_missingParams_returns400() throws Exception {
+        mockMvc.perform(post("/Proposals")
+                        .param("company", "vanroey"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Missing Required Parameter"));
     }
 }
