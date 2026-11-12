@@ -89,3 +89,12 @@ draaiende VM's betekenen nog niet dat Ansible en Kubernetes al klaar zijn.
 Live Kubernetes-deployments vereisen `GHCR_USERNAME` en `GHCR_TOKEN`, zodat een
 ontbrekende instelling geen werkend image-pull-secret met voorbeeldwaarden vervangt.
 De validatiemodus heeft die credentials niet nodig.
+
+Voor Gemini gebruikt iedere ontwikkelaar een eigen key in
+`Mapping_Proposal/.env`. `.env.example` blijft een leeg voorbeeld.
+Voor CD stel je één gedeeld repository-secret `GEMINI_API_KEY` in op GitHub.
+Je kunt per environment (`Testing` / `Production`) een eigen waarde instellen.
+CD schrijft die naar de Kubernetes Secret `gemini-api`;
+alleen Mapping Proposal leest hem als omgevingsvariabele. CI gebruikt mocks en
+heeft geen echte key nodig. Service-CD herstart Mapping Proposal om een nieuwe
+key in te lezen; kies bij volledige Kubernetes-CD `restart` voor een keywijziging.

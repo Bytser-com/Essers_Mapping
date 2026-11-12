@@ -82,6 +82,9 @@ jobs:
       SFTP_RUNTIME_USER: ${{ vars.SFTP_RUNTIME_USER || 'runtimeuser' }}
       SFTP_RUNTIME_PASSWORD: ${{ secrets.SFTP_RUNTIME_PASSWORD }}
 
+      # --- Gemini API Secret ---
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
       # --- TLS & DNS-01 Challenge Configuration ---
       ACME_EMAIL: ${{ vars.ACME_EMAIL || 'admin@example.com' }}
       DOMAIN_NAME: ${{ vars.DOMAIN_NAME || 'your-domain.example.com' }}
@@ -105,12 +108,13 @@ jobs:
             exit 1
           fi
 
-      - name: Require registry credentials before live deployment
+      - name: Require registry and Gemini credentials before live deployment
         if: steps.manifests.outputs.exists == 'true' && (env.MODE == 'apply' || env.MODE == 'restart')
         shell: bash
         run: |
           : "${GHCR_USERNAME:?Set GHCR_USERNAME to the owner of the registry read token}"
           : "${GHCR_TOKEN:?Set GHCR_TOKEN to a durable read:packages token for Kubernetes image pulls}"
+          : "${GEMINI_API_KEY:?Set GEMINI_API_KEY as a GitHub repository or environment secret}"
 
       - name: Verify infrastructure is deployed
         if: steps.manifests.outputs.exists == 'true' && (env.MODE == 'apply' || env.MODE == 'restart')
@@ -230,6 +234,7 @@ jobs:
           # Safe string substitution via perl $ENV{} to avoid sed delimiter / '&' replacement issues
           perl -pi -e '$u = $ENV{GHCR_USERNAME}; s/GITHUB_USERNAME_OR_ACTOR/$u/g' "$SECRETS_FILE"
           perl -pi -e '$t = $ENV{GHCR_TOKEN}; s/CHANGE_ME_GITHUB_TOKEN_OR_PAT/$t/g' "$SECRETS_FILE"
+          perl -pi -e '$k = $ENV{GEMINI_API_KEY}; s/CHANGE_ME_GEMINI_API_KEY/$k/g' "$SECRETS_FILE"
 
           if [ -n "${SFTP_SHARED_ADMIN_PASSWORD:-}" ]; then
             perl -pi -e '$p = $ENV{SFTP_SHARED_ADMIN_PASSWORD}; s/CHANGE_ME_SHARED_ADMIN_PASSWORD/$p/g' "$SECRETS_FILE"

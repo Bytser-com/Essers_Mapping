@@ -180,36 +180,123 @@ class SftpProposalStorageServiceTest {
         assertNull(dto.createdBy());
     }
 
-    @Test
-    @DisplayName("listProposals without company returns all companies with latest versions")
-    void listProposals_allCompanies_returnsLatestVersionForEach() {
-        when(template.exists("/Proposals")).thenReturn(true);
+    // Puts a version folder with an Excel file and a proposal.json with the given content on the mocked SFTP
+    private void mockVersionWithProposalJson(String versionPath, String proposalJson) {
+        SftpClient.DirEntry excel = createEntry("proposal.xlsx", false);
+        SftpClient.DirEntry json = createEntry("proposal.json", false);
+        when(template.list(versionPath)).thenReturn(new SftpClient.DirEntry[]{excel, json});
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(proposalJson.getBytes(StandardCharsets.UTF_8))) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq(versionPath + "/proposal.json"), any(InputStreamCallback.class));
+    }
 
-        SftpClient.DirEntry compA = createEntry("VanRoey", true);
-        SftpClient.DirEntry compB = createEntry("Google", true);
-        when(template.list("/Proposals")).thenReturn(new SftpClient.DirEntry[]{compA, compB});
+    private String proposalJson(String uploadedAt, String status) {
+        return "{\"uploaded_at\": \"" + uploadedAt + "\", \"status\": \"" + status + "\"}";
+    }
+
+    private void mockCompanies(String... companies) {
+        when(template.exists("/Proposals")).thenReturn(true);
+        SftpClient.DirEntry[] entries = new SftpClient.DirEntry[companies.length];
+        for (int i = 0; i < companies.length; i++) {
+            entries[i] = createEntry(companies[i], true);
+        }
+        when(template.list("/Proposals")).thenReturn(entries);
+    }
+
+    private void mockVersions(String company, String... versions) {
+        SftpClient.DirEntry[] entries = new SftpClient.DirEntry[versions.length];
+        for (int i = 0; i < versions.length; i++) {
+            entries[i] = createEntry(versions[i], true);
+        }
+        when(template.list("/Proposals/" + company)).thenReturn(entries);
+    }
+
+    @Test
+    @DisplayName("TC-57-02 listProposals without company returns all companies with their latest version")
+    void listProposals_allCompanies_returnsLatestVersionForEach() {
+        mockCompanies("VanRoey", "Google");
 
         // VanRoey has v1 and v10 -> v10 is latest
-        SftpClient.DirEntry v1 = createEntry("v1", true);
-        SftpClient.DirEntry v10 = createEntry("v10", true);
-        when(template.list("/Proposals/VanRoey")).thenReturn(new SftpClient.DirEntry[]{v1, v10});
-        SftpClient.DirEntry vanRoeyExcel = createEntry("vanroey_v10.xlsx", false);
-        when(template.list("/Proposals/VanRoey/v10")).thenReturn(new SftpClient.DirEntry[]{vanRoeyExcel});
+        mockVersions("VanRoey", "v1", "v10");
+        mockVersionWithProposalJson("/Proposals/VanRoey/v10", proposalJson("2026-11-10T10:00:00+01:00", "READY_FOR_REVIEW"));
 
         // Google has v2 -> v2 is latest
-        SftpClient.DirEntry v2 = createEntry("v2", true);
-        when(template.list("/Proposals/Google")).thenReturn(new SftpClient.DirEntry[]{v2});
-        SftpClient.DirEntry googleExcel = createEntry("google_v2.xlsx", false);
-        when(template.list("/Proposals/Google/v2")).thenReturn(new SftpClient.DirEntry[]{googleExcel});
+        mockVersions("Google", "v2");
+        mockVersionWithProposalJson("/Proposals/Google/v2", proposalJson("2026-11-09T10:00:00+01:00", "IN_REVIEW"));
 
         List<CompanyProposalOverviewDto> results = service.listProposals(null);
 
         assertEquals(2, results.size());
-        // Ordered alphabetically: Google, VanRoey
-        assertEquals("Google", results.get(0).company());
-        assertEquals("v2", results.get(0).latestVersion());
-        assertEquals("VanRoey", results.get(1).company());
-        assertEquals("v10", results.get(1).latestVersion());
+        assertEquals("VanRoey", results.get(0).company());
+        assertEquals("v10", results.get(0).latestVersion());
+        assertEquals("Google", results.get(1).company());
+        assertEquals("v2", results.get(1).latestVersion());
+    }
+
+    @Test
+    @DisplayName("TC-57-03 the newest upload is first, also when the timezones differ")
+    void listProposals_allCompanies_newestUploadFirst() {
+        mockCompanies("KlantA", "KlantB", "KlantC", "KlantD");
+        mockVersions("KlantA", "v1");
+        mockVersionWithProposalJson("/Proposals/KlantA/v1", proposalJson("2026-10-20T10:00:00+02:00", "READY_FOR_REVIEW"));
+        mockVersions("KlantB", "v1");
+        mockVersionWithProposalJson("/Proposals/KlantB/v1", proposalJson("2026-10-22T10:00:00+02:00", "READY_FOR_REVIEW"));
+        mockVersions("KlantC", "v1");
+        mockVersionWithProposalJson("/Proposals/KlantC/v1", proposalJson("2026-10-21T10:00:00+02:00", "READY_FOR_REVIEW"));
+        // 09:30 UTC = 11:30 in Brussels, so newer than KlantB
+        mockVersions("KlantD", "v1");
+        mockVersionWithProposalJson("/Proposals/KlantD/v1", proposalJson("2026-10-22T09:30:00Z", "READY_FOR_REVIEW"));
+
+        List<CompanyProposalOverviewDto> results = service.listProposals(null);
+
+        assertEquals(List.of("KlantD", "KlantB", "KlantC", "KlantA"),
+                results.stream().map(CompanyProposalOverviewDto::company).toList());
+    }
+
+    @Test
+    @DisplayName("TC-57-01 a proposal with missing or invalid data is skipped, the others are shown")
+    void listProposals_allCompanies_skipsInvalidProposals() {
+        mockCompanies("KlantB", "BadJson", "UnknownStatus", "NoUploadTime", "NoProposalJson");
+
+        mockVersions("KlantB", "v1");
+        mockVersionWithProposalJson("/Proposals/KlantB/v1", proposalJson("2026-10-22T10:00:00+02:00", "READY_FOR_REVIEW"));
+
+        mockVersions("BadJson", "v1");
+        mockVersionWithProposalJson("/Proposals/BadJson/v1", "INVALID_JSON_@@@");
+
+        mockVersions("UnknownStatus", "v1");
+        mockVersionWithProposalJson("/Proposals/UnknownStatus/v1", proposalJson("2026-10-22T10:00:00+02:00", "DONE"));
+
+        mockVersions("NoUploadTime", "v1");
+        mockVersionWithProposalJson("/Proposals/NoUploadTime/v1", "{\"status\": \"READY_FOR_REVIEW\"}");
+
+        mockVersions("NoProposalJson", "v1");
+        when(template.list("/Proposals/NoProposalJson/v1"))
+                .thenReturn(new SftpClient.DirEntry[]{createEntry("proposal.xlsx", false)});
+
+        List<CompanyProposalOverviewDto> results = service.listProposals(null);
+
+        assertEquals(1, results.size());
+        assertEquals("KlantB", results.get(0).company());
+    }
+
+    @Test
+    @DisplayName("TC-57-01 when the newest version is broken, the newest valid version is shown")
+    void listProposals_allCompanies_brokenNewestVersionFallsBackToPreviousVersion() {
+        mockCompanies("KlantA");
+        mockVersions("KlantA", "v1", "v2");
+        mockVersionWithProposalJson("/Proposals/KlantA/v1", proposalJson("2026-10-20T10:00:00+02:00", "IN_REVIEW"));
+        mockVersionWithProposalJson("/Proposals/KlantA/v2", "INVALID_JSON_@@@");
+
+        List<CompanyProposalOverviewDto> results = service.listProposals(null);
+
+        assertEquals(1, results.size());
+        assertEquals("v1", results.get(0).latestVersion());
+        assertEquals("IN_REVIEW", results.get(0).status());
     }
 
     @Test

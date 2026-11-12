@@ -16,7 +16,7 @@ configMapGenerator:
       - SFTP_SHARED_HOST=sftp-shared
       - SFTP_SHARED_PORT=22
       - SFTP_SHARED_USER=shareduser
-      - SFTP_SHARED_REMOTE_DIR=/upload
+      - SFTP_SHARED_PROPOSALS_DIR=/Proposals
       # Runtime SFTP Server (Runtime Zone)
       - SFTP_RUNTIME_HOST=sftp-runtime
       - SFTP_RUNTIME_PORT=22
