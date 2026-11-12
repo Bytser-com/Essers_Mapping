@@ -9,7 +9,6 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
-import os
 import time
 from collections import Counter
 from dataclasses import dataclass
@@ -31,6 +30,7 @@ from .experiment_tracker import ExperimentTracker
 from .mapping_validator import find_proposals_needing_retry, validate_mappings
 from .models import MappingResult, MappingSettings, PreviewResult
 from .readprompt import build_mapping_contents, run_gemini
+from .safe_files import atomic_writer, confined_path
 from .xml_parser import (
     discover_historical_pairs,
     parse_xml_files,
@@ -50,22 +50,29 @@ CODE_FILES = [
     *(ROOT / 'scripts' / name for name in (
         'config.py', 'errors.py', 'models.py', 'pipeline.py', 'xml_parser.py',
         'readprompt.py', 'mapping_validator.py', 'excel_generator.py',
-        'experiment_tracker.py',
+        'experiment_tracker.py', 'safe_files.py',
     )),
     TEMPLATE_PATH,
 ]
 
 
+def _run_file(path: Path) -> Path:
+    try:
+        return confined_path(RUNS_DIR, path)
+    except ValueError as error:
+        raise InputDataError('Run files must stay inside the configured runs directory.') from error
+
+
 def save_json(path: Path, data) -> None:
-    """Safely save results and checkpoints without partial JSON files."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temp = path.with_suffix(path.suffix + '.tmp')
-    temp.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding='utf-8')
-    os.replace(temp, path)
+    """Save model output as JSON data inside RUNS_DIR, never as a file path."""
+    target = _run_file(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with atomic_writer(target) as handle:
+        json.dump(data, handle, indent=2, ensure_ascii=False)
 
 
 def read_json(path: Path):
-    return json.loads(path.read_text(encoding='utf-8'))
+    return json.loads(_run_file(path).read_text(encoding='utf-8'))
 
 
 def fingerprint_files(files: list[Path]) -> str:

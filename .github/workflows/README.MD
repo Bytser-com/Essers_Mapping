@@ -119,6 +119,14 @@ Coverage reports are generated and uploaded for implemented services. Service
 workflows need no Sonar secrets and do not impose a separate coverage percentage.
 The SonarQube workflow enforces the quality gate configured in the hosted project.
 
+The team's minimum is **70% overall coverage**. Sonar's built-in gate separately
+requires **80% coverage on new code**; these are different requirements.
+Sonar's `Coverage` combines line and condition coverage, so use overall `Coverage`,
+not only `Line coverage`, to assess the team target. No numerical threshold is
+configured in this repository. A hosted gate enforcing 70% overall coverage
+requires a [custom quality gate](https://docs.sonarsource.com/sonarqube-cloud/standards/managing-quality-gates/managing-custom-quality-gates),
+available on Team and Enterprise plans. The existing hosted gate remains enforced.
+
 ### Hosted SonarQube and local feature work
 
 [SonarQube](./sonarqube.yml) runs one combined analysis after each push to
@@ -131,6 +139,13 @@ defaults to `bytser-com`. Repository variables `SONAR_HOST_URL`,
 The repository secret `SONAR_TOKEN` is required. Configure `Development` as the
 project's main branch in SonarQube Cloud and disable automatic analysis when
 using this CI-based analysis.
+
+The workflow pins and caches the signature-verified SonarScanner CLI. The cache
+is saved even when analysis fails its quality gate, so repeated scans can reuse
+the verified installation. On a cache miss, `Scripts/sonar-gpg.sh` limits each GPG
+command to 30 seconds plus a 5-second termination grace period. This lets the
+official action try its fallback keyserver instead of waiting for many minutes.
+Signature verification is required; installation fails if it cannot be verified.
 
 The [Free plan](https://docs.sonarsource.com/sonarqube-cloud/administering-sonarcloud/managing-subscription/subscription-plans)
 supports the main-branch setup within its private-code and user limits. This
