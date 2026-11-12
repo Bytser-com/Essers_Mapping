@@ -121,7 +121,7 @@ jobs:
           install -Dm755 Scripts/sonar-gpg.sh "$RUNNER_TEMP/sonar-tools/gpg"
           echo "$RUNNER_TEMP/sonar-tools" >> "$GITHUB_PATH"
 
-      - name: Run SonarQube scan and enforce quality gate
+      - name: Run SonarQube scan
         id: sonar
         uses: SonarSource/sonarqube-scan-action@v8.3.0
         env:
@@ -133,6 +133,14 @@ jobs:
           args: >-
             -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
             -Dsonar.organization=${{ env.SONAR_ORGANIZATION }}
+            -Dsonar.qualitygate.wait=false
+
+      # Inspect this scan separately so only new-code coverage is advisory.
+      - name: Check Sonar gate (coverage warns, other failures block)
+        env:
+          # --- Secrets ---
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: python Scripts/check-sonar-quality-gate.py
 
       # A failed quality gate must not discard the successfully verified scanner.
       - name: Save verified SonarScanner CLI
@@ -148,6 +156,7 @@ jobs:
         with:
           name: sonarqube-reports
           path: |
+            test-results/sonarqube-quality-gate.json
             Frontend/coverage/
             Frontend/test-results/
             Runtime/target/site/jacoco/

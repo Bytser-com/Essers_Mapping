@@ -117,7 +117,8 @@ pull request waiting for a status indefinitely.
 
 Coverage reports are generated and uploaded for implemented services. Service
 workflows need no Sonar secrets and do not impose a separate coverage percentage.
-The SonarQube workflow enforces the quality gate configured in the hosted project.
+The SonarQube workflow blocks on hosted quality-gate failures except new-code
+coverage, which produces a GitHub Actions warning.
 
 The team's minimum is **70% overall coverage**. Sonar's built-in gate separately
 requires **80% coverage on new code**; these are different requirements.
@@ -125,7 +126,9 @@ Sonar's `Coverage` combines line and condition coverage, so use overall `Coverag
 not only `Line coverage`, to assess the team target. No numerical threshold is
 configured in this repository. A hosted gate enforcing 70% overall coverage
 requires a [custom quality gate](https://docs.sonarsource.com/sonarqube-cloud/standards/managing-quality-gates/managing-custom-quality-gates),
-available on Team and Enterprise plans. The existing hosted gate remains enforced.
+available on Team and Enterprise plans. The hosted gate is unchanged and can
+remain red when this workflow passes due to advisory new-code coverage.
+The 70% overall target is a team requirement, not an automated threshold here.
 
 ### Hosted SonarQube and local feature work
 
@@ -159,6 +162,16 @@ It imports Vitest LCOV, merged JaCoCo XML and pytest coverage XML using
 are isolated per service; placeholders defer coverage. Service linting and
 Playwright checks remain in the individual service workflows. Combined reports
 are uploaded as `sonarqube-reports` for 14 days.
+
+The scanner uploads the analysis with `sonar.qualitygate.wait=false`; scanner
+errors still fail the job. `Scripts/check-sonar-quality-gate.py` then waits up to
+300 seconds for the task recorded in `.scannerwork/report-task.txt` and requests
+the quality gate by that task's analysis ID. It never uses the latest project
+result, which could belong to another commit. Only a failed `new_coverage`
+condition is advisory. Other failures, missing/invalid results, processing
+failures, API errors and timeouts still fail CI. The JSON gate response is saved
+as `test-results/sonarqube-quality-gate.json` in the reports artifact.
+Local CLI scans retain `sonar.qualitygate.wait=true` and enforce the hosted gate.
 
 The standalone scanner receives Runtime's compiled production/test classes and
 dependency JARs explicitly. A Maven `copy-dependencies` step copies the resolved
