@@ -21,7 +21,7 @@ on:
         description: "validate = syntax-check & manifest validation, apply = deploy to the cluster live, restart = rollout restart workloads"
         type: choice
         options: [apply, validate, restart]
-        default: apply
+        default: validate
       skip_addons:
         description: "Skip cluster addons (MetalLB & Longhorn) installation/reconciliation"
         type: boolean
@@ -29,7 +29,9 @@ on:
 
 # One Kubernetes deployment per environment at a time
 concurrency:
-  group: kubernetes-deploy-${{ github.base_ref || github.ref_name }}
+  # Service CD uses this same lock while changing images and pull credentials.
+  group: cluster-write-${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}
+  queue: max
   cancel-in-progress: false
 
 permissions:
@@ -53,10 +55,10 @@ jobs:
         (inputs.mode == 'apply' && 'Deploy') ||
         'Syntax & Validation'
       }}
-    runs-on: 
+    runs-on:
       - self-hosted
       - linux
-      - ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
+      - ${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}
     environment: ${{ (github.base_ref || github.ref_name) == 'main' && 'Production' || 'Testing' }}
     defaults:
       run:
@@ -68,8 +70,8 @@ jobs:
       DEBIAN_VM_USERNAME: ${{ vars.DEBIAN_VM_USERNAME || 'sysadmin' }}
       K8S_MASTER_VM_IPV4_ADDRESS: ${{ vars.K8S_MASTER_VM_IPV4_ADDRESS }}
 
-      # --- Registry & Application Secrets (Optional Overrides for base/common/secrets.yaml) ---
-      GHCR_USERNAME: ${{ vars.GHCR_USERNAME || github.repository_owner }}
+      # --- Required Registry Credentials & Optional Application Secrets ---
+      GHCR_USERNAME: ${{ vars.GHCR_USERNAME || github.actor }}
       GHCR_TOKEN: ${{ secrets.GHCR_TOKEN || secrets.GITHUB_TOKEN }}
       SFTP_SHARED_ADMIN_USER: ${{ vars.SFTP_SHARED_ADMIN_USER || 'admin' }}
       SFTP_SHARED_ADMIN_PASSWORD: ${{ secrets.SFTP_SHARED_ADMIN_PASSWORD }}
@@ -79,6 +81,9 @@ jobs:
       SFTP_RUNTIME_ADMIN_PASSWORD: ${{ secrets.SFTP_RUNTIME_ADMIN_PASSWORD }}
       SFTP_RUNTIME_USER: ${{ vars.SFTP_RUNTIME_USER || 'runtimeuser' }}
       SFTP_RUNTIME_PASSWORD: ${{ secrets.SFTP_RUNTIME_PASSWORD }}
+
+      # --- Gemini API Secret ---
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
       # --- TLS & DNS-01 Challenge Configuration ---
       ACME_EMAIL: ${{ vars.ACME_EMAIL || 'admin@example.com' }}
@@ -99,9 +104,25 @@ jobs:
           if [ -f "overlays/$OVERLAY/kustomization.yaml" ]; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
           else
-            echo "::warning::No Kustomize overlay found at $WORKDIR/overlays/$OVERLAY/kustomization.yaml - skipping Kubernetes execution."
-            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::error::Required Kustomize overlay is missing at $WORKDIR/overlays/$OVERLAY/kustomization.yaml."
+            exit 1
           fi
+
+      - name: Require registry and Gemini credentials before live deployment
+        if: steps.manifests.outputs.exists == 'true' && (env.MODE == 'apply' || env.MODE == 'restart')
+        shell: bash
+        run: |
+          : "${GHCR_USERNAME:?Set GHCR_USERNAME to the owner of the registry read token}"
+          : "${GHCR_TOKEN:?Set GHCR_TOKEN to a durable read:packages token for Kubernetes image pulls}"
+          : "${GEMINI_API_KEY:?Set GEMINI_API_KEY as a GitHub repository or environment secret}"
+
+      - name: Verify infrastructure is deployed
+        if: steps.manifests.outputs.exists == 'true' && (env.MODE == 'apply' || env.MODE == 'restart')
+        uses: ./.github/actions/check-infrastructure
+        with:
+          api-url: ${{ vars.PROXMOX_API_URL }}
+          api-token: ${{ secrets.PROXMOX_API_TOKEN }}
+          node-name: ${{ vars.NODE01_NAME }}
 
       - name: Verify Kubernetes CLI tooling
         if: steps.manifests.outputs.exists == 'true'
@@ -211,10 +232,9 @@ jobs:
           fi
 
           # Safe string substitution via perl $ENV{} to avoid sed delimiter / '&' replacement issues
-          if [ -n "${GHCR_TOKEN:-}" ]; then
-            perl -pi -e '$u = $ENV{GHCR_USERNAME}; s/GITHUB_USERNAME_OR_ACTOR/$u/g' "$SECRETS_FILE"
-            perl -pi -e '$t = $ENV{GHCR_TOKEN}; s/CHANGE_ME_GITHUB_TOKEN_OR_PAT/$t/g' "$SECRETS_FILE"
-          fi
+          perl -pi -e '$u = $ENV{GHCR_USERNAME}; s/GITHUB_USERNAME_OR_ACTOR/$u/g' "$SECRETS_FILE"
+          perl -pi -e '$t = $ENV{GHCR_TOKEN}; s/CHANGE_ME_GITHUB_TOKEN_OR_PAT/$t/g' "$SECRETS_FILE"
+          perl -pi -e '$k = $ENV{GEMINI_API_KEY}; s/CHANGE_ME_GEMINI_API_KEY/$k/g' "$SECRETS_FILE"
 
           if [ -n "${SFTP_SHARED_ADMIN_PASSWORD:-}" ]; then
             perl -pi -e '$p = $ENV{SFTP_SHARED_ADMIN_PASSWORD}; s/CHANGE_ME_SHARED_ADMIN_PASSWORD/$p/g' "$SECRETS_FILE"
@@ -285,6 +305,70 @@ jobs:
               --timeout 10m
           fi
 
+          # 3. cert-manager (TLS Automation) & ClusterIssuers
+          echo "Reconciling cert-manager..."
+          kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.16.2/cert-manager.yaml
+          kubectl rollout status deployment/cert-manager -n cert-manager --timeout=180s
+          kubectl rollout status deployment/cert-manager-webhook -n cert-manager --timeout=180s
+
+          # Deploy Cloudflare API token secret to cert-manager namespace for DNS-01 challenge
+          if [ -n "${CLOUDFLARE_API_TOKEN:-}" ]; then
+            echo "Deploying Cloudflare DNS-01 API token secret to cert-manager namespace..."
+            kubectl create secret generic cloudflare-api-token-secret \
+              --namespace cert-manager \
+              --from-literal=api-token="${CLOUDFLARE_API_TOKEN}" \
+              --dry-run=client -o yaml | kubectl apply -f -
+          else
+            echo "::warning::CLOUDFLARE_API_TOKEN secret is not set. DNS-01 challenges will not be able to authenticate with Cloudflare."
+          fi
+
+          if [ -f "cluster-addons/cert-manager/cluster-issuers.yaml" ]; then
+            echo "Applying cert-manager ClusterIssuers..."
+            ISSUERS_APPLIED=false
+            for attempt in 1 2 3 4 5 6; do
+              if kubectl apply -f "cluster-addons/cert-manager/cluster-issuers.yaml"; then
+                ISSUERS_APPLIED=true
+                break
+              fi
+              echo "Waiting for cert-manager webhook readiness (attempt ${attempt}/6)..."
+              sleep 5
+            done
+            if [ "$ISSUERS_APPLIED" != "true" ]; then
+              echo "::error::Failed to apply ClusterIssuers after 6 attempts."
+              exit 1
+            fi
+          fi
+
+          # 4. Ingress NGINX Controller (Binds dedicated LoadBalancer IP .101 or .201)
+          INGRESS_VALUES="cluster-addons/ingress-nginx/values-${OVERLAY}.yaml"
+          if [ -f "$INGRESS_VALUES" ]; then
+            echo "Reconciling ingress-nginx for ${OVERLAY}..."
+            helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx --force-update
+            helm repo update
+            helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
+              --namespace ingress-nginx \
+              --create-namespace \
+              -f "$INGRESS_VALUES" \
+              --wait \
+              --timeout 5m
+          fi
+
+      - name: Render manifests while preserving service CD releases
+        if: steps.manifests.outputs.exists == 'true' && (env.MODE == 'apply' || env.MODE == 'restart')
+        shell: bash
+        run: |
+          set -euo pipefail
+          kubectl kustomize "overlays/${OVERLAY}" > "$RUNNER_TEMP/rendered-overlay.yaml"
+          kubectl create --dry-run=client --validate=false \
+            -f "$RUNNER_TEMP/rendered-overlay.yaml" -o json > "$RUNNER_TEMP/rendered-overlay.json"
+          kubectl get deployments -n "$NAMESPACE" -o json --ignore-not-found > "$RUNNER_TEMP/live-deployments.json"
+          if [ ! -s "$RUNNER_TEMP/live-deployments.json" ]; then
+            printf '{"items":[]}' > "$RUNNER_TEMP/live-deployments.json"
+          fi
+          python3 "$GITHUB_WORKSPACE/Scripts/preserve-cd-images.py" \
+            --live "$RUNNER_TEMP/live-deployments.json" \
+            < "$RUNNER_TEMP/rendered-overlay.json" > "$RUNNER_TEMP/rendered-deploy.json"
+
       - name: Deploy Kubernetes overlay (${{ env.OVERLAY }})
         id: deploy
         if: steps.manifests.outputs.exists == 'true' && (env.MODE == 'apply' || env.MODE == 'restart')
@@ -296,7 +380,7 @@ jobs:
           rm -f "$APPLY_LOG"
 
           echo "Applying Kustomize overlay: overlays/${OVERLAY} (Namespace: ${NAMESPACE})..."
-          kubectl apply -k "overlays/${OVERLAY}" 2>&1 | tee "$APPLY_LOG"
+          kubectl apply -f "$RUNNER_TEMP/rendered-deploy.json" 2>&1 | tee "$APPLY_LOG"
 
           # Restart deployments when requested or on Testing (:latest mutable image tags with Always pull policy)
           if [ "$MODE" = "restart" ] || [ "$OVERLAY" = "testing" ]; then
@@ -308,7 +392,12 @@ jobs:
           echo "Waiting for deployments in ${NAMESPACE} to become ready..."
           for deploy in $(kubectl get deployments -n "$NAMESPACE" -o jsonpath='{.items[*].metadata.name}'); do
             echo "Waiting for rollout of deployment/${deploy}..."
-            kubectl rollout status "deployment/${deploy}" -n "$NAMESPACE" --timeout=300s 2>&1 | tee -a "$APPLY_LOG"
+            if ! kubectl rollout status "deployment/${deploy}" -n "$NAMESPACE" --timeout=300s 2>&1 | tee -a "$APPLY_LOG"; then
+              echo "::error::Rollout failed or timed out for deployment/${deploy} in ${NAMESPACE}. Triggering automatic rollback..."
+              kubectl rollout undo "deployment/${deploy}" -n "$NAMESPACE" 2>&1 | tee -a "$APPLY_LOG"
+              kubectl rollout status "deployment/${deploy}" -n "$NAMESPACE" --timeout=180s 2>&1 | tee -a "$APPLY_LOG" || true
+              exit 1
+            fi
           done
 
           # Display assigned LoadBalancer IPs and workload status
@@ -326,7 +415,7 @@ jobs:
               echo "- **Environment:** \`${OVERLAY}\`"
               echo "- **Mode:** \`${MODE}\`"
               echo ""
-              echo "Manifest YAML linting and Kustomize overlay builds (testing & production) validated cleanly."
+              echo "Manifest lint and Kustomize build result: ${STATUS}"
             } >> "$GITHUB_STEP_SUMMARY"
           else
             STATUS="${{ steps.deploy.outcome == 'success' && '✅ Succeeded' || '❌ Failed' }}"
@@ -373,4 +462,4 @@ jobs:
             find "$RUNNER_TEMP/k8s" -type f -exec shred -u {} + 2>/dev/null || rm -rf "$RUNNER_TEMP/k8s"
             rm -rf "$RUNNER_TEMP/k8s"
           fi
-          rm -f "$RUNNER_TEMP/k8s-apply.log" "$RUNNER_TEMP"/rendered-*.yaml
+          rm -f "$RUNNER_TEMP/k8s-apply.log" "$RUNNER_TEMP/live-deployments.json" "$RUNNER_TEMP"/rendered-*.yaml "$RUNNER_TEMP"/rendered-*.json

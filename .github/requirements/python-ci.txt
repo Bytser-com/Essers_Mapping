@@ -1,0 +1,5 @@
+# Shared CI tools for Mapping_Proposal and Mapping_Converter.
+# Application dependencies belong in each service's own manifest.
+pytest>=8,<10
+pytest-cov>=6,<8
+ruff>=0.14,<1

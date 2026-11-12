@@ -1,0 +1,72 @@
+name: Runtime CI
+
+on:
+  pull_request:
+    branches: [main, Testing, Development]
+  push:
+    branches: [main, Testing, Development]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: runtime-ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    name: Detect runtime changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      changed: ${{ steps.changes.outputs.changed }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Detect runtime changes
+        id: changes
+        uses: ./.github/actions/service-changes
+        with:
+          service-path: Runtime
+          workflow-path: .github/workflows/runtime-ci.yml
+          shared-paths: |
+            Scripts/detect-service-changes.py
+            .github/workflows/java-service-ci.yml
+            .github/actions/dependency-audit
+            Scripts/dependency-inventory.py
+            .github/workflows/runtime-cd.yml
+            .github/workflows/service-cd.yml
+            Scripts/smoke-service-image.sh
+            Scripts/registry-pull-secret.py
+
+  checks:
+    name: Runtime checks
+    needs: changes
+    if: needs.changes.outputs.changed == 'true'
+    uses: ./.github/workflows/java-service-ci.yml
+    with:
+      service-path: Runtime
+      artifact-prefix: runtime
+
+  quality-gate:
+    name: Runtime CI Gate
+    needs: [changes, checks]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require successful change detection
+        env:
+          RESULT: ${{ needs.changes.result }}
+        run: test "$RESULT" = success
+
+      - name: Require successful checks when the service changed
+        if: needs.changes.outputs.changed != 'false'
+        env:
+          RESULT: ${{ needs.checks.result }}
+        run: test "$RESULT" = success

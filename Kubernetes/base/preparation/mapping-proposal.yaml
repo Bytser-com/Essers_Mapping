@@ -70,6 +70,11 @@ spec:
             - configMapRef:
                 name: common-config
           env:
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: gemini-api
+                  key: GEMINI_API_KEY
             - name: SERVICE_NAME
               value: "mapping-proposal"
             - name: SFTP_SHARED_PASSWORD
@@ -77,8 +82,10 @@ spec:
                 secretKeyRef:
                   name: sftp-shared-credentials
                   key: SFTP_PASSWORD
-            - name: SHARED_MOUNT_PATH
-              value: "/mnt/sftp-shared"
+            # Connects directly over SFTP to sftp-shared (SFTP_SHARED_HOST/PORT/USER/PROPOSALS_DIR)
+            # Files wait in /tmp/source until the service handles them.
+            - name: INCOMING_DIR
+              value: "/tmp/source"
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -110,15 +117,9 @@ spec:
           volumeMounts:
             - name: tmp-dir
               mountPath: /tmp
-            - name: shared-files
-              mountPath: /mnt/sftp-shared
-              readOnly: false
       volumes:
         - name: tmp-dir
           emptyDir: {}
-        - name: shared-files
-          persistentVolumeClaim:
-            claimName: sftp-shared-pvc
 ---
 apiVersion: v1
 kind: Service

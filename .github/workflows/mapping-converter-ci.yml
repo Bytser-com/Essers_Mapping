@@ -1,0 +1,75 @@
+name: Mapping Converter CI
+
+on:
+  pull_request:
+    branches: [main, Testing, Development]
+  push:
+    branches: [main, Testing, Development]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mapping-converter-ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    name: Detect Mapping Converter changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      changed: ${{ steps.changes.outputs.changed }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Detect service changes
+        id: changes
+        uses: ./.github/actions/service-changes
+        with:
+          service-path: Mapping_Converter
+          workflow-path: .github/workflows/mapping-converter-ci.yml
+          shared-paths: |
+            Scripts/detect-service-changes.py
+            .github/actions/dependency-audit
+            Scripts/dependency-inventory.py
+            .github/workflows/python-service-ci.yml
+            .github/actions/setup-python-service
+            Scripts/python-service-readiness.py
+            .github/requirements/python-ci.txt
+            .github/workflows/mapping-converter-cd.yml
+            .github/workflows/service-cd.yml
+            Scripts/smoke-service-image.sh
+            Scripts/registry-pull-secret.py
+
+  checks:
+    name: Mapping Converter checks
+    needs: changes
+    if: needs.changes.outputs.changed == 'true'
+    uses: ./.github/workflows/python-service-ci.yml
+    with:
+      service-path: Mapping_Converter
+      artifact-prefix: mapping-converter
+
+  quality-gate:
+    name: Mapping Converter CI Gate
+    needs: [changes, checks]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require successful change detection
+        env:
+          RESULT: ${{ needs.changes.result }}
+        run: test "$RESULT" = success
+
+      - name: Require successful checks when the service changed
+        if: needs.changes.outputs.changed != 'false'
+        env:
+          RESULT: ${{ needs.checks.result }}
+        run: test "$RESULT" = success

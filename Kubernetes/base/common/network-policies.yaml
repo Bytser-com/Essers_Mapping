@@ -74,8 +74,8 @@ spec:
 ---
 # 4. SHARED SFTPGo FILE SHARE (`sftp-shared` in `shared-storage` in-between zone):
 #    - Ingress:
-#      a) Reachable internally by ALL workloads with `essers.io/sftp-shared-access: "true"`
-#         (frontend, mapping-converter, mapping-proposal, version-control-backend, runtime-backend)
+#      a) Reachable internally by backend workloads with `essers.io/sftp-shared-access: "true"`
+#         (mapping-converter, mapping-proposal, version-control-backend, runtime-backend; Frontend is strictly BLOCKED)
 #      b) Publicly reachable on its dedicated IP (192.168.100.102 / .202) on port 2022 (mapped from Service 22) and 8080 (SFTPGo WebClient/API)
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -89,7 +89,7 @@ spec:
   policyTypes:
     - Ingress
   ingress:
-    # Internal cluster access from Frontend + Preparation Backends + Runtime Backend
+    # Internal cluster access from Preparation Backends + Runtime Backend (Frontend has NO access)
     - from:
         - podSelector:
             matchLabels:
@@ -139,29 +139,27 @@ spec:
           port: 2022
         - protocol: TCP
           port: 8080
-    # External/Public access via Dedicated LoadBalancer IP (192.168.100.103 / 192.168.100.203)
-    # Note: Pod CIDR (10.244.0.0/16) is excluded from external ipBlock so Preparation pods cannot spoof access
+    # External/Public access via Dedicated LoadBalancer IP (192.168.100.103 / 192.168.100.203) & NodePort
     - from:
         - ipBlock:
             cidr: 0.0.0.0/0
-            except:
-              - 10.244.0.0/16
       ports:
         - protocol: TCP
           port: 2022
         - protocol: TCP
           port: 8080
 ---
-# 6. PREPARATION ZONE EGRESS RESTRICTION:
-#    Explicitly ensures Preparation pods (frontend, python backends, version-control-backend)
-#    can ONLY talk to DNS, Preparation backends, and `sftp-shared` — NEVER to `runtime` zone (`sftp-runtime` or `runtime-backend`).
+# 6. FRONTEND EGRESS RESTRICTION:
+#    Frontend can ONLY talk to CoreDNS and Preparation backends (proxying /api/*).
+#    It is strictly BLOCKED from talking directly to SFTP (`sftp-shared` or `sftp-runtime`).
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: restrict-preparation-zone-egress
+  name: restrict-frontend-egress
 spec:
   podSelector:
     matchLabels:
+      app.kubernetes.io/name: frontend
       essers.io/zone: preparation
   policyTypes:
     - Egress
@@ -172,7 +170,40 @@ spec:
           port: 53
         - protocol: TCP
           port: 53
-    # Allow talking to other pods in the Preparation zone (e.g. Frontend -> /api/* backends)
+    # Allow talking ONLY to Preparation backends (proxying /api/*)
+    - to:
+        - podSelector:
+            matchLabels:
+              essers.io/zone: preparation
+              app.kubernetes.io/tier: backend
+      ports:
+        - protocol: TCP
+          port: 8000
+        - protocol: TCP
+          port: 8080
+---
+# 7. PREPARATION BACKENDS EGRESS RESTRICTION:
+#    Preparation backends (mapping-converter, mapping-proposal, version-control-backend)
+#    can talk to CoreDNS, Preparation zone, and `sftp-shared` — NEVER to `runtime` zone.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: restrict-preparation-backends-egress
+spec:
+  podSelector:
+    matchLabels:
+      essers.io/zone: preparation
+      app.kubernetes.io/tier: backend
+  policyTypes:
+    - Egress
+  egress:
+    # Allow CoreDNS resolution (UDP/TCP 53)
+    - ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Allow talking to other pods in the Preparation zone
     - to:
         - podSelector:
             matchLabels:
@@ -182,7 +213,7 @@ spec:
           port: 8000
         - protocol: TCP
           port: 8080
-    # Allow talking to the Shared SFTPGo server in the Shared-Storage zone (Service port 22 -> Pod port 2022 & API 8080)
+    # Allow talking to the Shared SFTPGo server in the Shared-Storage zone
     - to:
         - podSelector:
             matchLabels:

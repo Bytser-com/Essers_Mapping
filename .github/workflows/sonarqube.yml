@@ -1,0 +1,170 @@
+name: SonarQube
+
+on:
+  push:
+    branches: [Development]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sonarqube-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analysis:
+    name: SonarQube Quality Gate
+    # Preserve the existing SonarCloud baseline and avoid unsupported branch scans.
+    # Feature branches retain local IDE analysis and service tests/coverage.
+    if: github.ref_name == 'Development'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CI: 'true'
+      # --- Variables ---
+      SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL || 'https://sonarcloud.io' }}
+      SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY || 'Bytser-com_Essers_Mapping' }}
+      SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION || 'bytser-com' }}
+      SONAR_SCANNER_VERSION: '8.1.0.6389'
+    steps:
+      - name: Checkout repository with full history
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Require SonarQube token
+        env:
+          # --- Secrets ---
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          if [[ -z "$SONAR_TOKEN" ]]; then
+            echo "::error::Configure the repository SONAR_TOKEN secret to run SonarQube analysis."
+            exit 1
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: Frontend/package-lock.json
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: Runtime/pom.xml
+
+      # Generate coverage for every implemented service at the same revision.
+      # Unchanged services are included so the combined project retains coverage.
+      - name: Frontend tests and coverage
+        working-directory: Frontend
+        run: |
+          npm ci
+          npm run test:coverage
+
+      - name: Runtime tests, bytecode and coverage
+        working-directory: Runtime
+        run: mvn --batch-mode --no-transfer-progress -Dstyle.color=never clean verify
+
+      # The standalone scanner needs the Maven dependency JARs, including test dependencies.
+      - name: Prepare Java libraries for SonarQube
+        working-directory: Runtime
+        run: >-
+          mvn --batch-mode --no-transfer-progress -Dstyle.color=never
+          org.apache.maven.plugins:maven-dependency-plugin:3.8.1:copy-dependencies
+          -DincludeScope=test -DoutputDirectory=target/sonar-libraries
+
+      - name: Setup Mapping_Proposal
+        id: proposal
+        uses: ./.github/actions/setup-python-service
+        with:
+          service-path: Mapping_Proposal
+
+      - name: Mapping_Proposal tests and coverage
+        if: steps.proposal.outputs.enabled == 'true'
+        working-directory: Mapping_Proposal
+        run: >-
+          python -m pytest tests -ra
+          --junitxml=test-results/pytest-junit.xml
+          --cov=. --cov-branch --cov-report=term-missing
+          --cov-report=xml:coverage.xml --cov-report=html:coverage
+
+      - name: Setup Mapping_Converter
+        id: converter
+        uses: ./.github/actions/setup-python-service
+        with:
+          service-path: Mapping_Converter
+
+      - name: Mapping_Converter tests and coverage
+        if: steps.converter.outputs.enabled == 'true'
+        working-directory: Mapping_Converter
+        run: >-
+          python -m pytest tests -ra
+          --junitxml=test-results/pytest-junit.xml
+          --cov=. --cov-branch --cov-report=term-missing
+          --cov-report=xml:coverage.xml --cov-report=html:coverage
+
+      - name: Restore verified SonarScanner CLI
+        id: scanner-cache
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ runner.tool_cache }}/sonar-scanner-cli
+          key: sonar-scanner-verified-${{ runner.os }}-${{ runner.arch }}-${{ env.SONAR_SCANNER_VERSION }}-v1
+
+      - name: Bound GPG keyserver wait time
+        run: |
+          install -Dm755 Scripts/sonar-gpg.sh "$RUNNER_TEMP/sonar-tools/gpg"
+          echo "$RUNNER_TEMP/sonar-tools" >> "$GITHUB_PATH"
+
+      - name: Run SonarQube scan
+        id: sonar
+        uses: SonarSource/sonarqube-scan-action@v8.3.0
+        env:
+          # --- Secrets ---
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          scannerVersion: ${{ env.SONAR_SCANNER_VERSION }}
+          skipSignatureVerification: false
+          args: >-
+            -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=${{ env.SONAR_ORGANIZATION }}
+            -Dsonar.qualitygate.wait=false
+
+      # Inspect this scan separately so only new-code coverage is advisory.
+      - name: Check Sonar gate (coverage warns, other failures block)
+        env:
+          # --- Secrets ---
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: python Scripts/check-sonar-quality-gate.py
+
+      # A failed quality gate must not discard the successfully verified scanner.
+      - name: Save verified SonarScanner CLI
+        if: ${{ !cancelled() && steps.scanner-cache.outputs.cache-hit != 'true' && steps.sonar.outcome != 'skipped' }}
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ runner.tool_cache }}/sonar-scanner-cli
+          key: ${{ steps.scanner-cache.outputs.cache-primary-key }}
+
+      - name: Upload combined coverage and test reports
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: sonarqube-reports
+          path: |
+            test-results/sonarqube-quality-gate.json
+            Frontend/coverage/
+            Frontend/test-results/
+            Runtime/target/site/jacoco/
+            Runtime/target/surefire-reports/
+            Runtime/target/failsafe-reports/
+            Mapping_Proposal/coverage.xml
+            Mapping_Proposal/test-results/
+            Mapping_Converter/coverage.xml
+            Mapping_Converter/test-results/
+          if-no-files-found: warn
+          retention-days: 14

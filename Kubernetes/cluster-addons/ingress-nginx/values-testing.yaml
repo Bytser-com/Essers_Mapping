@@ -20,9 +20,8 @@ controller:
     controllerValue: "k8s.io/ingress-nginx"
   service:
     type: LoadBalancer
-    loadBalancerIP: "192.168.100.101"
     annotations:
-      metallb.universe.tf/loadBalancerIPs: "192.168.100.101"
+      metallb.io/loadBalancerIPs: "192.168.100.101"
     ports:
       http: 80
       https: 443

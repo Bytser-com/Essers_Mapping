@@ -5,6 +5,7 @@ collections:
   - name: ansible.utils
     version: ">=3.0.0"
   - name: community.general
-    version: ">=9.0.0"
+    # Major 14 requires a newer core than setup-ansible's 2.18 series.
+    version: ">=9.0.0,<14.0.0"
   - name: kubernetes.core
     version: ">=5.0.0"
