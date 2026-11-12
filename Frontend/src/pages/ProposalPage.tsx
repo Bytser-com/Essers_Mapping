@@ -257,7 +257,13 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
           <button type="button" className="btn" onClick={() => { onUpload?.(); setShowUploadDialog(true); }}>
             Aangepaste Excel uploaden
           </button>
-          <button type="button" className="btn btn--primary" onClick={handleApprove}>
+          <button
+            type="button"
+            className="btn btn--primary"
+            onClick={handleApprove}
+            disabled={hasReviewFields}
+            title={hasReviewFields ? "Goedkeuren is pas mogelijk als alle velden zijn nagekeken" : undefined}
+          >
             Goedkeuren
           </button>
           <button
