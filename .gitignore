@@ -34,6 +34,8 @@ __pycache__/
 .eggs/
 dist/
 build/
+.venv/
+venv/
 
 ### Ruby ###
 *.gem
@@ -150,3 +152,6 @@ playwright-report/
 coverage.xml
 htmlcov/
 .pytest_cache/
+
+# Testbestanden voor de lokale SFTP
+sftp-data/

@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom'
 import App from '../App'
 import Home from '../pages/Home'
 import VersionControl from '../pages/VersionControl'
+import ProposalPage from '../pages/ProposalPage'
 
 const router = createBrowserRouter([
   {
@@ -15,6 +16,16 @@ const router = createBrowserRouter([
       {
         path: 'version-control',
         element: <VersionControl />,
+      },
+    ],
+  },
+  {
+    path: '/proposals/:company',
+    element: <App />,
+    children: [
+      {
+        index: true,
+        element: <ProposalPage />,
       },
     ],
   },
