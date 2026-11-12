@@ -87,10 +87,6 @@ spec:
                 secretKeyRef:
                   name: sftp-runtime-credentials
                   key: SFTP_PASSWORD
-            - name: SHARED_MOUNT_PATH
-              value: "/mnt/sftp-shared"
-            - name: RUNTIME_MOUNT_PATH
-              value: "/mnt/sftp-runtime"
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -122,23 +118,9 @@ spec:
           volumeMounts:
             - name: tmp-dir
               mountPath: /tmp
-            # 1. Shared SFTP file share (in-between shared-storage zone)
-            - name: shared-files
-              mountPath: /mnt/sftp-shared
-              readOnly: false
-            # 2. Runtime SFTP file share (exclusive runtime zone)
-            - name: runtime-files
-              mountPath: /mnt/sftp-runtime
-              readOnly: false
       volumes:
         - name: tmp-dir
           emptyDir: {}
-        - name: shared-files
-          persistentVolumeClaim:
-            claimName: sftp-shared-pvc
-        - name: runtime-files
-          persistentVolumeClaim:
-            claimName: sftp-runtime-pvc
 ---
 apiVersion: v1
 kind: Service

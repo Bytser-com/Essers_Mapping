@@ -1,0 +1,34 @@
+name: Mapping Converter CD
+
+on:
+  workflow_run:
+    workflows: ['Mapping Converter CI']
+    branches: [Testing, main]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  packages: write
+
+concurrency:
+  group: mapping-converter-cd-${{ github.event.workflow_run.head_branch || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  delivery:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
+    uses: ./.github/workflows/service-cd.yml
+    with:
+      service-path: Mapping_Converter
+      image-name: mapping-converter
+      deployment: mapping-converter
+      ci-workflow: mapping-converter-ci.yml
+      artifact-name: mapping-converter-test-reports
+      artifact-path: ''
+    secrets: inherit

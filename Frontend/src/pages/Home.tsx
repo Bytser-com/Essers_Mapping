@@ -1,7 +1,17 @@
+import { useState } from 'react'
 import InterfaceUpload from '../components/InterfaceUpload'
+import ProposalOverview from '../components/ProposalOverview'
 import { uploadInterface } from '../services/uploadService'
 
 function Home() {
+  // Raised after every successful upload, so the proposals list shows the new proposal
+  const [uploads, setUploads] = useState(0)
+
+  async function upload(customerName: string, files: File[]) {
+    await uploadInterface(customerName, files)
+    setUploads((count) => count + 1)
+  }
+
   return (
     <div data-testid="home-page" className="flex flex-col gap-4 px-8 py-7">
       <div className="flex flex-col gap-[6px]">
@@ -10,7 +20,8 @@ function Home() {
           Upload een interface van een klant. De AI maakt er een mapping proposal van.
         </p>
       </div>
-      <InterfaceUpload onUpload={uploadInterface} />
+      <InterfaceUpload onUpload={upload} />
+      <ProposalOverview refreshKey={uploads} />
     </div>
   )
 }
