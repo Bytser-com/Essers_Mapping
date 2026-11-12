@@ -1,6 +1,7 @@
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useProposalStore } from "../stores/proposalStore";
+import { getProposalFile } from "../services/proposalService";
 
 type ProposalPageProps = {
   onDownload?: () => void;
@@ -22,6 +23,9 @@ const tdClass = "px-1.5 py-[13px] first:pl-4 last:pr-4 align-middle text-[13px]"
 
 function formatUploadDate(isoDate: string): string {
   const date = new Date(isoDate);
+  if (Number.isNaN(date.getTime())) {
+    return "—";
+  }
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const hours = String(date.getHours()).padStart(2, "0");
@@ -58,6 +62,37 @@ export default function ProposalPage({ onDownload, onUpload, onApprove }: Readon
     }
   }, [company, fetchProposal]);
 
+  async function handleDownload() {
+    if (onDownload) {
+      onDownload();
+      return;
+    }
+    if (!proposal) return;
+    try {
+      const file = await getProposalFile(proposal.klant, `v${proposal.versie}`);
+      if (!file.fileContentBase64) return;
+      const byteCharacters = atob(file.fileContentBase64);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], {
+        type: file.contentType || "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = file.filename || `MProposal-${proposal.klant}_v${proposal.versie}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Failed to download proposal Excel file:", err);
+    }
+  }
+
   if (loading) return <p className="px-8 py-7 text-grey">Voorstel wordt geladen...</p>;
   if (error) return <p className="px-8 py-7">{error}</p>;
   if (!proposal) return null;
@@ -69,7 +104,9 @@ export default function ProposalPage({ onDownload, onUpload, onApprove }: Readon
       <header className="flex items-end gap-4">
         <div className="flex flex-1 flex-col gap-1.5">
           <nav className="flex gap-2 text-xs text-grey">
-            <span>Home</span>
+            <Link to="/" className="text-grey hover:underline">
+              Home
+            </Link>
             <span>/</span>
             <span>{proposal.klant}</span>
           </nav>
@@ -87,13 +124,13 @@ export default function ProposalPage({ onDownload, onUpload, onApprove }: Readon
         </div>
 
         <div className="flex items-center gap-2.5">
-          <button type="button" className="btn" onClick={onDownload}>
+          <button type="button" className="btn" onClick={handleDownload}>
             Download Excel
           </button>
           <button type="button" className="btn" onClick={onUpload}>
             Aangepaste Excel uploaden
           </button>
-          <button type="button" className="btn btn--primary" onClick={onApprove} disabled={ hasReviewFields }>
+          <button type="button" className="btn btn--primary" onClick={onApprove} disabled={hasReviewFields}>
             Goedkeuren
           </button>
         </div>
