@@ -65,7 +65,7 @@ describe('ProposalTable', () => {
     ['AI_CHECKING_REVIEW', 'AI controleert review van analist'],
     ['RETURNED', 'Teruggestuurd'],
   ] as const)('TC-57-05 status %s is shown as "%s"', (status, label) => {
-    render(<ProposalTable proposals={[proposal({ status: status as any })]} />)
+    render(<ProposalTable proposals={[proposal({ status: status as unknown as Proposal['status'] })]} />)
 
     expect(within(rows()[0]!).getByText(label)).toBeInTheDocument()
   })

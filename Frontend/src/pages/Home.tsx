@@ -27,13 +27,6 @@ function Home() {
   const inRouter = useInRouterContext()
 
   const message = storeMessage || routerMessage
-  const [dismissed, setDismissed] = useState(false)
-
-  useEffect(() => {
-    if (message) {
-      setDismissed(false)
-    }
-  }, [message])
 
   async function upload(customerName: string, files: File[]) {
     await uploadInterface(customerName, files)
@@ -41,7 +34,6 @@ function Home() {
   }
 
   function handleDismiss() {
-    setDismissed(true)
     clearDeleteSuccessMessage()
     setRouterMessage(null)
     if (typeof window !== 'undefined' && window.history?.replaceState) {
@@ -59,7 +51,7 @@ function Home() {
         </p>
       </div>
 
-      {!dismissed && message && (
+      {message && (
         <div
           role="status"
           data-testid="delete-success-banner"

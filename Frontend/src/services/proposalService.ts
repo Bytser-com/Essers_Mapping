@@ -9,6 +9,8 @@ export type CompanyProposalOverviewDto = {
   fullPath?: string | null;
   createdDate?: string | null;
   createdBy?: string | null;
+  uploadUser?: string | null;
+  upload_user?: string | null;
   description?: string | null;
   status?: string | null;
   aiStatus?: string | null;
@@ -36,6 +38,8 @@ export type ProposalFileDataDto = {
   updated_time?: string | null;
   updated_date?: string | null;
   upload_user?: string | null;
+  uploadUser?: string | null;
+  createdBy?: string | null;
   status?: string | null;
   rows: Array<{
     source_field?: string | null;
@@ -101,7 +105,7 @@ export async function getProposal(company: string, version?: string): Promise<Pr
       if (fileData.upload_time) proposal.uploadTime = fileData.upload_time;
       if (fileData.updated_date) proposal.updatedDate = fileData.updated_date;
       if (fileData.updated_time) proposal.updatedTime = fileData.updated_time;
-      const directUser = fileData.upload_user || (fileData as any).uploadUser || (fileData as any).createdBy;
+      const directUser = fileData.upload_user || fileData.uploadUser || fileData.createdBy;
       if (directUser) proposal.uploadUser = directUser;
       return proposal;
     } catch (err) {
@@ -147,7 +151,7 @@ export async function getProposal(company: string, version?: string): Promise<Pr
       geupload: item.createdDate || new Date().toISOString(),
       mappings: item.mappings,
     };
-    const overviewUser = item.createdBy || (item as any).uploadUser || (item as any).upload_user;
+    const overviewUser = item.createdBy || item.uploadUser || item.upload_user;
     if (overviewUser) proposal.uploadUser = overviewUser;
     return proposal;
   }
@@ -182,7 +186,7 @@ export async function getProposal(company: string, version?: string): Promise<Pr
     if (fileData.upload_time) proposal.uploadTime = fileData.upload_time;
     if (fileData.updated_date) proposal.updatedDate = fileData.updated_date;
     if (fileData.updated_time) proposal.updatedTime = fileData.updated_time;
-    const user = fileData.upload_user || (fileData as any).uploadUser || item.createdBy || (item as any).uploadUser || (item as any).upload_user;
+    const user = fileData.upload_user || fileData.uploadUser || item.createdBy || item.uploadUser || item.upload_user;
     if (user) proposal.uploadUser = user;
     return proposal;
   } catch (err) {
@@ -198,7 +202,7 @@ export async function getProposal(company: string, version?: string): Promise<Pr
       geupload: item.createdDate || new Date().toISOString(),
       mappings: item.mappings || [],
     };
-    const fallbackUser = item.createdBy || (item as any).uploadUser || (item as any).upload_user;
+    const fallbackUser = item.createdBy || item.uploadUser || item.upload_user;
     if (fallbackUser) proposal.uploadUser = fallbackUser;
     return proposal;
   }
