@@ -15,7 +15,6 @@ from __future__ import annotations
 
 import argparse
 import json
-from pathlib import Path
 
 from services.proposal_runner import workbook_name
 from services.storage import LocalStorage, proposal_storage
