@@ -188,3 +188,20 @@ export async function getProposalFile(company: string, version: string): Promise
   }
   return res.json();
 }
+
+export async function uploadProposalFile(company: string, version: string, file: File): Promise<void> {
+  const params = new URLSearchParams({ company, version });
+
+  const res = await fetch(`${VERSION_CONTROL_API}/proposals/file?${params.toString()}`, {
+    method: "PUT",
+    headers: { "Content-Type": file.type || "application/octet-stream" },
+    body: file,
+  });
+
+  if (res.status === 502 || res.status === 503) {
+    throw new Error(`De bestanden zijn tijdelijk niet bereikbaar (status ${res.status})`);         
+  }
+  if (!res.ok) {
+    throw new Error(`Bestand kon niet worden geüpload (status ${res.status})`);
+  }
+}

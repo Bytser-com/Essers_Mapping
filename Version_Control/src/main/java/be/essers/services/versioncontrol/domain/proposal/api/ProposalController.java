@@ -27,6 +27,7 @@ import java.util.List;
 @RequestMapping({"/proposals", "/Proposals"})
 public class ProposalController {
 
+    private static final String XLSX_EXTENSION = ".xlsx";
     private final ProposalStorageService proposalStorageService;
 
     public ProposalController(ProposalStorageService proposalStorageService) {
