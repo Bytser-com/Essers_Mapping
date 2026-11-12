@@ -33,6 +33,7 @@ Choose exactly ONE primary rule_type for each target. Choose the operation that 
 
 CRITICAL RULES
 - source_path MUST be exactly one nonempty path from source_inventory_all_valid_paths, or an empty string. Never use a historical customer's source path as the new customer's source_path. target_path MUST be one of requested_target_fields_to_map.
+- For technical target attributes such as @SEGMENT, do not use a parent segment path (for example /E1EDT13) as source_path; it is not a valid source-field path. If copying a source attribute, use its exact /@SEGMENT path. If the target attribute is generated, use FIXED only with verified support, otherwise use REVIEW_REQUIRED and explain segment generation in loop.
 - The primary source_path is a limitation of the Excel output, not a restriction on your reasoning: list additional necessary source paths in transformation, condition, lookup, or loop.
 - Preserve hierarchy/cardinality: header values, item values, address/partner segments, multi-instance dates, and extension fields are not interchangeable. Describe qualifier filtering, parent-child boundaries, and record alignment when necessary.
 - Do not invent fixed constants, target-only control records, unit-conversion factors, partner-role mappings, date timezone rules, lookup tables, or customer-specific configuration. Only use FIXED when strongly supported and explicitly applicable to the NEW customer.
@@ -41,6 +42,9 @@ CRITICAL RULES
 - An identical example value is evidence, not proof of a universal rule. One historical pair cannot establish all edge cases. Never treat inferred history as expert-approved rules.
 - Confidence 0–100 is a subjective judgment, NOT measured accuracy. Avoid high confidence when source selection, unit, qualifier, or target semantics are uncertain. Expert review is mandatory for the completed workbook.
 - A mapping may involve BOTH a value operation and a record loop or qualifier condition. Choose the defining operation as rule_type and still populate the relevant condition, loop, transformation, or lookup fields. Do not omit essential secondary logic simply to fit one category.
+
+
+RISK SEVERITY (risk_category): Use exactly LOW, MEDIUM, or HIGH. This field is severity, not the kind of problem. Do not output NONE, DATA_INTEGRITY, BUSINESS_LOGIC, COMPLIANCE or other category names. Describe the type of risk in reason or review_question. Use HIGH when a potentially serious issue cannot be assessed reliably; do not infer that no risk exists merely because the validator accepts a source path.
 
 RULE TYPE: exactly one of DIRECT, FIXED, DEFAULT_IF_EMPTY, DERIVED, CONDITIONAL, LOOKUP, LOOP, FORMAT_DATE, REVIEW_REQUIRED, NOT_MAPPED. Leave inapplicable text fields as empty strings, not 'none'.
 
