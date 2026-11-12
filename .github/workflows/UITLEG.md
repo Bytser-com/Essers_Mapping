@@ -56,6 +56,13 @@ dezelfde setup, zodat ze dezelfde afhankelijkheden en testtools installeren.
 SonarQube draait één gezamenlijke analyse op `Development` en verzamelt daarvoor
 opnieuw coverage van alle geïmplementeerde services.
 
+De losse Sonar-scanner kent de Maven-classpath niet automatisch. Daarom kopiëren
+we de Runtime-dependencies (inclusief testdependencies) naar `target/sonar-libraries`.
+`sonar-project.properties` verwijst naar die JARs en de gecompileerde productie-
+en testklassen. Python wordt als versie 3.12 geanalyseerd, net als in CI.
+Het patroon `Mapping_*/coverage.xml` leest bestaande Python-rapporten en verwacht
+geen rapport van een service die alleen een README bevat.
+
 Onze teamafspraak is **minstens 70% totale coverage**. Dat is een andere maatstaf
 dan de standaard Sonar-gate: die vereist **80% coverage op nieuwe code**.
 De workflow neemt de gate over van SonarCloud; het percentage staat niet in YAML.

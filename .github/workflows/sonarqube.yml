@@ -71,6 +71,14 @@ jobs:
         working-directory: Runtime
         run: mvn --batch-mode --no-transfer-progress -Dstyle.color=never clean verify
 
+      # The standalone scanner needs the Maven dependency JARs, including test dependencies.
+      - name: Prepare Java libraries for SonarQube
+        working-directory: Runtime
+        run: >-
+          mvn --batch-mode --no-transfer-progress -Dstyle.color=never
+          org.apache.maven.plugins:maven-dependency-plugin:3.8.1:copy-dependencies
+          -DincludeScope=test -DoutputDirectory=target/sonar-libraries
+
       - name: Setup Mapping_Proposal
         id: proposal
         uses: ./.github/actions/setup-python-service

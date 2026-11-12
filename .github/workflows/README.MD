@@ -160,6 +160,13 @@ are isolated per service; placeholders defer coverage. Service linting and
 Playwright checks remain in the individual service workflows. Combined reports
 are uploaded as `sonarqube-reports` for 14 days.
 
+The standalone scanner receives Runtime's compiled production/test classes and
+dependency JARs explicitly. A Maven `copy-dependencies` step copies the resolved
+dependencies, including test libraries, into `Runtime/target/sonar-libraries`.
+Python analysis targets version 3.12 to match CI. The coverage pattern
+`Mapping_*/coverage.xml` imports reports from implemented Python services without
+requiring a report from README-only placeholders.
+
 Use the free [SonarQube for IDE](https://www.sonarsource.com/products/sonarqube/ide/)
 extension (formerly SonarLint) for local feature-branch analysis, alongside the
 local test and coverage commands below. It can align rules with SonarQube Cloud
