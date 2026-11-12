@@ -208,10 +208,8 @@ python -m pytest tests -ra --junitxml=test-results/pytest-junit.xml --cov=. --co
 
 ### Separate service CD workflows
 
-CI and CD are separate files. The reviewed delivery branch is
-`Feature/CI-Pipelines`, based on `Feature/service-ci-cd` and the latest
-`Development`. Pushes to this review branch run service CI and pipeline
-validation without deploying.
+CI and CD are separate files. Feature branches run service CI and pipeline
+validation via pull requests targeting `Development` without deploying.
 
 | CD workflow | Successful source CI | GHCR image suffix / Deployment |
 | --- | --- | --- |

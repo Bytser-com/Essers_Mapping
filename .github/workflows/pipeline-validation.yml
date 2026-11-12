@@ -5,7 +5,7 @@ on:
     branches: [main, Testing, Development]
     paths: ['.github/**', 'Scripts/**']
   push:
-    branches: [main, Testing, Development, Feature/CI-Pipelines]
+    branches: [main, Testing, Development]
     paths: ['.github/**', 'Scripts/**']
   workflow_dispatch:
 
