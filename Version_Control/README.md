@@ -88,7 +88,7 @@ Copy `.env.example` to `.env` or supply these environment variables:
 | `SFTP_PORT` | SFTP port | `22` | `SFTP_SHARED_PORT` |
 | `SFTP_USER` | SFTP username | `sftpuser` | `SFTP_SHARED_USER` |
 | `SFTP_PASSWORD` | SFTP password | `sftppass` | `SFTP_SHARED_PASSWORD` |
-| `SFTP_BASE_PATH` | Root directory on SFTP share | `/Proposals` | `SFTP_SHARED_REMOTE_DIR` |
+| `SFTP_BASE_PATH` | Root directory on SFTP share | `/Proposals` | `SFTP_SHARED_PROPOSALS_DIR` |
 | `SFTP_ALLOW_UNKNOWN_KEYS` | Allow unverified SSH host keys | `true` | — |
 
 ---

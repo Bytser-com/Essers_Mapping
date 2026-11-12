@@ -310,7 +310,7 @@ One proposal in the response:
 <shared storage>/proposals/<customer-folder>/v<version>/proposal.json
 ```
 
-- The proposals are stored on an SFTP server, in `<SFTP_SHARED_REMOTE_DIR>/Proposals/<customer>/v<N>/`. This service connects to it directly over SFTP (`services/storage.py`, with paramiko). `/Proposals` is also the folder the Version_Control service reads, so both services find the same files. The folder name can be changed with `SFTP_SHARED_PROPOSALS_DIR`.
+- The proposals are stored on an SFTP server, in `<SFTP_SHARED_PROPOSALS_DIR>/<customer>/v<N>/`. This service connects to it directly over SFTP (`services/storage.py`, with paramiko). `/Proposals` is also the folder the Version_Control service reads, so both services find the same files. The folder name can be configured with `SFTP_SHARED_PROPOSALS_DIR`.
 - In Kubernetes the settings come from the `common-config` ConfigMap and the `sftp-shared-credentials` Secret (`SFTP_SHARED_HOST=sftp-shared`). Later the SFTP server at Essers will be used: then only these settings change. Because those servers are not always reachable, **locally SFTPGo runs in Docker** (`Scripts/docker-compose.sftp.yml` from repo root):
 
   ```powershell
@@ -324,7 +324,7 @@ One proposal in the response:
   SFTP_SHARED_PORT=2222
   SFTP_SHARED_USER=shareduser
   SFTP_SHARED_PASSWORD=devpassword
-  SFTP_SHARED_REMOTE_DIR=/
+  SFTP_SHARED_PROPOSALS_DIR=/Proposals
   ```
 
   The files on that server are visible in `data/sftp-server/`. `pytest -m integration` tests against it (skipped when it is not running).

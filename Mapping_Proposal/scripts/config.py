@@ -86,24 +86,19 @@ def sftp_shared_config() -> dict | None:
         port = int(os.getenv('SFTP_SHARED_PORT', '22'))
     except ValueError:
         port = 22
-    base = os.getenv('SFTP_SHARED_REMOTE_DIR', '').strip() or '/'
-    explicit_prop = os.getenv('SFTP_SHARED_PROPOSALS_DIR')
-    if explicit_prop is not None and explicit_prop.strip():
-        proposals_dir = explicit_prop.strip().strip('/')
-    elif base.rstrip('/').endswith('Proposals'):
-        proposals_dir = ''
-    else:
-        proposals_dir = 'Proposals'
+    prop = os.getenv('SFTP_SHARED_PROPOSALS_DIR', '/Proposals').strip() or '/Proposals'
+    if not prop.startswith('/'):
+        prop = '/' + prop
 
     return {
         'host': host,
         'port': port,
         'user': os.getenv('SFTP_SHARED_USER', '').strip(),
         'password': os.getenv('SFTP_SHARED_PASSWORD', ''),
-        # Folder on the server; the proposals go in <SFTP_SHARED_REMOTE_DIR>/<SFTP_SHARED_PROPOSALS_DIR>,
-        # by default /Proposals: the folder the Version_Control service reads (SFTP_BASE_PATH).
-        'base_dir': base,
-        'proposals_dir': proposals_dir,
+        # Root folder on the server where proposals are stored (default: /Proposals),
+        # matching the folder the Version_Control service reads (SFTP_SHARED_PROPOSALS_DIR).
+        'base_dir': prop,
+        'proposals_dir': '',
     }
 
 

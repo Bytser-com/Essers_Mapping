@@ -77,7 +77,7 @@ spec:
                 secretKeyRef:
                   name: sftp-shared-credentials
                   key: SFTP_PASSWORD
-            # Connects directly over SFTP to sftp-shared (SFTP_SHARED_HOST/PORT/USER/REMOTE_DIR)
+            # Connects directly over SFTP to sftp-shared (SFTP_SHARED_HOST/PORT/USER/PROPOSALS_DIR)
             # Files wait in /tmp/source until the service handles them.
             - name: INCOMING_DIR
               value: "/tmp/source"

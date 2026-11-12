@@ -32,7 +32,7 @@
 #   SFTP_SHARED_PORT=2222
 #   SFTP_SHARED_USER=shareduser
 #   SFTP_SHARED_PASSWORD=devpassword
-#   SFTP_SHARED_REMOTE_DIR=/
+#   SFTP_SHARED_PROPOSALS_DIR=/Proposals
 #
 # Runtime Backend (Runtime SFTP):
 #   SFTP_RUNTIME_HOST=localhost
