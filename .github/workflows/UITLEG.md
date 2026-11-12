@@ -67,9 +67,23 @@ Onze teamafspraak is **minstens 70% totale coverage**. Dat is een andere maatsta
 dan de standaard Sonar-gate: die vereist **80% coverage op nieuwe code**.
 De workflow neemt de gate over van SonarCloud; het percentage staat niet in YAML.
 Een eigen gate met 70% totale coverage vereist in SonarCloud een Team- of
-Enterprise-abonnement. De bestaande Sonar-gate blijft actief.
+Enterprise-abonnement. De bestaande Sonar-gate blijft actief in SonarCloud.
+In GitHub Actions behandelen we alleen een tekort aan coverage op nieuwe code
+als waarschuwing. De cloud-gate kan daardoor rood zijn terwijl deze workflow groen
+is. Security-, betrouwbaarheids-, onderhoudbaarheids-, duplicatie- en andere
+gatefouten blijven de workflow blokkeren. De 70% totale coverage is een teamdoel;
+deze wijziging voegt daarvoor geen automatische grens toe.
 Let op: Sonars `Coverage` combineert regels en vertakkingen en kan dus lager zijn
 dan alleen `Line coverage`. Bekijk voor onze afspraak de totale `Coverage`.
+
+De scan uploadt eerst de analyse zonder zelf op de gate te wachten. Daarna leest
+`Scripts/check-sonar-quality-gate.py` het taaknummer uit `.scannerwork/report-task.txt`.
+Het script wacht maximaal vijf minuten op die taak en controleert de voorwaarden
+van precies die analyse. Alleen `new_coverage` geeft een `::warning::` en exitcode 0.
+Andere gefaalde voorwaarden, ontbrekende resultaten, API-fouten en timeouts geven
+exitcode 1. Een fout tijdens het scannen zelf blijft ook blokkeren.
+Het JSON-gateresultaat staat in het artifact `sonarqube-reports`, onder
+`test-results/sonarqube-quality-gate.json`.
 
 De scanner controleert bij de installatie een GPG-handtekening. We bewaren de
 geverifieerde scanner in een cache, ook als de analyse vervolgens een rode gate
