@@ -70,6 +70,11 @@ spec:
             - configMapRef:
                 name: common-config
           env:
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: gemini-api
+                  key: GEMINI_API_KEY
             - name: SERVICE_NAME
               value: "mapping-proposal"
             - name: SFTP_SHARED_PASSWORD

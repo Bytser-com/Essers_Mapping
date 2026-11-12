@@ -244,13 +244,43 @@ jobs:
           chmod 600 "$kubeconfig_path"
           echo "KUBECONFIG=$kubeconfig_path" >> "$GITHUB_ENV"
 
+      - name: Configure Mapping Proposal Gemini credentials
+        if: inputs.service-path == 'Mapping_Proposal'
+        env:
+          # --- Secrets ---
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          set -euo pipefail
+          : "${GEMINI_API_KEY:?Set GEMINI_API_KEY as a GitHub repository or environment secret}"
+          kubectl create secret generic gemini-api \
+            --namespace "$NAMESPACE" \
+            --from-literal=GEMINI_API_KEY="$GEMINI_API_KEY" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
       - name: Deploy only the selected service and wait for rollout
         run: |
           set -euo pipefail
           kubectl get deployment "$DEPLOYMENT" -n "$NAMESPACE" >/dev/null
           # Durable credentials allow later restarts/scaling after GITHUB_TOKEN expires.
           python3 Scripts/registry-pull-secret.py | kubectl apply -f -
-          patch=$(python3 -c 'import json,os; print(json.dumps({"metadata":{"annotations":{"essers.io/image-managed-by":"service-cd","essers.io/source-sha":os.environ["SOURCE_SHA"]}},"spec":{"template":{"spec":{"containers":[{"name":os.environ["DEPLOYMENT"],"image":os.environ["IMAGE"]}]}}}}))')
+          # Apply image and key-refresh annotation together, producing one rollout.
+          patch=$(python3 -c '
+          import json
+          import os
+
+          template = {"spec": {"containers": [{"name": os.environ["DEPLOYMENT"], "image": os.environ["IMAGE"]}]}}
+          if os.environ["DEPLOYMENT"] == "mapping-proposal":
+              template["metadata"] = {"annotations": {
+                  "essers.io/gemini-deploy-run": os.environ["GITHUB_RUN_ID"] + "-" + os.environ["GITHUB_RUN_ATTEMPT"],
+              }}
+          print(json.dumps({
+              "metadata": {"annotations": {
+                  "essers.io/image-managed-by": "service-cd",
+                  "essers.io/source-sha": os.environ["SOURCE_SHA"],
+              }},
+              "spec": {"template": template},
+          }))
+          ')
           kubectl patch deployment "$DEPLOYMENT" -n "$NAMESPACE" --type=strategic --patch "$patch"
           if ! kubectl rollout status "deployment/$DEPLOYMENT" -n "$NAMESPACE" --timeout=300s; then
             echo "::error::Rollout failed or timed out for deployment/$DEPLOYMENT in $NAMESPACE. Triggering automatic rollback..."

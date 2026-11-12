@@ -77,7 +77,7 @@ Mapping_Proposal/
 
 ## First-time setup (Windows / VS Code)
 
-1. Open the **`ai_tool` folder** in VS Code or a PowerShell terminal.
+1. Open the **`Mapping_Proposal` folder** in VS Code or a PowerShell terminal.
 2. Make sure Python is installed (preferably Python 3.11 or later).
 3. Optional but recommended: create a virtual environment:
 
@@ -92,7 +92,13 @@ Mapping_Proposal/
    python -m pip install -r requirements.txt
    ```
 
-5. Make sure there is a local `.env` file in the `ai_tool` folder. It is not stored in Git, so create it yourself if it is missing:
+5. Copy the shared example to your personal, Git-ignored `.env` file:
+
+   ```powershell
+   Copy-Item .env.example .env
+   ```
+
+   Edit `.env`, for example:
 
    ```text
    GEMINI_API_KEY=replace_with_your_key
@@ -101,6 +107,29 @@ Mapping_Proposal/
    ```
 
 6. Open `.env` and replace `replace_with_your_key` with a **valid Gemini API key**. You can also change `GEMINI_MODEL` to another model available to your account. **Never commit or share `.env`.**
+
+### Gemini credentials in CI/CD
+
+Each developer uses their own key in `Mapping_Proposal/.env`. Keep
+`.env.example` as a blank template, without anyone's real key. Local `.env`
+files are excluded from Git and from the Docker build context.
+
+For deployment, add a team-managed `GEMINI_API_KEY` under GitHub repository
+**Settings → Secrets and variables → Actions → New repository secret**.
+Both Testing and Production can use this shared deployment key. To use separate
+keys, configure an environment secret with the same name under
+**Settings → Environments → Testing / Production → Environment secrets**;
+the environment value takes precedence over the repository value.
+
+Service CD and full Kubernetes CD populate the Kubernetes Secret `gemini-api`.
+Only Mapping Proposal references it as the environment variable
+`GEMINI_API_KEY`. An injected environment variable takes precedence over a
+local `.env` value. A live deployment fails clearly if the GitHub secret is
+missing; validation and CI tests do not require it. Tests mock Gemini.
+
+Service CD restarts Mapping Proposal to pick up a changed key. For a key-only
+change through full Kubernetes CD, select `restart` to refresh existing Pods.
+This credential setup does not replace the Dockerfile required by service CD.
 
 ## Your first mapping proposal
 
