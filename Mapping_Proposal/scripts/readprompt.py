@@ -22,7 +22,7 @@ except ImportError:  # Preview/offline modes work before installing API dependen
 
 # Settings (API key, model, timeout) now come from config.py instead of
 # reading .env here; errors are translated into the tool's own error types.
-from .config import PROMPT_PATH, ROOT, load_settings
+from .config import PROMPT_PATH, ROOT, gemini_max_attempts, load_settings
 from .errors import ConfigError, GeminiError, QuotaExceededError
 
 logger = logging.getLogger(__name__)
@@ -169,10 +169,11 @@ def run_gemini(
             retry_options=types.HttpRetryOptions(attempts=1),
         ),
     )
+    max_attempts = gemini_max_attempts()
     try:
-        for attempt in range(1, 5):
+        for attempt in range(1, max_attempts + 1):
             try:
-                logger.info('Gemini request: %s (attempt %d/4)', model, attempt)
+                logger.info('Gemini request: %s (attempt %d/%d)', model, attempt, max_attempts)
                 if on_event:
                     on_event({'type': 'attempt'})
                 response = client.models.generate_content(
@@ -214,7 +215,7 @@ def run_gemini(
                 if code != 429:
                     raise _client_error(error) from error
                 kind = _quota_type(error)
-                if kind != 'minute' or attempt == 4:
+                if kind != 'minute' or attempt == max_attempts:
                     raise QuotaExceededError(f'Gemini rate limit reached ({kind} quota).', code=429) from error
                 delay = (_retry_after_seconds(error) or 65.0) + 2.0
                 logger.warning('Per-minute quota reached. Waiting %.1fs before retrying...', delay)
@@ -224,20 +225,26 @@ def run_gemini(
             except errors.ServerError as error:
                 if on_event:
                     on_event({'type': 'api_error', 'code': getattr(error, 'code', None)})
-                # 503 = Gemini overloaded: retry with increasing waits, up to 4 attempts.
+                # Transient Gemini server errors: retry with capped exponential backoff.
                 code = getattr(error, 'code', None)
-                if code == 503 and attempt == 4:
-                    raise QuotaExceededError('Gemini is overloaded (503).', code=503) from error
-                if code != 503:
+                if code in (500, 502, 503, 504) and attempt == max_attempts:
+                    raise GeminiError(f'Gemini server unavailable ({code}) after {max_attempts} attempts.', code=code) from error
+                if code not in (500, 502, 503, 504):
                     raise GeminiError(f'Gemini server error ({code}): {_short_message(error)}', code=code) from error
                 delay = min(2 ** (attempt - 1) + random.uniform(0, 1), 30)
-                logger.warning('Gemini overloaded (503). Retrying in %.1fs...', delay)
+                logger.warning('Gemini server unavailable (%s). Retrying in %.1fs...', code, delay)
                 if on_event:
                     on_event({'type': 'retry'})
                 time.sleep(delay)
             except httpx.TimeoutException as error:
                 if on_event:
                     on_event({'type': 'api_error', 'code': 'timeout'})
-                raise GeminiError(f'Gemini request timed out ({timeout} ms)', code='timeout') from error
+                if attempt == max_attempts:
+                    raise GeminiError(f'Gemini request timed out ({timeout} ms)', code='timeout') from error
+                delay = min(2 ** (attempt - 1) + random.uniform(0, 1), 30)
+                logger.warning('Gemini request timed out. Retrying in %.1fs...', delay)
+                if on_event:
+                    on_event({'type': 'retry'})
+                time.sleep(delay)
     finally:
         client.close()

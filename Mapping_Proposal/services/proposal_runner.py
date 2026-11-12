@@ -26,7 +26,7 @@ from dataclasses import replace
 from pathlib import Path
 
 from scripts.config import SOURCE_DIR
-from scripts.errors import InputDataError
+from scripts.errors import GeminiError, InputDataError
 from scripts.models import MappingResult, MappingSettings
 
 from .proposals import AiStatus, ProposalRef, ProposalStatus, ProposalStore
@@ -46,6 +46,16 @@ def workbook_name(customer: str, version: int) -> str:
     return f'MProposal-{name}_V{version}.xlsx'
 
 RunMapping = Callable[[MappingSettings], MappingResult]
+
+def is_retryable_gemini_error(error: BaseException) -> bool:
+    """Only transient Gemini failures can keep an upload in RUNNING state."""
+    if not isinstance(error, GeminiError):
+        return False
+    if error.code == 429:
+        # Unknown/daily quota errors are not safe to retry indefinitely.
+        return 'minute quota' in str(error).lower()
+    return error.code in (500, 502, 503, 504, 'timeout')
+
 
 
 def _default_run() -> RunMapping:
@@ -68,11 +78,13 @@ def generate_proposal(
     source_dir: Path,
     store: ProposalStore,
     run: RunMapping | None = None,
+    *,
+    retry_temporary: bool = False,
 ) -> MappingResult:
     """Step 2: let the AI analyse the XML in ``source_dir`` and store the Excel on SFTP.
 
-    On any failure (also Ctrl+C) the row gets AI status "Mislukt", so it is never
-    left on "Bezig"; the error is raised again for the caller.
+    For automatic uploads, transient Gemini failures keep the status RUNNING so
+    the watcher can resume the same checkpoints. Permanent errors still fail.
     """
     run = run or _default_run()
     try:
@@ -81,9 +93,12 @@ def generate_proposal(
         result = run(replace(settings, source_dir=Path(source_dir)))
         store.save_file(ref, result.workbook_path, workbook_name(ref.customer, ref.version))
     except BaseException as error:
-        store.set_status(ref, ProposalStatus.AI_GENERATING, AiStatus.FAILED,
-                         error=f'{type(error).__name__}: {error}'[:300])
-        logger.warning(f'Proposal {ref.id}: AI run failed.')
+        if retry_temporary and is_retryable_gemini_error(error):
+            logger.warning('Proposal %s: temporary Gemini failure; keeping it in progress.', ref.id)
+        else:
+            store.set_status(ref, ProposalStatus.AI_GENERATING, AiStatus.FAILED,
+                             error=f'{type(error).__name__}: {error}'[:300])
+            logger.warning('Proposal %s: AI run failed.', ref.id)
         raise
 
     # Done: "Klaar om na te kijken".
