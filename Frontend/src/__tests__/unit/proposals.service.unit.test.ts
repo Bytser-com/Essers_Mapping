@@ -34,9 +34,9 @@ describe('fetchProposals', () => {
 
     const result = await fetchProposals(controller.signal)
     expect(result.total).toBe(1)
-    expect(result.proposals[0].customer).toBe('Ostavel')
-    expect(result.proposals[0].version).toBe(1)
-    expect(result.proposals[0].status).toBe('READY_FOR_REVIEW')
+    expect(result.proposals[0]?.customer).toBe('Ostavel')
+    expect(result.proposals[0]?.version).toBe(1)
+    expect(result.proposals[0]?.status).toBe('READY_FOR_REVIEW')
 
     expect(fetchMock).toHaveBeenCalledWith('/api/version-control/proposals', { signal: controller.signal })
   })

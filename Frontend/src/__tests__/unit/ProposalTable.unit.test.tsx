@@ -44,12 +44,12 @@ describe('ProposalTable', () => {
     )
 
     expect(rows()).toHaveLength(2)
-    const first = within(rows()[0])
+    const first = within(rows()[0]!)
     expect(first.getByText('Ostavel')).toBeInTheDocument()
     expect(first.getByText('v1')).toBeInTheDocument()
     expect(first.getByText(formatUploadedAt('2026-10-30T13:30:00+01:00'))).toBeInTheDocument()
     expect(first.getByText('Klaar om na te kijken')).toBeInTheDocument()
-    const second = within(rows()[1])
+    const second = within(rows()[1]!)
     expect(second.getByText('Brunos')).toBeInTheDocument()
     expect(second.getByText('v3')).toBeInTheDocument()
     expect(second.getByText('In review')).toBeInTheDocument()
@@ -64,7 +64,7 @@ describe('ProposalTable', () => {
   ] as const)('TC-57-05 status %s is shown as "%s"', (status, label) => {
     render(<ProposalTable proposals={[proposal({ status })]} />)
 
-    expect(within(rows()[0]).getByText(label)).toBeInTheDocument()
+    expect(within(rows()[0]!).getByText(label)).toBeInTheDocument()
   })
 
   it.each([
@@ -74,7 +74,7 @@ describe('ProposalTable', () => {
   ] as const)('TC-57-05 AI status %s is shown as "%s"', (aiStatus, label) => {
     render(<ProposalTable proposals={[proposal({ ai_status: aiStatus })]} />)
 
-    expect(within(rows()[0]).getByText(label)).toBeInTheDocument()
+    expect(within(rows()[0]!).getByText(label)).toBeInTheDocument()
   })
 
   it('TC-57-06 "Openen" is disabled while the AI is making the proposal', () => {
@@ -87,8 +87,8 @@ describe('ProposalTable', () => {
       />,
     )
 
-    expect(within(rows()[0]).getByRole('button', { name: 'Openen' })).toBeDisabled()
-    expect(within(rows()[1]).getByRole('button', { name: 'Openen' })).toBeEnabled()
+    expect(within(rows()[0]!).getByRole('button', { name: 'Openen' })).toBeDisabled()
+    expect(within(rows()[1]!).getByRole('button', { name: 'Openen' })).toBeEnabled()
   })
 
   it('TC-57-06 "Openen" goes to the page of that customer', async () => {
