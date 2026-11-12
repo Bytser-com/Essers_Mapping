@@ -1,6 +1,5 @@
 """Routes for the proposals overview on the Home page (GET /proposals)."""
 from datetime import datetime
-from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
@@ -21,13 +20,13 @@ class ProposalOut(BaseModel):
     version: int                     # column VERSIE (show as "v1")
     uploaded_at: datetime            # column GEÜPLOAD OP (ISO 8601 with timezone)
     status: ProposalStatus           # column STATUS (code; the frontend shows the Dutch label)
-    ai_status: Optional[AiStatus] = None  # column AI-STATUS; null = "—"
+    ai_status: AiStatus | None = None  # column AI-STATUS; null = "—"
     can_open: bool                   # whether the "Openen" button is enabled
 
 
 class ProposalListOut(BaseModel):
     total: int                       # number shown in the "Proposals" badge
-    proposals: List[ProposalOut]
+    proposals: list[ProposalOut]
 
 
 # Dependency: tests replace this with a store on a temporary folder.

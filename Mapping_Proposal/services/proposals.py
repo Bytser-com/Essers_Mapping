@@ -25,14 +25,14 @@ Example proposal.json:
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
-from datetime import datetime, timezone
-from enum import Enum
 import json
 import logging
-from pathlib import Path
 import re
 import unicodedata
+from dataclasses import dataclass
+from datetime import UTC, datetime
+from enum import StrEnum
+from pathlib import Path
 
 from .storage import LocalStorage, Storage, StorageSession
 
@@ -45,7 +45,7 @@ METADATA_FILE = 'proposal.json'
 _VERSION_FOLDER = re.compile(r'^v(\d+)$')
 
 
-class ProposalStatus(str, Enum):
+class ProposalStatus(StrEnum):
     """Workflow status of a proposal. The frontend translates these codes to labels."""
 
     AI_GENERATING = 'AI_GENERATING'            # "AI maakt voorstel"
@@ -55,7 +55,7 @@ class ProposalStatus(str, Enum):
     RETURNED = 'RETURNED'                      # "Teruggestuurd"
 
 
-class AiStatus(str, Enum):
+class AiStatus(StrEnum):
     """What the AI is doing for this proposal. ``None`` means nothing ("—" in the UI)."""
 
     RUNNING = 'RUNNING'  # "Bezig"
@@ -146,7 +146,7 @@ class ProposalStore:
             while not s.make_dir(f'{customer_dir}/v{version}'):
                 version += 1
             folder = f'{customer_dir}/v{version}'
-            now = datetime.now(timezone.utc).isoformat(timespec='seconds')
+            now = datetime.now(UTC).isoformat(timespec='seconds')
             _write_metadata(s, folder, {
                 'customer': customer,
                 'company': customer,
@@ -166,7 +166,7 @@ class ProposalStore:
             data.update({
                 'status': status.value,
                 'ai_status': ai_status.value if ai_status else None,
-                'updated_at': datetime.now(timezone.utc).isoformat(timespec='seconds'),
+                'updated_at': datetime.now(UTC).isoformat(timespec='seconds'),
             })
             if error:
                 data['error'] = error  # short message for analysts/logs; not shown in the overview yet
@@ -277,7 +277,7 @@ def _parse_timestamp(value) -> datetime:
     except ValueError:
         raise ValueError(f'uploaded_at is not an ISO 8601 timestamp: {value!r}') from None
     if moment.tzinfo is None:
-        moment = moment.replace(tzinfo=timezone.utc)
+        moment = moment.replace(tzinfo=UTC)
     return moment
 
 

@@ -5,7 +5,6 @@ used from the command line and (later) from an API without stopping the process.
 """
 from __future__ import annotations
 
-
 # Hierarchy:
 #   MappingError            -> catch this one to handle every expected tool error
 #   ├── ConfigError         -> fix .env or the command-line options

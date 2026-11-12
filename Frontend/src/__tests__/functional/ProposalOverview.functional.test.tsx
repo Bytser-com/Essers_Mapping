@@ -30,7 +30,7 @@ function list(...proposals: Proposal[]): ProposalList {
 // A fake backend that answers with the given lists in order; the last one keeps repeating.
 function loader(...responses: Array<ProposalList | Error>) {
   let call = 0
-  return vi.fn(async (_signal: AbortSignal) => {
+  return vi.fn(async () => {
     const response = responses[Math.min(call, responses.length - 1)]
     call += 1
     if (response instanceof Error) throw response

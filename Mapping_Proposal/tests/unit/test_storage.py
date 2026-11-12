@@ -5,18 +5,24 @@ SFTP server is needed. The same ProposalStore code runs on both storages.
 """
 from __future__ import annotations
 
-from contextlib import contextmanager
 import errno
 import os
-from pathlib import Path
 import sys
 import types
+from contextlib import contextmanager
+from pathlib import Path
 
 import pytest
 
 from scripts.errors import StorageError
 from services.proposals import AiStatus, ProposalStatus, ProposalStore
-from services.storage import LocalStorage, SftpSettings, SftpStorage, _SftpSession, proposal_storage
+from services.storage import (
+    LocalStorage,
+    SftpSettings,
+    SftpStorage,
+    _SftpSession,
+    proposal_storage,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -35,20 +41,20 @@ class FakeSftpClient:
     def stat(self, remote):
         path = self._local(remote)
         if not path.exists():
-            raise IOError(errno.ENOENT, 'No such file')
+            raise OSError(errno.ENOENT, 'No such file')
         return os.stat(path)
 
     def listdir_attr(self, remote):
         path = self._local(remote)
         if not path.is_dir():
-            raise IOError(errno.ENOENT, 'No such folder')
+            raise OSError(errno.ENOENT, 'No such folder')
         return [types.SimpleNamespace(filename=child.name, st_mode=os.stat(child).st_mode)
                 for child in path.iterdir()]
 
     def mkdir(self, remote):
         path = self._local(remote)
         if path.exists() or not path.parent.is_dir():
-            raise IOError('Failure')  # SFTP servers give a generic failure
+            raise OSError('Failure')  # SFTP servers give a generic failure
         path.mkdir()
 
     def open(self, remote, mode):
@@ -59,12 +65,12 @@ class FakeSftpClient:
 
     def posix_rename(self, old, new):
         if not self.supports_posix_rename:
-            raise IOError('posix-rename not supported')
+            raise OSError('posix-rename not supported')
         os.replace(self._local(old), self._local(new))
 
     def rename(self, old, new):
         if self._local(new).exists():
-            raise IOError('Failure: target exists')
+            raise OSError('Failure: target exists')
         os.rename(self._local(old), self._local(new))
 
     def remove(self, remote):
@@ -147,9 +153,8 @@ def test_unreachable_sftp_server_gives_a_storage_error(monkeypatch):
     monkeypatch.setitem(sys.modules, 'paramiko', types.SimpleNamespace(Transport=FailingTransport))
     storage = SftpStorage(SftpSettings(host='sftp-shared', user='shareduser', password='x'))
 
-    with pytest.raises(StorageError, match='sftp-shared:22'):
-        with storage.session():
-            pass
+    with pytest.raises(StorageError, match='sftp-shared:22'), storage.session():
+        pass
 
 
 def test_sftp_connection_is_closed_after_the_session(monkeypatch):

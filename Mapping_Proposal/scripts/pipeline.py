@@ -6,17 +6,25 @@ All mapping decisions are proposed by Gemini and require expert approval.
 """
 from __future__ import annotations
 
-from collections import Counter
-from dataclasses import dataclass
-from datetime import datetime, timezone
 import hashlib
 import json
 import logging
 import os
-from pathlib import Path
 import time
+from collections import Counter
+from dataclasses import dataclass
+from datetime import UTC, datetime
+from pathlib import Path
 
-from .config import HISTORICAL_DIR, PROMPT_PATH, ROOT, RUNS_DIR, SOURCE_DIR, TEMPLATE_PATH, load_settings
+from .config import (
+    HISTORICAL_DIR,
+    PROMPT_PATH,
+    ROOT,
+    RUNS_DIR,
+    SOURCE_DIR,
+    TEMPLATE_PATH,
+    load_settings,
+)
 from .errors import ConfigError, InputDataError, QuotaExceededError
 from .excel_generator import export_excel
 from .experiment_tracker import ExperimentTracker
@@ -232,7 +240,7 @@ def run_mapping(settings: MappingSettings) -> MappingResult:
     same settings resumes the job.
     """
     started = time.perf_counter()
-    started_utc = datetime.now(timezone.utc).isoformat(timespec='seconds')
+    started_utc = datetime.now(UTC).isoformat(timespec='seconds')
     inputs = _prepare(settings)
     log_preview(_preview(inputs, settings))
 

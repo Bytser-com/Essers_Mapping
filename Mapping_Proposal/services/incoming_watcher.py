@@ -27,17 +27,18 @@ Runs inside the API (started in api.py), or separately:
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass
 import json
 import logging
 import os
 import shutil
-from pathlib import Path
 import threading
-from typing import Callable
+from collections.abc import Callable
+from dataclasses import dataclass
+from pathlib import Path
 
 from scripts.config import ai_limit_targets, incoming_dir, incoming_poll_seconds
 from scripts.models import MappingSettings
+
 from .proposal_runner import RunMapping, generate_proposal, start_proposal
 from .proposals import AiStatus, ProposalRef, ProposalStatus, ProposalStore
 from .storage import proposal_storage

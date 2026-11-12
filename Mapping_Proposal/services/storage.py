@@ -15,14 +15,15 @@ is reused for a group of operations and always closed afterwards.
 """
 from __future__ import annotations
 
-from contextlib import contextmanager
-from dataclasses import dataclass
 import logging
 import os
-from pathlib import Path, PurePosixPath
 import posixpath
 import stat
-from typing import Iterator, Protocol
+from collections.abc import Iterator
+from contextlib import contextmanager
+from dataclasses import dataclass
+from pathlib import Path, PurePosixPath
+from typing import Protocol
 
 from scripts.errors import StorageError
 
@@ -48,10 +49,13 @@ class Storage(Protocol):
     def describe(self) -> str: ...
 
 
-def proposal_storage() -> 'LocalStorage | SftpStorage':
+def proposal_storage() -> LocalStorage | SftpStorage:
     """Where the proposals are stored: the SFTP server if SFTP_SHARED_HOST is set, else
     the local folder data/sftp-shared/proposals/."""
-    from scripts.config import proposals_dir, sftp_shared_config  # read .env at call time
+    from scripts.config import (  # read .env at call time
+        proposals_dir,
+        sftp_shared_config,
+    )
 
     config = sftp_shared_config()
     if config:
@@ -78,7 +82,7 @@ class LocalStorage:
         return f'local folder {self.root}'
 
     @contextmanager
-    def session(self) -> Iterator['LocalStorage']:
+    def session(self) -> Iterator[LocalStorage]:
         yield self
 
     def _path(self, path: str) -> Path:
@@ -147,7 +151,7 @@ class SftpStorage:
         return f'sftp://{s.user}@{s.host}:{s.port}{self.root}'
 
     @contextmanager
-    def session(self) -> Iterator['_SftpSession']:
+    def session(self) -> Iterator[_SftpSession]:
         try:
             import paramiko
         except ImportError as error:  # pragma: no cover - only without requirements installed
@@ -185,13 +189,13 @@ class _SftpSession:
     def _stat(self, remote: str):
         try:
             return self.client.stat(remote)
-        except IOError:
+        except OSError:
             return None
 
     def list_dirs(self, path: str) -> list[str]:
         try:
             entries = self.client.listdir_attr(self._path(path))
-        except IOError:
+        except OSError:
             return []
         return sorted(e.filename for e in entries if stat.S_ISDIR(e.st_mode or 0))
 
@@ -207,7 +211,7 @@ class _SftpSession:
                 continue
             try:
                 self.client.mkdir(current)
-            except IOError:
+            except OSError:
                 if self._stat(current) is None:  # not created by someone else at the same time
                     raise
 
@@ -216,7 +220,7 @@ class _SftpSession:
         try:
             self.client.mkdir(remote)
             return True
-        except IOError:
+        except OSError:
             if self._stat(remote) is not None:
                 return False
             raise
@@ -241,7 +245,7 @@ class _SftpSession:
         write(temp)
         try:
             self.client.posix_rename(temp, remote)  # overwrites (OpenSSH/SFTPGo extension)
-        except IOError:
+        except OSError:
             # Server without posix-rename: remove the old file first, then a normal rename.
             if self._stat(remote) is not None:
                 self.client.remove(remote)

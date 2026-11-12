@@ -19,17 +19,17 @@ result. The SFTP share is a temporary folder with the same layout (see services/
 How the Home page shows these statuses is tested in
 Frontend/src/__tests__/functional/ProposalOverview.fitcriteria.test.tsx.
 """
-from datetime import datetime, timedelta, timezone
 import json
-from pathlib import Path
 import shutil
+from datetime import UTC, datetime, timedelta
+from pathlib import Path
 
-from openpyxl import load_workbook
 import pytest
+from openpyxl import load_workbook
 
-import scripts.pipeline as pipeline
-from services.incoming_watcher import IncomingWatcher
+from scripts import pipeline
 from scripts.models import MappingSettings
+from services.incoming_watcher import IncomingWatcher
 from services.proposal_runner import workbook_name
 from services.proposals import AiStatus, ProposalStatus, ProposalStore
 
@@ -167,7 +167,7 @@ def test_tc_new_row_after_upload_with_name_version_date_and_ai_maakt_voorstel(tm
     ai.on_call = lambda: rows_during_ai.append({p.customer: p.to_dict() for p in sftp.list_proposals()})
     upload(incoming, 'upload-1', 'Ostavel', OSTAVEL_XML)
     upload(incoming, 'upload-2', 'Klant B', xml_variant(tmp_path, 'order_klant_b.xml', 'SO-KLB-0042'))
-    upload_moment = datetime.now(timezone.utc).replace(microsecond=0)
+    upload_moment = datetime.now(UTC).replace(microsecond=0)
 
     watcher.run_once()
 

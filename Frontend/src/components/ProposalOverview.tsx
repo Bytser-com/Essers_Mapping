@@ -36,6 +36,7 @@ function ProposalOverview({
   // After an upload: reload now (quietly, the current table stays visible) and keep checking.
   useEffect(() => {
     if (refreshKey === 0) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setWaitUntil(Date.now() + waitAfterUploadMs)
     setAttempt((count) => count + 1)
   }, [refreshKey, waitAfterUploadMs])
