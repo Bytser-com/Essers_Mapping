@@ -11,5 +11,10 @@ export type Proposal = {
   versie: number;
   status: string;
   geupload: string;
+  uploadDate?: string | null;
+  uploadTime?: string | null;
+  updatedDate?: string | null;
+  updatedTime?: string | null;
+  uploadUser?: string | null;
   mappings: Mapping[];
 };

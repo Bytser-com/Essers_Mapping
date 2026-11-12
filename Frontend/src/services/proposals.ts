@@ -72,13 +72,54 @@ export function proposalPath(proposal: Pick<Proposal, 'id'>): string {
   return `/proposals/${encodeURIComponent(customerFolder)}`
 }
 
+export function normalizeStatus(rawStatus?: string | null): ProposalStatus {
+  if (!rawStatus) return 'READY_FOR_REVIEW'
+  const trimmed = rawStatus.trim()
+  const upper = trimmed.toUpperCase().replace(/[\s-]+/g, '_')
+
+  if (upper === 'IN_REVIEW' || trimmed.toLowerCase() === 'in review') {
+    return 'IN_REVIEW'
+  }
+  if (
+    upper === 'READY_FOR_REVIEW' ||
+    trimmed.toLowerCase() === 'klaar om na te kijken'
+  ) {
+    return 'READY_FOR_REVIEW'
+  }
+  if (
+    upper === 'AI_GENERATING' ||
+    trimmed.toLowerCase() === 'ai maakt voorstel' ||
+    trimmed.toLowerCase() === 'wordt gegenereerd'
+  ) {
+    return 'AI_GENERATING'
+  }
+  if (
+    upper === 'AI_CHECKING_REVIEW' ||
+    trimmed.toLowerCase() === 'ai controleert review van analist' ||
+    trimmed.toLowerCase() === 'ai controleert'
+  ) {
+    return 'AI_CHECKING_REVIEW'
+  }
+  if (upper === 'RETURNED' || trimmed.toLowerCase() === 'teruggestuurd') {
+    return 'RETURNED'
+  }
+
+  return STATUS_LABELS[upper as ProposalStatus]
+    ? (upper as ProposalStatus)
+    : 'READY_FOR_REVIEW'
+}
+
 export function toProposal(item: CompanyProposalOverview | Proposal): Proposal {
   if ('customer' in item && typeof item.customer === 'string' && 'version' in item && typeof item.version === 'number') {
-    return item as Proposal
+    const p = item as Proposal
+    return {
+      ...p,
+      status: normalizeStatus(p.status),
+    }
   }
   const ov = item as CompanyProposalOverview
   const versionNum = parseInt(String(ov.latestVersion ?? '').replace(/^v/i, ''), 10) || 1
-  const status: ProposalStatus = (ov.status as ProposalStatus) || 'READY_FOR_REVIEW'
+  const status: ProposalStatus = normalizeStatus(ov.status)
   const aiStatus: AiStatus | null = (ov.aiStatus as AiStatus) || null
   const canOpen = status !== 'AI_GENERATING'
 

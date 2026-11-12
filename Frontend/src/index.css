@@ -4,6 +4,7 @@
 /* Huisstijl H.Essers (Figma: pagina "Huisstijl") */
 @theme {
   --color-red: #a50000;
+  --color-red-light: #fee2e2;
   --color-anthracite: #1c1c1f;
   --color-grey: #6b6b73;
   --color-mid-grey: #a1a1ab;
@@ -43,6 +44,10 @@
 
   .btn--primary {
     @apply border-anthracite bg-anthracite text-white enabled:hover:bg-black;
+  }
+
+  .btn--danger {
+    @apply border-red bg-red text-white enabled:hover:bg-red/90;
   }
 
   /* Status (component "Label"): altijd een label met tekst erin */

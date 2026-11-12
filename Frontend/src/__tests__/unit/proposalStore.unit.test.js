@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useProposalStore } from '../../stores/proposalStore'
-import { getProposal } from '../../services/proposalService'
+import { getProposal, deleteProposal } from '../../services/proposalService'
 
 vi.mock('../../services/proposalService')
 
@@ -100,5 +100,47 @@ describe('proposalStore', () => {
         // Assert
         const state = useProposalStore.getState()
         expect(state.error).toBe(null)
+    })
+
+    it('sets deleteSuccessMessage and clears proposal when deleteProposal succeeds', async () => {
+        // Arrange
+        useProposalStore.setState({ proposal: PROPOSAL, deleteSuccessMessage: null })
+        deleteProposal.mockResolvedValue(true)
+
+        // Act
+        const result = await useProposalStore.getState().deleteProposal('brunos', 'v1', 'brunos')
+
+        // Assert
+        expect(result).toBe(true)
+        const state = useProposalStore.getState()
+        expect(state.proposal).toBeNull()
+        expect(state.deleteSuccessMessage).toBe('Voorstel voor brunos (v1) is succesvol verwijderd.')
+        expect(deleteProposal).toHaveBeenCalledWith('brunos', 'v1', 'brunos')
+    })
+
+    it('clears deleteSuccessMessage when clearDeleteSuccessMessage is called', () => {
+        // Arrange
+        useProposalStore.setState({ deleteSuccessMessage: 'Voorstel voor brunos (v1) is succesvol verwijderd.' })
+
+        // Act
+        useProposalStore.getState().clearDeleteSuccessMessage()
+
+        // Assert
+        expect(useProposalStore.getState().deleteSuccessMessage).toBeNull()
+    })
+
+    it('sets actionError and leaves deleteSuccessMessage unchanged when deleteProposal fails', async () => {
+        // Arrange
+        useProposalStore.setState({ proposal: PROPOSAL, deleteSuccessMessage: null })
+        deleteProposal.mockRejectedValue(new Error('Delete failed'))
+
+        // Act
+        const result = await useProposalStore.getState().deleteProposal('brunos', 'v1', 'wrong')
+
+        // Assert
+        expect(result).toBe(false)
+        const state = useProposalStore.getState()
+        expect(state.actionError).toBe('Delete failed')
+        expect(state.deleteSuccessMessage).toBeNull()
     })
 })

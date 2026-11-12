@@ -4,6 +4,7 @@ import {
   STATUS_LABELS,
   formatUploadedAt,
   proposalPath,
+  normalizeStatus,
   type AiStatus,
   type Proposal,
   type ProposalStatus,
@@ -32,6 +33,16 @@ const STATUS_LABEL_STYLE: Record<ProposalStatus, LabelStyle> = {
   IN_REVIEW: 'outlined',
   AI_CHECKING_REVIEW: 'outlined',
   RETURNED: 'dotted',
+}
+
+function getStatusLabel(status: ProposalStatus | string): string {
+  const norm = normalizeStatus(status)
+  return STATUS_LABELS[norm] || (typeof status === 'string' && status.trim() ? status : 'Klaar om na te kijken')
+}
+
+function getStatusStyle(status: ProposalStatus | string): LabelStyle {
+  const norm = normalizeStatus(status)
+  return STATUS_LABEL_STYLE[norm] || 'outlined'
 }
 
 const AI_STATUS_LABEL_STYLE: Record<AiStatus, LabelStyle> = {
@@ -126,7 +137,7 @@ function ProposalTable({ proposals }: ProposalTableProps) {
                 {formatUploadedAt(proposal.uploaded_at)}
               </td>
               <td className={`${STATUS_CELL} ${BODY_CELL}`}>
-                <Label style={STATUS_LABEL_STYLE[proposal.status]}>{STATUS_LABELS[proposal.status]}</Label>
+                <Label style={getStatusStyle(proposal.status)}>{getStatusLabel(proposal.status)}</Label>
               </td>
               <td className={`${AI_CELL} ${BODY_CELL}`}>
                 <AiStatusCell status={proposal.ai_status} />

@@ -1,7 +1,9 @@
 package be.essers.services.versioncontrol.domain.proposal.api;
 
 import be.essers.services.versioncontrol.domain.proposal.api.dto.CompanyProposalOverviewDto;
+import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalFileDataDto;
 import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalFileDetailsDto;
+import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalRowDto;
 import be.essers.services.versioncontrol.domain.proposal.service.ProposalStorageService;
 import be.essers.services.versioncontrol.shared.exception.EntityNotFoundException;
 import be.essers.services.versioncontrol.shared.exception.GlobalExceptionHandler;
@@ -14,13 +16,22 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -176,6 +187,379 @@ class ProposalControllerTest {
                         .param("company", "NonExisting")
                         .param("version", "v1")
                         .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.title").value("Entity Not Found"));
+    }
+
+    @Test
+    @DisplayName("GET /Proposals/filedata returns file metadata and rows")
+    void getProposalFileData_validParams_returnsFileData() throws Exception {
+        ProposalRowDto row1 = new ProposalRowDto("OrderNo", "DeliveryNumber", 95, "Direct match");
+        ProposalRowDto row2 = new ProposalRowDto(null, "DefaultFlag", 100, "Fixed value");
+
+        ProposalFileDataDto fileData = new ProposalFileDataDto(
+                "v3",
+                "VanRoey",
+                "2026-11-10",
+                "14:30:00",
+                "15:00:00",
+                "2026-11-10",
+                "Jane Doe",
+                "READY_FOR_REVIEW",
+                List.of(row1, row2)
+        );
+
+        when(proposalStorageService.getProposalFileData("VanRoey", "v3")).thenReturn(fileData);
+
+        mockMvc.perform(get("/Proposals/filedata")
+                        .param("company", "VanRoey")
+                        .param("version", "v3")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.version").value("v3"))
+                .andExpect(jsonPath("$.companyname").value("VanRoey"))
+                .andExpect(jsonPath("$.comapnyname").doesNotExist())
+                .andExpect(jsonPath("$.upload_date").value("2026-11-10"))
+                .andExpect(jsonPath("$.upload_time").value("14:30:00"))
+                .andExpect(jsonPath("$.updated_time").value("15:00:00"))
+                .andExpect(jsonPath("$.updated_date").value("2026-11-10"))
+                .andExpect(jsonPath("$.upload_user").value("Jane Doe"))
+                .andExpect(jsonPath("$.status").value("READY_FOR_REVIEW"))
+                .andExpect(jsonPath("$.rows.length()").value(2))
+                .andExpect(jsonPath("$.rows[0].source_field").value("OrderNo"))
+                .andExpect(jsonPath("$.rows[0].target_field").value("DeliveryNumber"))
+                .andExpect(jsonPath("$.rows[0].score").value(95))
+                .andExpect(jsonPath("$.rows[0].comment").value("Direct match"))
+                .andExpect(jsonPath("$.rows[1].source_field").doesNotExist())
+                .andExpect(jsonPath("$.rows[1].target_field").value("DefaultFlag"))
+                .andExpect(jsonPath("$.rows[1].score").value(100))
+                .andExpect(jsonPath("$.rows[1].comment").value("Fixed value"));
+    }
+
+    @Test
+    @DisplayName("GET /proposals/filedata (lowercase) maps correctly")
+    void getProposalFileData_lowercasePath_returnsFileData() throws Exception {
+        ProposalFileDataDto fileData = new ProposalFileDataDto(
+                "v1",
+                "Google",
+                "2026-11-09",
+                "10:00:00",
+                null,
+                null,
+                "John Smith",
+                List.of()
+        );
+
+        when(proposalStorageService.getProposalFileData("Google", "v1")).thenReturn(fileData);
+
+        mockMvc.perform(get("/proposals/filedata")
+                        .param("company", "Google")
+                        .param("version", "v1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.version").value("v1"))
+                .andExpect(jsonPath("$.companyname").value("Google"))
+                .andExpect(jsonPath("$.rows").isArray());
+    }
+
+    @Test
+    @DisplayName("GET /proposals/filedata with unknown company returns 404")
+    void getProposalFileData_notFound_returns404() throws Exception {
+        when(proposalStorageService.getProposalFileData("NonExisting", "v1"))
+                .thenThrow(new EntityNotFoundException("Company directory 'NonExisting' does not exist"));
+
+        mockMvc.perform(get("/Proposals/filedata")
+                        .param("company", "NonExisting")
+                        .param("version", "v1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.title").value("Entity Not Found"));
+    }
+
+    @Test
+    @DisplayName("GET /Proposals/filedata with missing company parameter returns 400")
+    void getProposalFileData_missingCompany_returns400() throws Exception {
+        mockMvc.perform(get("/Proposals/filedata")
+                        .param("version", "v1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("GET /Proposals/filedata with missing version parameter returns 400")
+    void getProposalFileData_missingVersion_returns400() throws Exception {
+        mockMvc.perform(get("/Proposals/filedata")
+                        .param("company", "VanRoey")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("GET /Proposals/filedata with path traversal characters returns 400")
+    void getProposalFileData_pathTraversal_returns400() throws Exception {
+        when(proposalStorageService.getProposalFileData("../etc", "v1"))
+                .thenThrow(new IllegalArgumentException("Path segment contains illegal characters: ../etc"));
+
+        mockMvc.perform(get("/Proposals/filedata")
+                        .param("company", "../etc")
+                        .param("version", "v1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"));
+    }
+
+    @Test
+    @DisplayName("GET /Proposals/filedata returns 502 when SFTP fails")
+    void getProposalFileData_sftpFailure_returns502() throws Exception {
+        when(proposalStorageService.getProposalFileData("VanRoey", "v3"))
+                .thenThrow(new StorageException("Failed to read file from SFTP storage"));
+
+        mockMvc.perform(get("/Proposals/filedata")
+                        .param("company", "VanRoey")
+                        .param("version", "v3")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadGateway())
+                .andExpect(jsonPath("$.title").value("SFTP Storage Error"));
+    }
+
+    @Test
+    @DisplayName("PUT /Proposals/file with multipart file overwrites proposal and returns details")
+    void overwriteProposalFile_multipart_success() throws Exception {
+        byte[] dummyContent = "dummy-excel".getBytes();
+        MockMultipartFile multipartFile = new MockMultipartFile(
+                "file",
+                "mappingproposal.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                dummyContent
+        );
+
+        ProposalFileDetailsDto details = new ProposalFileDetailsDto(
+                "VanRoey",
+                "v3",
+                "mappingproposal.xlsx",
+                "/Proposals/VanRoey/v3/mappingproposal.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                dummyContent.length,
+                "2026-11-10T12:00:00Z",
+                "John Smith",
+                "Initial proposal",
+                "ZHVtbXktZXhjZWw="
+        );
+
+        when(proposalStorageService.overwriteProposalFile(eq("vanroey"), eq("v3"), any(byte[].class), eq("mappingproposal.xlsx")))
+                .thenReturn(details);
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/Proposals/file")
+                        .file(multipartFile)
+                        .with(request -> {
+                            request.setMethod("PUT");
+                            return request;
+                        })
+                        .param("company", "vanroey")
+                        .param("version", "v3"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.company").value("VanRoey"))
+                .andExpect(jsonPath("$.version").value("v3"))
+                .andExpect(jsonPath("$.filename").value("mappingproposal.xlsx"));
+    }
+
+    @Test
+    @DisplayName("PUT /proposals/file (lowercase) with binary body overwrites proposal")
+    void overwriteProposalFile_binary_success() throws Exception {
+        byte[] dummyContent = "binary-excel".getBytes();
+
+        ProposalFileDetailsDto details = new ProposalFileDetailsDto(
+                "vanroey",
+                "v3",
+                "mappingproposal.xlsx",
+                "/Proposals/vanroey/v3/mappingproposal.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                dummyContent.length,
+                "2026-11-10T12:00:00Z",
+                "John Smith",
+                "Initial proposal",
+                "YmluYXJ5LWV4Y2Vs"
+        );
+
+        when(proposalStorageService.overwriteProposalFile(eq("vanroey"), eq("v3"), any(byte[].class), eq(null)))
+                .thenReturn(details);
+
+        mockMvc.perform(put("/proposals/file")
+                        .param("company", "vanroey")
+                        .param("version", "v3")
+                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                        .content(dummyContent))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.company").value("vanroey"))
+                .andExpect(jsonPath("$.version").value("v3"));
+    }
+
+    @Test
+    @DisplayName("PUT /Proposals/file returns 404 when company or version not found")
+    void overwriteProposalFile_notFound_returns404() throws Exception {
+        byte[] dummyContent = "dummy-excel".getBytes();
+        when(proposalStorageService.overwriteProposalFile(eq("NonExisting"), eq("v1"), any(byte[].class), eq(null)))
+                .thenThrow(new EntityNotFoundException("Company directory 'NonExisting' does not exist"));
+
+        mockMvc.perform(put("/Proposals/file")
+                        .param("company", "NonExisting")
+                        .param("version", "v1")
+                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                        .content(dummyContent))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.title").value("Entity Not Found"));
+    }
+
+    @Test
+    @DisplayName("PUT /Proposals/file returns 400 when missing query parameter")
+    void overwriteProposalFile_missingParams_returns400() throws Exception {
+        mockMvc.perform(put("/Proposals/file")
+                        .param("company", "vanroey")
+                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                        .content(new byte[]{1, 2, 3}))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Missing Required Parameter"));
+    }
+
+    @Test
+    @DisplayName("PUT /Proposals/file returns 400 when empty file uploaded")
+    void overwriteProposalFile_emptyFile_returns400() throws Exception {
+        mockMvc.perform(put("/Proposals/file")
+                        .param("company", "vanroey")
+                        .param("version", "v3")
+                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                        .content(new byte[0]))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Body"));
+    }
+
+    @Test
+    @DisplayName("POST /Proposals returns 501 Not Implemented")
+    void approveProposal_returns501NotImplemented() throws Exception {
+        mockMvc.perform(post("/Proposals")
+                        .param("company", "vanroey")
+                        .param("version", "v3"))
+                .andExpect(status().isNotImplemented())
+                .andExpect(jsonPath("$.status").value(501))
+                .andExpect(jsonPath("$.title").value("Not Implemented"))
+                .andExpect(jsonPath("$.detail").value("Approving proposal for company 'vanroey' and version 'v3' is not implemented yet"))
+                .andExpect(jsonPath("$.company").value("vanroey"))
+                .andExpect(jsonPath("$.version").value("v3"));
+    }
+
+    @Test
+    @DisplayName("POST /proposals (lowercase) returns 501 Not Implemented")
+    void approveProposal_lowercase_returns501NotImplemented() throws Exception {
+        mockMvc.perform(post("/proposals")
+                        .param("company", "Google")
+                        .param("version", "v1"))
+                .andExpect(status().isNotImplemented())
+                .andExpect(jsonPath("$.status").value(501))
+                .andExpect(jsonPath("$.detail").value("Approving proposal for company 'Google' and version 'v1' is not implemented yet"));
+    }
+
+    @Test
+    @DisplayName("POST /Proposals returns 400 when missing query parameter")
+    void approveProposal_missingParams_returns400() throws Exception {
+        mockMvc.perform(post("/Proposals")
+                        .param("company", "vanroey"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Missing Required Parameter"));
+    }
+
+    @Test
+    @DisplayName("DELETE /Proposals with matching deleteCheck returns 204 No Content")
+    void deleteProposal_validRequest_returns204NoContent() throws Exception {
+        mockMvc.perform(delete("/Proposals")
+                        .param("company", "vanroey")
+                        .param("version", "v2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"deleteCheck\":\"vanroey\"}"))
+                .andExpect(status().isNoContent());
+
+        verify(proposalStorageService).deleteProposal("vanroey", "v2");
+    }
+
+    @Test
+    @DisplayName("DELETE /proposals (lowercase) with matching deleteCheck returns 204 No Content")
+    void deleteProposal_lowercase_returns204NoContent() throws Exception {
+        mockMvc.perform(delete("/proposals")
+                        .param("company", "Google")
+                        .param("version", "v1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"deleteCheck\":\"Google\"}"))
+                .andExpect(status().isNoContent());
+
+        verify(proposalStorageService).deleteProposal("Google", "v1");
+    }
+
+    @Test
+    @DisplayName("DELETE /Proposals returns 400 when deleteCheck does not match company")
+    void deleteProposal_mismatchedDeleteCheck_returns400() throws Exception {
+        mockMvc.perform(delete("/Proposals")
+                        .param("company", "vanroey")
+                        .param("version", "v2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"deleteCheck\":\"wrong-company\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"))
+                .andExpect(jsonPath("$.detail").value("Confirmation check failed: deleteCheck ('wrong-company') must match company name ('vanroey')"));
+    }
+
+    @Test
+    @DisplayName("DELETE /Proposals returns 400 when deleteCheck is blank")
+    void deleteProposal_blankDeleteCheck_returns400() throws Exception {
+        mockMvc.perform(delete("/Proposals")
+                        .param("company", "vanroey")
+                        .param("version", "v2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"deleteCheck\":\"\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("DELETE /Proposals returns 400 when body is missing")
+    void deleteProposal_missingBody_returns400() throws Exception {
+        mockMvc.perform(delete("/Proposals")
+                        .param("company", "vanroey")
+                        .param("version", "v2"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Body"));
+    }
+
+    @Test
+    @DisplayName("DELETE /Proposals returns 400 when company param is missing")
+    void deleteProposal_missingCompany_returns400() throws Exception {
+        mockMvc.perform(delete("/Proposals")
+                        .param("version", "v2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"deleteCheck\":\"vanroey\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Missing Required Parameter"));
+    }
+
+    @Test
+    @DisplayName("DELETE /Proposals returns 400 when version param is missing")
+    void deleteProposal_missingVersion_returns400() throws Exception {
+        mockMvc.perform(delete("/Proposals")
+                        .param("company", "vanroey")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"deleteCheck\":\"vanroey\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Missing Required Parameter"));
+    }
+
+    @Test
+    @DisplayName("DELETE /Proposals returns 404 when company or version does not exist")
+    void deleteProposal_entityNotFound_returns404() throws Exception {
+        doThrow(new EntityNotFoundException("Company directory 'vanroey' does not exist"))
+                .when(proposalStorageService).deleteProposal("vanroey", "v2");
+
+        mockMvc.perform(delete("/Proposals")
+                        .param("company", "vanroey")
+                        .param("version", "v2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"deleteCheck\":\"vanroey\"}"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.title").value("Entity Not Found"));
     }

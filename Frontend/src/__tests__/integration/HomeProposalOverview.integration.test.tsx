@@ -112,4 +112,28 @@ describe('Home – proposals overview', () => {
 
     expect(await screen.findByText('De proposals konden niet geladen worden.')).toBeInTheDocument()
   })
+
+  it('shows "In review" status in the overview when backend returns status "In review"', async () => {
+    const rawProposal = {
+      company: 'vanroey',
+      latestVersion: 'v2',
+      createdDate: '2026-11-10T09:39:02+00:00',
+      status: 'In review',
+    }
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        json([rawProposal])
+      )
+    )
+
+    render(
+      <MemoryRouter>
+        <Home />
+      </MemoryRouter>,
+    )
+
+    const row = (await screen.findByText('vanroey', { selector: 'td' })).closest('tr') as HTMLElement
+    expect(within(row).getByText('In review')).toBeInTheDocument()
+  })
 })

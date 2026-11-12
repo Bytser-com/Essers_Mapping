@@ -94,13 +94,13 @@ function ProposalOverview({
       {state.kind === 'error' && (
         <div
           role="alert"
-          className="flex items-center justify-between gap-4 rounded-[12px] border border-[#e3e3e8] bg-white px-4 py-[13px] font-['Inter',sans-serif] text-[13px] text-[#1c1c1f]"
+          className="flex items-center justify-between gap-4 rounded-[12px] border border-[#1c1c1f] bg-[#fee2e2] px-4 py-[13px] font-['Inter',sans-serif] text-[13px] text-[#1c1c1f]"
         >
           <span>De proposals konden niet geladen worden.</span>
           <button
             type="button"
             onClick={retry}
-            className="rounded-[8px] border border-[#e3e3e8] bg-white px-4 py-[10px] text-[14px] leading-[normal] font-semibold text-[#1c1c1f] hover:bg-[#f4f4f6]"
+            className="rounded-[8px] border border-[#1c1c1f] bg-white px-4 py-[10px] text-[14px] leading-[normal] font-semibold text-[#1c1c1f] hover:bg-[#f4f4f6]"
           >
             Opnieuw proberen
           </button>

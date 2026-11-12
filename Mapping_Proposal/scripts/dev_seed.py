@@ -59,6 +59,9 @@ def seed_proposals(storage=None, force: bool = False) -> None:
                 'createdDate': uploaded_at,
                 'status': status,
                 'ai_status': ai_status,
+                'uploadUser': 'exampleUser',
+                'upload_user': 'exampleUser',
+                'createdBy': 'exampleUser',
             }
             if excel_name:
                 metadata['filename'] = excel_name

@@ -4,13 +4,17 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock, MockInstance } from 'vitest'
 import ProposalPage from '../../pages/ProposalPage'
-import { getProposalFile } from '../../services/proposalService'
+import Home from '../../pages/Home'
+import { approveProposal, deleteProposal, getProposalFile } from '../../services/proposalService'
 import { useProposalStore } from '../../stores/proposalStore'
 import type { Proposal } from '../../types/proposal'
 
 vi.mock('../../services/proposalService', () => ({
   getProposal: vi.fn(),
   getProposalFile: vi.fn(),
+  uploadProposalFile: vi.fn(),
+  approveProposal: vi.fn(),
+  deleteProposal: vi.fn(),
 }))
 
 const PROPOSAL: Proposal = {
@@ -41,6 +45,7 @@ function renderPage(props: Props = {}, url = '/proposals/brunos') {
       <Routes>
         <Route path="/proposals/:company" element={<ProposalPage {...props} />} />
         <Route path="/proposals" element={<ProposalPage {...props} />} />
+        <Route path="/" element={<Home />} />
       </Routes>
     </MemoryRouter>,
   )
@@ -168,6 +173,120 @@ describe('ProposalPage actions', () => {
 
     // Assert
     expect(onApprove).toHaveBeenCalledTimes(1)
+  })
+
+  it('calls approveProposal with company and version when "Goedkeuren" is clicked without onApprove prop', async () => {
+    // Arrange
+    vi.mocked(approveProposal).mockResolvedValue(undefined)
+    renderPage()
+
+    // Act
+    await userEvent.click(screen.getByRole('button', { name: 'Goedkeuren' }))
+
+    // Assert
+    await waitFor(() =>
+      expect(approveProposal).toHaveBeenCalledWith('brunos', 'v2'),
+    )
+  })
+
+  it('displays the error banner when approving fails', async () => {
+    // Arrange
+    const errorMsg = "Approving proposal for company 'brunos' and version 'v2' is not implemented yet"
+    vi.mocked(approveProposal).mockRejectedValue(new Error(errorMsg))
+    renderPage()
+
+    // Act
+    await userEvent.click(screen.getByRole('button', { name: 'Goedkeuren' }))
+
+    // Assert
+    await waitFor(() => {
+      const alert = screen.getByRole('alert')
+      expect(alert).toBeInTheDocument()
+      expect(alert).toHaveTextContent(errorMsg)
+    })
+  })
+
+  it('calls onDelete when "Verwijderen" is clicked with prop', async () => {
+    // Arrange
+    const onDelete = vi.fn()
+    renderPage({ onDelete })
+
+    // Act
+    await userEvent.click(screen.getByRole('button', { name: 'Verwijderen' }))
+
+    // Assert
+    expect(onDelete).toHaveBeenCalledTimes(1)
+  })
+
+  it('opens delete confirmation dialog when "Verwijderen" is clicked', async () => {
+    // Arrange
+    renderPage()
+
+    // Act
+    await userEvent.click(screen.getByRole('button', { name: 'Verwijderen' }))
+
+    // Assert
+    expect(screen.getByText(/Are you sure you want to delete this/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Proceed' })).toBeDisabled()
+  })
+
+  it('sends delete request with entered deleteCheck when Proceed is clicked', async () => {
+    // Arrange
+    vi.mocked(deleteProposal).mockResolvedValue(undefined)
+    renderPage()
+
+    // Act
+    await userEvent.click(screen.getByRole('button', { name: 'Verwijderen' }))
+    const input = screen.getByPlaceholderText('brunos')
+    await userEvent.type(input, 'brunos')
+
+    const proceedBtn = screen.getByRole('button', { name: 'Proceed' })
+    expect(proceedBtn).toBeEnabled()
+    await userEvent.click(proceedBtn)
+
+    // Assert
+    await waitFor(() => {
+      expect(deleteProposal).toHaveBeenCalledWith('brunos', 'v2', 'brunos')
+    })
+    await waitFor(() => {
+      expect(screen.getByTestId('delete-success-banner')).toBeInTheDocument()
+    })
+    expect(screen.getByText('Voorstel succesvol verwijderd.')).toBeInTheDocument()
+    expect(screen.getByText('Voorstel voor brunos (v2) is succesvol verwijderd.')).toBeInTheDocument()
+  })
+
+  it('displays error banner when delete fails', async () => {
+    // Arrange
+    const errorMsg = "Confirmation check failed: deleteCheck ('wrong') must match company name ('brunos')"
+    vi.mocked(deleteProposal).mockRejectedValue(new Error(errorMsg))
+    renderPage()
+
+    // Act
+    await userEvent.click(screen.getByRole('button', { name: 'Verwijderen' }))
+    const input = screen.getByPlaceholderText('brunos')
+    await userEvent.type(input, 'wrong')
+    await userEvent.click(screen.getByRole('button', { name: 'Proceed' }))
+
+    // Assert
+    await waitFor(() => {
+      const alert = screen.getByRole('alert')
+      expect(alert).toBeInTheDocument()
+      expect(alert).toHaveTextContent(errorMsg)
+    })
+  })
+
+  it('closes delete dialog when Annuleren is clicked', async () => {
+    // Arrange
+    renderPage()
+
+    // Act
+    await userEvent.click(screen.getByRole('button', { name: 'Verwijderen' }))
+    expect(screen.getByText(/Are you sure you want to delete this/i)).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Annuleren' }))
+
+    // Assert
+    expect(screen.queryByText(/Are you sure you want to delete this/i)).not.toBeInTheDocument()
   })
 
   it('shows a dash for an invalid upload date', () => {

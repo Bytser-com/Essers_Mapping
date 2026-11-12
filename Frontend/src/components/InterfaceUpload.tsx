@@ -156,25 +156,25 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
       </section>
 
       {uploadError && (
-        <div role="alert" className="flex items-center gap-3 rounded-lg border border-[#1c1c1f] bg-white px-4 py-3">
+        <div role="alert" className="flex items-center gap-3 rounded-lg border border-[#1c1c1f] bg-[#fee2e2] px-4 py-3">
           <img src={iconError} alt="" width={18} height={18} />
           <div className="flex flex-col gap-[2px]">
             {uploadError === 'customer' ? (
               <>
-                <p className="text-[13px] font-semibold">Upload mislukt: Vul eerst een klant in.</p>
-                <p className="text-[12px] text-[#6b6b73]">Vul de klantnaam in en probeer opnieuw.</p>
+                <p className="text-[13px] font-semibold text-[#1c1c1f]">Upload mislukt: Vul eerst een klant in.</p>
+                <p className="text-[12px] text-[#1c1c1f]">Vul de klantnaam in en probeer opnieuw.</p>
               </>
             ) : uploadError === 'noFile' ? (
               <>
-                <p className="text-[13px] font-semibold">Upload mislukt: kies eerst een XML-bestand.</p>
-                <p className="text-[12px] text-[#6b6b73]">Kies een XML-bestand van de klant en probeer opnieuw.</p>
+                <p className="text-[13px] font-semibold text-[#1c1c1f]">Upload mislukt: kies eerst een XML-bestand.</p>
+                <p className="text-[12px] text-[#1c1c1f]">Kies een XML-bestand van de klant en probeer opnieuw.</p>
               </>
             ) : uploadError === 'server' ? (
-              <p className="text-[13px] font-semibold">{serverMessage}</p>
+              <p className="text-[13px] font-semibold text-[#1c1c1f]">{serverMessage}</p>
             ) : (
               <>
-                <p className="text-[13px] font-semibold">Upload mislukt: dit is geen XML-bestand.</p>
-                <p className="text-[12px] text-[#6b6b73]">Kies een XML-bestand van de klant en probeer opnieuw.</p>
+                <p className="text-[13px] font-semibold text-[#1c1c1f]">Upload mislukt: dit is geen XML-bestand.</p>
+                <p className="text-[12px] text-[#1c1c1f]">Kies een XML-bestand van de klant en probeer opnieuw.</p>
               </>
             )}
           </div>
