@@ -9,10 +9,10 @@ Matches are unverified mapping *candidates*, not proof of semantic equivalence.
 """
 from __future__ import annotations
 
-from collections import defaultdict
-from difflib import SequenceMatcher
 import re
 import xml.etree.ElementTree as ET
+from collections import defaultdict
+from difflib import SequenceMatcher
 
 
 def _local(tag: str) -> str:
