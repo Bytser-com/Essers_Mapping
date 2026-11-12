@@ -119,7 +119,6 @@ export default function ProposalPage({ onDownload, onUpload, onApprove }: Readon
   const totalMappings = proposal.mappings.length;
   const reviewCount = proposal.mappings.filter((m) => !m.bronveld).length;
   const matchedCount = totalMappings - reviewCount;
-  const matchRate = totalMappings > 0 ? Math.round((matchedCount / totalMappings) * 100) : 0;
   const hasReviewFields = reviewCount > 0;
 
   const filteredMappings = proposal.mappings.filter((mapping) => {
@@ -166,7 +165,7 @@ export default function ProposalPage({ onDownload, onUpload, onApprove }: Readon
             </span>
           </div>
 
-          <p className="m-0 text-[13px] text-grey">Geüpload op {formatUploadDate(proposal.geupload)}</p>
+          <p className="m-0 text-[13px] text-grey">Geüpload op {formatUploadDate(proposal.geupload)} door { proposal.uploadUser ?? "onbekend" }</p>
         </div>
 
         <div className="flex items-center gap-2.5">
