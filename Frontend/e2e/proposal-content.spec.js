@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 test.use({ timezoneId: 'Europe/Brussels', locale: 'nl-BE' })
 
-const PROPOSAL_API = '**/proposals/brunos'
+const PROPOSAL_API = '**/proposals*'
 
 const MAPPING = { id: 'MP-001', bronveld: 'Klant/Nummer', doelveld: 'Klantnummer', zekerheid: 92, opmerking: '' }
 const REVIEW_MAPPING = { id: 'MP-002', bronveld: null, doelveld: 'Leverdatum', zekerheid: null, opmerking: '' }

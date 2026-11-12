@@ -41,7 +41,7 @@ describe('ProposalPage integration', () => {
 
     // Assert
     expect(await screen.findByText('brunos · v1')).toBeInTheDocument()
-    expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/proposals/brunos'))
+    expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/proposals?company=brunos'))
   })
 
   it('shows the error when the API returns 404', async () => {
@@ -53,7 +53,7 @@ describe('ProposalPage integration', () => {
 
     // Assert
     expect(await screen.findByText('geen mapping gevonden (status 404)')).toBeInTheDocument()
-    expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/proposals/brunos'))
+    expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/proposals?company=brunos'))
   })
 
   it('shows the error when the API returns 503', async () => {
@@ -65,6 +65,6 @@ describe('ProposalPage integration', () => {
 
     // Assert
     expect(await screen.findByText('De bestanden zijn tijdelijk niet bereikbaar (status 503)')).toBeInTheDocument()
-    expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/proposals/brunos'))
+    expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/proposals?company=brunos'))
   })
 })
