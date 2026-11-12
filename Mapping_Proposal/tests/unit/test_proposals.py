@@ -1,11 +1,15 @@
-"""Proposals overview on Home (backend): services/proposals.py.
+"""The proposal.json files that Mapping_Proposal writes per upload: services/proposals.py.
 
 User story: "Als analist wil ik een overzicht van alle klanten en hun mapping packages,
 zodat ik snel naar het juiste package kan gaan."
 
+The overview on Home itself is served by Version_Control (GET /api/version-control/proposals),
+see SftpProposalStorageServiceTest there. These tests check that the data Mapping_Proposal writes
+can be read back with the same rules. The test names keep the Jira test case (TC-57-xx) they relate to.
+
 The storage is a temporary folder with the same layout as on the SFTP server
 (<root>/<customer folder>/v<N>/proposal.json). The same code runs on SFTP, see
-tests/unit/test_storage.py. Every test name starts with its Jira test case (TC-57-xx).
+tests/unit/test_storage.py.
 """
 from __future__ import annotations
 

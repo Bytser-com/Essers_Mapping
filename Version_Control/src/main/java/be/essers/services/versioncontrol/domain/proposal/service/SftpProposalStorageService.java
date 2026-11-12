@@ -16,6 +16,11 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.file.attribute.FileTime;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 @Service
@@ -26,6 +31,10 @@ public class SftpProposalStorageService implements ProposalStorageService {
     private static final String FALLBACK_METADATA_FILENAME = "proposal.json";
     private static final String EXCEL_XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     private static final String EXCEL_XLS_MIME = "application/vnd.ms-excel";
+    // Statuses the overview can show (same values as Mapping_Proposal writes in proposal.json)
+    private static final Set<String> PROPOSAL_STATUSES =
+            Set.of("AI_GENERATING", "READY_FOR_REVIEW", "IN_REVIEW", "AI_CHECKING_REVIEW", "RETURNED");
+    private static final Set<String> AI_STATUSES = Set.of("RUNNING", "FAILED");
 
     private final SftpRemoteFileTemplate template;
     private final SftpProperties properties;
@@ -164,45 +173,116 @@ public class SftpProposalStorageService implements ProposalStorageService {
                 continue;
             }
 
-            CompanyProposalOverviewDto overview = buildCompanyOverview(rootPath, entryName);
+            CompanyProposalOverviewDto overview = buildValidCompanyOverview(rootPath, entryName);
             if (overview != null) {
                 results.add(overview);
             }
         }
 
-        results.sort(Comparator.comparing(CompanyProposalOverviewDto::company, String.CASE_INSENSITIVE_ORDER));
+        // Newest upload first; the company name keeps the order stable
+        results.sort(Comparator
+                .comparing((CompanyProposalOverviewDto p) -> parseUploadTime(p.createdDate()),
+                        Comparator.nullsLast(Comparator.reverseOrder()))
+                .thenComparing(CompanyProposalOverviewDto::company, String.CASE_INSENSITIVE_ORDER));
         return results;
     }
 
     private CompanyProposalOverviewDto buildCompanyOverview(String rootPath, String companyName) {
         String companyPath = rootPath + "/" + companyName;
-        SftpClient.DirEntry[] companyEntries = template.list(companyPath);
-        if (companyEntries == null || companyEntries.length == 0) {
+        List<String> versions = listVersions(companyPath);
+        if (versions.isEmpty()) {
             return null;
         }
 
+        String latestVersion = versions.get(versions.size() - 1);
+        String versionPath = companyPath + "/" + latestVersion;
+        SftpClient.DirEntry[] versionEntries = listVersionEntries(versionPath);
+        return toOverview(companyName, latestVersion, versionPath, versionEntries, readMetadata(versionPath, versionEntries));
+    }
+
+    /**
+     * Overview on Home: the newest version of the company with valid proposal data.
+     * A version with missing or invalid data is skipped, so one broken upload never breaks the list.
+     */
+    private CompanyProposalOverviewDto buildValidCompanyOverview(String rootPath, String companyName) {
+        String companyPath = rootPath + "/" + companyName;
+        List<String> versions = listVersions(companyPath);
+
+        for (int i = versions.size() - 1; i >= 0; i--) {
+            String version = versions.get(i);
+            String versionPath = companyPath + "/" + version;
+            SftpClient.DirEntry[] versionEntries = listVersionEntries(versionPath);
+            ProposalMetadata metadata = readMetadata(versionPath, versionEntries);
+
+            String problem = findMetadataProblem(metadata);
+            if (problem != null) {
+                log.warn("Skipping proposal {}: {}", versionPath, problem);
+                continue;
+            }
+            return toOverview(companyName, version, versionPath, versionEntries, metadata);
+        }
+        return null;
+    }
+
+    // Version folders of a company, sorted from oldest to newest (v2 before v10)
+    private List<String> listVersions(String companyPath) {
+        SftpClient.DirEntry[] companyEntries = template.list(companyPath);
         List<String> versions = new ArrayList<>();
+        if (companyEntries == null) {
+            return versions;
+        }
+
         for (SftpClient.DirEntry entry : companyEntries) {
             String name = entry.getFilename();
             if (!isSpecialDirectory(name) && isDirectory(entry)) {
                 versions.add(name);
             }
         }
+        versions.sort(VersionComparator.INSTANCE);
+        return versions;
+    }
 
-        if (versions.isEmpty()) {
+    private SftpClient.DirEntry[] listVersionEntries(String versionPath) {
+        SftpClient.DirEntry[] versionEntries = template.list(versionPath);
+        return versionEntries != null ? versionEntries : new SftpClient.DirEntry[0];
+    }
+
+    // Returns why the proposal data cannot be shown in the overview, or null when it is valid
+    private String findMetadataProblem(ProposalMetadata metadata) {
+        if (metadata == null) {
+            return "metadata.json / proposal.json is missing or not valid JSON";
+        }
+        if (metadata.status() == null || !PROPOSAL_STATUSES.contains(metadata.status())) {
+            return "unknown status '" + metadata.status() + "'";
+        }
+        if (metadata.aiStatus() != null && !metadata.aiStatus().isBlank() && !AI_STATUSES.contains(metadata.aiStatus())) {
+            return "unknown AI status '" + metadata.aiStatus() + "'";
+        }
+        if (parseUploadTime(metadata.createdDate()) == null) {
+            return "upload time is missing or not an ISO 8601 timestamp";
+        }
+        return null;
+    }
+
+    // ISO 8601 upload time, e.g. 2026-10-22T14:05:00+02:00; a time without timezone is taken as UTC
+    static Instant parseUploadTime(String value) {
+        if (value == null || value.isBlank()) {
             return null;
         }
-
-        versions.sort(VersionComparator.INSTANCE);
-        String latestVersion = versions.get(versions.size() - 1);
-
-        String versionPath = companyPath + "/" + latestVersion;
-        SftpClient.DirEntry[] versionEntries = template.list(versionPath);
-        if (versionEntries == null) {
-            versionEntries = new SftpClient.DirEntry[0];
+        String text = value.trim();
+        try {
+            return OffsetDateTime.parse(text).toInstant();
+        } catch (DateTimeParseException e) {
+            try {
+                return LocalDateTime.parse(text).toInstant(ZoneOffset.UTC);
+            } catch (DateTimeParseException ignored) {
+                return null;
+            }
         }
+    }
 
-        ProposalMetadata metadata = readMetadata(versionPath, versionEntries);
+    private CompanyProposalOverviewDto toOverview(String companyName, String version, String versionPath,
+                                                  SftpClient.DirEntry[] versionEntries, ProposalMetadata metadata) {
         SftpClient.DirEntry excelEntry = findExcelEntry(versionEntries, metadata != null ? metadata.filename() : null);
 
         String filename = (excelEntry != null)
@@ -220,7 +300,7 @@ public class SftpProposalStorageService implements ProposalStorageService {
 
         return new CompanyProposalOverviewDto(
                 companyName,
-                latestVersion,
+                version,
                 filename,
                 fullPath,
                 createdDate,

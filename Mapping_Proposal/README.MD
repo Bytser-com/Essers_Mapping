@@ -23,7 +23,7 @@ Mapping_Proposal/
 ├── .env                    Your local API key configuration (not in Git)
 ├── requirements.txt        Python packages to install
 ├── routers/                HTTP endpoints, one file per resource (thin: they call services/)
-│   └── proposals.py        GET /proposals – the overview on Home
+│   └── upload.py           POST /upload – the XML files from the Home page
 ├── services/               Business logic used by the API and the command line
 │   ├── proposals.py        Read/write proposals on the shared storage (SFTP share)
 │   ├── proposal_runner.py  Run the AI for one proposal and keep its status up to date
@@ -255,22 +255,20 @@ Only use XML files that Essers explicitly authorizes for an external AI API. The
 
 Your teammates need Python, the dependency installation, their own authorized API key, and access to the same scrambled example files to run this project. There is **no web frontend or deployment server** yet; this is a local command-line prototype.
 
-## Proposals API (overview on the Home page)
+## API and proposal storage
 
-`api.py` creates the FastAPI app; the endpoints live in `routers/` (`routers/proposals.py` lists the proposals stored on the shared storage, the SFTP share).
+`api.py` creates the FastAPI app; the endpoints live in `routers/` (`routers/upload.py`). The overview on the Home page (`GET /proposals`) is served by Version_Control, which reads the `proposal.json` files this service writes on the SFTP share.
 
 | Endpoint | Returns |
 |---|---|
 | `GET /health` | `{"status": "ok"}` |
-| `GET /proposals` | `{"total": 6, "proposals": [...]}`: latest version per customer, newest upload first |
-| `GET /proposals?all_versions=true` | every version |
+| `POST /upload` | stores the uploaded XML files of one customer, the AI run then makes the proposal |
 
-One proposal in the response:
+The `proposal.json` of one version:
 
 ```json
-{"id": "voorbeeldbedrijf-a/v1", "customer": "Voorbeeldbedrijf A", "version": 1,
- "uploaded_at": "2026-10-22T14:05:00+02:00", "status": "AI_GENERATING",
- "ai_status": "RUNNING", "can_open": false}
+{"customer": "Voorbeeldbedrijf A", "uploaded_at": "2026-10-22T14:05:00+02:00",
+ "status": "AI_GENERATING", "ai_status": "RUNNING"}
 ```
 
 `status` is one of `AI_GENERATING`, `READY_FOR_REVIEW`, `IN_REVIEW`, `AI_CHECKING_REVIEW`, `RETURNED`; `ai_status` is `RUNNING`, `FAILED` or `null`. The frontend shows the Dutch labels.
@@ -300,7 +298,7 @@ One proposal in the response:
 
   The files on that server are visible in `data/sftp-server/`. `pytest -m integration` tests against it (skipped when it is not running).
 - Without `SFTP_SHARED_HOST` (no Docker) the local folder `data/sftp-shared/proposals/` is used instead. Fill it with example data: `python -m scripts.dev_seed`.
-- When the SFTP server cannot be reached, `GET /proposals` answers 503 and uploads wait in the source folder until it is back.
+- When the SFTP server cannot be reached, uploads wait in the source folder until it is back.
 
 **Run locally** (from `Mapping_Proposal/`):
 
