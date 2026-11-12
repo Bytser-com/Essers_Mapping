@@ -170,4 +170,50 @@ class ExcelProposalParserTest {
             }
         }
     }
+
+    @Test
+    @DisplayName("Throws IllegalArgumentException when parsing corrupted or non-Excel stream")
+    void parse_corruptBytes_throwsException() {
+        byte[] garbage = "This is not a zip or excel file".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        assertThrows(IllegalArgumentException.class,
+                () -> parser.parseProposalRows(new ByteArrayInputStream(garbage)));
+    }
+
+    @Test
+    @DisplayName("Ignores completely blank rows and rows with empty strings")
+    void parse_withBlankRows_ignoresBlankRows() throws IOException {
+        String[][] data = {
+                {"source_field", "target_field", "score", "comment"},
+                {"FieldA", "TargetA", "90", "Valid"},
+                {null, null, null, null},
+                {"", "   ", "", null},
+                {"FieldB", "TargetB", "85", "Also valid"}
+        };
+
+        byte[] bytes = createWorkbookBytes("Mapping Proposal", data);
+        List<ProposalRowDto> rows = parser.parseProposalRows(new ByteArrayInputStream(bytes));
+
+        assertEquals(2, rows.size());
+        assertEquals("FieldA", rows.get(0).sourceField());
+        assertEquals("FieldB", rows.get(1).sourceField());
+    }
+
+    @Test
+    @DisplayName("Parses large dataset of 500 rows with high performance")
+    void parse_largeDataset_performance() throws IOException {
+        int count = 500;
+        String[][] data = new String[count + 1][4];
+        data[0] = new String[]{"source_field", "target_field", "score", "comment"};
+        for (int i = 1; i <= count; i++) {
+            data[i] = new String[]{"Source" + i, "Target" + i, String.valueOf(50 + (i % 50)), "Comment " + i};
+        }
+
+        byte[] bytes = createWorkbookBytes("Mapping Proposal", data);
+        long start = System.currentTimeMillis();
+        List<ProposalRowDto> rows = parser.parseProposalRows(new ByteArrayInputStream(bytes));
+        long duration = System.currentTimeMillis() - start;
+
+        assertEquals(count, rows.size());
+        assertTrue(duration < 2000, "Parsing 500 rows should take under 2 seconds, took " + duration + " ms");
+    }
 }

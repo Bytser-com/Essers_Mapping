@@ -620,7 +620,6 @@ class SftpProposalStorageServiceTest {
 
         assertNotNull(result);
         assertEquals("v3", result.version());
-        assertEquals("VanRoey", result.comapnyname());
         assertEquals("VanRoey", result.companyname());
         assertEquals("2026-10-20", result.uploadDate());
         assertEquals("16:45:00", result.uploadTime());
@@ -677,5 +676,166 @@ class SftpProposalStorageServiceTest {
 
         assertThrows(be.essers.services.versioncontrol.shared.exception.StorageException.class,
                 () -> service.getProposalFileData("VanRoey", "v1"));
+    }
+
+    @Test
+    @DisplayName("getProposalFileData resolves company and version case-insensitively")
+    void getProposalFileData_caseInsensitiveResolution() throws Exception {
+        when(template.exists("/Proposals/vanroey")).thenReturn(false);
+        SftpClient.DirEntry companyEntry = createEntry("VanRoey", true);
+        when(template.list("/Proposals")).thenReturn(new SftpClient.DirEntry[]{companyEntry});
+
+        when(template.exists("/Proposals/VanRoey/v3")).thenReturn(true);
+
+        SftpClient.DirEntry excelEntry = createEntry("mappingproposal.xlsx", false);
+        when(template.list("/Proposals/VanRoey/v3")).thenReturn(new SftpClient.DirEntry[]{excelEntry});
+
+        byte[] excelBytes;
+        try (org.apache.poi.xssf.usermodel.XSSFWorkbook wb = new org.apache.poi.xssf.usermodel.XSSFWorkbook();
+             java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream()) {
+            org.apache.poi.ss.usermodel.Sheet sheet = wb.createSheet("Mapping Proposal");
+            org.apache.poi.ss.usermodel.Row r0 = sheet.createRow(0);
+            r0.createCell(0).setCellValue("source_field");
+            r0.createCell(1).setCellValue("target_field");
+            r0.createCell(2).setCellValue("score");
+            r0.createCell(3).setCellValue("comment");
+            org.apache.poi.ss.usermodel.Row r1 = sheet.createRow(1);
+            r1.createCell(0).setCellValue("SrcA");
+            r1.createCell(1).setCellValue("TgtA");
+            r1.createCell(2).setCellValue(99);
+            r1.createCell(3).setCellValue("OK");
+            wb.write(baos);
+            excelBytes = baos.toByteArray();
+        }
+
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(excelBytes)) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq("/Proposals/VanRoey/v3/mappingproposal.xlsx"), any(InputStreamCallback.class));
+
+        ProposalFileDataDto result = service.getProposalFileData("vanroey", "v3");
+
+        assertNotNull(result);
+        assertEquals("VanRoey", result.companyname());
+        assertEquals("v3", result.version());
+        assertEquals(1, result.rows().size());
+        assertEquals("SrcA", result.rows().get(0).sourceField());
+    }
+
+    @Test
+    @DisplayName("getProposalFileData throws EntityNotFoundException when version does not exist")
+    void getProposalFileData_versionNotFound_throwsEntityNotFound() {
+        when(template.exists("/Proposals/VanRoey")).thenReturn(true);
+        when(template.exists("/Proposals/VanRoey/v99")).thenReturn(false);
+        when(template.list("/Proposals/VanRoey")).thenReturn(new SftpClient.DirEntry[0]);
+
+        assertThrows(EntityNotFoundException.class,
+                () -> service.getProposalFileData("VanRoey", "v99"));
+    }
+
+    @Test
+    @DisplayName("getProposalFileData throws EntityNotFoundException when no Excel exists in version folder")
+    void getProposalFileData_noExcelInVersion_throwsEntityNotFound() {
+        when(template.exists("/Proposals/VanRoey")).thenReturn(true);
+        when(template.exists("/Proposals/VanRoey/v1")).thenReturn(true);
+
+        SftpClient.DirEntry textEntry = createEntry("notes.txt", false);
+        when(template.list("/Proposals/VanRoey/v1")).thenReturn(new SftpClient.DirEntry[]{textEntry});
+
+        assertThrows(EntityNotFoundException.class,
+                () -> service.getProposalFileData("VanRoey", "v1"));
+    }
+
+    @Test
+    @DisplayName("getProposalFileData falls back to proposal.json when metadata.json is not present")
+    void getProposalFileData_fallbackToProposalJson() throws Exception {
+        when(template.exists("/Proposals/VanRoey")).thenReturn(true);
+        when(template.exists("/Proposals/VanRoey/v1")).thenReturn(true);
+
+        SftpClient.DirEntry excelEntry = createEntry("proposal.xlsx", false);
+        SftpClient.DirEntry proposalJsonEntry = createEntry("proposal.json", false);
+        when(template.list("/Proposals/VanRoey/v1")).thenReturn(new SftpClient.DirEntry[]{excelEntry, proposalJsonEntry});
+
+        String proposalJson = """
+                {
+                  "customer": "VanRoey Customer",
+                  "version": "v1",
+                  "uploaded_at": "2026-10-15T08:30:00Z",
+                  "status": "IN_REVIEW",
+                  "creator": "System"
+                }
+                """;
+
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(proposalJson.getBytes(StandardCharsets.UTF_8))) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq("/Proposals/VanRoey/v1/proposal.json"), any(InputStreamCallback.class));
+
+        byte[] emptyExcelBytes;
+        try (org.apache.poi.xssf.usermodel.XSSFWorkbook wb = new org.apache.poi.xssf.usermodel.XSSFWorkbook();
+             java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream()) {
+            wb.createSheet("Mapping Proposal");
+            wb.write(baos);
+            emptyExcelBytes = baos.toByteArray();
+        }
+
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(emptyExcelBytes)) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq("/Proposals/VanRoey/v1/proposal.xlsx"), any(InputStreamCallback.class));
+
+        ProposalFileDataDto result = service.getProposalFileData("VanRoey", "v1");
+
+        assertNotNull(result);
+        assertEquals("VanRoey Customer", result.companyname());
+        assertEquals("2026-10-15", result.uploadDate());
+        assertEquals("08:30:00", result.uploadTime());
+        assertEquals("IN_REVIEW", result.status());
+        assertEquals("System", result.uploadUser());
+        assertTrue(result.rows().isEmpty());
+    }
+
+    @Test
+    @DisplayName("getProposalFileData falls back to Excel file modify time when updated_at is absent")
+    void getProposalFileData_updatedAtFromModifyTimeFallback() throws Exception {
+        when(template.exists("/Proposals/VanRoey")).thenReturn(true);
+        when(template.exists("/Proposals/VanRoey/v1")).thenReturn(true);
+
+        SftpClient.DirEntry excelEntry = createEntry("mappingproposal.xlsx", false);
+        // modify time set on excelEntry
+        excelEntry.getAttributes().setModifyTime(FileTime.from(Instant.parse("2026-11-12T11:22:33Z")));
+
+        when(template.list("/Proposals/VanRoey/v1")).thenReturn(new SftpClient.DirEntry[]{excelEntry});
+
+        byte[] excelBytes;
+        try (org.apache.poi.xssf.usermodel.XSSFWorkbook wb = new org.apache.poi.xssf.usermodel.XSSFWorkbook();
+             java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream()) {
+            wb.createSheet("Mapping Proposal");
+            wb.write(baos);
+            excelBytes = baos.toByteArray();
+        }
+
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(excelBytes)) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq("/Proposals/VanRoey/v1/mappingproposal.xlsx"), any(InputStreamCallback.class));
+
+        ProposalFileDataDto result = service.getProposalFileData("VanRoey", "v1");
+
+        assertNotNull(result);
+        assertEquals("2026-11-12", result.updatedDate());
+        assertEquals("11:22:33", result.updatedTime());
     }
 }

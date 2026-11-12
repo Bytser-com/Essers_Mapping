@@ -50,7 +50,7 @@ Proposal files are organized on the SFTP storage under the base directory (defau
 │       └── metadata.json
 └── <CompanyB>/
     └── v1/
-        ├── proposal_b.xlsx
+        ├── mappingproposal.xlsx
         └── metadata.json
 ```
 
@@ -125,8 +125,8 @@ Retrieves an overview of all companies with their **latest version** and associa
   {
     "company": "Google",
     "latestVersion": "v2",
-    "filename": "google_v2.xlsx",
-    "fullPath": "/Proposals/Google/v2/google_v2.xlsx",
+    "filename": "mappingproposal.xlsx",
+    "fullPath": "/Proposals/Google/v2/mappingproposal.xlsx",
     "createdDate": "2026-11-10T12:00:00Z",
     "createdBy": "John Smith",
     "description": "Initial proposal"
@@ -221,7 +221,6 @@ Host: localhost:8080
 ```json
 {
   "version": "v1",
-  "comapnyname": "Voorbeeldbedrijf C",
   "companyname": "Voorbeeldbedrijf C",
   "upload_date": "2026-10-20",
   "upload_time": "16:45:00",

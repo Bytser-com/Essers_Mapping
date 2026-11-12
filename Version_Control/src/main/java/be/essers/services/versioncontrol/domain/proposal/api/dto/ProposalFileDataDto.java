@@ -7,7 +7,6 @@ import java.util.List;
 
 @JsonPropertyOrder({
         "version",
-        "comapnyname",
         "companyname",
         "upload_date",
         "upload_time",
@@ -20,9 +19,6 @@ import java.util.List;
 public record ProposalFileDataDto(
         @JsonProperty("version")
         String version,
-
-        @JsonProperty("comapnyname")
-        String comapnyname,
 
         @JsonProperty("companyname")
         String companyname,
@@ -56,23 +52,8 @@ public record ProposalFileDataDto(
             String updatedTime,
             String updatedDate,
             String uploadUser,
-            String status,
             List<ProposalRowDto> rows
     ) {
-        this(version, companyName, companyName, uploadDate, uploadTime, updatedTime, updatedDate, uploadUser, status, rows);
-    }
-
-    // Overload without status for backwards compatibility if needed
-    public ProposalFileDataDto(
-            String version,
-            String companyName,
-            String uploadDate,
-            String uploadTime,
-            String updatedTime,
-            String updatedDate,
-            String uploadUser,
-            List<ProposalRowDto> rows
-    ) {
-        this(version, companyName, companyName, uploadDate, uploadTime, updatedTime, updatedDate, uploadUser, null, rows);
+        this(version, companyName, uploadDate, uploadTime, updatedTime, updatedDate, uploadUser, null, rows);
     }
 }

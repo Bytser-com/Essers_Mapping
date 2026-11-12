@@ -208,8 +208,8 @@ class ProposalControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.version").value("v3"))
-                .andExpect(jsonPath("$.comapnyname").value("VanRoey"))
                 .andExpect(jsonPath("$.companyname").value("VanRoey"))
+                .andExpect(jsonPath("$.comapnyname").doesNotExist())
                 .andExpect(jsonPath("$.upload_date").value("2026-11-10"))
                 .andExpect(jsonPath("$.upload_time").value("14:30:00"))
                 .andExpect(jsonPath("$.updated_time").value("15:00:00"))
@@ -249,7 +249,7 @@ class ProposalControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.version").value("v1"))
-                .andExpect(jsonPath("$.comapnyname").value("Google"))
+                .andExpect(jsonPath("$.companyname").value("Google"))
                 .andExpect(jsonPath("$.rows").isArray());
     }
 
@@ -265,5 +265,51 @@ class ProposalControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.title").value("Entity Not Found"));
+    }
+
+    @Test
+    @DisplayName("GET /Proposals/filedata with missing company parameter returns 400")
+    void getProposalFileData_missingCompany_returns400() throws Exception {
+        mockMvc.perform(get("/Proposals/filedata")
+                        .param("version", "v1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("GET /Proposals/filedata with missing version parameter returns 400")
+    void getProposalFileData_missingVersion_returns400() throws Exception {
+        mockMvc.perform(get("/Proposals/filedata")
+                        .param("company", "VanRoey")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("GET /Proposals/filedata with path traversal characters returns 400")
+    void getProposalFileData_pathTraversal_returns400() throws Exception {
+        when(proposalStorageService.getProposalFileData("../etc", "v1"))
+                .thenThrow(new IllegalArgumentException("Path segment contains illegal characters: ../etc"));
+
+        mockMvc.perform(get("/Proposals/filedata")
+                        .param("company", "../etc")
+                        .param("version", "v1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"));
+    }
+
+    @Test
+    @DisplayName("GET /Proposals/filedata returns 502 when SFTP fails")
+    void getProposalFileData_sftpFailure_returns502() throws Exception {
+        when(proposalStorageService.getProposalFileData("VanRoey", "v3"))
+                .thenThrow(new StorageException("Failed to read file from SFTP storage"));
+
+        mockMvc.perform(get("/Proposals/filedata")
+                        .param("company", "VanRoey")
+                        .param("version", "v3")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadGateway())
+                .andExpect(jsonPath("$.title").value("SFTP Storage Error"));
     }
 }
