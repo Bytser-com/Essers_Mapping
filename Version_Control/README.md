@@ -9,7 +9,7 @@ The **Version Control Service** is a Java Spring Boot microservice within the Pr
 - [Features](#features)
 - [SFTP Fileshare Folder Structure](#sftp-fileshare-folder-structure)
   - [Directory Hierarchy](#directory-hierarchy)
-  - [Companion `metadata.json`](#companion-metadatajson)
+  - [Companion Metadata (`proposal.json` / `metadata.json`)](#companion-metadata-proposaljson--metadatajson)
   - [Version Ordering & Fallbacks](#version-ordering--fallbacks)
 - [Environment Variables](#environment-variables)
 - [API Endpoints Reference](#api-endpoints-reference)
@@ -24,7 +24,7 @@ The **Version Control Service** is a Java Spring Boot microservice within the Pr
 
 - **SFTP Integration**: Communicates with the remote SFTP share via Spring Integration SFTP without needing a local persistent mount.
 - **Natural Versioning**: Employs a semantic/numeric version comparator ensuring natural version ordering (e.g. `v10` is recognized as newer than `v3`).
-- **Metadata Support**: Reads companion `metadata.json` for creation timestamp, author, and description, with automatic fallback to file attributes.
+- **Metadata Support**: Reads companion `proposal.json` (or `metadata.json`) for creation timestamp, author, description, workflow status, and AI status, with automatic fallback to file attributes.
 - **Base64 File Streaming**: Delivers Excel spreadsheets (`.xlsx`, `.xls`) packaged inside JSON payloads for API clients and frontend UIs.
 - **Security & Validation**: Strict input sanitation preventing directory traversal attacks (`..`, `/`, `\`). Case-insensitive folder resolution for cross-platform compatibility.
 
@@ -34,46 +34,69 @@ The **Version Control Service** is a Java Spring Boot microservice within the Pr
 
 ### Directory Hierarchy
 
-Proposal files are organized on the SFTP storage under the base directory (default `/Proposals/`), partitioned by company name and version folder:
+Proposal files are organized on the SFTP storage under the base directory (default `/Proposals/`), partitioned by customer slug and version folder:
 
 ```text
 /Proposals/                                <-- Base directory (configurable via SFTP_BASE_PATH)
-├── <CompanyA>/                            <-- Company name (e.g., VanRoey)
+├── <customer-slug>/                       <-- Customer directory (e.g., nouryon, voorbeeldbedrijf-c)
 │   ├── v1/
-│   │   ├── mappingproposal.xlsx           <-- Proposal Excel spreadsheet
-│   │   └── metadata.json                  <-- Companion metadata file
+│   │   ├── MProposal-Nouryon_V1.xlsx      <-- Proposal Excel spreadsheet (pattern: MProposal-<Customer>_V<N>.xlsx)
+│   │   └── proposal.json                  <-- Companion metadata file (or metadata.json)
 │   ├── v2/
-│   │   ├── mappingproposal.xlsx
-│   │   └── metadata.json
+│   │   ├── MProposal-Nouryon_V2.xlsx
+│   │   └── proposal.json
 │   └── v3/
-│       ├── mappingproposal.xlsx
-│       └── metadata.json
-└── <CompanyB>/
+│       ├── MProposal-Nouryon_V3.xlsx
+│       └── proposal.json
+└── <another-customer>/
     └── v1/
-        ├── mappingproposal.xlsx
-        └── metadata.json
+        ├── MProposal-Customer_V1.xlsx
+        └── proposal.json
 ```
 
-### Companion `metadata.json`
+### Companion Metadata (`proposal.json` / `metadata.json`)
 
-Each version directory contains a `metadata.json` file providing structured context about that proposal release:
+Each version directory contains a companion metadata JSON file (`proposal.json` written by the AI pipeline, or `metadata.json`) providing structured context and status for that proposal release:
 
 ```json
 {
-  "company": "VanRoey",
-  "version": "v3",
-  "filename": "mappingproposal.xlsx",
-  "createdDate": "2026-11-10T14:30:00Z",
-  "createdBy": "Jane Doe",
-  "description": "Updated warehouse pallet mapping rules"
+  "customer": "Nouryon",
+  "company": "Nouryon",
+  "version": "v2",
+  "filename": "MProposal-Nouryon_V2.xlsx",
+  "uploaded_at": "2026-11-12T14:30:00+00:00",
+  "createdDate": "2026-11-12T14:30:00+00:00",
+  "status": "READY_FOR_REVIEW",
+  "ai_status": null,
+  "createdBy": "AI Pipeline",
+  "description": "Generated mapping proposal"
 }
 ```
+
+#### Supported Metadata Fields & Aliases:
+- **`customer` / `company`**: Customer identifier or display name.
+- **`version`**: Version identifier (e.g., `"v2"`).
+- **`filename`**: Name of the generated Excel spreadsheet (e.g., `"MProposal-Nouryon_V2.xlsx"`). The backend prioritizes this filename when locating the proposal spreadsheet.
+- **`uploaded_at` / `createdDate` / `created_date` / `uploadedAt`**: ISO 8601 creation/upload timestamp.
+- **`status` / `proposal_status` / `proposalStatus`**: Proposal workflow status:
+  - `AI_GENERATING`: Proposal generation in progress
+  - `READY_FOR_REVIEW`: Completed and ready for reviewer inspection
+  - `IN_REVIEW`: Currently under human review
+  - `AI_CHECKING_REVIEW`: AI validation in progress
+  - `RETURNED`: Proposal returned for revision
+- **`ai_status` / `aiStatus`**: AI engine processing status:
+  - `RUNNING`: AI background job is currently running
+  - `FAILED`: AI job execution encountered an error
+  - `null` / omitted: Idle / completed
+- **`createdBy` / `created_by` / `creator`**: (Optional) Author or pipeline identity.
+- **`description`**: (Optional) Free-text description of the proposal or change notes.
 
 ### Version Ordering & Fallbacks
 
 - **Version Resolution**: Versions are compared using `VersionComparator` so `v1` < `v2` < `v3` < `v10`.
-- **Missing `metadata.json`**: If `metadata.json` is missing or corrupted, the service automatically detects the `.xlsx` or `.xls` file in the version folder and uses the SFTP file modification timestamp as fallback.
-- **Case-Insensitive Resolution**: If an API consumer passes `company=vanroey&version=v3`, the service resolves the directory names even if they are stored as `VanRoey` and `V3`.
+- **Metadata Fallbacks**: The service checks for `metadata.json` first, then falls back to `proposal.json` (both case-insensitive). If metadata is missing or invalid, the version is skipped in the `GET /proposals` overview to prevent broken entries, but can still be fetched directly via `GET /proposals/file` with fallback to file modification timestamps.
+- **Excel File Resolution**: The service first looks for the file named in `metadata.filename`. If not specified or absent, it automatically detects the first non-directory file ending with `.xlsx` or `.xls`.
+- **Case-Insensitive Resolution**: If an API consumer passes `company=nouryon&version=v2`, the service resolves the directory names even if they are stored with different casing on disk (e.g., `Nouryon/V2`).
 
 ---
 
@@ -107,7 +130,7 @@ Retrieves an overview of all companies with their **latest version** and associa
 * **URL**: `/proposals` (or `/Proposals`)
 * **Method**: `GET`
 * **Query Parameters**:
-  * `company` *(optional, string)*: Filter results to a specific company (e.g. `?company=VanRoey`).
+  * `company` *(optional, string)*: Filter results to a specific company (e.g. `?company=nouryon`).
 
 #### Response Codes
 
@@ -123,22 +146,26 @@ Retrieves an overview of all companies with their **latest version** and associa
 ```json
 [
   {
-    "company": "Google",
+    "company": "nouryon",
     "latestVersion": "v2",
-    "filename": "mappingproposal.xlsx",
-    "fullPath": "/Proposals/Google/v2/mappingproposal.xlsx",
-    "createdDate": "2026-11-10T12:00:00Z",
-    "createdBy": "John Smith",
-    "description": "Initial proposal"
+    "filename": "MProposal-Nouryon_V2.xlsx",
+    "fullPath": "/Proposals/nouryon/v2/MProposal-Nouryon_V2.xlsx",
+    "createdDate": "2026-11-12T14:30:00+00:00",
+    "createdBy": "AI Pipeline",
+    "description": "Generated mapping proposal",
+    "status": "READY_FOR_REVIEW",
+    "aiStatus": null
   },
   {
-    "company": "VanRoey",
-    "latestVersion": "v3",
-    "filename": "mappingproposal.xlsx",
-    "fullPath": "/Proposals/VanRoey/v3/mappingproposal.xlsx",
-    "createdDate": "2026-11-10T14:30:00Z",
-    "createdBy": "Jane Doe",
-    "description": "Updated warehouse pallet mapping rules"
+    "company": "voorbeeldbedrijf-c",
+    "latestVersion": "v1",
+    "filename": "MProposal-VoorbeeldbedrijfC_V1.xlsx",
+    "fullPath": "/Proposals/voorbeeldbedrijf-c/v1/MProposal-VoorbeeldbedrijfC_V1.xlsx",
+    "createdDate": "2026-10-20T16:45:00+02:00",
+    "createdBy": null,
+    "description": null,
+    "status": "AI_CHECKING_REVIEW",
+    "aiStatus": "RUNNING"
   }
 ]
 ```
@@ -152,8 +179,8 @@ Retrieves a specific proposal version for a company, returning the Excel file (e
 * **URL**: `/proposals/file` (or `/Proposals/file`)
 * **Method**: `GET`
 * **Query Parameters**:
-  * `company` *(required, string)*: Name of the company (e.g. `vanroey`).
-  * `version` *(required, string)*: Version identifier (e.g. `v3`).
+  * `company` *(required, string)*: Name of the company (e.g. `nouryon`).
+  * `version` *(required, string)*: Version identifier (e.g. `v2`).
 
 #### Response Codes
 
@@ -167,7 +194,7 @@ Retrieves a specific proposal version for a company, returning the Excel file (e
 #### Example Request
 
 ```http
-GET /proposals/file?company=vanroey&version=v3 HTTP/1.1
+GET /proposals/file?company=nouryon&version=v2 HTTP/1.1
 Host: localhost:8080
 ```
 
@@ -175,15 +202,15 @@ Host: localhost:8080
 
 ```json
 {
-  "company": "VanRoey",
-  "version": "v3",
-  "filename": "mappingproposal.xlsx",
-  "fullPath": "/Proposals/VanRoey/v3/mappingproposal.xlsx",
+  "company": "nouryon",
+  "version": "v2",
+  "filename": "MProposal-Nouryon_V2.xlsx",
+  "fullPath": "/Proposals/nouryon/v2/MProposal-Nouryon_V2.xlsx",
   "contentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   "sizeBytes": 14250,
-  "createdDate": "2026-11-10T14:30:00Z",
-  "createdBy": "Jane Doe",
-  "description": "Updated warehouse pallet mapping rules",
+  "createdDate": "2026-11-12T14:30:00+00:00",
+  "createdBy": "AI Pipeline",
+  "description": "Generated mapping proposal",
   "fileContentBase64": "UEsDBBQAAAAIAAA..."
 }
 ```

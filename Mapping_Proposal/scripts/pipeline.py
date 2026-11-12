@@ -9,7 +9,6 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
-import os
 import time
 from collections import Counter
 from dataclasses import dataclass
@@ -28,9 +27,11 @@ from .config import (
 from .errors import ConfigError, InputDataError, QuotaExceededError
 from .excel_generator import export_excel
 from .experiment_tracker import ExperimentTracker
+from .historical_evidence import extract_reference_evidence
 from .mapping_validator import find_proposals_needing_retry, validate_mappings
 from .models import MappingResult, MappingSettings, PreviewResult
 from .readprompt import build_mapping_contents, run_gemini
+from .safe_files import atomic_writer, confined_path
 from .xml_parser import (
     discover_historical_pairs,
     parse_xml_files,
@@ -49,23 +50,31 @@ CODE_FILES = [
     ROOT / 'main.py',
     *(ROOT / 'scripts' / name for name in (
         'config.py', 'errors.py', 'models.py', 'pipeline.py', 'xml_parser.py',
-        'readprompt.py', 'mapping_validator.py', 'excel_generator.py',
-        'experiment_tracker.py',
+        'readprompt.py', 'mapping_validator.py', 'historical_evidence.py', 'excel_generator.py',
+        'experiment_tracker.py', 'safe_files.py',
     )),
     TEMPLATE_PATH,
+    ROOT / 'mapping_schema.json',
 ]
 
 
+def _run_file(path: Path) -> Path:
+    try:
+        return confined_path(RUNS_DIR, path)
+    except ValueError as error:
+        raise InputDataError('Run files must stay inside the configured runs directory.') from error
+
+
 def save_json(path: Path, data) -> None:
-    """Safely save results and checkpoints without partial JSON files."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temp = path.with_suffix(path.suffix + '.tmp')
-    temp.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding='utf-8')
-    os.replace(temp, path)
+    """Save model output as JSON data inside RUNS_DIR, never as a file path."""
+    target = _run_file(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with atomic_writer(target) as handle:
+        json.dump(data, handle, indent=2, ensure_ascii=False)
 
 
 def read_json(path: Path):
-    return json.loads(path.read_text(encoding='utf-8'))
+    return json.loads(_run_file(path).read_text(encoding='utf-8'))
 
 
 def fingerprint_files(files: list[Path]) -> str:
@@ -109,7 +118,7 @@ def unresolved(target: str) -> dict:
         'evidence': '', 'fixed_value': '', 'transformation': '',
         'condition': '', 'lookup': '', 'loop': '',
         'review_question': 'Which source field or business rule should populate this target?',
-        'risk_category': 'Unmapped target', 'validation_issues': [],
+        'risk_category': 'HIGH', 'validation_issues': [],
     }
 
 
@@ -271,7 +280,7 @@ def run_mapping(settings: MappingSettings) -> MappingResult:
     run_dir = RUNS_DIR / name
     checkpoints = run_dir / 'checkpoints'
     tracker = ExperimentTracker(
-        root=ROOT, run_dir=run_dir,
+        root=ROOT, run_dir=run_dir, job_signature=signature,
         started_monotonic=started, started_utc=started_utc, settings={
             'model': model,
             'dataset_version': dataset_hash[:12],
@@ -316,12 +325,13 @@ def run_mapping(settings: MappingSettings) -> MappingResult:
             stage = 'gemini'
             target_paths = [f['path'] for f in batch]
             checkpoint = checkpoints / f'batch_{index:04d}.json'
+            tracker.begin_batch(index)
             # A batch that was already completed in an earlier (interrupted) run
             # is loaded from disk instead of calling Gemini again.
             restored = _restore_checkpoint(checkpoint, signature, target_paths, index)
             if restored is not None:
-                proposals.extend(restored)
-                tracker.restored_batch()
+                proposals.extend(restored['proposals'])
+                tracker.restored_batch(index, restored.get('metrics'))
                 logger.info(f'Batch {index}/{len(inputs.batches)} restored from checkpoint.')
                 continue
 
@@ -335,7 +345,8 @@ def run_mapping(settings: MappingSettings) -> MappingResult:
                     code=error.code,
                 ) from None
             # Save this batch immediately, so a later failure cannot lose it.
-            save_json(checkpoint, {'signature': signature, 'targets': target_paths, 'proposals': batch_proposals})
+            save_json(checkpoint, {'signature': signature, 'targets': target_paths,
+                                   'proposals': batch_proposals, 'metrics': tracker.batch_metrics(index)})
             proposals.extend(batch_proposals)
             logger.info(f'Saved {len(batch_proposals)} proposal(s).')
 
@@ -346,6 +357,18 @@ def run_mapping(settings: MappingSettings) -> MappingResult:
         found = {p['target_path'] for p in accepted}
         missing = [f['path'] for f in inputs.target_fields if f['path'] not in found]
         accepted.extend(unresolved(path) for path in missing)
+        # Independent, deterministic XML evidence; no extra task for Gemini.
+        # Only exact-value candidates from the historical examples Gemini saw.
+        reference_evidence = extract_reference_evidence(
+            inputs.historical_docs, [f['path'] for f in inputs.target_fields],
+        )
+        save_json(run_dir / 'historical_evidence_audit.json', {
+            'method': 'independent_exact_value_matching',
+            'checked_matches': len(reference_evidence),
+            'caution': 'Observed value agreement is not proof of a business mapping.',
+        })
+        logger.info('Historical reference evidence: %d XML-checked candidate(s).',
+                    len(reference_evidence))
         warnings = []
         if missing:
             warnings.append(f'{len(missing)} target fields have explicit placeholders (not Gemini mappings).')
@@ -359,12 +382,15 @@ def run_mapping(settings: MappingSettings) -> MappingResult:
             accepted, inputs.source_fields, inputs.source_files, inputs.converted_files,
             run_dir / 'mapping_package.xlsx', TEMPLATE_PATH,
             historical_pairs=inputs.pairs, selected_historical_examples=inputs.historical_docs,
+            verified_historical_evidence=reference_evidence,
         ))
         # Write one row to output/experiments.csv for this execution.
         tracker.finish(status='completed', results={
             'mapping_rows': len(accepted), 'placeholders': len(missing),
             'rejected_proposals': len(rejected), 'structural_issues': len(issues),
             'workbook_path': workbook.relative_to(ROOT).as_posix(),
+            'historical_evidence_checked': len(reference_evidence),
+            'historical_evidence_rejected': 0,
         })
         logger.info(f'Created Excel: {workbook}')
         logger.info(f'{len(accepted)} rows; {len(missing)} placeholders; {len(rejected)} rejected; '
@@ -400,7 +426,7 @@ def _restore_checkpoint(checkpoint: Path, signature: str, target_paths: list[str
         # Only reuse the checkpoint if it belongs to exactly this job and batch.
         if (saved.get('signature') == signature and saved.get('targets') == target_paths
                 and isinstance(saved.get('proposals'), list)):
-            return saved['proposals']
+            return saved
     except (OSError, ValueError, TypeError, AttributeError):
         logger.warning(f'Batch {index}: corrupt checkpoint; regenerating.')
     return None

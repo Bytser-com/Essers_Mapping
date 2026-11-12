@@ -41,7 +41,7 @@
 #   SFTP_RUNTIME_PASSWORD=devpassword
 #   SFTP_RUNTIME_REMOTE_DIR=/
 #
-# The server files live in ../data/shared-sftp/ and ../data/runtime-sftp/ (data/ is ignored by Git).
+# The server data is stored in Docker volumes (shared-sftp-data and runtime-sftp-data).
 # ==============================================================================
 services:
   shared-sftp:
@@ -67,7 +67,7 @@ services:
       - "2222:2022"
       - "8081:8080"
     volumes:
-      - ../data/shared-sftp:/srv/sftpgo/data
+      - shared-sftp-data:/srv/sftpgo/data
     restart: unless-stopped
 
   runtime-sftp:
@@ -93,5 +93,9 @@ services:
       - "2223:2022"
       - "8082:8080"
     volumes:
-      - ../data/runtime-sftp:/srv/sftpgo/data
+      - runtime-sftp-data:/srv/sftpgo/data
     restart: unless-stopped
+
+volumes:
+  shared-sftp-data:
+  runtime-sftp-data:
