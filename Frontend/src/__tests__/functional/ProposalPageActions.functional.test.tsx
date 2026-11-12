@@ -89,7 +89,7 @@ describe('ProposalPage actions', () => {
     // Assert
     await waitFor(() => expect(anchorClick).toHaveBeenCalledTimes(1))
     expect(getProposalFile).toHaveBeenCalledWith('brunos', 'v2')
-    const blob = createObjectURL.mock.calls[0][0]
+    const blob = createObjectURL.mock.calls[0]?.[0] as Blob
     expect(blob.type).toBe('application/test')
     expect(blob.size).toBe(5)
     const link = anchorClick.mock.contexts[0] as unknown as HTMLAnchorElement
@@ -109,7 +109,7 @@ describe('ProposalPage actions', () => {
 
     // Assert
     await waitFor(() => expect(anchorClick).toHaveBeenCalledTimes(1))
-    const blob = createObjectURL.mock.calls[0][0]
+    const blob = createObjectURL.mock.calls[0]?.[0] as Blob
     expect(blob.type).toBe('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     const link = anchorClick.mock.contexts[0] as unknown as HTMLAnchorElement
     expect(link.download).toBe('MProposal-brunos_v2.xlsx')

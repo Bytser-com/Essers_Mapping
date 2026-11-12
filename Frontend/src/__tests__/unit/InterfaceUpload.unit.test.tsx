@@ -8,7 +8,8 @@ function xmlFile(name = 'order.xml') {
 }
 
 function renderUpload(onUpload?: (customer: string, files: File[]) => void | Promise<void>) {
-  render(<InterfaceUpload onUpload={onUpload} />)
+  // Only pass onUpload when the test gives one (exactOptionalPropertyTypes)
+  render(onUpload ? <InterfaceUpload onUpload={onUpload} /> : <InterfaceUpload />)
   return {
     customer: screen.getByLabelText('Klantnaam'),
     fileInput: screen.getByTestId('file-input') as HTMLInputElement,
