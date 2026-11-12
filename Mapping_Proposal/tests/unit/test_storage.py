@@ -191,10 +191,54 @@ def test_sftp_connection_is_closed_after_the_session(monkeypatch):
 # ---------------------------------------------------------------------------
 # Path safety
 # ---------------------------------------------------------------------------
-@pytest.mark.parametrize('bad_path', ['../geheim', 'ostavel/../../x', '..'])
+@pytest.mark.parametrize('bad_path', [
+    '../geheim', 'ostavel/../../x', '..', '/etc/passwd',
+    r'C:\Windows\secret', 'C:secret', r'\\server\share\secret',
+    r'ostavel\..\secret', 'invalid\x00name',
+])
 def test_paths_cannot_leave_the_storage_root(tmp_path, bad_path):
     with pytest.raises(StorageError):
         LocalStorage(tmp_path).exists(bad_path)
+
+
+def test_local_upload_accepts_a_workbook_from_outside_the_storage(tmp_path):
+    workbook = tmp_path / 'generated.xlsx'
+    workbook.write_bytes(b'\x00excel\xff')
+    storage = LocalStorage(tmp_path / 'proposals')
+    storage.make_dirs('customer/v1')
+
+    storage.upload_file(workbook, 'customer/v1/mapping.xlsx')
+    storage.write_text('customer/v1/proposal.json', '{"status": "ready"}')
+
+    assert (storage.root / 'customer/v1/mapping.xlsx').read_bytes() == workbook.read_bytes()
+    assert storage.read_text('customer/v1/proposal.json') == '{"status": "ready"}'
+    assert sorted(p.name for p in (storage.root / 'customer/v1').iterdir()) == [
+        'mapping.xlsx', 'proposal.json',
+    ]
+
+
+def test_storage_rejects_a_symlink_to_another_directory(tmp_path):
+    root = tmp_path / 'proposals'
+    root.mkdir()
+    outside = tmp_path / 'private'
+    outside.mkdir()
+    secret = outside / 'secret.txt'
+    secret.write_text('unchanged')
+    try:
+        (root / 'customer').symlink_to(outside, target_is_directory=True)
+    except OSError as error:
+        pytest.skip(f'This machine cannot create symlinks: {error}')
+    storage = LocalStorage(root)
+
+    with pytest.raises(StorageError):
+        storage.read_text('customer/secret.txt')
+    with pytest.raises(StorageError):
+        storage.write_text('customer/secret.txt', 'overwritten')
+    with pytest.raises(StorageError):
+        storage.upload_file(secret, 'customer/upload.txt')
+
+    assert secret.read_text() == 'unchanged'
+    assert not (outside / 'upload.txt').exists()
 
 
 # ---------------------------------------------------------------------------

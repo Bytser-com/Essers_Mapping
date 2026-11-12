@@ -16,16 +16,17 @@ is reused for a group of operations and always closed afterwards.
 from __future__ import annotations
 
 import logging
-import os
 import posixpath
+import shutil
 import stat
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
-from pathlib import Path, PurePosixPath
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Protocol
 
 from scripts.errors import StorageError
+from scripts.safe_files import atomic_writer, confined_path
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +66,10 @@ def proposal_storage() -> LocalStorage | SftpStorage:
 
 def _clean(path: str) -> str:
     """Relative POSIX path without '..', so nothing can leave the storage root."""
-    parts = [part for part in PurePosixPath(path.replace('\\', '/')).parts if part not in ('', '.', '/')]
+    normalized = path.replace('\\', '/')
+    if '\x00' in normalized or PurePosixPath(normalized).is_absolute() or PureWindowsPath(normalized).drive:
+        raise StorageError(f'Invalid path on the shared storage: {path!r}')
+    parts = [part for part in PurePosixPath(normalized).parts if part not in ('', '.', '/')]
     if '..' in parts:
         raise StorageError(f'Invalid path on the shared storage: {path!r}')
     return '/'.join(parts)
@@ -76,7 +80,7 @@ def _clean(path: str) -> str:
 # ---------------------------------------------------------------------------
 class LocalStorage:
     def __init__(self, root: Path):
-        self.root = Path(root)
+        self.root = Path(root).resolve()
 
     def describe(self) -> str:
         return f'local folder {self.root}'
@@ -87,7 +91,10 @@ class LocalStorage:
 
     def _path(self, path: str) -> Path:
         clean = _clean(path)
-        return self.root / clean if clean else self.root
+        try:
+            return confined_path(self.root, Path(clean))
+        except ValueError as error:
+            raise StorageError(f'Invalid path on the shared storage: {path!r}') from error
 
     def list_dirs(self, path: str) -> list[str]:
         folder = self._path(path)
@@ -113,15 +120,13 @@ class LocalStorage:
 
     def write_text(self, path: str, text: str) -> None:
         target = self._path(path)
-        temp = target.with_name(f'.{target.name}.tmp')
-        temp.write_text(text, encoding='utf-8')
-        os.replace(temp, target)
+        with atomic_writer(target) as handle:
+            handle.write(text)
 
     def upload_file(self, local_path: Path, path: str) -> None:
         target = self._path(path)
-        temp = target.with_name(f'.{target.name}.tmp')
-        temp.write_bytes(Path(local_path).read_bytes())
-        os.replace(temp, target)
+        with Path(local_path).open('rb') as source, atomic_writer(target, binary=True) as destination:
+            shutil.copyfileobj(source, destination)
 
 
 # ---------------------------------------------------------------------------

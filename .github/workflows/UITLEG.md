@@ -56,6 +56,28 @@ dezelfde setup, zodat ze dezelfde afhankelijkheden en testtools installeren.
 SonarQube draait één gezamenlijke analyse op `Development` en verzamelt daarvoor
 opnieuw coverage van alle geïmplementeerde services.
 
+De losse Sonar-scanner kent de Maven-classpath niet automatisch. Daarom kopiëren
+we de Runtime-dependencies (inclusief testdependencies) naar `target/sonar-libraries`.
+`sonar-project.properties` verwijst naar die JARs en de gecompileerde productie-
+en testklassen. Python wordt als versie 3.12 geanalyseerd, net als in CI.
+Het patroon `Mapping_*/coverage.xml` leest bestaande Python-rapporten en verwacht
+geen rapport van een service die alleen een README bevat.
+
+Onze teamafspraak is **minstens 70% totale coverage**. Dat is een andere maatstaf
+dan de standaard Sonar-gate: die vereist **80% coverage op nieuwe code**.
+De workflow neemt de gate over van SonarCloud; het percentage staat niet in YAML.
+Een eigen gate met 70% totale coverage vereist in SonarCloud een Team- of
+Enterprise-abonnement. De bestaande Sonar-gate blijft actief.
+Let op: Sonars `Coverage` combineert regels en vertakkingen en kan dus lager zijn
+dan alleen `Line coverage`. Bekijk voor onze afspraak de totale `Coverage`.
+
+De scanner controleert bij de installatie een GPG-handtekening. We bewaren de
+geverifieerde scanner in een cache, ook als de analyse vervolgens een rode gate
+oplevert. Zonder cache begrenst `Scripts/sonar-gpg.sh` ieder GPG-commando tot
+30 seconden (met maximaal 5 seconden om te stoppen), zodat de action bij een
+vastlopende keyserver zijn andere keyserver kan proberen. De handtekeningcontrole
+blijft verplicht; een mislukte verificatie laat de workflow falen.
+
 ## Rapporten en dependencychecks
 
 OSV vergelijkt de dependencyversies met bekende kwetsbaarheden. Een gevonden

@@ -64,3 +64,6 @@ jobs:
 
       - name: Check container smoke script syntax
         run: bash -n Scripts/smoke-service-image.sh
+
+      - name: Check Sonar GPG wrapper syntax
+        run: bash -n Scripts/sonar-gpg.sh
