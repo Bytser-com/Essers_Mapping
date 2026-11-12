@@ -15,7 +15,7 @@ public record ProposalMetadata(
         @JsonAlias({"createdDate", "uploaded_at", "created_date", "uploadedAt"})
         String createdDate,
 
-        @JsonAlias({"createdBy", "created_by", "creator"})
+        @JsonAlias({"createdBy", "created_by", "creator", "upload_user", "uploadUser"})
         String createdBy,
 
         String description,
@@ -24,6 +24,21 @@ public record ProposalMetadata(
         String status,
 
         @JsonAlias({"ai_status", "aiStatus"})
-        String aiStatus
+        String aiStatus,
+
+        @JsonAlias({"updated_at", "updatedAt", "updated_date", "updatedDate"})
+        String updatedAt
 ) {
+    public ProposalMetadata(
+            String company,
+            String version,
+            String filename,
+            String createdDate,
+            String createdBy,
+            String description,
+            String status,
+            String aiStatus
+    ) {
+        this(company, version, filename, createdDate, createdBy, description, status, aiStatus, null);
+    }
 }

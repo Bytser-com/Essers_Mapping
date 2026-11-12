@@ -1,7 +1,9 @@
 package be.essers.services.versioncontrol.domain.proposal.api;
 
 import be.essers.services.versioncontrol.domain.proposal.api.dto.CompanyProposalOverviewDto;
+import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalFileDataDto;
 import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalFileDetailsDto;
+import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalRowDto;
 import be.essers.services.versioncontrol.domain.proposal.service.ProposalStorageService;
 import be.essers.services.versioncontrol.shared.exception.EntityNotFoundException;
 import be.essers.services.versioncontrol.shared.exception.GlobalExceptionHandler;
@@ -173,6 +175,91 @@ class ProposalControllerTest {
                 .thenThrow(new EntityNotFoundException("Company directory 'NonExisting' does not exist"));
 
         mockMvc.perform(get("/proposals/file")
+                        .param("company", "NonExisting")
+                        .param("version", "v1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.title").value("Entity Not Found"));
+    }
+
+    @Test
+    @DisplayName("GET /Proposals/filedata returns file metadata and rows")
+    void getProposalFileData_validParams_returnsFileData() throws Exception {
+        ProposalRowDto row1 = new ProposalRowDto("OrderNo", "DeliveryNumber", 95, "Direct match");
+        ProposalRowDto row2 = new ProposalRowDto(null, "DefaultFlag", 100, "Fixed value");
+
+        ProposalFileDataDto fileData = new ProposalFileDataDto(
+                "v3",
+                "VanRoey",
+                "2026-11-10",
+                "14:30:00",
+                "15:00:00",
+                "2026-11-10",
+                "Jane Doe",
+                "READY_FOR_REVIEW",
+                List.of(row1, row2)
+        );
+
+        when(proposalStorageService.getProposalFileData("VanRoey", "v3")).thenReturn(fileData);
+
+        mockMvc.perform(get("/Proposals/filedata")
+                        .param("company", "VanRoey")
+                        .param("version", "v3")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.version").value("v3"))
+                .andExpect(jsonPath("$.comapnyname").value("VanRoey"))
+                .andExpect(jsonPath("$.companyname").value("VanRoey"))
+                .andExpect(jsonPath("$.upload_date").value("2026-11-10"))
+                .andExpect(jsonPath("$.upload_time").value("14:30:00"))
+                .andExpect(jsonPath("$.updated_time").value("15:00:00"))
+                .andExpect(jsonPath("$.updated_date").value("2026-11-10"))
+                .andExpect(jsonPath("$.upload_user").value("Jane Doe"))
+                .andExpect(jsonPath("$.status").value("READY_FOR_REVIEW"))
+                .andExpect(jsonPath("$.rows.length()").value(2))
+                .andExpect(jsonPath("$.rows[0].source_field").value("OrderNo"))
+                .andExpect(jsonPath("$.rows[0].target_field").value("DeliveryNumber"))
+                .andExpect(jsonPath("$.rows[0].score").value(95))
+                .andExpect(jsonPath("$.rows[0].comment").value("Direct match"))
+                .andExpect(jsonPath("$.rows[1].source_field").doesNotExist())
+                .andExpect(jsonPath("$.rows[1].target_field").value("DefaultFlag"))
+                .andExpect(jsonPath("$.rows[1].score").value(100))
+                .andExpect(jsonPath("$.rows[1].comment").value("Fixed value"));
+    }
+
+    @Test
+    @DisplayName("GET /proposals/filedata (lowercase) maps correctly")
+    void getProposalFileData_lowercasePath_returnsFileData() throws Exception {
+        ProposalFileDataDto fileData = new ProposalFileDataDto(
+                "v1",
+                "Google",
+                "2026-11-09",
+                "10:00:00",
+                null,
+                null,
+                "John Smith",
+                List.of()
+        );
+
+        when(proposalStorageService.getProposalFileData("Google", "v1")).thenReturn(fileData);
+
+        mockMvc.perform(get("/proposals/filedata")
+                        .param("company", "Google")
+                        .param("version", "v1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.version").value("v1"))
+                .andExpect(jsonPath("$.comapnyname").value("Google"))
+                .andExpect(jsonPath("$.rows").isArray());
+    }
+
+    @Test
+    @DisplayName("GET /proposals/filedata with unknown company returns 404")
+    void getProposalFileData_notFound_returns404() throws Exception {
+        when(proposalStorageService.getProposalFileData("NonExisting", "v1"))
+                .thenThrow(new EntityNotFoundException("Company directory 'NonExisting' does not exist"));
+
+        mockMvc.perform(get("/Proposals/filedata")
                         .param("company", "NonExisting")
                         .param("version", "v1")
                         .contentType(MediaType.APPLICATION_JSON))

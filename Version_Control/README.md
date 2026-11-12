@@ -97,6 +97,9 @@ Copy `.env.example` to `.env` or supply these environment variables:
 
 All endpoints are mapped to both `/proposals` and `/Proposals`.
 
+> [!NOTE]
+> Interactive Swagger / OpenAPI UI is intentionally **not enabled** on this service in any environment (development, testing, or production). All endpoints, parameters, and response schemas are maintained directly in this specification document.
+
 ### 1. GET `/proposals`
 
 Retrieves an overview of all companies with their **latest version** and associated metadata.
@@ -182,6 +185,64 @@ Host: localhost:8080
   "createdBy": "Jane Doe",
   "description": "Updated warehouse pallet mapping rules",
   "fileContentBase64": "UEsDBBQAAAAIAAA..."
+}
+```
+
+---
+
+### 3. GET `/proposals/filedata`
+
+Retrieves parsed proposal file metadata and row mappings from the Excel file as structured JSON.
+
+* **URL**: `/proposals/filedata` (or `/Proposals/filedata`)
+* **Method**: `GET`
+* **Query Parameters**:
+  * `company` *(required, string)*: Name of the company (e.g. `bedrijfsnaam`).
+  * `version` *(required, string)*: Version identifier (e.g. `versie`).
+
+#### Response Codes
+
+| Status Code | Description |
+| :--- | :--- |
+| `200 OK` | Successfully retrieved and parsed file data and rows. |
+| `400 Bad Request` | Missing required query parameters or illegal path traversal characters. |
+| `404 Not Found` | Company directory, version directory, or Excel file does not exist. |
+| `502 Bad Gateway` / `500` | SFTP transfer failure or storage communication error. |
+
+#### Example Request
+
+```http
+GET /Proposals/filedata?company=bedrijfsnaam&version=versie HTTP/1.1
+Host: localhost:8080
+```
+
+#### Example Response (`200 OK`)
+
+```json
+{
+  "version": "v1",
+  "comapnyname": "Voorbeeldbedrijf C",
+  "companyname": "Voorbeeldbedrijf C",
+  "upload_date": "2026-10-20",
+  "upload_time": "16:45:00",
+  "updated_time": "23:03:02",
+  "updated_date": "2026-11-11",
+  "upload_user": "Jane Doe",
+  "status": "READY_FOR_REVIEW",
+  "rows": [
+    {
+      "source_field": "OrderNo",
+      "target_field": "DeliveryNumber",
+      "score": 95,
+      "comment": "Direct semantic match"
+    },
+    {
+      "source_field": null,
+      "target_field": "root",
+      "score": 95,
+      "comment": "Target structure is fixed in the skill"
+    }
+  ]
 }
 ```
 

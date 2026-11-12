@@ -99,7 +99,9 @@ source ../../.env    # if in a new terminal
 ```
 
 * Service runs on: **`http://localhost:8085`**
-* Test proposal endpoint: `http://localhost:8085/proposals`
+* Overview endpoint: `http://localhost:8085/proposals`
+* File details endpoint: `http://localhost:8085/proposals/file?company=<company>&version=<version>`
+* Parsed file data endpoint: `http://localhost:8085/proposals/filedata?company=<company>&version=<version>`
 
 ---
 

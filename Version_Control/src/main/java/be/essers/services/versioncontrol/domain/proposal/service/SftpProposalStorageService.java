@@ -1,8 +1,10 @@
 package be.essers.services.versioncontrol.domain.proposal.service;
 
 import be.essers.services.versioncontrol.domain.proposal.api.dto.CompanyProposalOverviewDto;
+import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalFileDataDto;
 import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalFileDetailsDto;
 import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalMetadata;
+import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalRowDto;
 import be.essers.services.versioncontrol.infrastructure.sftp.SftpProperties;
 import be.essers.services.versioncontrol.shared.exception.EntityNotFoundException;
 import be.essers.services.versioncontrol.shared.exception.StorageException;
@@ -14,12 +16,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
@@ -39,11 +43,21 @@ public class SftpProposalStorageService implements ProposalStorageService {
     private final SftpRemoteFileTemplate template;
     private final SftpProperties properties;
     private final ObjectMapper objectMapper;
+    private final ExcelProposalParser excelProposalParser;
 
-    public SftpProposalStorageService(SftpRemoteFileTemplate template, SftpProperties properties, ObjectMapper objectMapper) {
+    @org.springframework.beans.factory.annotation.Autowired
+    public SftpProposalStorageService(SftpRemoteFileTemplate template,
+                                      SftpProperties properties,
+                                      ObjectMapper objectMapper,
+                                      ExcelProposalParser excelProposalParser) {
         this.template = template;
         this.properties = properties;
         this.objectMapper = objectMapper;
+        this.excelProposalParser = excelProposalParser != null ? excelProposalParser : new ExcelProposalParser();
+    }
+
+    public SftpProposalStorageService(SftpRemoteFileTemplate template, SftpProperties properties, ObjectMapper objectMapper) {
+        this(template, properties, objectMapper, new ExcelProposalParser());
     }
 
     @Override
@@ -137,6 +151,96 @@ public class SftpProposalStorageService implements ProposalStorageService {
         } catch (Exception e) {
             log.error("Failed to retrieve proposal file for company '{}' and version '{}': {}", company, version, e.getMessage(), e);
             throw new StorageException("Unable to read proposal file from SFTP storage: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public ProposalFileDataDto getProposalFileData(String company, String version) {
+        if (company == null || company.isBlank()) {
+            throw new IllegalArgumentException("Company parameter must not be empty");
+        }
+        if (version == null || version.isBlank()) {
+            throw new IllegalArgumentException("Version parameter must not be empty");
+        }
+
+        String sanitizedCompany = sanitizePathSegment(company);
+        String sanitizedVersion = sanitizePathSegment(version);
+
+        try {
+            String rootPath = normalizePath(properties.basePath());
+            String resolvedCompany = resolveDirectoryName(rootPath, sanitizedCompany);
+            if (resolvedCompany == null) {
+                throw new EntityNotFoundException("Company directory '" + company + "' does not exist");
+            }
+
+            String companyPath = rootPath + "/" + resolvedCompany;
+            String resolvedVersion = resolveDirectoryName(companyPath, sanitizedVersion);
+            if (resolvedVersion == null) {
+                throw new EntityNotFoundException("Version directory '" + version + "' does not exist for company '" + resolvedCompany + "'");
+            }
+
+            String versionPath = companyPath + "/" + resolvedVersion;
+            SftpClient.DirEntry[] versionEntries = template.list(versionPath);
+            if (versionEntries == null || versionEntries.length == 0) {
+                throw new EntityNotFoundException("No files found in directory '" + versionPath + "'");
+            }
+
+            ProposalMetadata metadata = readMetadata(versionPath, versionEntries);
+            SftpClient.DirEntry excelEntry = findExcelEntry(versionEntries, metadata != null ? metadata.filename() : null);
+            if (excelEntry == null) {
+                throw new EntityNotFoundException("No Excel proposal file found for company '" + resolvedCompany + "' and version '" + resolvedVersion + "'");
+            }
+
+            String excelFilename = excelEntry.getFilename();
+            String excelFullPath = versionPath + "/" + excelFilename;
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            boolean readSuccess = template.get(excelFullPath, in -> in.transferTo(baos));
+            if (!readSuccess) {
+                throw new StorageException("Failed to read file from SFTP storage: " + excelFullPath);
+            }
+
+            List<ProposalRowDto> rows = excelProposalParser.parseProposalRows(new ByteArrayInputStream(baos.toByteArray()));
+
+            String companyName = (metadata != null && metadata.company() != null && !metadata.company().isBlank())
+                    ? metadata.company()
+                    : resolvedCompany;
+
+            String uploadTimestamp = (metadata != null && metadata.createdDate() != null)
+                    ? metadata.createdDate()
+                    : extractFileTimestamp(excelEntry);
+
+            String[] uploadParts = parseDateAndTime(uploadTimestamp);
+            String uploadDate = uploadParts[0];
+            String uploadTime = uploadParts[1];
+
+            String updateTimestamp = (metadata != null && metadata.updatedAt() != null)
+                    ? metadata.updatedAt()
+                    : extractFileModifyTimestamp(excelEntry);
+
+            String[] updateParts = parseDateAndTime(updateTimestamp);
+            String updatedDate = updateParts[0];
+            String updatedTime = updateParts[1];
+
+            String uploadUser = (metadata != null) ? metadata.createdBy() : null;
+            String status = (metadata != null) ? metadata.status() : null;
+
+            return new ProposalFileDataDto(
+                    resolvedVersion,
+                    companyName,
+                    uploadDate,
+                    uploadTime,
+                    updatedTime,
+                    updatedDate,
+                    uploadUser,
+                    status,
+                    rows
+            );
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Failed to retrieve proposal file data for company '{}' and version '{}': {}", company, version, e.getMessage(), e);
+            throw new StorageException("Unable to read proposal file data from SFTP storage: " + e.getMessage(), e);
         }
     }
 
@@ -281,6 +385,50 @@ public class SftpProposalStorageService implements ProposalStorageService {
         }
     }
 
+    static String[] parseDateAndTime(String timestamp) {
+        if (timestamp == null || timestamp.isBlank()) {
+            return new String[]{null, null};
+        }
+        String text = timestamp.trim();
+        try {
+            OffsetDateTime odt = OffsetDateTime.parse(text);
+            String date = odt.toLocalDate().toString();
+            String time = odt.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+            return new String[]{date, time};
+        } catch (DateTimeParseException ignored) {
+        }
+        try {
+            LocalDateTime ldt = LocalDateTime.parse(text);
+            String date = ldt.toLocalDate().toString();
+            String time = ldt.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+            return new String[]{date, time};
+        } catch (DateTimeParseException ignored) {
+        }
+        try {
+            Instant instant = Instant.parse(text);
+            OffsetDateTime odt = instant.atOffset(ZoneOffset.UTC);
+            String date = odt.toLocalDate().toString();
+            String time = odt.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+            return new String[]{date, time};
+        } catch (DateTimeParseException ignored) {
+        }
+        if (text.contains("T")) {
+            String[] parts = text.split("T", 2);
+            String date = parts[0].trim();
+            String timePart = parts[1].trim();
+            String time = timePart.replaceAll("([+-]\\d{2}:?\\d{2}|Z)$", "").trim();
+            if (time.length() > 8) {
+                time = time.substring(0, 8);
+            }
+            return new String[]{date, time.isBlank() ? null : time};
+        }
+        if (text.contains(" ")) {
+            String[] parts = text.split(" ", 2);
+            return new String[]{parts[0].trim(), parts[1].trim()};
+        }
+        return new String[]{text, null};
+    }
+
     private CompanyProposalOverviewDto toOverview(String companyName, String version, String versionPath,
                                                   SftpClient.DirEntry[] versionEntries, ProposalMetadata metadata) {
         SftpClient.DirEntry excelEntry = findExcelEntry(versionEntries, metadata != null ? metadata.filename() : null);
@@ -402,6 +550,17 @@ public class SftpProposalStorageService implements ProposalStorageService {
         FileTime createTime = entry.getAttributes().getCreateTime();
         if (createTime != null) {
             return createTime.toInstant().toString();
+        }
+        FileTime modifyTime = entry.getAttributes().getModifyTime();
+        if (modifyTime != null) {
+            return modifyTime.toInstant().toString();
+        }
+        return null;
+    }
+
+    private String extractFileModifyTimestamp(SftpClient.DirEntry entry) {
+        if (entry == null || entry.getAttributes() == null) {
+            return null;
         }
         FileTime modifyTime = entry.getAttributes().getModifyTime();
         if (modifyTime != null) {

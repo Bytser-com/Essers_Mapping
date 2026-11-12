@@ -1,6 +1,7 @@
 package be.essers.services.versioncontrol.domain.proposal.api;
 
 import be.essers.services.versioncontrol.domain.proposal.api.dto.CompanyProposalOverviewDto;
+import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalFileDataDto;
 import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalFileDetailsDto;
 import be.essers.services.versioncontrol.domain.proposal.service.ProposalStorageService;
 import org.springframework.http.ResponseEntity;
@@ -49,5 +50,20 @@ public class ProposalController {
     ) {
         ProposalFileDetailsDto fileDetails = proposalStorageService.getProposalFile(company, version);
         return ResponseEntity.ok(fileDetails);
+    }
+
+    /**
+     * GET /proposals/filedata?company=bedrijfsnaam&version=versie
+     * GET /Proposals/filedata?company=bedrijfsnaam&version=versie
+     *
+     * Retrieves parsed proposal file metadata and rows as a JSON response.
+     */
+    @GetMapping("/filedata")
+    public ResponseEntity<ProposalFileDataDto> getProposalFileData(
+            @RequestParam String company,
+            @RequestParam String version
+    ) {
+        ProposalFileDataDto fileData = proposalStorageService.getProposalFileData(company, version);
+        return ResponseEntity.ok(fileData);
     }
 }
