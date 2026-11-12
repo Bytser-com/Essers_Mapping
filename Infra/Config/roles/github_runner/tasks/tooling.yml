@@ -256,7 +256,7 @@
     - runner_install_docker | bool
     - not (ansible_check_mode and (runner_docker_pkg.changed | default(false)))
 
-- name: Add '{{ github_runner_user }}' and '{{ ansible_user }}' to docker group
+- name: Add GitHub Runner and administrative user to docker group
   ansible.builtin.user:
     name: "{{ item }}"
     groups: docker

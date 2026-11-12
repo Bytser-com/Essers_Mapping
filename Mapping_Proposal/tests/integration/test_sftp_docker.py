@@ -50,7 +50,7 @@ def _remove_tree(client, path):
     import stat
     try:
         entries = client.listdir_attr(path)
-    except IOError:
+    except OSError:
         return
     for entry in entries:
         child = f'{path}/{entry.filename}'

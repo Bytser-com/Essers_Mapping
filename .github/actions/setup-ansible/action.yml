@@ -61,8 +61,8 @@ runs:
         for req in requirements.yml collections/requirements.yml roles/requirements.yml; do
           if [ -f "$req" ]; then
             echo "Installing Galaxy requirements from $req..."
-            ansible-galaxy role install -r "$req" -p "$GALAXY_DIR/roles" || true
-            ansible-galaxy collection install -r "$req" -p "$GALAXY_DIR/collections" || true
+            ansible-galaxy role install -r "$req" -p "$GALAXY_DIR/roles"
+            ansible-galaxy collection install -r "$req" -p "$GALAXY_DIR/collections"
           fi
         done
 

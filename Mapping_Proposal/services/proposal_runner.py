@@ -18,16 +18,17 @@ away while the AI handles them one by one (see services/incoming_watcher.py):
 """
 from __future__ import annotations
 
-from dataclasses import replace
 import logging
-from pathlib import Path
 import re
 import unicodedata
-from typing import Callable
+from collections.abc import Callable
+from dataclasses import replace
+from pathlib import Path
 
 from scripts.config import SOURCE_DIR
 from scripts.errors import InputDataError
 from scripts.models import MappingResult, MappingSettings
+
 from .proposals import AiStatus, ProposalRef, ProposalStatus, ProposalStore
 from .storage import proposal_storage
 
@@ -48,7 +49,9 @@ RunMapping = Callable[[MappingSettings], MappingResult]
 
 
 def _default_run() -> RunMapping:
-    from scripts.pipeline import run_mapping  # imported here: tests do not need Gemini packages
+    from scripts.pipeline import (
+        run_mapping,  # imported here: tests do not need Gemini packages
+    )
     return run_mapping
 
 

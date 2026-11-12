@@ -23,16 +23,32 @@ on:
     paths:
       - "Infra/**"
       - "Kubernetes/**"
-      - ".github/workflows/**"
-      - ".github/actions/**"
+      - ".github/workflows/infra-pipeline.yml"
+      - ".github/workflows/terraform-infra.yml"
+      - ".github/workflows/ansible-infra.yml"
+      - ".github/workflows/kubernetes-deploy.yml"
+      - ".github/actions/setup-ansible/**"
+      - ".github/actions/check-infrastructure/**"
+      - "Scripts/check-proxmox-vms.py"
+      - "Scripts/preserve-cd-images.py"
+      - "Scripts/tests/test_check_proxmox_vms.py"
+      - "Scripts/tests/test_service_cd.py"
 
   push:
     branches: [main, Testing]
     paths:
       - "Infra/**"
       - "Kubernetes/**"
-      - ".github/workflows/**"
-      - ".github/actions/**"
+      - ".github/workflows/infra-pipeline.yml"
+      - ".github/workflows/terraform-infra.yml"
+      - ".github/workflows/ansible-infra.yml"
+      - ".github/workflows/kubernetes-deploy.yml"
+      - ".github/actions/setup-ansible/**"
+      - ".github/actions/check-infrastructure/**"
+      - "Scripts/check-proxmox-vms.py"
+      - "Scripts/preserve-cd-images.py"
+      - "Scripts/tests/test_check_proxmox_vms.py"
+      - "Scripts/tests/test_service_cd.py"
 
   workflow_dispatch:
     inputs:

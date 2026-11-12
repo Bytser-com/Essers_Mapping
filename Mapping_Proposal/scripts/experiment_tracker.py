@@ -6,11 +6,10 @@ No API keys, raw XML, prompts, or response contents are written to the log.
 from __future__ import annotations
 
 import csv
-from datetime import datetime, timezone
-from pathlib import Path
 import time
+from datetime import UTC, datetime
+from pathlib import Path
 from uuid import uuid4
-
 
 COLUMNS = [
     'run_id', 'started_utc', 'finished_utc', 'status', 'model',
@@ -29,7 +28,7 @@ COLUMNS = [
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec='seconds')
+    return datetime.now(UTC).isoformat(timespec='seconds')
 
 
 class ExperimentTracker:
@@ -38,7 +37,7 @@ class ExperimentTracker:
     def __init__(self, *, settings: dict, run_dir: Path, root: Path,
                  started_monotonic: float | None = None, started_utc: str | None = None):
         self.started = started_monotonic if started_monotonic is not None else time.perf_counter()
-        self.run_id = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S') + '_' + uuid4().hex[:8]
+        self.run_id = datetime.now(UTC).strftime('%Y%m%dT%H%M%S') + '_' + uuid4().hex[:8]
         self.run_dir = run_dir
         self.root = root
         self.data = {

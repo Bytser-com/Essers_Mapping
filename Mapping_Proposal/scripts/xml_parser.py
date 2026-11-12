@@ -2,10 +2,10 @@
 
 Python does not decide any business mappings or rewrite the XML sent to Gemini.
 """
-from collections import defaultdict
-from pathlib import Path
 import re
 import xml.etree.ElementTree as ET
+from collections import defaultdict
+from pathlib import Path
 
 
 def _local(tag: str) -> str:
@@ -54,7 +54,7 @@ def parse_xml_files(xml_files: list[Path]) -> list[dict]:
     ]
 
 
-PAIR_PATTERN = re.compile(r'^(?P<stem>.+)_(?P<role>original|converted)\.xml$', re.I)
+PAIR_PATTERN = re.compile(r'^(?P<stem>.+)_(?P<role>original|converted)\.xml$', re.IGNORECASE)
 
 
 def discover_historical_pairs(historical_dir: str | Path) -> list[dict]:
@@ -108,7 +108,7 @@ def read_raw_xml(file: str | Path) -> str:
     Raises on undecodable input rather than silently dropping characters.
     """
     data = Path(file).read_bytes()
-    declaration = re.search(br'<\?xml[^>]*encoding=[\'\"]([^\'\"]+)', data[:256], re.I)
+    declaration = re.search(br'<\?xml[^>]*encoding=[\'\"]([^\'\"]+)', data[:256], re.IGNORECASE)
     encoding = declaration.group(1).decode('ascii') if declaration else 'utf-8-sig'
     return data.decode(encoding)
 

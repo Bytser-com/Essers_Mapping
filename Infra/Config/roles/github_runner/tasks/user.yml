@@ -3,12 +3,12 @@
 # GITHUB_RUNNER TASKS: SERVICE ACCOUNT & STATE DIRECTORIES
 # ==============================================================================
 
-- name: Ensure GitHub Runner group '{{ github_runner_group }}' exists
+- name: Ensure GitHub Runner group exists
   ansible.builtin.group:
     name: "{{ github_runner_group }}"
     state: present
 
-- name: Ensure GitHub Runner user '{{ github_runner_user }}' exists
+- name: Ensure GitHub Runner user exists
   ansible.builtin.user:
     name: "{{ github_runner_user }}"
     group: "{{ github_runner_group }}"

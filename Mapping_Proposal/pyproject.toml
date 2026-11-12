@@ -8,3 +8,11 @@ junit_family = "xunit1"
 markers = [
     "integration: slower tests that need extra services such as Docker (run with: pytest -m integration)",
 ]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP"]
+ignore = ["E501"]

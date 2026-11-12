@@ -8,9 +8,9 @@ from __future__ import annotations
 
 import json
 
+import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-import pytest
 
 from routers import proposals as proposals_router
 from scripts.errors import StorageError

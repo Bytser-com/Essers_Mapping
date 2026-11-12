@@ -9,14 +9,18 @@ tests/unit/test_storage.py. Every test name starts with its Jira test case (TC-5
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
 import json
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
 
 from services.proposals import (
-    AiStatus, ProposalStatus, ProposalStore, ProposalSummary, customer_folder_name,
+    AiStatus,
+    ProposalStatus,
+    ProposalStore,
+    ProposalSummary,
+    customer_folder_name,
 )
 
 
@@ -146,7 +150,7 @@ def test_tc_57_05_ai_status_is_read_and_empty_means_none(root, store, ai_status,
     (ProposalStatus.RETURNED, True),
 ])
 def test_tc_57_06_openen_only_when_the_ai_is_not_writing_the_proposal(status, can_open):
-    row = ProposalSummary('klant/v1', 'Klant', 1, datetime.now(timezone.utc), status, None)
+    row = ProposalSummary('klant/v1', 'Klant', 1, datetime.now(UTC), status, None)
 
     assert row.can_open is can_open
     assert row.to_dict()['can_open'] is can_open
@@ -171,9 +175,9 @@ def test_tc_57_04_version_comes_from_the_folder_name(root, store):
 
 
 @pytest.mark.parametrize('value, expected', [
-    ('2026-10-22T14:05:00+02:00', datetime(2026, 10, 22, 12, 5, tzinfo=timezone.utc)),
-    ('2026-10-22T12:05:00Z', datetime(2026, 10, 22, 12, 5, tzinfo=timezone.utc)),
-    ('2026-10-22T12:05:00', datetime(2026, 10, 22, 12, 5, tzinfo=timezone.utc)),  # no timezone = UTC
+    ('2026-10-22T14:05:00+02:00', datetime(2026, 10, 22, 12, 5, tzinfo=UTC)),
+    ('2026-10-22T12:05:00Z', datetime(2026, 10, 22, 12, 5, tzinfo=UTC)),
+    ('2026-10-22T12:05:00', datetime(2026, 10, 22, 12, 5, tzinfo=UTC)),  # no timezone = UTC
 ])
 def test_tc_57_04_upload_time_formats_are_understood(root, store, value, expected):
     write_proposal(root, 'klant', 1, uploaded_at=value)
@@ -239,7 +243,7 @@ def test_tc_57_01_windows_bom_in_proposal_json_is_accepted(root, store):
 # Status changes made by the AI run are visible in the overview
 # ---------------------------------------------------------------------------
 def test_tc_57_08_new_proposal_appears_with_ai_maakt_voorstel_and_bezig(store):
-    before = datetime.now(timezone.utc).replace(microsecond=0)
+    before = datetime.now(UTC).replace(microsecond=0)
 
     ref = store.create_proposal('  Ostavel  ')
 

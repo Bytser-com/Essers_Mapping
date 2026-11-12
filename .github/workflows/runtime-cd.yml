@@ -1,0 +1,34 @@
+name: Runtime CD
+
+on:
+  workflow_run:
+    workflows: ['Runtime CI']
+    branches: [Testing, main]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  packages: write
+
+concurrency:
+  group: runtime-cd-${{ github.event.workflow_run.head_branch || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  delivery:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
+    uses: ./.github/workflows/service-cd.yml
+    with:
+      service-path: Runtime
+      image-name: runtime-backend
+      deployment: runtime-backend
+      ci-workflow: runtime-ci.yml
+      artifact-name: runtime-jar
+      artifact-path: 'Runtime/target'
+    secrets: inherit
