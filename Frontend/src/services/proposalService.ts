@@ -101,7 +101,8 @@ export async function getProposal(company: string, version?: string): Promise<Pr
       if (fileData.upload_time) proposal.uploadTime = fileData.upload_time;
       if (fileData.updated_date) proposal.updatedDate = fileData.updated_date;
       if (fileData.updated_time) proposal.updatedTime = fileData.updated_time;
-      if (fileData.upload_user) proposal.uploadUser = fileData.upload_user;
+      const directUser = fileData.upload_user || (fileData as any).uploadUser || (fileData as any).createdBy;
+      if (directUser) proposal.uploadUser = directUser;
       return proposal;
     } catch (err) {
       // Fallback to overview lookup if filedata specifically fails with non-network error
@@ -146,7 +147,8 @@ export async function getProposal(company: string, version?: string): Promise<Pr
       geupload: item.createdDate || new Date().toISOString(),
       mappings: item.mappings,
     };
-    if (item.createdBy) proposal.uploadUser = item.createdBy;
+    const overviewUser = item.createdBy || (item as any).uploadUser || (item as any).upload_user;
+    if (overviewUser) proposal.uploadUser = overviewUser;
     return proposal;
   }
 
@@ -180,7 +182,7 @@ export async function getProposal(company: string, version?: string): Promise<Pr
     if (fileData.upload_time) proposal.uploadTime = fileData.upload_time;
     if (fileData.updated_date) proposal.updatedDate = fileData.updated_date;
     if (fileData.updated_time) proposal.updatedTime = fileData.updated_time;
-    const user = fileData.upload_user || item.createdBy;
+    const user = fileData.upload_user || (fileData as any).uploadUser || item.createdBy || (item as any).uploadUser || (item as any).upload_user;
     if (user) proposal.uploadUser = user;
     return proposal;
   } catch (err) {
@@ -196,7 +198,8 @@ export async function getProposal(company: string, version?: string): Promise<Pr
       geupload: item.createdDate || new Date().toISOString(),
       mappings: item.mappings || [],
     };
-    if (item.createdBy) proposal.uploadUser = item.createdBy;
+    const fallbackUser = item.createdBy || (item as any).uploadUser || (item as any).upload_user;
+    if (fallbackUser) proposal.uploadUser = fallbackUser;
     return proposal;
   }
 }

@@ -128,7 +128,7 @@ class ProposalStore:
 
     # -- Writing (used by the AI run, see services/proposal_runner.py) -----------------
 
-    def create_proposal(self, customer: str) -> ProposalRef:
+    def create_proposal(self, customer: str, upload_user: str = 'Analist A') -> ProposalRef:
         """Create the next version folder for this customer with status 'AI is generating'.
 
         The overview shows the new row immediately, while the AI is still working.
@@ -155,6 +155,9 @@ class ProposalStore:
                 'createdDate': now,
                 'status': ProposalStatus.AI_GENERATING.value,
                 'ai_status': AiStatus.RUNNING.value,
+                'uploadUser': upload_user,
+                'upload_user': upload_user,
+                'createdBy': upload_user,
             })
         return ProposalRef(customer=customer, version=version, folder=folder)
 
