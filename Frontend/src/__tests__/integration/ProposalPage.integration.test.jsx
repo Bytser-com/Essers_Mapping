@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import ProposalPage from '../../pages/ProposalPage'
+import Home from '../../pages/Home'
 import { useProposalStore } from '../../stores/proposalStore'
 
 const PROPOSAL = {
@@ -19,6 +20,7 @@ function renderPage() {
     <MemoryRouter initialEntries={['/proposals/brunos']}>
       <Routes>
         <Route path="/proposals/:company" element={<ProposalPage />} />
+        <Route path="/" element={<Home />} />
       </Routes>
     </MemoryRouter>
   )
@@ -26,7 +28,7 @@ function renderPage() {
 
 describe('ProposalPage integration', () => {
   beforeEach(() => {
-    useProposalStore.setState({ proposal: null, loading: false, error: null })
+    useProposalStore.setState({ proposal: null, loading: false, error: null, deleteSuccessMessage: null })
   })
 
   afterEach(() => {
@@ -161,6 +163,13 @@ describe('ProposalPage integration', () => {
         }
       )
     })
+
+    // Assert redirection to Home and delete success banner displayed
+    await waitFor(() => {
+      expect(screen.getByTestId('delete-success-banner')).toBeInTheDocument()
+    })
+    expect(screen.getByText('Voorstel succesvol verwijderd.')).toBeInTheDocument()
+    expect(screen.getByText('Voorstel voor brunos (v1) is succesvol verwijderd.')).toBeInTheDocument()
   })
 
   it('displays the 400 error alert banner when deleteCheck does not match', async () => {

@@ -14,6 +14,9 @@ type ProposalState = {
   loading: boolean;
   error: string | null;
   actionError: string | null;
+  deleteSuccessMessage: string | null;
+  setDeleteSuccessMessage: (message: string | null) => void;
+  clearDeleteSuccessMessage: () => void;
   fetchProposal: (company: string) => Promise<void>;
   downloadProposal: (company: string, version: string) => Promise<ProposalFileDetailsDto | null>;
   uploadProposal: (company: string, version: string, file: File) => Promise<boolean>;
@@ -26,6 +29,10 @@ export const useProposalStore = create<ProposalState>()((set, get) => ({
   loading: false,
   error: null,
   actionError: null,
+  deleteSuccessMessage: null,
+
+  setDeleteSuccessMessage: (message) => set({ deleteSuccessMessage: message }),
+  clearDeleteSuccessMessage: () => set({ deleteSuccessMessage: null }),
 
   fetchProposal: async (company) => {
     set({ loading: true, error: null });
@@ -76,7 +83,10 @@ export const useProposalStore = create<ProposalState>()((set, get) => ({
     set({ actionError: null });
     try {
       await deleteProposal(company, version, deleteCheck);
-      set({ proposal: null });
+      set({
+        proposal: null,
+        deleteSuccessMessage: `Voorstel voor ${company} (${version}) is succesvol verwijderd.`,
+      });
       return true;
     } catch (err) {
       set({ actionError: err instanceof Error ? err.message : "Onbekende fout" });

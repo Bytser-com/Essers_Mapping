@@ -147,12 +147,17 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
   async function handleConfirmDelete() {
     if (!proposal || !company) return;
     setIsDeleting(true);
-    const success = await deleteProposal(company, `v${proposal.versie}`, deleteConfirmText);
+    const versionStr = `v${proposal.versie}`;
+    const success = await deleteProposal(company, versionStr, deleteConfirmText);
     setIsDeleting(false);
     if (success) {
       setShowDeleteDialog(false);
       setDeleteConfirmText("");
-      navigate("/");
+      navigate("/", {
+        state: {
+          deleteSuccessMessage: `Voorstel voor ${company} (${versionStr}) is succesvol verwijderd.`,
+        },
+      });
     } else {
       setShowDeleteDialog(false);
     }
@@ -182,7 +187,16 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
   }
 
   if (loading) return <p className="px-8 py-7 text-grey">Voorstel wordt geladen...</p>;
-  if (error) return <p className="px-8 py-7 text-red font-medium">{error}</p>;
+  if (error) {
+    return (
+      <main className="flex flex-1 flex-col gap-5 min-h-screen px-8 py-7 bg-background">
+        <div role="alert" className="flex items-center gap-3 rounded-small border border-anthracite bg-[#fee2e2] px-4 py-3">
+          <img src={iconError} alt="" width={18} height={18} />
+          <p className="m-0 text-[13px] font-semibold text-anthracite">{error}</p>
+        </div>
+      </main>
+    );
+  }
   if (!proposal) return null;
 
   const totalMappings = proposal.mappings.length;
@@ -291,9 +305,9 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
 
       {/* Error banner when downloading or uploading failed */}
       {actionError && (
-        <div role="alert" className="flex items-center gap-3 rounded-small border border-anthracite bg-white px-4 py-3">
+        <div role="alert" className="flex items-center gap-3 rounded-small border border-anthracite bg-[#fee2e2] px-4 py-3">
           <img src={iconError} alt="" width={18} height={18} />
-          <p className="m-0 text-[13px] font-semibold">{actionError}</p>
+          <p className="m-0 text-[13px] font-semibold text-anthracite">{actionError}</p>
         </div>
       )}
 

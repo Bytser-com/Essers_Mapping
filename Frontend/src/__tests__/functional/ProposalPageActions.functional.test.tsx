@@ -4,6 +4,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Mock, MockInstance } from 'vitest'
 import ProposalPage from '../../pages/ProposalPage'
+import Home from '../../pages/Home'
 import { approveProposal, deleteProposal, getProposalFile } from '../../services/proposalService'
 import { useProposalStore } from '../../stores/proposalStore'
 import type { Proposal } from '../../types/proposal'
@@ -44,6 +45,7 @@ function renderPage(props: Props = {}, url = '/proposals/brunos') {
       <Routes>
         <Route path="/proposals/:company" element={<ProposalPage {...props} />} />
         <Route path="/proposals" element={<ProposalPage {...props} />} />
+        <Route path="/" element={<Home />} />
       </Routes>
     </MemoryRouter>,
   )
@@ -246,6 +248,11 @@ describe('ProposalPage actions', () => {
     await waitFor(() => {
       expect(deleteProposal).toHaveBeenCalledWith('brunos', 'v2', 'brunos')
     })
+    await waitFor(() => {
+      expect(screen.getByTestId('delete-success-banner')).toBeInTheDocument()
+    })
+    expect(screen.getByText('Voorstel succesvol verwijderd.')).toBeInTheDocument()
+    expect(screen.getByText('Voorstel voor brunos (v2) is succesvol verwijderd.')).toBeInTheDocument()
   })
 
   it('displays error banner when delete fails', async () => {

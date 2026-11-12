@@ -4,6 +4,7 @@
 /* Huisstijl H.Essers (Figma: pagina "Huisstijl") */
 @theme {
   --color-red: #a50000;
+  --color-red-light: #fee2e2;
   --color-anthracite: #1c1c1f;
   --color-grey: #6b6b73;
   --color-mid-grey: #a1a1ab;
