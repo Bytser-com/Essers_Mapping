@@ -60,9 +60,9 @@ The project uses a unified environment file located in the parent directory (`..
 
 1. Copy the example environment file:
    ```bash
-   cp ../.env.example ../.env
+   cp .env.example ../.env
    ```
-2. *(Optional)* Verify or update `GEMINI_API_KEY` in `../.env` if you need AI generation.
+2. Verify and update `API_KEYS` in `../.env`.
 3. In each new terminal session, load the environment variables:
    ```bash
    source ../.env
