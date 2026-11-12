@@ -16,13 +16,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -311,5 +316,116 @@ class ProposalControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadGateway())
                 .andExpect(jsonPath("$.title").value("SFTP Storage Error"));
+    }
+
+    @Test
+    @DisplayName("PUT /Proposals/file with multipart file overwrites proposal and returns details")
+    void overwriteProposalFile_multipart_success() throws Exception {
+        byte[] dummyContent = "dummy-excel".getBytes();
+        MockMultipartFile multipartFile = new MockMultipartFile(
+                "file",
+                "mappingproposal.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                dummyContent
+        );
+
+        ProposalFileDetailsDto details = new ProposalFileDetailsDto(
+                "VanRoey",
+                "v3",
+                "mappingproposal.xlsx",
+                "/Proposals/VanRoey/v3/mappingproposal.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                dummyContent.length,
+                "2026-11-10T12:00:00Z",
+                "John Smith",
+                "Initial proposal",
+                "ZHVtbXktZXhjZWw="
+        );
+
+        when(proposalStorageService.overwriteProposalFile(eq("vanroey"), eq("v3"), any(byte[].class), eq("mappingproposal.xlsx")))
+                .thenReturn(details);
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/Proposals/file")
+                        .file(multipartFile)
+                        .with(request -> {
+                            request.setMethod("PUT");
+                            return request;
+                        })
+                        .param("company", "vanroey")
+                        .param("version", "v3"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.company").value("VanRoey"))
+                .andExpect(jsonPath("$.version").value("v3"))
+                .andExpect(jsonPath("$.filename").value("mappingproposal.xlsx"));
+    }
+
+    @Test
+    @DisplayName("PUT /proposals/file (lowercase) with binary body overwrites proposal")
+    void overwriteProposalFile_binary_success() throws Exception {
+        byte[] dummyContent = "binary-excel".getBytes();
+
+        ProposalFileDetailsDto details = new ProposalFileDetailsDto(
+                "vanroey",
+                "v3",
+                "mappingproposal.xlsx",
+                "/Proposals/vanroey/v3/mappingproposal.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                dummyContent.length,
+                "2026-11-10T12:00:00Z",
+                "John Smith",
+                "Initial proposal",
+                "YmluYXJ5LWV4Y2Vs"
+        );
+
+        when(proposalStorageService.overwriteProposalFile(eq("vanroey"), eq("v3"), any(byte[].class), eq(null)))
+                .thenReturn(details);
+
+        mockMvc.perform(put("/proposals/file")
+                        .param("company", "vanroey")
+                        .param("version", "v3")
+                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                        .content(dummyContent))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.company").value("vanroey"))
+                .andExpect(jsonPath("$.version").value("v3"));
+    }
+
+    @Test
+    @DisplayName("PUT /Proposals/file returns 404 when company or version not found")
+    void overwriteProposalFile_notFound_returns404() throws Exception {
+        byte[] dummyContent = "dummy-excel".getBytes();
+        when(proposalStorageService.overwriteProposalFile(eq("NonExisting"), eq("v1"), any(byte[].class), eq(null)))
+                .thenThrow(new EntityNotFoundException("Company directory 'NonExisting' does not exist"));
+
+        mockMvc.perform(put("/Proposals/file")
+                        .param("company", "NonExisting")
+                        .param("version", "v1")
+                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                        .content(dummyContent))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.title").value("Entity Not Found"));
+    }
+
+    @Test
+    @DisplayName("PUT /Proposals/file returns 400 when missing query parameter")
+    void overwriteProposalFile_missingParams_returns400() throws Exception {
+        mockMvc.perform(put("/Proposals/file")
+                        .param("company", "vanroey")
+                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                        .content(new byte[]{1, 2, 3}))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Missing Required Parameter"));
+    }
+
+    @Test
+    @DisplayName("PUT /Proposals/file returns 400 when empty file uploaded")
+    void overwriteProposalFile_emptyFile_returns400() throws Exception {
+        mockMvc.perform(put("/Proposals/file")
+                        .param("company", "vanroey")
+                        .param("version", "v3")
+                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                        .content(new byte[0]))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Body"));
     }
 }

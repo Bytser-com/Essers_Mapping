@@ -4,12 +4,18 @@ import be.essers.services.versioncontrol.domain.proposal.api.dto.CompanyProposal
 import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalFileDataDto;
 import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalFileDetailsDto;
 import be.essers.services.versioncontrol.domain.proposal.service.ProposalStorageService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -65,5 +71,51 @@ public class ProposalController {
     ) {
         ProposalFileDataDto fileData = proposalStorageService.getProposalFileData(company, version);
         return ResponseEntity.ok(fileData);
+    }
+
+    /**
+     * PUT /proposals/file?company=vanroey&version=v3
+     * PUT /Proposals/file?company=vanroey&version=v3
+     *
+     * Overwrites the current Excel proposal on SFTP, updates updated_time / updated_date,
+     * and sets status to "In review" in the metadata file. Supports multipart/form-data ("file").
+     */
+    @PutMapping(value = "/file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProposalFileDetailsDto> overwriteProposalFileMultipart(
+            @RequestParam String company,
+            @RequestParam String version,
+            @RequestPart("file") MultipartFile file
+    ) throws IOException {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("Uploaded file cannot be empty");
+        }
+        ProposalFileDetailsDto details = proposalStorageService.overwriteProposalFile(
+                company, version, file.getBytes(), file.getOriginalFilename());
+        return ResponseEntity.ok(details);
+    }
+
+    /**
+     * PUT /proposals/file?company=vanroey&version=v3
+     * PUT /Proposals/file?company=vanroey&version=v3
+     *
+     * Overwrites the current Excel proposal on SFTP, updates updated_time / updated_date,
+     * and sets status to "In review" in the metadata file. Supports raw octet-stream / excel binary body.
+     */
+    @PutMapping(value = "/file", consumes = {
+            MediaType.APPLICATION_OCTET_STREAM_VALUE,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/vnd.ms-excel"
+    })
+    public ResponseEntity<ProposalFileDetailsDto> overwriteProposalFileBinary(
+            @RequestParam String company,
+            @RequestParam String version,
+            @RequestBody byte[] fileBytes
+    ) {
+        if (fileBytes == null || fileBytes.length == 0) {
+            throw new IllegalArgumentException("Uploaded file content cannot be empty");
+        }
+        ProposalFileDetailsDto details = proposalStorageService.overwriteProposalFile(
+                company, version, fileBytes, null);
+        return ResponseEntity.ok(details);
     }
 }

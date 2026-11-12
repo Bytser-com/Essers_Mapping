@@ -10,4 +10,5 @@ public interface ProposalStorageService {
     List<CompanyProposalOverviewDto> listProposals(String company);
     ProposalFileDetailsDto getProposalFile(String company, String version);
     ProposalFileDataDto getProposalFileData(String company, String version);
+    ProposalFileDetailsDto overwriteProposalFile(String company, String version, byte[] fileBytes, String originalFilename);
 }

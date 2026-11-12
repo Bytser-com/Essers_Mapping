@@ -13,9 +13,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.integration.file.remote.InputStreamCallback;
+import org.springframework.integration.file.remote.SessionCallback;
+import org.springframework.integration.file.remote.session.Session;
 import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
 
 import java.io.ByteArrayInputStream;
@@ -837,5 +840,97 @@ class SftpProposalStorageServiceTest {
         assertNotNull(result);
         assertEquals("2026-11-12", result.updatedDate());
         assertEquals("11:22:33", result.updatedTime());
+    }
+
+    @Test
+    @DisplayName("overwriteProposalFile successfully overwrites Excel and updates metadata")
+    void overwriteProposalFile_success() throws Exception {
+        when(template.exists("/Proposals/vanroey")).thenReturn(true);
+        when(template.exists("/Proposals/vanroey/v3")).thenReturn(true);
+
+        SftpClient.DirEntry excelEntry = createEntry("mappingproposal.xlsx", false);
+        SftpClient.DirEntry metaEntry = createEntry("proposal.json", false);
+        when(template.list("/Proposals/vanroey/v3")).thenReturn(new SftpClient.DirEntry[]{excelEntry, metaEntry});
+
+        String initialJson = """
+                {
+                  "company": "vanroey",
+                  "version": "v3",
+                  "status": "AI_GENERATING",
+                  "createdDate": "2026-11-01T10:00:00Z"
+                }
+                """;
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(initialJson.getBytes(StandardCharsets.UTF_8))) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq("/Proposals/vanroey/v3/proposal.json"), any(InputStreamCallback.class));
+
+        Session<SftpClient.DirEntry> session = org.mockito.Mockito.mock(Session.class);
+        doAnswer(invocation -> {
+            SessionCallback<SftpClient.DirEntry, Object> action = invocation.getArgument(0);
+            return action.doInSession(session);
+        }).when(template).execute(any());
+
+        byte[] validExcel;
+        try (org.apache.poi.xssf.usermodel.XSSFWorkbook wb = new org.apache.poi.xssf.usermodel.XSSFWorkbook();
+             java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream()) {
+            wb.createSheet("Sheet1");
+            wb.write(baos);
+            validExcel = baos.toByteArray();
+        }
+
+        ProposalFileDetailsDto details = service.overwriteProposalFile("vanroey", "v3", validExcel, "new_name.xlsx");
+
+        assertNotNull(details);
+        assertEquals("vanroey", details.company());
+        assertEquals("v3", details.version());
+        assertEquals("mappingproposal.xlsx", details.filename());
+        assertEquals("/Proposals/vanroey/v3/mappingproposal.xlsx", details.fullPath());
+
+        // Verify excel written to target path
+        org.mockito.Mockito.verify(session).write(any(InputStream.class), eq("/Proposals/vanroey/v3/mappingproposal.xlsx"));
+
+        // Verify metadata written to proposal.json with status "In review"
+        ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
+        org.mockito.Mockito.verify(session).write(streamCaptor.capture(), eq("/Proposals/vanroey/v3/proposal.json"));
+
+        List<InputStream> capturedStreams = streamCaptor.getAllValues();
+        // The last captured stream is the metadata JSON
+        InputStream metaStream = capturedStreams.get(capturedStreams.size() - 1);
+        String savedMeta = new String(metaStream.readAllBytes(), StandardCharsets.UTF_8);
+        assertTrue(savedMeta.contains("\"status\" : \"In review\"") || savedMeta.contains("\"status\":\"In review\""));
+        assertTrue(savedMeta.contains("updated_time"));
+        assertTrue(savedMeta.contains("updated_date"));
+    }
+
+    @Test
+    @DisplayName("overwriteProposalFile throws IllegalArgumentException for corrupt non-Excel data")
+    void overwriteProposalFile_invalidExcel_throwsIllegalArgument() {
+        byte[] invalidData = "not an excel file".getBytes(StandardCharsets.UTF_8);
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+                service.overwriteProposalFile("vanroey", "v3", invalidData, "test.xlsx"));
+        assertTrue(ex.getMessage().contains("not a valid Excel file"));
+    }
+
+    @Test
+    @DisplayName("overwriteProposalFile throws EntityNotFoundException when company does not exist")
+    void overwriteProposalFile_companyNotFound_throwsEntityNotFound() {
+        byte[] validExcel;
+        try (org.apache.poi.xssf.usermodel.XSSFWorkbook wb = new org.apache.poi.xssf.usermodel.XSSFWorkbook();
+             java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream()) {
+            wb.createSheet("Sheet1");
+            wb.write(baos);
+            validExcel = baos.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        when(template.list("/Proposals")).thenReturn(new SftpClient.DirEntry[0]);
+
+        assertThrows(EntityNotFoundException.class, () ->
+                service.overwriteProposalFile("NonExisting", "v1", validExcel, null));
     }
 }

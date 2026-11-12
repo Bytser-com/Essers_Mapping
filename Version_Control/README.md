@@ -247,6 +247,62 @@ Host: localhost:8080
 
 ---
 
+### 4. PUT `/proposals/file`
+
+Overwrites the current proposal Excel spreadsheet file on SFTP for a given company and version, updates `updated_date` and `updated_time` (and ISO `updated_at`) in `metadata.json` / `proposal.json`, and sets the status to `"In review"`.
+
+* **URL**: `/proposals/file` (or `/Proposals/file`)
+* **Method**: `PUT`
+* **Query Parameters**:
+  * `company` *(required, string)*: Company name (e.g. `vanroey`). Case-insensitive lookup.
+  * `version` *(required, string)*: Version string (e.g. `v3`). Case-insensitive lookup.
+* **Request Body**:
+  * Either `multipart/form-data` with part name `file` containing the `.xlsx` / `.xls` binary,
+  * Or binary request body with `Content-Type: application/octet-stream` or `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`.
+
+#### Response Codes
+
+| Status Code | Description |
+| :--- | :--- |
+| `200 OK` | Proposal file successfully replaced and metadata updated. |
+| `400 Bad Request` | Missing query parameters, empty body, or corrupt non-Excel file. |
+| `404 Not Found` | Company directory, version directory, or proposal directory does not exist. |
+| `502 Bad Gateway` / `500` | SFTP transfer failure or remote write error. |
+
+#### Example Request (`multipart/form-data`)
+
+```http
+PUT /Proposals/file?company=vanroey&version=v3 HTTP/1.1
+Host: localhost:8080
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="mappingproposal.xlsx"
+Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+<binary excel data>
+--boundary--
+```
+
+#### Example Response (`200 OK`)
+
+```json
+{
+  "company": "VanRoey",
+  "version": "v3",
+  "filename": "mappingproposal.xlsx",
+  "fullPath": "/Proposals/VanRoey/v3/mappingproposal.xlsx",
+  "contentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "sizeBytes": 12480,
+  "createdDate": "2026-11-10T12:00:00Z",
+  "createdBy": "John Smith",
+  "description": "Initial proposal",
+  "fileContentBase64": "UEsDBBQAAAAIA..."
+}
+```
+
+---
+
 ## How to Run Locally
 
 ### Prerequisites
