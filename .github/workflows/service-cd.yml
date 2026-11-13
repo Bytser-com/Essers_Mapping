@@ -215,6 +215,7 @@ jobs:
     timeout-minutes: 15
     permissions:
       contents: read
+      packages: read
     env:
       # --- Secrets ---
       KUBECONFIG_SECRET: ${{ secrets.KUBECONFIG }}
@@ -319,7 +320,12 @@ jobs:
           ')
           kubectl patch deployment "$DEPLOYMENT" -n "$NAMESPACE" --type=strategic --patch "$patch"
           if ! kubectl rollout status "deployment/$DEPLOYMENT" -n "$NAMESPACE" --timeout=300s; then
-            echo "::error::Rollout failed or timed out for deployment/$DEPLOYMENT in $NAMESPACE. Triggering automatic rollback..."
+            echo "::error::Rollout failed or timed out for deployment/$DEPLOYMENT in $NAMESPACE. Capturing diagnostics..."
+            kubectl describe deployment "$DEPLOYMENT" -n "$NAMESPACE" || true
+            kubectl get pods -n "$NAMESPACE" -l app.kubernetes.io/name="$DEPLOYMENT" -o wide || true
+            kubectl describe pods -n "$NAMESPACE" -l app.kubernetes.io/name="$DEPLOYMENT" || true
+            kubectl logs -n "$NAMESPACE" deployment/"$DEPLOYMENT" --tail=100 --all-containers=true || true
+            echo "Triggering automatic rollback..."
             kubectl rollout undo "deployment/$DEPLOYMENT" -n "$NAMESPACE"
             kubectl rollout status "deployment/$DEPLOYMENT" -n "$NAMESPACE" --timeout=180s || true
             echo "⚠️ Rollout failed: $DEPLOYMENT was automatically rolled back to the previous stable revision." >> "$GITHUB_STEP_SUMMARY"
