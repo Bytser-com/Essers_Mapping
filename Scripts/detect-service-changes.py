@@ -10,8 +10,7 @@ def git(*args):
 
 
 def needs_checks(event, branch, base, service, workflow, shared):
-    # Each release revision needs artifacts, even after an unrelated push.
-    if event == "workflow_dispatch" or (event == "push" and branch in {"Testing", "main"}):
+    if event == "workflow_dispatch":
         return True
     if not base or set(base) == {"0"} or git("cat-file", "-e", f"{base}^{{commit}}").returncode:
         return True

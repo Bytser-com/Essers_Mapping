@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root>
+  <MessageType>Outbound Delivery</MessageType>
+  <DocHeader>
+    <OutboundNumber>SO270000065</OutboundNumber>
+    <DocumentNumber>SO270000065</DocumentNumber>
+    <Reference>600065 /70065</Reference>
+    <DeliveryDate>12/12/2026</DeliveryDate>
+    <ShipByDate>09/12/2026</ShipByDate>
+    <RushIndicator>N</RushIndicator>
+    <Carrier>XPO</Carrier>
+    <ShipToCode>200065</ShipToCode>
+    <Name1>Mats Leroy</Name1>
+    <Name2>Leroy Trading</Name2>
+    <Address1>Nieuwstraat 102</Address1>
+    <Address2>Bus 7</Address2>
+    <PostalCode>63797</PostalCode>
+    <City>Verona</City>
+    <County />
+    <Country>IT</Country>
+    <LanguageCode>IT</LanguageCode>
+    <CommentCustomer />
+    <CommentOrder>
+      <Comment>Customer Reference: 800065</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>INCO:EXW</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>T4T : +32 11 85 35 55</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>Open: Ma-Di-Wo-Do-Vr 08:00-16:00</Comment>
+    </CommentOrder>
+    <TransportInstruction>
+      <Comment>T4T : +32 11 85 35 55</Comment>
+    </TransportInstruction>
+    <TransportInstruction>
+      <Comment>F92 : 1 08001600 2 08001600 3 08001600 4 08001600 5 08001600</Comment>
+    </TransportInstruction>
+    <WarehouseInstruction />
+  </DocHeader>
+  <DocLine>
+    <OrderLine>1</OrderLine>
+    <Product>KI030474</Product>
+    <Quantity>18</Quantity>
+    <UOM>CAN</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>0</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+</Root>

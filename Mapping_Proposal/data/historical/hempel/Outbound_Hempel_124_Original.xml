@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120124</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22124</CustomerNumber>
+    <DeliveryAddress>Industrieweg 241 Afdeling 9 20248 Porto Portugal</DeliveryAddress>
+    <ShipmentName />
+    <Name>Maes Systems</Name>
+    <WarehouseID>PT10</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-16T20:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Industrieweg 241 Afdeling 9</DlvStreet>
+    <DlvZipcode>20248</DlvZipcode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCounty>Porto</DlvCounty>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <Recipient>Emma Maes</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706124</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000124</RouteID>
+    <Qty>24.000000000000</Qty>
+    <ItemID>RM209745</ItemID>
+    <InventoryOrderID>000207141</InventoryOrderID>
+    <DeliveryDate>2026-08-22T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395241</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030124</InventTransRefID>
+    <DeliveryAdress>Industrieweg 241 Afdeling 9 20248 Porto Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Precisie Paneel Plus</Note>
+    <MultiComponentItemID>RM209745</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 241 Afdeling 9 20248 Porto Portugal</DlvAddress>
+    <DlvStreet>Industrieweg 241 Afdeling 9</DlvStreet>
+    <DlvZipCode>20248</DlvZipCode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCountry>Porto</DlvCountry>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395240</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000124</RouteID>
+    <Qty>31.000000000000</Qty>
+    <ItemID>YN194052</ItemID>
+    <InventoryOrderID>000207142</InventoryOrderID>
+    <DeliveryDate>2026-08-22T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395242</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030124</InventTransRefID>
+    <DeliveryAdress>Industrieweg 241 Afdeling 9 20248 Porto Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Premium Omvormer X1</Note>
+    <MultiComponentItemID>YN194052</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 241 Afdeling 9 20248 Porto Portugal</DlvAddress>
+    <DlvStreet>Industrieweg 241 Afdeling 9</DlvStreet>
+    <DlvZipCode>20248</DlvZipCode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCountry>Porto</DlvCountry>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395240</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000124</RouteID>
+    <Qty>24.000000000000</Qty>
+    <ItemID>BR995348</ItemID>
+    <InventoryOrderID>000207143</InventoryOrderID>
+    <DeliveryDate>2026-08-22T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395243</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030124</InventTransRefID>
+    <DeliveryAdress>Industrieweg 241 Afdeling 9 20248 Porto Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Snel Meetset X1</Note>
+    <MultiComponentItemID>BR995348</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 241 Afdeling 9 20248 Porto Portugal</DlvAddress>
+    <DlvStreet>Industrieweg 241 Afdeling 9</DlvStreet>
+    <DlvZipCode>20248</DlvZipCode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCountry>Porto</DlvCountry>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395240</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000124</RouteID>
+    <Qty>7.000000000000</Qty>
+    <ItemID>ET534228</ItemID>
+    <InventoryOrderID>000207144</InventoryOrderID>
+    <DeliveryDate>2026-08-22T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395244</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030124</InventTransRefID>
+    <DeliveryAdress>Industrieweg 241 Afdeling 9 20248 Porto Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Industrieel Meetset V2</Note>
+    <MultiComponentItemID>ET534228</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 241 Afdeling 9 20248 Porto Portugal</DlvAddress>
+    <DlvStreet>Industrieweg 241 Afdeling 9</DlvStreet>
+    <DlvZipCode>20248</DlvZipCode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCountry>Porto</DlvCountry>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395240</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000124</RouteID>
+    <Qty>19.000000000000</Qty>
+    <ItemID>CF835685</ItemID>
+    <InventoryOrderID>000207145</InventoryOrderID>
+    <DeliveryDate>2026-08-22T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395245</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030124</InventTransRefID>
+    <DeliveryAdress>Industrieweg 241 Afdeling 9 20248 Porto Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Automatisch Houder Kit</Note>
+    <MultiComponentItemID>CF835685</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 241 Afdeling 9 20248 Porto Portugal</DlvAddress>
+    <DlvStreet>Industrieweg 241 Afdeling 9</DlvStreet>
+    <DlvZipCode>20248</DlvZipCode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCountry>Porto</DlvCountry>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395240</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

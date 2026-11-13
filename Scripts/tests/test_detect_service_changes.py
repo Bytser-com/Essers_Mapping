@@ -76,7 +76,7 @@ class ChangeDetectionTests(unittest.TestCase):
         self.commit()
         self.assertTrue(self.changed(shared="\nScripts/shared.py\n"))
 
-    def test_release_push_rechecks_after_unrelated_follow_up_commit(self):
+    def test_unrelated_commit_skips_on_release_branches(self):
         self.write("Runtime/New.java")
         self.commit()
         self.base = self.git("rev-parse", "HEAD").strip()
@@ -84,7 +84,7 @@ class ChangeDetectionTests(unittest.TestCase):
         self.commit()
         for branch in ("Testing", "main"):
             with self.subTest(branch=branch):
-                self.assertTrue(self.changed(event="push", branch=branch))
+                self.assertFalse(self.changed(event="push", branch=branch))
 
     def test_manual_new_branch_and_missing_base_run_checks(self):
         self.assertTrue(self.changed(event="workflow_dispatch"))

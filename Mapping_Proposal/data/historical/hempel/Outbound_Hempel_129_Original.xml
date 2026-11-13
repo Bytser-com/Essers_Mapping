@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120129</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22129</CustomerNumber>
+    <DeliveryAddress>Stationslaan 174 43146 Bilbao Spain</DeliveryAddress>
+    <ShipmentName />
+    <Name>Peeters Services</Name>
+    <WarehouseID>ES30</WarehouseID>
+    <CompanyID>E223</CompanyID>
+    <PublishedByAX>2026-08-17T11:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Stationslaan 174</DlvStreet>
+    <DlvZipcode>43146</DlvZipcode>
+    <DlvCity>Bilbao</DlvCity>
+    <DlvCounty>Bilbao</DlvCounty>
+    <DlvState>Bilbao</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <Recipient>Yara Peeters</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706129</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000129</RouteID>
+    <Qty>57.000000000000</Qty>
+    <ItemID>KH666066</ItemID>
+    <InventoryOrderID>000207191</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395291</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030129</InventTransRefID>
+    <DeliveryAdress>Stationslaan 174 43146 Bilbao Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Snel Module Plus</Note>
+    <MultiComponentItemID>KH666066</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Stationslaan 174 43146 Bilbao Spain</DlvAddress>
+    <DlvStreet>Stationslaan 174</DlvStreet>
+    <DlvZipCode>43146</DlvZipCode>
+    <DlvCity>Bilbao</DlvCity>
+    <DlvCountry>Bilbao</DlvCountry>
+    <DlvState>Bilbao</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1395290</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000129</RouteID>
+    <Qty>87.000000000000</Qty>
+    <ItemID>OU487588</ItemID>
+    <InventoryOrderID>000207192</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395292</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030129</InventTransRefID>
+    <DeliveryAdress>Stationslaan 174 43146 Bilbao Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Compact Module Basic</Note>
+    <MultiComponentItemID>OU487588</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Stationslaan 174 43146 Bilbao Spain</DlvAddress>
+    <DlvStreet>Stationslaan 174</DlvStreet>
+    <DlvZipCode>43146</DlvZipCode>
+    <DlvCity>Bilbao</DlvCity>
+    <DlvCountry>Bilbao</DlvCountry>
+    <DlvState>Bilbao</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1395290</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

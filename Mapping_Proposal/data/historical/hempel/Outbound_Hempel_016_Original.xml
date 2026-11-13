@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120016</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22016</CustomerNumber>
+    <DeliveryAddress>Ringlaan 151 Bus 16 16773 Genk Belgium</DeliveryAddress>
+    <ShipmentName />
+    <Name>Leclercq Systems</Name>
+    <WarehouseID>BE10</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-03T08:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Ringlaan 151 Bus 16</DlvStreet>
+    <DlvZipcode>16773</DlvZipcode>
+    <DlvCity>Genk</DlvCity>
+    <DlvCounty>Genk</DlvCounty>
+    <DlvState>Genk</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <Recipient>Amelie Leclercq</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706016</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000016</RouteID>
+    <Qty>23.000000000000</Qty>
+    <ItemID>OP206335</ItemID>
+    <InventoryOrderID>000206061</InventoryOrderID>
+    <DeliveryDate>2026-08-05T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394161</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030016</InventTransRefID>
+    <DeliveryAdress>Ringlaan 151 Bus 16 16773 Genk Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Modulair Sensor Basic</Note>
+    <MultiComponentItemID>OP206335</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 151 Bus 16 16773 Genk Belgium</DlvAddress>
+    <DlvStreet>Ringlaan 151 Bus 16</DlvStreet>
+    <DlvZipCode>16773</DlvZipCode>
+    <DlvCity>Genk</DlvCity>
+    <DlvCountry>Genk</DlvCountry>
+    <DlvState>Genk</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394160</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000016</RouteID>
+    <Qty>26.000000000000</Qty>
+    <ItemID>KI030474</ItemID>
+    <InventoryOrderID>000206062</InventoryOrderID>
+    <DeliveryDate>2026-08-05T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394162</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030016</InventTransRefID>
+    <DeliveryAdress>Ringlaan 151 Bus 16 16773 Genk Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Veilig Scanner Pro</Note>
+    <MultiComponentItemID>KI030474</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 151 Bus 16 16773 Genk Belgium</DlvAddress>
+    <DlvStreet>Ringlaan 151 Bus 16</DlvStreet>
+    <DlvZipCode>16773</DlvZipCode>
+    <DlvCity>Genk</DlvCity>
+    <DlvCountry>Genk</DlvCountry>
+    <DlvState>Genk</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394160</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000016</RouteID>
+    <Qty>23.000000000000</Qty>
+    <ItemID>ZK667847</ItemID>
+    <InventoryOrderID>000206063</InventoryOrderID>
+    <DeliveryDate>2026-08-05T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394163</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030016</InventTransRefID>
+    <DeliveryAdress>Ringlaan 151 Bus 16 16773 Genk Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Compact Motor Plus</Note>
+    <MultiComponentItemID>ZK667847</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 151 Bus 16 16773 Genk Belgium</DlvAddress>
+    <DlvStreet>Ringlaan 151 Bus 16</DlvStreet>
+    <DlvZipCode>16773</DlvZipCode>
+    <DlvCity>Genk</DlvCity>
+    <DlvCountry>Genk</DlvCountry>
+    <DlvState>Genk</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394160</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000016</RouteID>
+    <Qty>66.000000000000</Qty>
+    <ItemID>SO106299</ItemID>
+    <InventoryOrderID>000206064</InventoryOrderID>
+    <DeliveryDate>2026-08-05T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394164</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030016</InventTransRefID>
+    <DeliveryAdress>Ringlaan 151 Bus 16 16773 Genk Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Slim Beugel Set</Note>
+    <MultiComponentItemID>SO106299</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 151 Bus 16 16773 Genk Belgium</DlvAddress>
+    <DlvStreet>Ringlaan 151 Bus 16</DlvStreet>
+    <DlvZipCode>16773</DlvZipCode>
+    <DlvCity>Genk</DlvCity>
+    <DlvCountry>Genk</DlvCountry>
+    <DlvState>Genk</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394160</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000016</RouteID>
+    <Qty>20.000000000000</Qty>
+    <ItemID>HB357965</ItemID>
+    <InventoryOrderID>000206065</InventoryOrderID>
+    <DeliveryDate>2026-08-05T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394165</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030016</InventTransRefID>
+    <DeliveryAdress>Ringlaan 151 Bus 16 16773 Genk Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Modulair Controller Mini</Note>
+    <MultiComponentItemID>HB357965</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 151 Bus 16 16773 Genk Belgium</DlvAddress>
+    <DlvStreet>Ringlaan 151 Bus 16</DlvStreet>
+    <DlvZipCode>16773</DlvZipCode>
+    <DlvCity>Genk</DlvCity>
+    <DlvCountry>Genk</DlvCountry>
+    <DlvState>Genk</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394160</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

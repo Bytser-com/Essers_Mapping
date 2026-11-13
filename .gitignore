@@ -69,7 +69,6 @@ lerna-debug.log*
 tmp/
 temp/
 .swp
-data/
 
 ### BlueJ files ###
 *.ctxt

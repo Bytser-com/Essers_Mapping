@@ -61,6 +61,16 @@ jobs:
             let run;
             if (context.payload.workflow_run) {
               ({ data: run } = await github.rest.actions.getWorkflowRun({ owner, repo, run_id: context.payload.workflow_run.id }));
+            } else if (context.eventName === 'push' && context.runId) {
+              run = {
+                id: context.runId,
+                head_sha: context.sha,
+                head_branch: branch,
+                event: 'push',
+                conclusion: 'success',
+                workflow_id: workflow.id,
+                head_repository: { full_name: `${owner}/${repo}` },
+              };
             } else {
               const { data } = await github.rest.actions.listWorkflowRuns({ owner, repo, workflow_id: workflow.id, branch, head_sha: ref.object.sha, event: 'push', status: 'success', per_page: 10 });
               run = data.workflow_runs[0];

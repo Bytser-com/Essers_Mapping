@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120044</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22044</CustomerNumber>
+    <DeliveryAddress>Ringlaan 177 Gebouw Z 11327 Barcelona Spain</DeliveryAddress>
+    <ShipmentName />
+    <Name>Muller Logistics</Name>
+    <WarehouseID>ES30</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-06T20:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Ringlaan 177 Gebouw Z</DlvStreet>
+    <DlvZipcode>11327</DlvZipcode>
+    <DlvCity>Barcelona</DlvCity>
+    <DlvCounty>Barcelona</DlvCounty>
+    <DlvState>Barcelona</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <Recipient>Sofia Muller</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706044</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000044</RouteID>
+    <Qty>26.000000000000</Qty>
+    <ItemID>NG876657</ItemID>
+    <InventoryOrderID>000206341</InventoryOrderID>
+    <DeliveryDate>2026-08-12T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394441</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030044</InventTransRefID>
+    <DeliveryAdress>Ringlaan 177 Gebouw Z 11327 Barcelona Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Professioneel Omvormer Set</Note>
+    <MultiComponentItemID>NG876657</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 177 Gebouw Z 11327 Barcelona Spain</DlvAddress>
+    <DlvStreet>Ringlaan 177 Gebouw Z</DlvStreet>
+    <DlvZipCode>11327</DlvZipCode>
+    <DlvCity>Barcelona</DlvCity>
+    <DlvCountry>Barcelona</DlvCountry>
+    <DlvState>Barcelona</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394440</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000044</RouteID>
+    <Qty>85.000000000000</Qty>
+    <ItemID>XL471187</ItemID>
+    <InventoryOrderID>000206342</InventoryOrderID>
+    <DeliveryDate>2026-08-12T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394442</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030044</InventTransRefID>
+    <DeliveryAdress>Ringlaan 177 Gebouw Z 11327 Barcelona Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Digitaal Filter V2</Note>
+    <MultiComponentItemID>XL471187</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 177 Gebouw Z 11327 Barcelona Spain</DlvAddress>
+    <DlvStreet>Ringlaan 177 Gebouw Z</DlvStreet>
+    <DlvZipCode>11327</DlvZipCode>
+    <DlvCity>Barcelona</DlvCity>
+    <DlvCountry>Barcelona</DlvCountry>
+    <DlvState>Barcelona</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394440</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000044</RouteID>
+    <Qty>16.000000000000</Qty>
+    <ItemID>WR617655</ItemID>
+    <InventoryOrderID>000206343</InventoryOrderID>
+    <DeliveryDate>2026-08-12T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394443</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030044</InventTransRefID>
+    <DeliveryAdress>Ringlaan 177 Gebouw Z 11327 Barcelona Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Sterk Afdichting Set</Note>
+    <MultiComponentItemID>WR617655</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 177 Gebouw Z 11327 Barcelona Spain</DlvAddress>
+    <DlvStreet>Ringlaan 177 Gebouw Z</DlvStreet>
+    <DlvZipCode>11327</DlvZipCode>
+    <DlvCity>Barcelona</DlvCity>
+    <DlvCountry>Barcelona</DlvCountry>
+    <DlvState>Barcelona</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394440</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000044</RouteID>
+    <Qty>37.000000000000</Qty>
+    <ItemID>OJ146459</ItemID>
+    <InventoryOrderID>000206344</InventoryOrderID>
+    <DeliveryDate>2026-08-12T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394444</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030044</InventTransRefID>
+    <DeliveryAdress>Ringlaan 177 Gebouw Z 11327 Barcelona Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Sterk Pomp Basic</Note>
+    <MultiComponentItemID>OJ146459</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 177 Gebouw Z 11327 Barcelona Spain</DlvAddress>
+    <DlvStreet>Ringlaan 177 Gebouw Z</DlvStreet>
+    <DlvZipCode>11327</DlvZipCode>
+    <DlvCity>Barcelona</DlvCity>
+    <DlvCountry>Barcelona</DlvCountry>
+    <DlvState>Barcelona</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394440</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000044</RouteID>
+    <Qty>84.000000000000</Qty>
+    <ItemID>JM382882</ItemID>
+    <InventoryOrderID>000206345</InventoryOrderID>
+    <DeliveryDate>2026-08-12T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394445</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030044</InventTransRefID>
+    <DeliveryAdress>Ringlaan 177 Gebouw Z 11327 Barcelona Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Flexibel Schakelaar Kit</Note>
+    <MultiComponentItemID>JM382882</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 177 Gebouw Z 11327 Barcelona Spain</DlvAddress>
+    <DlvStreet>Ringlaan 177 Gebouw Z</DlvStreet>
+    <DlvZipCode>11327</DlvZipCode>
+    <DlvCity>Barcelona</DlvCity>
+    <DlvCountry>Barcelona</DlvCountry>
+    <DlvState>Barcelona</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394440</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120138</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22138</CustomerNumber>
+    <DeliveryAddress>Kasteelstraat 107 Bus 18 16191 Coimbra Portugal</DeliveryAddress>
+    <ShipmentName />
+    <Name>Mertens Services</Name>
+    <WarehouseID>PT10</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-18T14:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kasteelstraat 107 Bus 18</DlvStreet>
+    <DlvZipcode>16191</DlvZipcode>
+    <DlvCity>Coimbra</DlvCity>
+    <DlvCounty>Coimbra</DlvCounty>
+    <DlvState>Coimbra</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <Recipient>Victor Mertens</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706138</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000138</RouteID>
+    <Qty>85.000000000000</Qty>
+    <ItemID>VJ623227</ItemID>
+    <InventoryOrderID>000207281</InventoryOrderID>
+    <DeliveryDate>2026-08-22T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395381</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030138</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 107 Bus 18 16191 Coimbra Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Eco Beugel Plus</Note>
+    <MultiComponentItemID>VJ623227</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 107 Bus 18 16191 Coimbra Portugal</DlvAddress>
+    <DlvStreet>Kasteelstraat 107 Bus 18</DlvStreet>
+    <DlvZipCode>16191</DlvZipCode>
+    <DlvCity>Coimbra</DlvCity>
+    <DlvCountry>Coimbra</DlvCountry>
+    <DlvState>Coimbra</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395380</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000138</RouteID>
+    <Qty>75.000000000000</Qty>
+    <ItemID>QD446580</ItemID>
+    <InventoryOrderID>000207282</InventoryOrderID>
+    <DeliveryDate>2026-08-22T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395382</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030138</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 107 Bus 18 16191 Coimbra Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Veilig Meetset Pro</Note>
+    <MultiComponentItemID>QD446580</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 107 Bus 18 16191 Coimbra Portugal</DlvAddress>
+    <DlvStreet>Kasteelstraat 107 Bus 18</DlvStreet>
+    <DlvZipCode>16191</DlvZipCode>
+    <DlvCity>Coimbra</DlvCity>
+    <DlvCountry>Coimbra</DlvCountry>
+    <DlvState>Coimbra</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395380</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000138</RouteID>
+    <Qty>46.000000000000</Qty>
+    <ItemID>KK854616</ItemID>
+    <InventoryOrderID>000207283</InventoryOrderID>
+    <DeliveryDate>2026-08-22T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395383</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030138</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 107 Bus 18 16191 Coimbra Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Digitaal Ventiel Basic</Note>
+    <MultiComponentItemID>KK854616</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 107 Bus 18 16191 Coimbra Portugal</DlvAddress>
+    <DlvStreet>Kasteelstraat 107 Bus 18</DlvStreet>
+    <DlvZipCode>16191</DlvZipCode>
+    <DlvCity>Coimbra</DlvCity>
+    <DlvCountry>Coimbra</DlvCountry>
+    <DlvState>Coimbra</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395380</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

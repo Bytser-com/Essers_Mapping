@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120046</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22046</CustomerNumber>
+    <DeliveryAddress>Kerkstraat 42 Bus 21 50678 Gent Belgium</DeliveryAddress>
+    <ShipmentName />
+    <Name>Mertens Solutions</Name>
+    <WarehouseID>BE10</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-07T02:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kerkstraat 42 Bus 21</DlvStreet>
+    <DlvZipcode>50678</DlvZipcode>
+    <DlvCity>Gent</DlvCity>
+    <DlvCounty>Gent</DlvCounty>
+    <DlvState>Gent</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <Recipient>Finn Mertens</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706046</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000046</RouteID>
+    <Qty>15.000000000000</Qty>
+    <ItemID>XI237326</ItemID>
+    <InventoryOrderID>000206361</InventoryOrderID>
+    <DeliveryDate>2026-08-15T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394461</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030046</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 42 Bus 21 50678 Gent Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Eco Controller Set</Note>
+    <MultiComponentItemID>XI237326</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 42 Bus 21 50678 Gent Belgium</DlvAddress>
+    <DlvStreet>Kerkstraat 42 Bus 21</DlvStreet>
+    <DlvZipCode>50678</DlvZipCode>
+    <DlvCity>Gent</DlvCity>
+    <DlvCountry>Gent</DlvCountry>
+    <DlvState>Gent</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394460</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000046</RouteID>
+    <Qty>91.000000000000</Qty>
+    <ItemID>FV079975</ItemID>
+    <InventoryOrderID>000206362</InventoryOrderID>
+    <DeliveryDate>2026-08-15T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394462</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030046</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 42 Bus 21 50678 Gent Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Robuust Afdichting Kit</Note>
+    <MultiComponentItemID>FV079975</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 42 Bus 21 50678 Gent Belgium</DlvAddress>
+    <DlvStreet>Kerkstraat 42 Bus 21</DlvStreet>
+    <DlvZipCode>50678</DlvZipCode>
+    <DlvCity>Gent</DlvCity>
+    <DlvCountry>Gent</DlvCountry>
+    <DlvState>Gent</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394460</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000046</RouteID>
+    <Qty>1.000000000000</Qty>
+    <ItemID>ET435036</ItemID>
+    <InventoryOrderID>000206363</InventoryOrderID>
+    <DeliveryDate>2026-08-15T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394463</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030046</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 42 Bus 21 50678 Gent Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Digitaal Omvormer Kit</Note>
+    <MultiComponentItemID>ET435036</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 42 Bus 21 50678 Gent Belgium</DlvAddress>
+    <DlvStreet>Kerkstraat 42 Bus 21</DlvStreet>
+    <DlvZipCode>50678</DlvZipCode>
+    <DlvCity>Gent</DlvCity>
+    <DlvCountry>Gent</DlvCountry>
+    <DlvState>Gent</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394460</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

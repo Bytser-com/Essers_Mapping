@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120135</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22135</CustomerNumber>
+    <DeliveryAddress>Kerkstraat 11 Bus 1 70213 Breda Netherlands</DeliveryAddress>
+    <ShipmentName />
+    <Name>Visser Systems</Name>
+    <WarehouseID>NL20</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-18T05:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kerkstraat 11 Bus 1</DlvStreet>
+    <DlvZipcode>70213</DlvZipcode>
+    <DlvCity>Breda</DlvCity>
+    <DlvCounty>Breda</DlvCounty>
+    <DlvState>Breda</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <Recipient>Mats Visser</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706135</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000135</RouteID>
+    <Qty>4.000000000000</Qty>
+    <ItemID>IP566875</ItemID>
+    <InventoryOrderID>000207251</InventoryOrderID>
+    <DeliveryDate>2026-08-27T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395351</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030135</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 11 Bus 1 70213 Breda Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Automatisch Lader Mini</Note>
+    <MultiComponentItemID>IP566875</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 11 Bus 1 70213 Breda Netherlands</DlvAddress>
+    <DlvStreet>Kerkstraat 11 Bus 1</DlvStreet>
+    <DlvZipCode>70213</DlvZipCode>
+    <DlvCity>Breda</DlvCity>
+    <DlvCountry>Breda</DlvCountry>
+    <DlvState>Breda</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395350</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000135</RouteID>
+    <Qty>28.000000000000</Qty>
+    <ItemID>CZ760592</ItemID>
+    <InventoryOrderID>000207252</InventoryOrderID>
+    <DeliveryDate>2026-08-27T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395352</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030135</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 11 Bus 1 70213 Breda Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Precisie Terminal Kit</Note>
+    <MultiComponentItemID>CZ760592</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 11 Bus 1 70213 Breda Netherlands</DlvAddress>
+    <DlvStreet>Kerkstraat 11 Bus 1</DlvStreet>
+    <DlvZipCode>70213</DlvZipCode>
+    <DlvCity>Breda</DlvCity>
+    <DlvCountry>Breda</DlvCountry>
+    <DlvState>Breda</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395350</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000135</RouteID>
+    <Qty>62.000000000000</Qty>
+    <ItemID>MA453497</ItemID>
+    <InventoryOrderID>000207253</InventoryOrderID>
+    <DeliveryDate>2026-08-27T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395353</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030135</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 11 Bus 1 70213 Breda Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Licht Module Plus</Note>
+    <MultiComponentItemID>MA453497</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 11 Bus 1 70213 Breda Netherlands</DlvAddress>
+    <DlvStreet>Kerkstraat 11 Bus 1</DlvStreet>
+    <DlvZipCode>70213</DlvZipCode>
+    <DlvCity>Breda</DlvCity>
+    <DlvCountry>Breda</DlvCountry>
+    <DlvState>Breda</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395350</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000135</RouteID>
+    <Qty>38.000000000000</Qty>
+    <ItemID>YS422563</ItemID>
+    <InventoryOrderID>000207254</InventoryOrderID>
+    <DeliveryDate>2026-08-27T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395354</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030135</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 11 Bus 1 70213 Breda Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Duurzaam Omvormer Set</Note>
+    <MultiComponentItemID>YS422563</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 11 Bus 1 70213 Breda Netherlands</DlvAddress>
+    <DlvStreet>Kerkstraat 11 Bus 1</DlvStreet>
+    <DlvZipCode>70213</DlvZipCode>
+    <DlvCity>Breda</DlvCity>
+    <DlvCountry>Breda</DlvCountry>
+    <DlvState>Breda</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395350</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

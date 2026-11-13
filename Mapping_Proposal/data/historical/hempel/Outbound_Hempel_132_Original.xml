@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120132</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22132</CustomerNumber>
+    <DeliveryAddress>Ringlaan 284 Gebouw Y 44511 Brussel Belgium</DeliveryAddress>
+    <ShipmentName />
+    <Name>Janssens Supply</Name>
+    <WarehouseID>BE10</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-17T20:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Ringlaan 284 Gebouw Y</DlvStreet>
+    <DlvZipcode>44511</DlvZipcode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCounty>Brussel</DlvCounty>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <Recipient>Lucas Janssens</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706132</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000132</RouteID>
+    <Qty>95.000000000000</Qty>
+    <ItemID>OB091368</ItemID>
+    <InventoryOrderID>000207221</InventoryOrderID>
+    <DeliveryDate>2026-08-23T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395321</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030132</InventTransRefID>
+    <DeliveryAdress>Ringlaan 284 Gebouw Y 44511 Brussel Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Premium Adapter Mini</Note>
+    <MultiComponentItemID>OB091368</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 284 Gebouw Y 44511 Brussel Belgium</DlvAddress>
+    <DlvStreet>Ringlaan 284 Gebouw Y</DlvStreet>
+    <DlvZipCode>44511</DlvZipCode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCountry>Brussel</DlvCountry>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1395320</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000132</RouteID>
+    <Qty>1.000000000000</Qty>
+    <ItemID>VP258289</ItemID>
+    <InventoryOrderID>000207222</InventoryOrderID>
+    <DeliveryDate>2026-08-23T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395322</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030132</InventTransRefID>
+    <DeliveryAdress>Ringlaan 284 Gebouw Y 44511 Brussel Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Premium Omvormer Pro</Note>
+    <MultiComponentItemID>VP258289</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 284 Gebouw Y 44511 Brussel Belgium</DlvAddress>
+    <DlvStreet>Ringlaan 284 Gebouw Y</DlvStreet>
+    <DlvZipCode>44511</DlvZipCode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCountry>Brussel</DlvCountry>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1395320</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000132</RouteID>
+    <Qty>23.000000000000</Qty>
+    <ItemID>FH618011</ItemID>
+    <InventoryOrderID>000207223</InventoryOrderID>
+    <DeliveryDate>2026-08-23T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395323</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030132</InventTransRefID>
+    <DeliveryAdress>Ringlaan 284 Gebouw Y 44511 Brussel Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Professioneel Kabel Plus</Note>
+    <MultiComponentItemID>FH618011</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 284 Gebouw Y 44511 Brussel Belgium</DlvAddress>
+    <DlvStreet>Ringlaan 284 Gebouw Y</DlvStreet>
+    <DlvZipCode>44511</DlvZipCode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCountry>Brussel</DlvCountry>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1395320</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000132</RouteID>
+    <Qty>95.000000000000</Qty>
+    <ItemID>CL362276</ItemID>
+    <InventoryOrderID>000207224</InventoryOrderID>
+    <DeliveryDate>2026-08-23T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395324</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030132</InventTransRefID>
+    <DeliveryAdress>Ringlaan 284 Gebouw Y 44511 Brussel Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Universeel Terminal X2</Note>
+    <MultiComponentItemID>CL362276</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 284 Gebouw Y 44511 Brussel Belgium</DlvAddress>
+    <DlvStreet>Ringlaan 284 Gebouw Y</DlvStreet>
+    <DlvZipCode>44511</DlvZipCode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCountry>Brussel</DlvCountry>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1395320</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000132</RouteID>
+    <Qty>15.000000000000</Qty>
+    <ItemID>BC136419</ItemID>
+    <InventoryOrderID>000207225</InventoryOrderID>
+    <DeliveryDate>2026-08-23T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395325</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030132</InventTransRefID>
+    <DeliveryAdress>Ringlaan 284 Gebouw Y 44511 Brussel Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Compact Terminal Basic</Note>
+    <MultiComponentItemID>BC136419</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 284 Gebouw Y 44511 Brussel Belgium</DlvAddress>
+    <DlvStreet>Ringlaan 284 Gebouw Y</DlvStreet>
+    <DlvZipCode>44511</DlvZipCode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCountry>Brussel</DlvCountry>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1395320</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

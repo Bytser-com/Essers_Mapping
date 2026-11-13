@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120106</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22106</CustomerNumber>
+    <DeliveryAddress>Industrieweg 173 Unit 40 27808 Gent Belgium</DeliveryAddress>
+    <ShipmentName />
+    <Name>Simon Technics</Name>
+    <WarehouseID>BE10</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-14T14:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Industrieweg 173 Unit 40</DlvStreet>
+    <DlvZipcode>27808</DlvZipcode>
+    <DlvCity>Gent</DlvCity>
+    <DlvCounty>Gent</DlvCounty>
+    <DlvState>Gent</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <Recipient>Noah Simon</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706106</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000106</RouteID>
+    <Qty>82.000000000000</Qty>
+    <ItemID>JN074122</ItemID>
+    <InventoryOrderID>000206961</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395061</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030106</InventTransRefID>
+    <DeliveryAdress>Industrieweg 173 Unit 40 27808 Gent Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Sterk Pomp Pro</Note>
+    <MultiComponentItemID>JN074122</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 173 Unit 40 27808 Gent Belgium</DlvAddress>
+    <DlvStreet>Industrieweg 173 Unit 40</DlvStreet>
+    <DlvZipCode>27808</DlvZipCode>
+    <DlvCity>Gent</DlvCity>
+    <DlvCountry>Gent</DlvCountry>
+    <DlvState>Gent</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1395060</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000106</RouteID>
+    <Qty>28.000000000000</Qty>
+    <ItemID>HB357965</ItemID>
+    <InventoryOrderID>000206962</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395062</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030106</InventTransRefID>
+    <DeliveryAdress>Industrieweg 173 Unit 40 27808 Gent Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Modulair Controller Mini</Note>
+    <MultiComponentItemID>HB357965</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 173 Unit 40 27808 Gent Belgium</DlvAddress>
+    <DlvStreet>Industrieweg 173 Unit 40</DlvStreet>
+    <DlvZipCode>27808</DlvZipCode>
+    <DlvCity>Gent</DlvCity>
+    <DlvCountry>Gent</DlvCountry>
+    <DlvState>Gent</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1395060</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000106</RouteID>
+    <Qty>50.000000000000</Qty>
+    <ItemID>GD445598</ItemID>
+    <InventoryOrderID>000206963</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395063</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030106</InventTransRefID>
+    <DeliveryAdress>Industrieweg 173 Unit 40 27808 Gent Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Licht Controller Set</Note>
+    <MultiComponentItemID>GD445598</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 173 Unit 40 27808 Gent Belgium</DlvAddress>
+    <DlvStreet>Industrieweg 173 Unit 40</DlvStreet>
+    <DlvZipCode>27808</DlvZipCode>
+    <DlvCity>Gent</DlvCity>
+    <DlvCountry>Gent</DlvCountry>
+    <DlvState>Gent</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1395060</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

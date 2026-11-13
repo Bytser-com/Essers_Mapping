@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120054</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22054</CustomerNumber>
+    <DeliveryAddress>Havenlaan 243 Unit 8 93013 Milaan Italy</DeliveryAddress>
+    <ShipmentName />
+    <Name>Visser Transport</Name>
+    <WarehouseID>IT20</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-08T02:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Havenlaan 243 Unit 8</DlvStreet>
+    <DlvZipcode>93013</DlvZipcode>
+    <DlvCity>Milaan</DlvCity>
+    <DlvCounty>Milaan</DlvCounty>
+    <DlvState>Milaan</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <Recipient>Finn Visser</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706054</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000054</RouteID>
+    <Qty>71.000000000000</Qty>
+    <ItemID>OP206335</ItemID>
+    <InventoryOrderID>000206441</InventoryOrderID>
+    <DeliveryDate>2026-08-16T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394541</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030054</InventTransRefID>
+    <DeliveryAdress>Havenlaan 243 Unit 8 93013 Milaan Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Modulair Sensor Basic</Note>
+    <MultiComponentItemID>OP206335</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Havenlaan 243 Unit 8 93013 Milaan Italy</DlvAddress>
+    <DlvStreet>Havenlaan 243 Unit 8</DlvStreet>
+    <DlvZipCode>93013</DlvZipCode>
+    <DlvCity>Milaan</DlvCity>
+    <DlvCountry>Milaan</DlvCountry>
+    <DlvState>Milaan</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394540</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000054</RouteID>
+    <Qty>17.000000000000</Qty>
+    <ItemID>ST712664</ItemID>
+    <InventoryOrderID>000206442</InventoryOrderID>
+    <DeliveryDate>2026-08-16T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394542</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030054</InventTransRefID>
+    <DeliveryAdress>Havenlaan 243 Unit 8 93013 Milaan Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Robuust Paneel Max</Note>
+    <MultiComponentItemID>ST712664</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Havenlaan 243 Unit 8 93013 Milaan Italy</DlvAddress>
+    <DlvStreet>Havenlaan 243 Unit 8</DlvStreet>
+    <DlvZipCode>93013</DlvZipCode>
+    <DlvCity>Milaan</DlvCity>
+    <DlvCountry>Milaan</DlvCountry>
+    <DlvState>Milaan</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394540</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000054</RouteID>
+    <Qty>37.000000000000</Qty>
+    <ItemID>ZC780644</ItemID>
+    <InventoryOrderID>000206443</InventoryOrderID>
+    <DeliveryDate>2026-08-16T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394543</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030054</InventTransRefID>
+    <DeliveryAdress>Havenlaan 243 Unit 8 93013 Milaan Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Precisie Ventiel Kit</Note>
+    <MultiComponentItemID>ZC780644</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Havenlaan 243 Unit 8 93013 Milaan Italy</DlvAddress>
+    <DlvStreet>Havenlaan 243 Unit 8</DlvStreet>
+    <DlvZipCode>93013</DlvZipCode>
+    <DlvCity>Milaan</DlvCity>
+    <DlvCountry>Milaan</DlvCountry>
+    <DlvState>Milaan</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394540</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

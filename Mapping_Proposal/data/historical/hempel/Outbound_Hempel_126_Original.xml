@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120126</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22126</CustomerNumber>
+    <DeliveryAddress>Marktplein 257 Gebouw S 76553 Rotterdam Netherlands</DeliveryAddress>
+    <ShipmentName />
+    <Name>Muller Logistics</Name>
+    <WarehouseID>NL20</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-17T02:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Marktplein 257 Gebouw S</DlvStreet>
+    <DlvZipcode>76553</DlvZipcode>
+    <DlvCity>Rotterdam</DlvCity>
+    <DlvCounty>Rotterdam</DlvCounty>
+    <DlvState>Rotterdam</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <Recipient>Victor Muller</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706126</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000126</RouteID>
+    <Qty>89.000000000000</Qty>
+    <ItemID>XQ052919</ItemID>
+    <InventoryOrderID>000207161</InventoryOrderID>
+    <DeliveryDate>2026-08-25T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395261</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030126</InventTransRefID>
+    <DeliveryAdress>Marktplein 257 Gebouw S 76553 Rotterdam Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Industrieel Pomp Set</Note>
+    <MultiComponentItemID>XQ052919</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 257 Gebouw S 76553 Rotterdam Netherlands</DlvAddress>
+    <DlvStreet>Marktplein 257 Gebouw S</DlvStreet>
+    <DlvZipCode>76553</DlvZipCode>
+    <DlvCity>Rotterdam</DlvCity>
+    <DlvCountry>Rotterdam</DlvCountry>
+    <DlvState>Rotterdam</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395260</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000126</RouteID>
+    <Qty>56.000000000000</Qty>
+    <ItemID>IQ989718</ItemID>
+    <InventoryOrderID>000207162</InventoryOrderID>
+    <DeliveryDate>2026-08-25T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395262</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030126</InventTransRefID>
+    <DeliveryAdress>Marktplein 257 Gebouw S 76553 Rotterdam Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Automatisch Ventiel Basic</Note>
+    <MultiComponentItemID>IQ989718</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 257 Gebouw S 76553 Rotterdam Netherlands</DlvAddress>
+    <DlvStreet>Marktplein 257 Gebouw S</DlvStreet>
+    <DlvZipCode>76553</DlvZipCode>
+    <DlvCity>Rotterdam</DlvCity>
+    <DlvCountry>Rotterdam</DlvCountry>
+    <DlvState>Rotterdam</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395260</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000126</RouteID>
+    <Qty>8.000000000000</Qty>
+    <ItemID>PJ543141</ItemID>
+    <InventoryOrderID>000207163</InventoryOrderID>
+    <DeliveryDate>2026-08-25T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395263</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030126</InventTransRefID>
+    <DeliveryAdress>Marktplein 257 Gebouw S 76553 Rotterdam Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Automatisch Adapter X2</Note>
+    <MultiComponentItemID>PJ543141</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 257 Gebouw S 76553 Rotterdam Netherlands</DlvAddress>
+    <DlvStreet>Marktplein 257 Gebouw S</DlvStreet>
+    <DlvZipCode>76553</DlvZipCode>
+    <DlvCity>Rotterdam</DlvCity>
+    <DlvCountry>Rotterdam</DlvCountry>
+    <DlvState>Rotterdam</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395260</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

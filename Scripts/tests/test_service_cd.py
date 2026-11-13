@@ -85,6 +85,26 @@ class ServiceCdTests(unittest.TestCase):
         result = images.preserve_images({"items": [desired]}, {"items": [live]})
         self.assertEqual(result["items"][0]["spec"]["template"]["spec"]["containers"][1]["image"], "sidecar:v2")
 
+    def test_load_manifests_handles_concatenated_json_stream(self):
+        import io
+        stream = io.StringIO(
+            json.dumps({"kind": "Namespace", "metadata": {"name": "test-ns"}}) + "\n" +
+            json.dumps(deployment())
+        )
+        loaded = images.load_manifests(stream)
+        self.assertEqual(loaded["kind"], "List")
+        self.assertEqual(len(loaded["items"]), 2)
+        self.assertEqual(loaded["items"][0]["kind"], "Namespace")
+        self.assertEqual(loaded["items"][1]["kind"], "Deployment")
+
+    def test_load_manifests_preserves_single_list_object(self):
+        import io
+        stream = io.StringIO(json.dumps({"kind": "List", "items": [deployment()]}))
+        loaded = images.load_manifests(stream)
+        self.assertEqual(loaded["kind"], "List")
+        self.assertEqual(len(loaded["items"]), 1)
+        self.assertEqual(loaded["items"][0]["kind"], "Deployment")
+
 
 if __name__ == "__main__":
     unittest.main()

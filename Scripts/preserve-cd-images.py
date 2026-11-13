@@ -6,13 +6,34 @@ import re
 import sys
 
 
+def load_manifests(stream):
+    raw = stream.read().strip()
+    if not raw:
+        return {"items": []}
+    decoder = json.JSONDecoder()
+    pos = 0
+    items = []
+    while pos < len(raw):
+        while pos < len(raw) and raw[pos].isspace():
+            pos += 1
+        if pos >= len(raw):
+            break
+        obj, end = decoder.raw_decode(raw, idx=pos)
+        items.append(obj)
+        pos = end
+    if len(items) == 1 and isinstance(items[0], dict) and "items" in items[0]:
+        return items[0]
+    return {"apiVersion": "v1", "kind": "List", "items": items}
+
+
 def preserve_images(desired, live):
     managed = {}
     for deployment in live.get("items", []):
         metadata = deployment.get("metadata", {})
         if metadata.get("annotations", {}).get("essers.io/image-managed-by") == "service-cd":
             managed[(metadata.get("namespace"), metadata["name"])] = deployment
-    for resource in desired.get("items", []):
+    resources = desired if isinstance(desired, list) else desired.get("items", [])
+    for resource in resources:
         if resource.get("kind") != "Deployment":
             continue
         metadata = resource["metadata"]
@@ -32,7 +53,7 @@ def preserve_images(desired, live):
                 container["image"] = image
         annotations = metadata.setdefault("annotations", {})
         annotations["essers.io/image-managed-by"] = "service-cd"
-        source_sha = current["metadata"]["annotations"].get("essers.io/source-sha")
+        source_sha = current["metadata"].get("annotations", {}).get("essers.io/source-sha")
         if source_sha:
             annotations["essers.io/source-sha"] = source_sha
     return desired
@@ -44,4 +65,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     with open(args.live, encoding="utf-8") as live_file:
         live = json.load(live_file)
-    json.dump(preserve_images(json.load(sys.stdin), live), sys.stdout)
+    json.dump(preserve_images(load_manifests(sys.stdin), live), sys.stdout)
+

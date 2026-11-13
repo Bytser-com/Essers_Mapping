@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120069</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22069</CustomerNumber>
+    <DeliveryAddress>Parklaan 240 23484 Valencia Spain</DeliveryAddress>
+    <ShipmentName />
+    <Name>Vermeulen Logistics</Name>
+    <WarehouseID>ES30</WarehouseID>
+    <CompanyID>E223</CompanyID>
+    <PublishedByAX>2026-08-09T23:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Parklaan 240</DlvStreet>
+    <DlvZipcode>23484</DlvZipcode>
+    <DlvCity>Valencia</DlvCity>
+    <DlvCounty>Valencia</DlvCounty>
+    <DlvState>Valencia</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <Recipient>Victor Vermeulen</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706069</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000069</RouteID>
+    <Qty>86.000000000000</Qty>
+    <ItemID>WC586997</ItemID>
+    <InventoryOrderID>000206591</InventoryOrderID>
+    <DeliveryDate>2026-08-16T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394691</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030069</InventTransRefID>
+    <DeliveryAdress>Parklaan 240 23484 Valencia Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Automatisch Sensor Plus</Note>
+    <MultiComponentItemID>WC586997</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Parklaan 240 23484 Valencia Spain</DlvAddress>
+    <DlvStreet>Parklaan 240</DlvStreet>
+    <DlvZipCode>23484</DlvZipCode>
+    <DlvCity>Valencia</DlvCity>
+    <DlvCountry>Valencia</DlvCountry>
+    <DlvState>Valencia</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394690</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000069</RouteID>
+    <Qty>21.000000000000</Qty>
+    <ItemID>VZ148007</ItemID>
+    <InventoryOrderID>000206592</InventoryOrderID>
+    <DeliveryDate>2026-08-16T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394692</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030069</InventTransRefID>
+    <DeliveryAdress>Parklaan 240 23484 Valencia Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Universeel Adapter Set</Note>
+    <MultiComponentItemID>VZ148007</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Parklaan 240 23484 Valencia Spain</DlvAddress>
+    <DlvStreet>Parklaan 240</DlvStreet>
+    <DlvZipCode>23484</DlvZipCode>
+    <DlvCity>Valencia</DlvCity>
+    <DlvCountry>Valencia</DlvCountry>
+    <DlvState>Valencia</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394690</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

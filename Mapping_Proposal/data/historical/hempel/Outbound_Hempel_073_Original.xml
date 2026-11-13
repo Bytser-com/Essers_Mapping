@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120073</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22073</CustomerNumber>
+    <DeliveryAddress>Kasteelstraat 115 19207 Brussel Belgium</DeliveryAddress>
+    <ShipmentName />
+    <Name>Leroy Services</Name>
+    <WarehouseID>BE10</WarehouseID>
+    <CompanyID>E223</CompanyID>
+    <PublishedByAX>2026-08-10T11:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kasteelstraat 115</DlvStreet>
+    <DlvZipcode>19207</DlvZipcode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCounty>Brussel</DlvCounty>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <Recipient>Jules Leroy</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706073</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000073</RouteID>
+    <Qty>36.000000000000</Qty>
+    <ItemID>MF934147</ItemID>
+    <InventoryOrderID>000206631</InventoryOrderID>
+    <DeliveryDate>2026-08-13T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394731</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030073</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 115 19207 Brussel Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Modulair Paneel Plus</Note>
+    <MultiComponentItemID>MF934147</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 115 19207 Brussel Belgium</DlvAddress>
+    <DlvStreet>Kasteelstraat 115</DlvStreet>
+    <DlvZipCode>19207</DlvZipCode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCountry>Brussel</DlvCountry>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394730</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000073</RouteID>
+    <Qty>69.000000000000</Qty>
+    <ItemID>MA453497</ItemID>
+    <InventoryOrderID>000206632</InventoryOrderID>
+    <DeliveryDate>2026-08-13T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394732</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030073</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 115 19207 Brussel Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Licht Module Plus</Note>
+    <MultiComponentItemID>MA453497</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 115 19207 Brussel Belgium</DlvAddress>
+    <DlvStreet>Kasteelstraat 115</DlvStreet>
+    <DlvZipCode>19207</DlvZipCode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCountry>Brussel</DlvCountry>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394730</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>
