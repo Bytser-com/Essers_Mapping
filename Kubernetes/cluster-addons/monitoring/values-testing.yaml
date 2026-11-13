@@ -140,6 +140,9 @@ prometheus:
     ruleSelectorNilUsesHelmValues: false
     ruleSelector: {}
 
+    # Enable Prometheus Remote-Write receiver for Grafana Alloy push metrics
+    enableRemoteWriteReceiver: true
+
     # Scrape intervals
     scrapeInterval: 30s
     evaluationInterval: 30s

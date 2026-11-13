@@ -1,0 +1,6 @@
+# ==============================================================================
+# PROMETHEUS NODE EXPORTER SYSTEM DEFAULTS
+# Managed by Ansible - role: node_monitoring
+# ==============================================================================
+
+ARGS="--web.listen-address={{ node_monitoring_node_exporter_listen_address }}:{{ node_monitoring_node_exporter_port }} --collector.systemd --collector.processes --collector.textfile.directory={{ node_monitoring_node_exporter_collector_textfile_dir }}"

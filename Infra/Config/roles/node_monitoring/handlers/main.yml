@@ -1,0 +1,18 @@
+---
+# ==============================================================================
+# HANDLERS: node_monitoring
+# ==============================================================================
+
+- name: Restart node-exporter
+  ansible.builtin.systemd:
+    name: prometheus-node-exporter
+    state: restarted
+    enabled: true
+  when: not ansible_check_mode
+
+- name: Restart alloy
+  ansible.builtin.systemd:
+    name: alloy
+    state: restarted
+    enabled: true
+  when: not ansible_check_mode

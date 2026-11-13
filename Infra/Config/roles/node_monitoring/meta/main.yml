@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  author: "Essers Mapping Team"
+  description: "Installs and configures Prometheus Node Exporter and Grafana Alloy telemetry agent on Debian 13 virtual machines"
+  company: "Essers"
+  license: "proprietary"
+  min_ansible_version: "2.16.0"
+  platforms:
+    - name: Debian
+      versions:
+        - "12"
+        - "13"
+  galaxy_tags:
+    - monitoring
+    - prometheus
+    - node_exporter
+    - alloy
+    - grafana
+
+dependencies: []
