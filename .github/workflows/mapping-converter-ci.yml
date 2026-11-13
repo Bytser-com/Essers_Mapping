@@ -9,6 +9,8 @@ on:
 
 permissions:
   contents: read
+  actions: read
+  packages: write
 
 concurrency:
   group: mapping-converter-ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
@@ -73,3 +75,17 @@ jobs:
         env:
           RESULT: ${{ needs.checks.result }}
         run: test "$RESULT" = success
+
+  delivery:
+    name: Mapping Converter CD
+    needs: [changes, checks, quality-gate]
+    if: github.event_name == 'push' && (github.ref_name == 'Testing' || github.ref_name == 'main') && needs.changes.outputs.changed == 'true'
+    uses: ./.github/workflows/service-cd.yml
+    with:
+      service-path: Mapping_Converter
+      image-name: mapping-converter
+      deployment: mapping-converter
+      ci-workflow: mapping-converter-ci.yml
+      artifact-name: mapping-converter-test-reports
+      artifact-path: ''
+    secrets: inherit

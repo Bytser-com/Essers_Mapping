@@ -9,6 +9,8 @@ on:
 
 permissions:
   contents: read
+  actions: read
+  packages: write
 
 concurrency:
   group: runtime-ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
@@ -70,3 +72,17 @@ jobs:
         env:
           RESULT: ${{ needs.checks.result }}
         run: test "$RESULT" = success
+
+  delivery:
+    name: Runtime CD
+    needs: [changes, checks, quality-gate]
+    if: github.event_name == 'push' && (github.ref_name == 'Testing' || github.ref_name == 'main') && needs.changes.outputs.changed == 'true'
+    uses: ./.github/workflows/service-cd.yml
+    with:
+      service-path: Runtime
+      image-name: runtime-backend
+      deployment: runtime-backend
+      ci-workflow: runtime-ci.yml
+      artifact-name: runtime-jar
+      artifact-path: 'Runtime/target'
+    secrets: inherit
