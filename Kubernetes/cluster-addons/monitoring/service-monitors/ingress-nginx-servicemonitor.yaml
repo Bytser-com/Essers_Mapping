@@ -1,0 +1,23 @@
+# ==============================================================================
+# SERVICEMONITOR: NGINX INGRESS CONTROLLER
+# Scrapes Prometheus metrics from the NGINX Ingress Controller (traffic, status codes, latency)
+# ==============================================================================
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ingress-nginx-monitor
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+    app.kubernetes.io/name: ingress-nginx
+spec:
+  namespaceSelector:
+    matchNames:
+      - ingress-nginx
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ingress-nginx
+  endpoints:
+    - port: metrics
+      interval: 15s
+      scrapeTimeout: 10s

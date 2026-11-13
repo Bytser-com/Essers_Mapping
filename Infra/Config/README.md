@@ -26,6 +26,9 @@
   • Run default plays ONLY (K8s cluster, skipping never-tagged runner plays):
     ansible-playbook -i inventories/testing/hosts.yml site.yml
 
+  • Run ONLY the Prometheus & Grafana Monitoring stack deployment:
+    ansible-playbook -i inventories/testing/hosts.yml site.yml --tags monitoring
+
 
 
 
@@ -51,6 +54,7 @@ Industry-grade, role-based Ansible architecture for configuring the Debian 13 (T
 | **`k8s_common`** | `k8s_cluster` | Configures official Kubernetes APT repository (`pkgs.k8s.io`), installs and version-pins (`dpkg hold`) `kubelet`, `kubeadm`, and `kubectl`, and configures `--node-ip` and `/etc/crictl.yaml`. |
 | **`k8s_master`** | `k8s_masters` | Idempotent `kubeadm init` using declarative `kubeadm-config.yaml`, distributes `~/.kube/config`, deploys Calico/Flannel CNI, installs Helm 3, and generates a dynamic worker join command. |
 | **`k8s_worker`** | `k8s_workers` | Idempotently joins worker nodes to the Kubernetes Control Plane (`creates: /etc/kubernetes/kubelet.conf`), waits for node readiness, and applies worker role & environment labels. |
+| **`monitoring`** | `k8s_masters` | Automated deployment of Prometheus Operator (`kube-prometheus-stack`), Grafana dashboards-as-code, ServiceMonitors, and Calico Zero-Trust NetworkPolicies. |
 | **`github_runner`** | `runners` (`never` tag) | Creates `ghrunner` service user, creates `/opt/terraform-state/essers-infra-setup/{production,testing}` directories, installs CI/CD CLI stack (Terraform, Ansible, `kubectl`, Helm, Docker), fetches `/etc/kubernetes/admin.conf` from the Control Plane to configure `~/.kube/config` on the runner VM, and downloads/registers the GitHub Actions self-hosted runner systemd service. |
 
 ---

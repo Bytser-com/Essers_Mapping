@@ -90,6 +90,9 @@ jobs:
       DOMAIN_NAME: ${{ vars.DOMAIN_NAME || 'your-domain.example.com' }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
+      # --- Grafana Admin Secret ---
+      GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
+
       # --- Manual Options ---
       SKIP_ADDONS: ${{ inputs.skip_addons || false }}
 
@@ -262,7 +265,7 @@ jobs:
             perl -pi -e '$d = $ENV{DOMAIN_NAME}; s/your-domain\.example\.com/$d/g' "$INGRESS_FILE"
           fi
 
-      - name: Reconcile cluster addons (MetalLB, Longhorn, cert-manager, ingress-nginx)
+      - name: Reconcile cluster addons (MetalLB, Longhorn, cert-manager, ingress-nginx, monitoring)
         if: steps.manifests.outputs.exists == 'true' && env.MODE == 'apply' && env.SKIP_ADDONS != 'true'
         shell: bash
         run: |
@@ -351,6 +354,47 @@ jobs:
               -f "$INGRESS_VALUES" \
               --wait \
               --timeout 5m
+          fi
+
+          # 5. Prometheus Operator & Grafana Monitoring Stack (kube-prometheus-stack)
+          MONITORING_VALUES="cluster-addons/monitoring/values-${OVERLAY}.yaml"
+          if [ -f "$MONITORING_VALUES" ]; then
+            echo "Reconciling Prometheus & Grafana Monitoring Stack for ${OVERLAY}..."
+            kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
+
+            # In production, ensure the grafana-admin-credentials secret exists
+            if [ "$OVERLAY" = "production" ]; then
+              PROD_PASS="${GRAFANA_ADMIN_PASSWORD:-ProductionSecureGrafanaPass2026!}"
+              kubectl create secret generic grafana-admin-credentials \
+                --namespace monitoring \
+                --from-literal=admin-user=essers-admin \
+                --from-literal=admin-password="$PROD_PASS" \
+                --dry-run=client -o yaml | kubectl apply -f -
+            fi
+
+            helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update
+            helm repo update
+            helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+              --namespace monitoring \
+              --create-namespace \
+              -f "$MONITORING_VALUES" \
+              --wait \
+              --timeout 10m
+
+            if [ -f "cluster-addons/monitoring/network-policies.yaml" ]; then
+              echo "Applying monitoring Calico Zero-Trust NetworkPolicies..."
+              kubectl apply -f "cluster-addons/monitoring/network-policies.yaml"
+            fi
+
+            if [ -d "cluster-addons/monitoring/service-monitors" ]; then
+              echo "Applying monitoring ServiceMonitors..."
+              kubectl apply -f "cluster-addons/monitoring/service-monitors/"
+            fi
+
+            if [ -d "cluster-addons/monitoring/dashboards" ]; then
+              echo "Deploying GitOps Grafana Dashboards..."
+              kubectl apply -k "cluster-addons/monitoring/dashboards/"
+            fi
           fi
 
       - name: Render manifests while preserving service CD releases

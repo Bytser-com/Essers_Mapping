@@ -1,0 +1,556 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-k8s-cluster-overview
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+    app.kubernetes.io/part-of: essers-mapping
+  annotations:
+    k8s-sidecar-target-directory: "/tmp/dashboards/essers"
+data:
+  k8s-cluster-overview.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 1,
+      "id": null,
+      "links": [],
+      "liveNow": false,
+      "panels": [
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+          "id": 100,
+          "title": "CLUSTER HEALTH & CAPACITY OVERVIEW",
+          "type": "row"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+          "id": 1,
+          "title": "Cluster CPU Utilization",
+          "type": "gauge",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "#EAB839", "value": 70 },
+                  { "color": "red", "value": 85 }
+                ]
+              },
+              "unit": "percent"
+            }
+          },
+          "targets": [
+            {
+              "expr": "100 * (1 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m])))",
+              "legendFormat": "Cluster CPU",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+          "id": 2,
+          "title": "Cluster Memory Utilization",
+          "type": "gauge",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "#EAB839", "value": 75 },
+                  { "color": "red", "value": 90 }
+                ]
+              },
+              "unit": "percent"
+            }
+          },
+          "targets": [
+            {
+              "expr": "100 * (1 - (sum(node_memory_MemAvailable_bytes) / sum(node_memory_MemTotal_bytes)))",
+              "legendFormat": "Cluster RAM",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+          "id": 3,
+          "title": "Ready Nodes",
+          "type": "stat",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "red", "value": null },
+                  { "color": "green", "value": 1 }
+                ]
+              },
+              "unit": "none"
+            }
+          },
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "textMode": "auto"
+          },
+          "targets": [
+            {
+              "expr": "sum(kube_node_status_condition{condition=\"Ready\",status=\"true\"})",
+              "legendFormat": "Ready Nodes",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+          "id": 4,
+          "title": "Total Running Pods",
+          "type": "stat",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "blue", "value": null }
+                ]
+              },
+              "unit": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(kube_pod_status_phase{phase=\"Running\"})",
+              "legendFormat": "Running Pods",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+          "id": 5,
+          "title": "Pod Restarts (Last 1h)",
+          "type": "stat",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "#EAB839", "value": 1 },
+                  { "color": "red", "value": 5 }
+                ]
+              },
+              "unit": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(increase(kube_pod_container_status_restarts_total[1h]))",
+              "legendFormat": "Restarts (1h)",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+          "id": 6,
+          "title": "Storage Volume Usage",
+          "type": "gauge",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "#EAB839", "value": 70 },
+                  { "color": "red", "value": 85 }
+                ]
+              },
+              "unit": "percent"
+            }
+          },
+          "targets": [
+            {
+              "expr": "100 * (sum(kubelet_volume_stats_used_bytes) / sum(kubelet_volume_stats_capacity_bytes))",
+              "legendFormat": "PVC Storage",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+          "id": 101,
+          "title": "NODE COMPUTE INFRASTRUCTURE (PROXMOX K8S NODES)",
+          "type": "row"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+          "id": 11,
+          "title": "CPU Usage per Node",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
+              "unit": "percent"
+            }
+          },
+          "targets": [
+            {
+              "expr": "100 * (1 - rate(node_cpu_seconds_total{mode=\"idle\"}[5m]))",
+              "legendFormat": "{{instance}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+          "id": 12,
+          "title": "Memory Usage per Node",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
+              "unit": "bytes"
+            }
+          },
+          "targets": [
+            {
+              "expr": "node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes",
+              "legendFormat": "{{instance}} (Used)",
+              "refId": "A"
+            },
+            {
+              "expr": "node_memory_MemTotal_bytes",
+              "legendFormat": "{{instance}} (Total)",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+          "id": 13,
+          "title": "Network Traffic per Node (Bytes/sec)",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line" },
+              "unit": "Bps"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum by (instance) (rate(node_network_receive_bytes_total{device!~\"lo|veth.*|cali.*\"}[5m]))",
+              "legendFormat": "{{instance}} (RX)",
+              "refId": "A"
+            },
+            {
+              "expr": "sum by (instance) (rate(node_network_transmit_bytes_total{device!~\"lo|veth.*|cali.*\"}[5m]))",
+              "legendFormat": "{{instance}} (TX)",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+          "id": 14,
+          "title": "Disk I/O Wait & Storage Bandwidth",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line" },
+              "unit": "Bps"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum by (instance) (rate(node_disk_read_bytes_total[5m]))",
+              "legendFormat": "{{instance}} Read",
+              "refId": "A"
+            },
+            {
+              "expr": "sum by (instance) (rate(node_disk_written_bytes_total[5m]))",
+              "legendFormat": "{{instance}} Write",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 22 },
+          "id": 102,
+          "title": "ESSERS WORKLOADS & ZONE METRICS",
+          "type": "row"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 23 },
+          "id": 21,
+          "title": "Pod CPU Usage by Service (Cores)",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
+              "unit": "short"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum by (pod, namespace) (rate(container_cpu_usage_seconds_total{namespace=~\"$namespace\", container!=\"\", container!=\"POD\"}[5m]))",
+              "legendFormat": "{{namespace}} / {{pod}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 23 },
+          "id": 22,
+          "title": "Pod Memory Usage (Working Set)",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
+              "unit": "bytes"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum by (pod, namespace) (container_memory_working_set_bytes{namespace=~\"$namespace\", container!=\"\", container!=\"POD\"})",
+              "legendFormat": "{{namespace}} / {{pod}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 31 },
+          "id": 23,
+          "title": "Deployment Replicas: Desired vs Available",
+          "type": "table",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "align": "auto" }
+            }
+          },
+          "targets": [
+            {
+              "expr": "kube_deployment_status_replicas_available{namespace=~\"$namespace\"}",
+              "format": "table",
+              "instant": true,
+              "legendFormat": "Available",
+              "refId": "A"
+            },
+            {
+              "expr": "kube_deployment_spec_replicas{namespace=~\"$namespace\"}",
+              "format": "table",
+              "instant": true,
+              "legendFormat": "Desired",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 31 },
+          "id": 24,
+          "title": "Longhorn Persistent Volume Claims (PVC) Capacity & Usage",
+          "type": "table",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "align": "auto" }
+            }
+          },
+          "targets": [
+            {
+              "expr": "kubelet_volume_stats_capacity_bytes{namespace=~\"$namespace\"}",
+              "format": "table",
+              "instant": true,
+              "legendFormat": "Capacity",
+              "refId": "A"
+            },
+            {
+              "expr": "kubelet_volume_stats_used_bytes{namespace=~\"$namespace\"}",
+              "format": "table",
+              "instant": true,
+              "legendFormat": "Used",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 39 },
+          "id": 103,
+          "title": "EDGE INGRESS & NETWORK GATEWAY (192.168.100.101 / .201)",
+          "type": "row"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 7, "w": 8, "x": 0, "y": 40 },
+          "id": 31,
+          "title": "Ingress Request Rate (req/sec)",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
+              "unit": "reqps"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(rate(nginx_ingress_controller_requests[5m]))",
+              "legendFormat": "Total Requests",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 7, "w": 8, "x": 8, "y": 40 },
+          "id": 32,
+          "title": "Ingress HTTP Status Codes (2xx / 3xx / 4xx / 5xx)",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line" },
+              "unit": "reqps"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum by (status) (rate(nginx_ingress_controller_requests[5m]))",
+              "legendFormat": "HTTP {{status}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 7, "w": 8, "x": 16, "y": 40 },
+          "id": 33,
+          "title": "Ingress Latency (p95 & p99)",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line" },
+              "unit": "s"
+            }
+          },
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.95, sum(rate(nginx_ingress_controller_request_duration_seconds_bucket[5m])) by (le))",
+              "legendFormat": "p95 Latency",
+              "refId": "A"
+            },
+            {
+              "expr": "histogram_quantile(0.99, sum(rate(nginx_ingress_controller_request_duration_seconds_bucket[5m])) by (le))",
+              "legendFormat": "p99 Latency",
+              "refId": "B"
+            }
+          ]
+        }
+      ],
+      "refresh": "10s",
+      "schemaVersion": 38,
+      "style": "dark",
+      "tags": ["kubernetes", "essers", "infrastructure", "overview"],
+      "templating": {
+        "list": [
+          {
+            "current": { "selected": true, "text": "Prometheus", "value": "Prometheus" },
+            "hide": 0,
+            "label": "Data Source",
+            "name": "datasource",
+            "options": [],
+            "query": "prometheus",
+            "refresh": 1,
+            "type": "datasource"
+          },
+          {
+            "allValue": ".*",
+            "current": { "selected": true, "text": "All", "value": "$__all" },
+            "datasource": { "type": "prometheus", "uid": "${datasource}" },
+            "definition": "label_values(kube_pod_info, namespace)",
+            "hide": 0,
+            "includeAll": true,
+            "label": "Namespace",
+            "name": "namespace",
+            "options": [],
+            "query": { "query": "label_values(kube_pod_info, namespace)", "refId": "StandardVariableQuery" },
+            "refresh": 2,
+            "sort": 1,
+            "type": "query"
+          }
+        ]
+      },
+      "time": {
+        "from": "now-1h",
+        "to": "now"
+      },
+      "timepicker": {
+        "refresh_intervals": ["5s", "10s", "30s", "1m", "5m"]
+      },
+      "timezone": "browser",
+      "title": "Kubernetes Cluster & Workload Health",
+      "uid": "essers-k8s-cluster-overview",
+      "version": 1
+    }

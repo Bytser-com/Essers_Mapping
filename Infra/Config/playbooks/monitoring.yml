@@ -1,0 +1,126 @@
+---
+# ==============================================================================
+# PLAYBOOK: KUBERNETES MONITORING & GRAFANA STACK DEPLOYMENT
+# Targets: k8s_masters (Control Plane Node running kubectl & helm)
+# ==============================================================================
+
+- name: Deploy Prometheus Operator & Grafana Monitoring Stack on Kubernetes
+  hosts: k8s_masters
+  become: true
+  gather_facts: false
+  run_once: true
+  tags:
+    - monitoring
+    - grafana
+    - prometheus
+    - addons
+  vars:
+    monitoring_namespace: "monitoring"
+    monitoring_src_dir: "{{ playbook_dir }}/../../../Kubernetes/cluster-addons/monitoring"
+    monitoring_dest_dir: "/etc/kubernetes/addons/monitoring"
+    monitoring_env: "{{ env_name | default('testing') }}"
+    monitoring_helm_release: "kube-prometheus-stack"
+    monitoring_helm_chart: "prometheus-community/kube-prometheus-stack"
+    monitoring_helm_repo_url: "https://prometheus-community.github.io/helm-charts"
+    grafana_admin_user: "essers-admin"
+    grafana_admin_password: "{{ lookup('env', 'GRAFANA_ADMIN_PASSWORD') | default('ProductionSecureGrafanaPass2026!', true) }}"
+
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+
+  tasks:
+    - name: Verify control plane has admin.conf and cluster is responsive
+      ansible.builtin.command:
+        cmd: kubectl get nodes
+      changed_when: false
+
+    - name: Ensure target directory exists for monitoring manifests on master
+      ansible.builtin.file:
+        path: "{{ monitoring_dest_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Synchronize monitoring addon manifests to control plane node
+      ansible.builtin.copy:
+        src: "{{ monitoring_src_dir }}/"
+        dest: "{{ monitoring_dest_dir }}/"
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Ensure monitoring namespace exists
+      ansible.builtin.command:
+        cmd: "kubectl create namespace {{ monitoring_namespace }} --dry-run=client -o yaml"
+      register: mon_ns_yaml
+      changed_when: false
+
+    - name: Apply monitoring namespace
+      ansible.builtin.command:
+        cmd: "kubectl apply -f -"
+      args:
+        stdin: "{{ mon_ns_yaml.stdout }}"
+      changed_when: false
+
+    - name: Ensure production Grafana admin credentials secret exists
+      ansible.builtin.command: >-
+        kubectl create secret generic grafana-admin-credentials
+        --namespace {{ monitoring_namespace }}
+        --from-literal=admin-user={{ grafana_admin_user }}
+        --from-literal=admin-password={{ grafana_admin_password }}
+        --dry-run=client -o yaml
+      register: grafana_secret_yaml
+      changed_when: false
+      when: monitoring_env == 'production'
+
+    - name: Apply production Grafana admin credentials secret
+      ansible.builtin.command:
+        cmd: "kubectl apply -f -"
+      args:
+        stdin: "{{ grafana_secret_yaml.stdout }}"
+      changed_when: false
+      when: monitoring_env == 'production'
+
+    - name: Add prometheus-community Helm repository
+      ansible.builtin.command:
+        cmd: "helm repo add prometheus-community {{ monitoring_helm_repo_url }} --force-update"
+      changed_when: false
+
+    - name: Update Helm repositories
+      ansible.builtin.command:
+        cmd: "helm repo update"
+      changed_when: false
+
+    - name: Deploy or upgrade kube-prometheus-stack Helm chart ({{ monitoring_env }})
+      ansible.builtin.command: >-
+        helm upgrade --install {{ monitoring_helm_release }} {{ monitoring_helm_chart }}
+        --namespace {{ monitoring_namespace }}
+        --create-namespace
+        -f {{ monitoring_dest_dir }}/values-{{ monitoring_env }}.yaml
+        --wait
+        --timeout 10m
+      register: helm_monitoring_deploy
+      changed_when: "'STATUS: deployed' in helm_monitoring_deploy.stdout"
+
+    - name: Apply Calico Zero-Trust NetworkPolicies for monitoring namespace
+      ansible.builtin.command:
+        cmd: "kubectl apply -f {{ monitoring_dest_dir }}/network-policies.yaml"
+      changed_when: false
+
+    - name: Apply ServiceMonitors for automated workload metric discovery
+      ansible.builtin.command:
+        cmd: "kubectl apply -f {{ monitoring_dest_dir }}/service-monitors/"
+      changed_when: false
+
+    - name: Deploy GitOps Grafana Dashboards as ConfigMaps
+      ansible.builtin.command:
+        cmd: "kubectl apply -k {{ monitoring_dest_dir }}/dashboards/"
+      changed_when: false
+
+    - name: Verify Grafana rollout status
+      ansible.builtin.command: >-
+        kubectl rollout status deployment/{{ monitoring_helm_release }}-grafana
+        --namespace {{ monitoring_namespace }}
+        --timeout=180s
+      changed_when: false

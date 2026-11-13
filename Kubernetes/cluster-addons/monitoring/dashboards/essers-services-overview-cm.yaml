@@ -1,0 +1,441 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-essers-services-overview
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+    app.kubernetes.io/part-of: essers-mapping
+  annotations:
+    k8s-sidecar-target-directory: "/tmp/dashboards/essers"
+data:
+  essers-services-overview.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 1,
+      "id": null,
+      "links": [],
+      "liveNow": false,
+      "panels": [
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+          "id": 200,
+          "title": "ZONE 1: PREPARATION STAGE TELEMETRY",
+          "type": "row"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 4, "w": 6, "x": 0, "y": 1 },
+          "id": 101,
+          "title": "Frontend (NGINX) Pods Ready",
+          "type": "stat",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "red", "value": null },
+                  { "color": "green", "value": 1 }
+                ]
+              },
+              "unit": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(kube_deployment_status_replicas_available{deployment=\"frontend\", namespace=~\"$namespace\"})",
+              "legendFormat": "Replicas",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 4, "w": 6, "x": 6, "y": 1 },
+          "id": 102,
+          "title": "Mapping Converter Replicas",
+          "type": "stat",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "red", "value": null },
+                  { "color": "green", "value": 1 }
+                ]
+              },
+              "unit": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(kube_deployment_status_replicas_available{deployment=\"mapping-converter\", namespace=~\"$namespace\"})",
+              "legendFormat": "Replicas",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 4, "w": 6, "x": 12, "y": 1 },
+          "id": 103,
+          "title": "Mapping Proposal Replicas",
+          "type": "stat",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "red", "value": null },
+                  { "color": "green", "value": 1 }
+                ]
+              },
+              "unit": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(kube_deployment_status_replicas_available{deployment=\"mapping-proposal\", namespace=~\"$namespace\"})",
+              "legendFormat": "Replicas",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 4, "w": 6, "x": 18, "y": 1 },
+          "id": 104,
+          "title": "Version Control Backend Replicas",
+          "type": "stat",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "red", "value": null },
+                  { "color": "green", "value": 1 }
+                ]
+              },
+              "unit": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(kube_deployment_status_replicas_available{deployment=\"version-control-backend\", namespace=~\"$namespace\"})",
+              "legendFormat": "Replicas",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 5 },
+          "id": 111,
+          "title": "Preparation Zone CPU Utilization",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
+              "unit": "short"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum by (pod) (rate(container_cpu_usage_seconds_total{namespace=~\"$namespace\", pod=~\"(frontend|mapping-converter|mapping-proposal|version-control-backend)-.*\", container!=\"\", container!=\"POD\"}[5m]))",
+              "legendFormat": "{{pod}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 5 },
+          "id": 112,
+          "title": "Preparation Zone Memory Utilization",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
+              "unit": "bytes"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum by (pod) (container_memory_working_set_bytes{namespace=~\"$namespace\", pod=~\"(frontend|mapping-converter|mapping-proposal|version-control-backend)-.*\", container!=\"\", container!=\"POD\"})",
+              "legendFormat": "{{pod}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 },
+          "id": 201,
+          "title": "ZONE 2 & 3: SHARED STORAGE & RUNTIME STAGE TELEMETRY",
+          "type": "row"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 4, "w": 8, "x": 0, "y": 14 },
+          "id": 202,
+          "title": "SFTP Shared Replicas (.102 / .202)",
+          "type": "stat",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "red", "value": null },
+                  { "color": "green", "value": 1 }
+                ]
+              },
+              "unit": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(kube_deployment_status_replicas_available{deployment=\"sftp-shared\", namespace=~\"$namespace\"})",
+              "legendFormat": "Replicas",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 4, "w": 8, "x": 8, "y": 14 },
+          "id": 203,
+          "title": "Runtime Backend Replicas",
+          "type": "stat",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "red", "value": null },
+                  { "color": "green", "value": 1 }
+                ]
+              },
+              "unit": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(kube_deployment_status_replicas_available{deployment=\"runtime-backend\", namespace=~\"$namespace\"})",
+              "legendFormat": "Replicas",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 4, "w": 8, "x": 16, "y": 14 },
+          "id": 204,
+          "title": "SFTP Runtime Replicas (.103 / .203)",
+          "type": "stat",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "red", "value": null },
+                  { "color": "green", "value": 1 }
+                ]
+              },
+              "unit": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(kube_deployment_status_replicas_available{deployment=\"sftp-runtime\", namespace=~\"$namespace\"})",
+              "legendFormat": "Replicas",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 18 },
+          "id": 211,
+          "title": "Shared & Runtime Storage (Longhorn PVC Usage %)",
+          "type": "gauge",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "#EAB839", "value": 70 },
+                  { "color": "red", "value": 85 }
+                ]
+              },
+              "unit": "percent"
+            }
+          },
+          "targets": [
+            {
+              "expr": "100 * (kubelet_volume_stats_used_bytes{namespace=~\"$namespace\", persistentvolumeclaim=~\"sftp-.*\"} / kubelet_volume_stats_capacity_bytes{namespace=~\"$namespace\", persistentvolumeclaim=~\"sftp-.*\"})",
+              "legendFormat": "{{persistentvolumeclaim}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 18 },
+          "id": 212,
+          "title": "Runtime Backend & SFTP CPU/RAM Footprint",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
+              "unit": "bytes"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum by (pod) (container_memory_working_set_bytes{namespace=~\"$namespace\", pod=~\"(runtime-backend|sftp-shared|sftp-runtime)-.*\", container!=\"\", container!=\"POD\"})",
+              "legendFormat": "{{pod}} (RAM)",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 26 },
+          "id": 300,
+          "title": "APPLICATION RUNTIME HEALTH (JVM & PYTHON ENGINES)",
+          "type": "row"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 27 },
+          "id": 301,
+          "title": "Spring Boot JVM Heap Memory (Java Backends)",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
+              "unit": "bytes"
+            }
+          },
+          "targets": [
+            {
+              "expr": "jvm_memory_used_bytes{area=\"heap\", namespace=~\"$namespace\"}",
+              "legendFormat": "{{pod}} (Used Heap)",
+              "refId": "A"
+            },
+            {
+              "expr": "jvm_memory_max_bytes{area=\"heap\", namespace=~\"$namespace\"}",
+              "legendFormat": "{{pod}} (Max Heap)",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 27 },
+          "id": 302,
+          "title": "JVM Live Threads & Garbage Collection Pauses",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line" },
+              "unit": "short"
+            }
+          },
+          "targets": [
+            {
+              "expr": "jvm_threads_live_threads{namespace=~\"$namespace\"}",
+              "legendFormat": "{{pod}} Live Threads",
+              "refId": "A"
+            },
+            {
+              "expr": "sum by (pod) (rate(jvm_gc_pause_seconds_sum{namespace=~\"$namespace\"}[5m]))",
+              "legendFormat": "{{pod}} GC Pause (s/sec)",
+              "refId": "B"
+            }
+          ]
+        }
+      ],
+      "refresh": "10s",
+      "schemaVersion": 38,
+      "style": "dark",
+      "tags": ["essers", "microservices", "spring-boot", "python", "sftpgo"],
+      "templating": {
+        "list": [
+          {
+            "current": { "selected": true, "text": "Prometheus", "value": "Prometheus" },
+            "hide": 0,
+            "label": "Data Source",
+            "name": "datasource",
+            "options": [],
+            "query": "prometheus",
+            "refresh": 1,
+            "type": "datasource"
+          },
+          {
+            "allValue": "essers-mapping-.*",
+            "current": { "selected": true, "text": "All", "value": "$__all" },
+            "datasource": { "type": "prometheus", "uid": "${datasource}" },
+            "definition": "label_values(kube_pod_info{namespace=~\"essers-mapping-.*\"}, namespace)",
+            "hide": 0,
+            "includeAll": true,
+            "label": "Environment Namespace",
+            "name": "namespace",
+            "options": [],
+            "query": { "query": "label_values(kube_pod_info{namespace=~\"essers-mapping-.*\"}, namespace)", "refId": "StandardVariableQuery" },
+            "refresh": 2,
+            "sort": 1,
+            "type": "query"
+          }
+        ]
+      },
+      "time": {
+        "from": "now-1h",
+        "to": "now"
+      },
+      "timepicker": {
+        "refresh_intervals": ["5s", "10s", "30s", "1m", "5m"]
+      },
+      "timezone": "browser",
+      "title": "Essers Mapping End-to-End Zone Telemetry",
+      "uid": "essers-services-overview",
+      "version": 1
+    }
