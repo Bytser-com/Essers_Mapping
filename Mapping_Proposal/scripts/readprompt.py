@@ -61,18 +61,30 @@ def _short_message(error: Exception) -> str:
     return str(getattr(error, 'message', None) or error).splitlines()[0][:300]
 
 
-def _client_error(error: Exception) -> Exception:
+def _client_error(error: Exception) -> ConfigError | GeminiError:
     """Translate a non-quota 4xx Gemini error into a clear tool error."""
     code = getattr(error, 'code', None)
     text = str(error)
-    # 400 with API_KEY_INVALID: the key in .env is wrong or still the placeholder.
+
     if 'API_KEY_INVALID' in text or 'API key not valid' in text:
-        return ConfigError('Gemini rejected the API key. Check GEMINI_API_KEY in ai_tool/.env.')
+        return ConfigError(
+            'Gemini rejected the API key. Check GEMINI_API_KEY in ai_tool/.env.'
+        )
+
     if code in (401, 403):
-        return ConfigError(f'Gemini refused access ({code}): {_short_message(error)}')
+        return ConfigError(
+            f'Gemini refused access ({code}): {_short_message(error)}'
+        )
+
     if code == 404:
-        return ConfigError(f'Gemini model not found (404). Check GEMINI_MODEL or --model: {_short_message(error)}')
-    return GeminiError(f'Gemini request failed ({code}): {_short_message(error)}', code=code)
+        return ConfigError(
+            f'Gemini model not found (404). Check GEMINI_MODEL or --model: {_short_message(error)}'
+        )
+
+    return GeminiError(
+        f'Gemini request failed ({code}): {_short_message(error)}',
+        code=code,
+    )
 
 
 def build_mapping_contents(
@@ -133,6 +145,120 @@ def build_mapping_contents(
     return '\n'.join(chunks)
 
 
+def _notify(on_event: Callable[[dict], None] | None, event: dict) -> None:
+    """Forward progress events to the optional experiment tracker."""
+    if on_event:
+        on_event(event)
+
+
+def _create_gemini_client(api_key: str, timeout_ms: int):
+    """Use our retry loop rather than the SDK's built-in retry mechanism."""
+    return genai.Client(
+        api_key=api_key,
+        http_options=types.HttpOptions(
+            timeout=timeout_ms,
+            retry_options=types.HttpRetryOptions(attempts=1),
+        ),
+    )
+
+
+def _record_usage(response, on_event: Callable[[dict], None] | None) -> None:
+    """Record token usage even if the eventual response body is invalid."""
+    if not response.usage_metadata:
+        return
+    usage = response.usage_metadata
+    logger.info('Input tokens: %s', usage.prompt_token_count)
+    logger.info('Output tokens: %s', usage.candidates_token_count)
+    logger.info('Total tokens: %s', usage.total_token_count)
+    _notify(on_event, {
+        'type': 'usage',
+        'input_tokens': usage.prompt_token_count,
+        'output_tokens': usage.candidates_token_count,
+        'total_tokens': usage.total_token_count,
+    })
+
+
+def _parse_mappings(response) -> list[dict]:
+    """Read the structured response and enforce the mappings-list contract."""
+    if not response.text:
+        raise GeminiError('Gemini returned no text')
+    try:
+        result = json.loads(response.text)
+    except json.JSONDecodeError as error:
+        raise GeminiError(f'Gemini returned invalid JSON: {error}') from error
+    if not isinstance(result, dict) or not isinstance(result.get('mappings'), list):
+        raise GeminiError('Gemini response did not contain a mappings list')
+    return result['mappings']
+
+
+def _request_mappings(client, model: str, contents: str, on_event: Callable[[dict], None] | None) -> list[dict]:
+    """Send one request; leave scheduling further attempts to the caller."""
+    _notify(on_event, {'type': 'attempt'})
+    response = client.models.generate_content(
+        model=model,
+        contents=contents,
+        config=types.GenerateContentConfig(
+            response_mime_type='application/json',
+            response_json_schema=RULE_SCHEMA,
+            temperature=0.1,
+        ),
+    )
+    _record_usage(response, on_event)
+    return _parse_mappings(response)
+
+
+def _wait_before_retry(delay: float, on_event: Callable[[dict], None] | None) -> None:
+    """Report a scheduled retry and pause before the next API attempt."""
+    _notify(on_event, {'type': 'retry'})
+    time.sleep(delay)
+
+
+def _handle_client_error(
+    error: Exception, attempt: int, max_attempts: int,
+    on_event: Callable[[dict], None] | None,
+) -> None:
+    """Only per-minute 429 quotas are worth retrying."""
+    code = getattr(error, 'code', None)
+    _notify(on_event, {'type': 'api_error', 'code': code})
+    if code != 429:
+        raise _client_error(error) from error
+    kind = _quota_type(error)
+    if kind != 'minute' or attempt == max_attempts:
+        raise QuotaExceededError(f'Gemini rate limit reached ({kind} quota).', code=429) from error
+    delay = (_retry_after_seconds(error) or 65.0) + 2.0
+    logger.warning('Per-minute quota reached. Waiting %.1fs before retrying...', delay)
+    _wait_before_retry(delay, on_event)
+
+
+def _handle_server_error(
+    error: Exception, attempt: int, max_attempts: int,
+    on_event: Callable[[dict], None] | None,
+) -> None:
+    """Retry transient 5xx responses with a capped exponential backoff."""
+    code = getattr(error, 'code', None)
+    _notify(on_event, {'type': 'api_error', 'code': code})
+    if code in (500, 502, 503, 504) and attempt == max_attempts:
+        raise GeminiError(f'Gemini server unavailable ({code}) after {max_attempts} attempts.', code=code) from error
+    if code not in (500, 502, 503, 504):
+        raise GeminiError(f'Gemini server error ({code}): {_short_message(error)}', code=code) from error
+    delay = min(2 ** (attempt - 1) + random.uniform(0, 1), 30)
+    logger.warning('Gemini server unavailable (%s). Retrying in %.1fs...', code, delay)
+    _wait_before_retry(delay, on_event)
+
+
+def _handle_timeout(
+    error: httpx.TimeoutException, attempt: int, max_attempts: int,
+    timeout_ms: int, on_event: Callable[[dict], None] | None,
+) -> None:
+    """Treat a request timeout as a transient failure until attempts run out."""
+    _notify(on_event, {'type': 'api_error', 'code': 'timeout'})
+    if attempt == max_attempts:
+        raise GeminiError(f'Gemini request timed out ({timeout_ms} ms)', code='timeout') from error
+    delay = min(2 ** (attempt - 1) + random.uniform(0, 1), 30)
+    logger.warning('Gemini request timed out. Retrying in %.1fs...', delay)
+    _wait_before_retry(delay, on_event)
+
+
 def run_gemini(
     source_fields: list[dict],
     target_fields: list[dict],
@@ -147,10 +273,8 @@ def run_gemini(
     """Propose mappings using direct raw XML context (no knowledge distillation)."""
     if genai is None:
         raise ConfigError('google-genai is not installed. Run: python -m pip install -r requirements.txt')
-    # Read the API key, model and timeout from the central configuration.
     settings = load_settings()
-    key = settings.gemini_api_key
-    if not key:
+    if not settings.gemini_api_key:
         raise ConfigError('GEMINI_API_KEY is not configured in .env')
     model = model or settings.gemini_model
     contents = build_mapping_contents(
@@ -162,89 +286,18 @@ def run_gemini(
     logger.info('Prompt size: %s characters', f'{len(contents):,}')
 
     timeout = settings.gemini_timeout_ms
-    client = genai.Client(
-        api_key=key,
-        http_options=types.HttpOptions(
-            timeout=timeout,
-            retry_options=types.HttpRetryOptions(attempts=1),
-        ),
-    )
+    client = _create_gemini_client(settings.gemini_api_key, timeout)
     max_attempts = gemini_max_attempts()
     try:
         for attempt in range(1, max_attempts + 1):
             try:
                 logger.info('Gemini request: %s (attempt %d/%d)', model, attempt, max_attempts)
-                if on_event:
-                    on_event({'type': 'attempt'})
-                response = client.models.generate_content(
-                    model=model,
-                    contents=contents,
-                    config=types.GenerateContentConfig(
-                        response_mime_type='application/json',
-                        response_json_schema=RULE_SCHEMA,
-                        temperature=0.1,
-                    ),
-                )
-                if response.usage_metadata:
-                    usage = response.usage_metadata
-                    logger.info('Input tokens: %s', usage.prompt_token_count)
-                    logger.info('Output tokens: %s', usage.candidates_token_count)
-                    logger.info('Total tokens: %s', usage.total_token_count)
-                    if on_event:
-                        on_event({
-                            'type': 'usage',
-                            'input_tokens': usage.prompt_token_count,
-                            'output_tokens': usage.candidates_token_count,
-                            'total_tokens': usage.total_token_count,
-                        })
-                if not response.text:
-                    raise GeminiError('Gemini returned no text')
-                try:
-                    result = json.loads(response.text)
-                except json.JSONDecodeError as error:
-                    raise GeminiError(f'Gemini returned invalid JSON: {error}') from error
-                if not isinstance(result, dict) or not isinstance(result.get('mappings'), list):
-                    raise GeminiError('Gemini response did not contain a mappings list')
-                return result['mappings']
+                return _request_mappings(client, model, contents, on_event)
             except errors.ClientError as error:
-                if on_event:
-                    on_event({'type': 'api_error', 'code': getattr(error, 'code', None)})
-                # 429 = rate limit. Only a per-minute limit is worth waiting for;
-                # a daily limit stops the run (checkpoints keep finished batches).
-                code = getattr(error, 'code', None)
-                if code != 429:
-                    raise _client_error(error) from error
-                kind = _quota_type(error)
-                if kind != 'minute' or attempt == max_attempts:
-                    raise QuotaExceededError(f'Gemini rate limit reached ({kind} quota).', code=429) from error
-                delay = (_retry_after_seconds(error) or 65.0) + 2.0
-                logger.warning('Per-minute quota reached. Waiting %.1fs before retrying...', delay)
-                if on_event:
-                    on_event({'type': 'retry'})
-                time.sleep(delay)
+                _handle_client_error(error, attempt, max_attempts, on_event)
             except errors.ServerError as error:
-                if on_event:
-                    on_event({'type': 'api_error', 'code': getattr(error, 'code', None)})
-                # Transient Gemini server errors: retry with capped exponential backoff.
-                code = getattr(error, 'code', None)
-                if code in (500, 502, 503, 504) and attempt == max_attempts:
-                    raise GeminiError(f'Gemini server unavailable ({code}) after {max_attempts} attempts.', code=code) from error
-                if code not in (500, 502, 503, 504):
-                    raise GeminiError(f'Gemini server error ({code}): {_short_message(error)}', code=code) from error
-                delay = min(2 ** (attempt - 1) + random.uniform(0, 1), 30)
-                logger.warning('Gemini server unavailable (%s). Retrying in %.1fs...', code, delay)
-                if on_event:
-                    on_event({'type': 'retry'})
-                time.sleep(delay)
+                _handle_server_error(error, attempt, max_attempts, on_event)
             except httpx.TimeoutException as error:
-                if on_event:
-                    on_event({'type': 'api_error', 'code': 'timeout'})
-                if attempt == max_attempts:
-                    raise GeminiError(f'Gemini request timed out ({timeout} ms)', code='timeout') from error
-                delay = min(2 ** (attempt - 1) + random.uniform(0, 1), 30)
-                logger.warning('Gemini request timed out. Retrying in %.1fs...', delay)
-                if on_event:
-                    on_event({'type': 'retry'})
-                time.sleep(delay)
+                _handle_timeout(error, attempt, max_attempts, timeout, on_event)
     finally:
         client.close()
