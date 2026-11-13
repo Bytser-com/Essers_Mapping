@@ -125,6 +125,25 @@ jobs:
             exit 1
           }
 
+      - name: Resolve service version
+        id: version
+        shell: bash
+        env:
+          SERVICE_PATH: ${{ inputs.service-path }}
+        run: |
+          set -euo pipefail
+          VERSION_FILE="${SERVICE_PATH}/VERSION"
+          if [ -f "$VERSION_FILE" ]; then
+            RAW_VERSION=$(tr -d '[:space:]' < "$VERSION_FILE")
+          elif [ -f "${SERVICE_PATH}/package.json" ]; then
+            RAW_VERSION=$(node -p "require('./${SERVICE_PATH}/package.json').version || '1.0.0'" 2>/dev/null || echo "1.0.0")
+          else
+            RAW_VERSION="1.0.0"
+          fi
+          [[ "$RAW_VERSION" =~ ^v ]] || RAW_VERSION="v${RAW_VERSION}"
+          echo "version=${RAW_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Resolved service version: ${RAW_VERSION}"
+
       - name: Download the tested application artifact
         if: inputs.artifact-path != ''
         uses: actions/download-artifact@v6
@@ -143,7 +162,10 @@ jobs:
           context: ${{ inputs.service-path }}
           load: true
           push: false
-          tags: ${{ needs.select.outputs.image }}:sha-${{ needs.select.outputs.sha }}
+          tags: |
+            ${{ needs.select.outputs.image }}:sha-${{ needs.select.outputs.sha }}
+            ${{ needs.select.outputs.image }}:latest
+            ${{ needs.select.outputs.image }}:${{ steps.version.outputs.version }}
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ needs.select.outputs.sha }}
@@ -167,9 +189,13 @@ jobs:
         id: publish
         env:
           IMAGE: ${{ needs.select.outputs.image }}:sha-${{ needs.select.outputs.sha }}
+          IMAGE_BASE: ${{ needs.select.outputs.image }}
+          VERSION_TAG: ${{ steps.version.outputs.version }}
         run: |
           set -euo pipefail
           docker push "$IMAGE"
+          docker push "${IMAGE_BASE}:latest"
+          docker push "${IMAGE_BASE}:${VERSION_TAG}"
           image_ref=$(docker image inspect "$IMAGE" --format '{{index .RepoDigests 0}}')
           [[ "$image_ref" == ghcr.io/*@sha256:* ]] || { echo '::error::No registry digest returned'; exit 1; }
           echo "image=$image_ref" >> "$GITHUB_OUTPUT"
