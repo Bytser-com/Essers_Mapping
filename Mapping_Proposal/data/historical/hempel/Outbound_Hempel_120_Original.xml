@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120120</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22120</CustomerNumber>
+    <DeliveryAddress>Molenweg 20 Afdeling 1 47814 Lyon France</DeliveryAddress>
+    <ShipmentName />
+    <Name>Janssens Solutions</Name>
+    <WarehouseID>FR30</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-16T08:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Molenweg 20 Afdeling 1</DlvStreet>
+    <DlvZipcode>47814</DlvZipcode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCounty>Lyon</DlvCounty>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <Recipient>Lina Janssens</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706120</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000120</RouteID>
+    <Qty>47.000000000000</Qty>
+    <ItemID>HZ664835</ItemID>
+    <InventoryOrderID>000207101</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395201</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030120</InventTransRefID>
+    <DeliveryAdress>Molenweg 20 Afdeling 1 47814 Lyon France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Compact Ventiel X2</Note>
+    <MultiComponentItemID>HZ664835</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 20 Afdeling 1 47814 Lyon France</DlvAddress>
+    <DlvStreet>Molenweg 20 Afdeling 1</DlvStreet>
+    <DlvZipCode>47814</DlvZipCode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCountry>Lyon</DlvCountry>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395200</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000120</RouteID>
+    <Qty>68.000000000000</Qty>
+    <ItemID>ZK667847</ItemID>
+    <InventoryOrderID>000207102</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395202</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030120</InventTransRefID>
+    <DeliveryAdress>Molenweg 20 Afdeling 1 47814 Lyon France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Compact Motor Plus</Note>
+    <MultiComponentItemID>ZK667847</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 20 Afdeling 1 47814 Lyon France</DlvAddress>
+    <DlvStreet>Molenweg 20 Afdeling 1</DlvStreet>
+    <DlvZipCode>47814</DlvZipCode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCountry>Lyon</DlvCountry>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395200</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000120</RouteID>
+    <Qty>18.000000000000</Qty>
+    <ItemID>WK236695</ItemID>
+    <InventoryOrderID>000207103</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395203</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030120</InventTransRefID>
+    <DeliveryAdress>Molenweg 20 Afdeling 1 47814 Lyon France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Flexibel Lader V2</Note>
+    <MultiComponentItemID>WK236695</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 20 Afdeling 1 47814 Lyon France</DlvAddress>
+    <DlvStreet>Molenweg 20 Afdeling 1</DlvStreet>
+    <DlvZipCode>47814</DlvZipCode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCountry>Lyon</DlvCountry>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395200</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000120</RouteID>
+    <Qty>57.000000000000</Qty>
+    <ItemID>GR532480</ItemID>
+    <InventoryOrderID>000207104</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395204</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030120</InventTransRefID>
+    <DeliveryAdress>Molenweg 20 Afdeling 1 47814 Lyon France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Ergonomisch Afdichting Set</Note>
+    <MultiComponentItemID>GR532480</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 20 Afdeling 1 47814 Lyon France</DlvAddress>
+    <DlvStreet>Molenweg 20 Afdeling 1</DlvStreet>
+    <DlvZipCode>47814</DlvZipCode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCountry>Lyon</DlvCountry>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395200</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000120</RouteID>
+    <Qty>6.000000000000</Qty>
+    <ItemID>AI776574</ItemID>
+    <InventoryOrderID>000207105</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395205</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030120</InventTransRefID>
+    <DeliveryAdress>Molenweg 20 Afdeling 1 47814 Lyon France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Automatisch Kabel Max</Note>
+    <MultiComponentItemID>AI776574</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 20 Afdeling 1 47814 Lyon France</DlvAddress>
+    <DlvStreet>Molenweg 20 Afdeling 1</DlvStreet>
+    <DlvZipCode>47814</DlvZipCode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCountry>Lyon</DlvCountry>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395200</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120078</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22078</CustomerNumber>
+    <DeliveryAddress>Nieuwstraat 89 Unit 16 33455 Dusseldorf Germany</DeliveryAddress>
+    <ShipmentName />
+    <Name>Mertens Solutions</Name>
+    <WarehouseID>DE20</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-11T02:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Nieuwstraat 89 Unit 16</DlvStreet>
+    <DlvZipcode>33455</DlvZipcode>
+    <DlvCity>Dusseldorf</DlvCity>
+    <DlvCounty>Dusseldorf</DlvCounty>
+    <DlvState>Dusseldorf</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <Recipient>Louis Mertens</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706078</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000078</RouteID>
+    <Qty>26.000000000000</Qty>
+    <ItemID>JX326146</ItemID>
+    <InventoryOrderID>000206681</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394781</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030078</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 89 Unit 16 33455 Dusseldorf Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Flexibel Paneel X2</Note>
+    <MultiComponentItemID>JX326146</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 89 Unit 16 33455 Dusseldorf Germany</DlvAddress>
+    <DlvStreet>Nieuwstraat 89 Unit 16</DlvStreet>
+    <DlvZipCode>33455</DlvZipCode>
+    <DlvCity>Dusseldorf</DlvCity>
+    <DlvCountry>Dusseldorf</DlvCountry>
+    <DlvState>Dusseldorf</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394780</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000078</RouteID>
+    <Qty>92.000000000000</Qty>
+    <ItemID>MY993381</ItemID>
+    <InventoryOrderID>000206682</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394782</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030078</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 89 Unit 16 33455 Dusseldorf Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Automatisch Lader X2</Note>
+    <MultiComponentItemID>MY993381</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 89 Unit 16 33455 Dusseldorf Germany</DlvAddress>
+    <DlvStreet>Nieuwstraat 89 Unit 16</DlvStreet>
+    <DlvZipCode>33455</DlvZipCode>
+    <DlvCity>Dusseldorf</DlvCity>
+    <DlvCountry>Dusseldorf</DlvCountry>
+    <DlvState>Dusseldorf</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394780</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000078</RouteID>
+    <Qty>1.000000000000</Qty>
+    <ItemID>OS829664</ItemID>
+    <InventoryOrderID>000206683</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394783</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030078</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 89 Unit 16 33455 Dusseldorf Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Universeel Pomp Plus</Note>
+    <MultiComponentItemID>OS829664</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 89 Unit 16 33455 Dusseldorf Germany</DlvAddress>
+    <DlvStreet>Nieuwstraat 89 Unit 16</DlvStreet>
+    <DlvZipCode>33455</DlvZipCode>
+    <DlvCity>Dusseldorf</DlvCity>
+    <DlvCountry>Dusseldorf</DlvCountry>
+    <DlvState>Dusseldorf</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394780</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

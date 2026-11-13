@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120064</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22064</CustomerNumber>
+    <DeliveryAddress>Dorpsstraat 182 Gebouw N 90668 Verona Italy</DeliveryAddress>
+    <ShipmentName />
+    <Name>Lambert Consulting</Name>
+    <WarehouseID>IT20</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-09T08:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Dorpsstraat 182 Gebouw N</DlvStreet>
+    <DlvZipcode>90668</DlvZipcode>
+    <DlvCity>Verona</DlvCity>
+    <DlvCounty>Verona</DlvCounty>
+    <DlvState>Verona</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <Recipient>Lucas Lambert</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706064</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000064</RouteID>
+    <Qty>5.000000000000</Qty>
+    <ItemID>XD445348</ItemID>
+    <InventoryOrderID>000206541</InventoryOrderID>
+    <DeliveryDate>2026-08-11T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394641</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030064</InventTransRefID>
+    <DeliveryAdress>Dorpsstraat 182 Gebouw N 90668 Verona Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Snel Module Mini</Note>
+    <MultiComponentItemID>XD445348</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Dorpsstraat 182 Gebouw N 90668 Verona Italy</DlvAddress>
+    <DlvStreet>Dorpsstraat 182 Gebouw N</DlvStreet>
+    <DlvZipCode>90668</DlvZipCode>
+    <DlvCity>Verona</DlvCity>
+    <DlvCountry>Verona</DlvCountry>
+    <DlvState>Verona</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394640</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000064</RouteID>
+    <Qty>20.000000000000</Qty>
+    <ItemID>ST712664</ItemID>
+    <InventoryOrderID>000206542</InventoryOrderID>
+    <DeliveryDate>2026-08-11T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394642</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030064</InventTransRefID>
+    <DeliveryAdress>Dorpsstraat 182 Gebouw N 90668 Verona Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Robuust Paneel Max</Note>
+    <MultiComponentItemID>ST712664</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Dorpsstraat 182 Gebouw N 90668 Verona Italy</DlvAddress>
+    <DlvStreet>Dorpsstraat 182 Gebouw N</DlvStreet>
+    <DlvZipCode>90668</DlvZipCode>
+    <DlvCity>Verona</DlvCity>
+    <DlvCountry>Verona</DlvCountry>
+    <DlvState>Verona</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394640</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000064</RouteID>
+    <Qty>59.000000000000</Qty>
+    <ItemID>WJ326171</ItemID>
+    <InventoryOrderID>000206543</InventoryOrderID>
+    <DeliveryDate>2026-08-11T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394643</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030064</InventTransRefID>
+    <DeliveryAdress>Dorpsstraat 182 Gebouw N 90668 Verona Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Precisie Adapter X2</Note>
+    <MultiComponentItemID>WJ326171</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Dorpsstraat 182 Gebouw N 90668 Verona Italy</DlvAddress>
+    <DlvStreet>Dorpsstraat 182 Gebouw N</DlvStreet>
+    <DlvZipCode>90668</DlvZipCode>
+    <DlvCity>Verona</DlvCity>
+    <DlvCountry>Verona</DlvCountry>
+    <DlvState>Verona</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394640</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000064</RouteID>
+    <Qty>85.000000000000</Qty>
+    <ItemID>MV783354</ItemID>
+    <InventoryOrderID>000206544</InventoryOrderID>
+    <DeliveryDate>2026-08-11T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394644</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030064</InventTransRefID>
+    <DeliveryAdress>Dorpsstraat 182 Gebouw N 90668 Verona Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Modulair Kabel Set</Note>
+    <MultiComponentItemID>MV783354</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Dorpsstraat 182 Gebouw N 90668 Verona Italy</DlvAddress>
+    <DlvStreet>Dorpsstraat 182 Gebouw N</DlvStreet>
+    <DlvZipCode>90668</DlvZipCode>
+    <DlvCity>Verona</DlvCity>
+    <DlvCountry>Verona</DlvCountry>
+    <DlvState>Verona</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394640</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000064</RouteID>
+    <Qty>37.000000000000</Qty>
+    <ItemID>XC541848</ItemID>
+    <InventoryOrderID>000206545</InventoryOrderID>
+    <DeliveryDate>2026-08-11T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394645</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030064</InventTransRefID>
+    <DeliveryAdress>Dorpsstraat 182 Gebouw N 90668 Verona Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Robuust Beugel X2</Note>
+    <MultiComponentItemID>XC541848</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Dorpsstraat 182 Gebouw N 90668 Verona Italy</DlvAddress>
+    <DlvStreet>Dorpsstraat 182 Gebouw N</DlvStreet>
+    <DlvZipCode>90668</DlvZipCode>
+    <DlvCity>Verona</DlvCity>
+    <DlvCountry>Verona</DlvCountry>
+    <DlvState>Verona</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394640</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

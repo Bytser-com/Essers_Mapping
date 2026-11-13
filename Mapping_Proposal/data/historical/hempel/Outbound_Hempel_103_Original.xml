@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120103</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22103</CustomerNumber>
+    <DeliveryAddress>Molenweg 13 Gebouw L 54216 Bologna Italy</DeliveryAddress>
+    <ShipmentName />
+    <Name>Martin Services</Name>
+    <WarehouseID>IT20</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-14T05:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Molenweg 13 Gebouw L</DlvStreet>
+    <DlvZipcode>54216</DlvZipcode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCounty>Bologna</DlvCounty>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <Recipient>Adam Martin</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706103</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000103</RouteID>
+    <Qty>38.000000000000</Qty>
+    <ItemID>DK308401</ItemID>
+    <InventoryOrderID>000206931</InventoryOrderID>
+    <DeliveryDate>2026-08-23T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395031</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030103</InventTransRefID>
+    <DeliveryAdress>Molenweg 13 Gebouw L 54216 Bologna Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Industrieel Motor Kit</Note>
+    <MultiComponentItemID>DK308401</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 13 Gebouw L 54216 Bologna Italy</DlvAddress>
+    <DlvStreet>Molenweg 13 Gebouw L</DlvStreet>
+    <DlvZipCode>54216</DlvZipCode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCountry>Bologna</DlvCountry>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395030</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000103</RouteID>
+    <Qty>64.000000000000</Qty>
+    <ItemID>VP258289</ItemID>
+    <InventoryOrderID>000206932</InventoryOrderID>
+    <DeliveryDate>2026-08-23T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395032</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030103</InventTransRefID>
+    <DeliveryAdress>Molenweg 13 Gebouw L 54216 Bologna Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Premium Omvormer Pro</Note>
+    <MultiComponentItemID>VP258289</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 13 Gebouw L 54216 Bologna Italy</DlvAddress>
+    <DlvStreet>Molenweg 13 Gebouw L</DlvStreet>
+    <DlvZipCode>54216</DlvZipCode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCountry>Bologna</DlvCountry>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395030</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000103</RouteID>
+    <Qty>27.000000000000</Qty>
+    <ItemID>AY887586</ItemID>
+    <InventoryOrderID>000206933</InventoryOrderID>
+    <DeliveryDate>2026-08-23T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395033</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030103</InventTransRefID>
+    <DeliveryAdress>Molenweg 13 Gebouw L 54216 Bologna Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Universeel Schakelaar Basic</Note>
+    <MultiComponentItemID>AY887586</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 13 Gebouw L 54216 Bologna Italy</DlvAddress>
+    <DlvStreet>Molenweg 13 Gebouw L</DlvStreet>
+    <DlvZipCode>54216</DlvZipCode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCountry>Bologna</DlvCountry>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395030</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000103</RouteID>
+    <Qty>36.000000000000</Qty>
+    <ItemID>DN497379</ItemID>
+    <InventoryOrderID>000206934</InventoryOrderID>
+    <DeliveryDate>2026-08-23T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395034</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030103</InventTransRefID>
+    <DeliveryAdress>Molenweg 13 Gebouw L 54216 Bologna Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Modulair Kabel Mini</Note>
+    <MultiComponentItemID>DN497379</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 13 Gebouw L 54216 Bologna Italy</DlvAddress>
+    <DlvStreet>Molenweg 13 Gebouw L</DlvStreet>
+    <DlvZipCode>54216</DlvZipCode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCountry>Bologna</DlvCountry>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395030</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

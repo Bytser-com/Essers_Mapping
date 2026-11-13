@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120128</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22128</CustomerNumber>
+    <DeliveryAddress>Kasteelstraat 102 Unit 10 91508 Essen Germany</DeliveryAddress>
+    <ShipmentName />
+    <Name>Goossens Trading</Name>
+    <WarehouseID>DE20</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-17T08:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kasteelstraat 102 Unit 10</DlvStreet>
+    <DlvZipcode>91508</DlvZipcode>
+    <DlvCity>Essen</DlvCity>
+    <DlvCounty>Essen</DlvCounty>
+    <DlvState>Essen</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <Recipient>Arthur Goossens</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706128</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000128</RouteID>
+    <Qty>80.000000000000</Qty>
+    <ItemID>XB230784</ItemID>
+    <InventoryOrderID>000207181</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395281</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030128</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 102 Unit 10 91508 Essen Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Ergonomisch Adapter X2</Note>
+    <MultiComponentItemID>XB230784</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 102 Unit 10 91508 Essen Germany</DlvAddress>
+    <DlvStreet>Kasteelstraat 102 Unit 10</DlvStreet>
+    <DlvZipCode>91508</DlvZipCode>
+    <DlvCity>Essen</DlvCity>
+    <DlvCountry>Essen</DlvCountry>
+    <DlvState>Essen</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1395280</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000128</RouteID>
+    <Qty>92.000000000000</Qty>
+    <ItemID>TV691955</ItemID>
+    <InventoryOrderID>000207182</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395282</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030128</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 102 Unit 10 91508 Essen Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Professioneel Sensor Mini</Note>
+    <MultiComponentItemID>TV691955</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 102 Unit 10 91508 Essen Germany</DlvAddress>
+    <DlvStreet>Kasteelstraat 102 Unit 10</DlvStreet>
+    <DlvZipCode>91508</DlvZipCode>
+    <DlvCity>Essen</DlvCity>
+    <DlvCountry>Essen</DlvCountry>
+    <DlvState>Essen</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1395280</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000128</RouteID>
+    <Qty>21.000000000000</Qty>
+    <ItemID>VJ389680</ItemID>
+    <InventoryOrderID>000207183</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395283</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030128</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 102 Unit 10 91508 Essen Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Licht Omvormer X2</Note>
+    <MultiComponentItemID>VJ389680</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 102 Unit 10 91508 Essen Germany</DlvAddress>
+    <DlvStreet>Kasteelstraat 102 Unit 10</DlvStreet>
+    <DlvZipCode>91508</DlvZipCode>
+    <DlvCity>Essen</DlvCity>
+    <DlvCountry>Essen</DlvCountry>
+    <DlvState>Essen</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1395280</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000128</RouteID>
+    <Qty>76.000000000000</Qty>
+    <ItemID>BU942225</ItemID>
+    <InventoryOrderID>000207184</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395284</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030128</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 102 Unit 10 91508 Essen Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Modulair Lader X2</Note>
+    <MultiComponentItemID>BU942225</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 102 Unit 10 91508 Essen Germany</DlvAddress>
+    <DlvStreet>Kasteelstraat 102 Unit 10</DlvStreet>
+    <DlvZipCode>91508</DlvZipCode>
+    <DlvCity>Essen</DlvCity>
+    <DlvCountry>Essen</DlvCountry>
+    <DlvState>Essen</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1395280</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000128</RouteID>
+    <Qty>58.000000000000</Qty>
+    <ItemID>PJ928686</ItemID>
+    <InventoryOrderID>000207185</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395285</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030128</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 102 Unit 10 91508 Essen Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Sterk Meetset Plus</Note>
+    <MultiComponentItemID>PJ928686</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 102 Unit 10 91508 Essen Germany</DlvAddress>
+    <DlvStreet>Kasteelstraat 102 Unit 10</DlvStreet>
+    <DlvZipCode>91508</DlvZipCode>
+    <DlvCity>Essen</DlvCity>
+    <DlvCountry>Essen</DlvCountry>
+    <DlvState>Essen</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1395280</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

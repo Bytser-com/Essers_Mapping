@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120140</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22140</CustomerNumber>
+    <DeliveryAddress>Ringlaan 57 Bus 1 19694 Verona Italy</DeliveryAddress>
+    <ShipmentName />
+    <Name>Visser Systems</Name>
+    <WarehouseID>IT20</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-18T20:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Ringlaan 57 Bus 1</DlvStreet>
+    <DlvZipcode>19694</DlvZipcode>
+    <DlvCity>Verona</DlvCity>
+    <DlvCounty>Verona</DlvCounty>
+    <DlvState>Verona</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <Recipient>Sara Visser</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706140</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000140</RouteID>
+    <Qty>33.000000000000</Qty>
+    <ItemID>EP404160</ItemID>
+    <InventoryOrderID>000207301</InventoryOrderID>
+    <DeliveryDate>2026-08-24T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395401</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030140</InventTransRefID>
+    <DeliveryAdress>Ringlaan 57 Bus 1 19694 Verona Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Digitaal Controller Kit</Note>
+    <MultiComponentItemID>EP404160</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 57 Bus 1 19694 Verona Italy</DlvAddress>
+    <DlvStreet>Ringlaan 57 Bus 1</DlvStreet>
+    <DlvZipCode>19694</DlvZipCode>
+    <DlvCity>Verona</DlvCity>
+    <DlvCountry>Verona</DlvCountry>
+    <DlvState>Verona</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395400</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000140</RouteID>
+    <Qty>37.000000000000</Qty>
+    <ItemID>XF623697</ItemID>
+    <InventoryOrderID>000207302</InventoryOrderID>
+    <DeliveryDate>2026-08-24T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395402</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030140</InventTransRefID>
+    <DeliveryAdress>Ringlaan 57 Bus 1 19694 Verona Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Sterk Connector Max</Note>
+    <MultiComponentItemID>XF623697</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 57 Bus 1 19694 Verona Italy</DlvAddress>
+    <DlvStreet>Ringlaan 57 Bus 1</DlvStreet>
+    <DlvZipCode>19694</DlvZipCode>
+    <DlvCity>Verona</DlvCity>
+    <DlvCountry>Verona</DlvCountry>
+    <DlvState>Verona</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395400</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000140</RouteID>
+    <Qty>89.000000000000</Qty>
+    <ItemID>KQ685550</ItemID>
+    <InventoryOrderID>000207303</InventoryOrderID>
+    <DeliveryDate>2026-08-24T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395403</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030140</InventTransRefID>
+    <DeliveryAdress>Ringlaan 57 Bus 1 19694 Verona Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Flexibel Lader Set</Note>
+    <MultiComponentItemID>KQ685550</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 57 Bus 1 19694 Verona Italy</DlvAddress>
+    <DlvStreet>Ringlaan 57 Bus 1</DlvStreet>
+    <DlvZipCode>19694</DlvZipCode>
+    <DlvCity>Verona</DlvCity>
+    <DlvCountry>Verona</DlvCountry>
+    <DlvState>Verona</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395400</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000140</RouteID>
+    <Qty>5.000000000000</Qty>
+    <ItemID>VJ623227</ItemID>
+    <InventoryOrderID>000207304</InventoryOrderID>
+    <DeliveryDate>2026-08-24T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395404</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030140</InventTransRefID>
+    <DeliveryAdress>Ringlaan 57 Bus 1 19694 Verona Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Eco Beugel Plus</Note>
+    <MultiComponentItemID>VJ623227</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 57 Bus 1 19694 Verona Italy</DlvAddress>
+    <DlvStreet>Ringlaan 57 Bus 1</DlvStreet>
+    <DlvZipCode>19694</DlvZipCode>
+    <DlvCity>Verona</DlvCity>
+    <DlvCountry>Verona</DlvCountry>
+    <DlvState>Verona</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395400</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000140</RouteID>
+    <Qty>72.000000000000</Qty>
+    <ItemID>PE915554</ItemID>
+    <InventoryOrderID>000207305</InventoryOrderID>
+    <DeliveryDate>2026-08-24T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395405</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030140</InventTransRefID>
+    <DeliveryAdress>Ringlaan 57 Bus 1 19694 Verona Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Sterk Omvormer V2</Note>
+    <MultiComponentItemID>PE915554</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 57 Bus 1 19694 Verona Italy</DlvAddress>
+    <DlvStreet>Ringlaan 57 Bus 1</DlvStreet>
+    <DlvZipCode>19694</DlvZipCode>
+    <DlvCity>Verona</DlvCity>
+    <DlvCountry>Verona</DlvCountry>
+    <DlvState>Verona</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395400</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

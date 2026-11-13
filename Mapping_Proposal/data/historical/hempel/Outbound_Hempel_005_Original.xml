@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120005</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22005</CustomerNumber>
+    <DeliveryAddress>Ringlaan 226 Gebouw I 10914 Dudelange Luxembourg</DeliveryAddress>
+    <ShipmentName />
+    <Name>Vermeulen Consulting</Name>
+    <WarehouseID>LU10</WarehouseID>
+    <CompanyID>E223</CompanyID>
+    <PublishedByAX>2026-08-01T23:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Ringlaan 226 Gebouw I</DlvStreet>
+    <DlvZipcode>10914</DlvZipcode>
+    <DlvCity>Dudelange</DlvCity>
+    <DlvCounty>Dudelange</DlvCounty>
+    <DlvState>Dudelange</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <Recipient>Sara Vermeulen</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706005</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000005</RouteID>
+    <Qty>54.000000000000</Qty>
+    <ItemID>OT861424</ItemID>
+    <InventoryOrderID>000205951</InventoryOrderID>
+    <DeliveryDate>2026-08-08T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394051</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030005</InventTransRefID>
+    <DeliveryAdress>Ringlaan 226 Gebouw I 10914 Dudelange Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Sterk Terminal Mini</Note>
+    <MultiComponentItemID>OT861424</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 226 Gebouw I 10914 Dudelange Luxembourg</DlvAddress>
+    <DlvStreet>Ringlaan 226 Gebouw I</DlvStreet>
+    <DlvZipCode>10914</DlvZipCode>
+    <DlvCity>Dudelange</DlvCity>
+    <DlvCountry>Dudelange</DlvCountry>
+    <DlvState>Dudelange</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1394050</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000005</RouteID>
+    <Qty>9.000000000000</Qty>
+    <ItemID>IT621806</ItemID>
+    <InventoryOrderID>000205952</InventoryOrderID>
+    <DeliveryDate>2026-08-08T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394052</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030005</InventTransRefID>
+    <DeliveryAdress>Ringlaan 226 Gebouw I 10914 Dudelange Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Digitaal Beugel V2</Note>
+    <MultiComponentItemID>IT621806</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 226 Gebouw I 10914 Dudelange Luxembourg</DlvAddress>
+    <DlvStreet>Ringlaan 226 Gebouw I</DlvStreet>
+    <DlvZipCode>10914</DlvZipCode>
+    <DlvCity>Dudelange</DlvCity>
+    <DlvCountry>Dudelange</DlvCountry>
+    <DlvState>Dudelange</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1394050</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120095</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22095</CustomerNumber>
+    <DeliveryAddress>Veldweg 164 Afdeling 12 94470 Leuven Belgium</DeliveryAddress>
+    <ShipmentName />
+    <Name>Jacobs Logistics</Name>
+    <WarehouseID>BE10</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-13T05:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Veldweg 164 Afdeling 12</DlvStreet>
+    <DlvZipcode>94470</DlvZipcode>
+    <DlvCity>Leuven</DlvCity>
+    <DlvCounty>Leuven</DlvCounty>
+    <DlvState>Leuven</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <Recipient>Arthur Jacobs</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706095</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000095</RouteID>
+    <Qty>1.000000000000</Qty>
+    <ItemID>PT793500</ItemID>
+    <InventoryOrderID>000206851</InventoryOrderID>
+    <DeliveryDate>2026-08-22T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394951</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030095</InventTransRefID>
+    <DeliveryAdress>Veldweg 164 Afdeling 12 94470 Leuven Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Industrieel Connector Set</Note>
+    <MultiComponentItemID>PT793500</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 164 Afdeling 12 94470 Leuven Belgium</DlvAddress>
+    <DlvStreet>Veldweg 164 Afdeling 12</DlvStreet>
+    <DlvZipCode>94470</DlvZipCode>
+    <DlvCity>Leuven</DlvCity>
+    <DlvCountry>Leuven</DlvCountry>
+    <DlvState>Leuven</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394950</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000095</RouteID>
+    <Qty>71.000000000000</Qty>
+    <ItemID>QX510331</ItemID>
+    <InventoryOrderID>000206852</InventoryOrderID>
+    <DeliveryDate>2026-08-22T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394952</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030095</InventTransRefID>
+    <DeliveryAdress>Veldweg 164 Afdeling 12 94470 Leuven Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Slim Module X2</Note>
+    <MultiComponentItemID>QX510331</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 164 Afdeling 12 94470 Leuven Belgium</DlvAddress>
+    <DlvStreet>Veldweg 164 Afdeling 12</DlvStreet>
+    <DlvZipCode>94470</DlvZipCode>
+    <DlvCity>Leuven</DlvCity>
+    <DlvCountry>Leuven</DlvCountry>
+    <DlvState>Leuven</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394950</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000095</RouteID>
+    <Qty>60.000000000000</Qty>
+    <ItemID>OJ484800</ItemID>
+    <InventoryOrderID>000206853</InventoryOrderID>
+    <DeliveryDate>2026-08-22T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394953</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030095</InventTransRefID>
+    <DeliveryAdress>Veldweg 164 Afdeling 12 94470 Leuven Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Slim Connector V2</Note>
+    <MultiComponentItemID>OJ484800</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 164 Afdeling 12 94470 Leuven Belgium</DlvAddress>
+    <DlvStreet>Veldweg 164 Afdeling 12</DlvStreet>
+    <DlvZipCode>94470</DlvZipCode>
+    <DlvCity>Leuven</DlvCity>
+    <DlvCountry>Leuven</DlvCountry>
+    <DlvState>Leuven</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394950</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000095</RouteID>
+    <Qty>51.000000000000</Qty>
+    <ItemID>PK515644</ItemID>
+    <InventoryOrderID>000206854</InventoryOrderID>
+    <DeliveryDate>2026-08-22T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394954</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030095</InventTransRefID>
+    <DeliveryAdress>Veldweg 164 Afdeling 12 94470 Leuven Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Snel Lader Set</Note>
+    <MultiComponentItemID>PK515644</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 164 Afdeling 12 94470 Leuven Belgium</DlvAddress>
+    <DlvStreet>Veldweg 164 Afdeling 12</DlvStreet>
+    <DlvZipCode>94470</DlvZipCode>
+    <DlvCity>Leuven</DlvCity>
+    <DlvCountry>Leuven</DlvCountry>
+    <DlvState>Leuven</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394950</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

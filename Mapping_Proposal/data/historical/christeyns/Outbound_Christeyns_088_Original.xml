@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root>
+  <MessageType>Outbound Delivery</MessageType>
+  <DocHeader>
+    <OutboundNumber>SO270000087</OutboundNumber>
+    <DocumentNumber>SO270000087</DocumentNumber>
+    <Reference>600087 /70087</Reference>
+    <DeliveryDate>27/01/2027</DeliveryDate>
+    <ShipByDate>22/01/2027</ShipByDate>
+    <RushIndicator>N</RushIndicator>
+    <Carrier>DHL</Carrier>
+    <ShipToCode>200087</ShipToCode>
+    <Name1>Lucas Willems</Name1>
+    <Name2>Willems Solutions</Name2>
+    <Address1>Ringlaan 26</Address1>
+    <Address2 />
+    <PostalCode>15681</PostalCode>
+    <City>Bologna</City>
+    <County />
+    <Country>IT</Country>
+    <LanguageCode>IT</LanguageCode>
+    <CommentCustomer />
+    <CommentOrder>
+      <Comment>Customer Reference: 800087</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>INCO:DAP</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>T4T : +32 11 37 57 77</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>Open: Ma-Di-Wo-Do-Vr 08:00-16:00</Comment>
+    </CommentOrder>
+    <TransportInstruction>
+      <Comment>T4T : +32 11 37 57 77</Comment>
+    </TransportInstruction>
+    <TransportInstruction>
+      <Comment>F92 : 1 08001600 2 08001600 3 08001600 4 08001600 5 08001600</Comment>
+    </TransportInstruction>
+    <WarehouseInstruction />
+  </DocHeader>
+  <DocLine>
+    <OrderLine>1</OrderLine>
+    <Product>BC136419</Product>
+    <Quantity>16</Quantity>
+    <UOM>PCS</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>5.6</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>2</OrderLine>
+    <Product>GB576869</Product>
+    <Quantity>19</Quantity>
+    <UOM>PAL</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>12</VOCContent>
+    <BiocideCode>47088</BiocideCode>
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>3</OrderLine>
+    <Product>MP559950</Product>
+    <Quantity>22</Quantity>
+    <UOM>DRM</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>22</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>4</OrderLine>
+    <Product>TV691955</Product>
+    <Quantity>1</Quantity>
+    <UOM>CAN</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>0</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>5</OrderLine>
+    <Product>VU214613</Product>
+    <Quantity>4</Quantity>
+    <UOM>BOX</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>3.4</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>6</OrderLine>
+    <Product>BJ925857</Product>
+    <Quantity>7</Quantity>
+    <UOM>PCS</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>5.6</VOCContent>
+    <BiocideCode>47092</BiocideCode>
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>7</OrderLine>
+    <Product>TN351017</Product>
+    <Quantity>10</Quantity>
+    <UOM>PAL</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>12</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+</Root>

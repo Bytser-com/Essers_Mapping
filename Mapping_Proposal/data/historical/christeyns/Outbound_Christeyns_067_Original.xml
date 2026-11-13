@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root>
+  <MessageType>Outbound Delivery</MessageType>
+  <DocHeader>
+    <OutboundNumber>SO270000066</OutboundNumber>
+    <DocumentNumber>SO270000066</DocumentNumber>
+    <Reference>600066 /70066</Reference>
+    <DeliveryDate>15/12/2026</DeliveryDate>
+    <ShipByDate>11/12/2026</ShipByDate>
+    <RushIndicator>N</RushIndicator>
+    <Carrier>DAC</Carrier>
+    <ShipToCode>200066</ShipToCode>
+    <Name1>Sofia Schmidt</Name1>
+    <Name2>Schmidt Logistics</Name2>
+    <Address1>Bosweg 101</Address1>
+    <Address2 />
+    <PostalCode>27338</PostalCode>
+    <City>Madrid</City>
+    <County />
+    <Country>ES</Country>
+    <LanguageCode>ES</LanguageCode>
+    <CommentCustomer />
+    <CommentOrder>
+      <Comment>Customer Reference: 800066</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>INCO:DDP</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>T4T : +32 11 86 36 56</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>Open: Ma-Di-Wo-Do-Vr 08:00-16:00</Comment>
+    </CommentOrder>
+    <TransportInstruction>
+      <Comment>T4T : +32 11 86 36 56</Comment>
+    </TransportInstruction>
+    <TransportInstruction>
+      <Comment>F92 : 1 08001600 2 08001600 3 08001600 4 08001600 5 08001600</Comment>
+    </TransportInstruction>
+    <WarehouseInstruction />
+  </DocHeader>
+  <DocLine>
+    <OrderLine>1</OrderLine>
+    <Product>FD101571</Product>
+    <Quantity>19</Quantity>
+    <UOM>BOX</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>3.4</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>2</OrderLine>
+    <Product>VJ389680</Product>
+    <Quantity>22</Quantity>
+    <UOM>PCS</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>5.6</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+</Root>

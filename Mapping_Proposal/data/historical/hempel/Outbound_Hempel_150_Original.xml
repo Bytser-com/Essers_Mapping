@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120150</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22150</CustomerNumber>
+    <DeliveryAddress>Ringlaan 134 81876 Aken Germany</DeliveryAddress>
+    <ShipmentName />
+    <Name>Leclercq Trading</Name>
+    <WarehouseID>DE20</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-20T02:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Ringlaan 134</DlvStreet>
+    <DlvZipcode>81876</DlvZipcode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCounty>Aken</DlvCounty>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <Recipient>Louis Leclercq</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706150</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000150</RouteID>
+    <Qty>1.000000000000</Qty>
+    <ItemID>FH618011</ItemID>
+    <InventoryOrderID>000207401</InventoryOrderID>
+    <DeliveryDate>2026-08-28T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395501</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030150</InventTransRefID>
+    <DeliveryAdress>Ringlaan 134 81876 Aken Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Professioneel Kabel Plus</Note>
+    <MultiComponentItemID>FH618011</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 134 81876 Aken Germany</DlvAddress>
+    <DlvStreet>Ringlaan 134</DlvStreet>
+    <DlvZipCode>81876</DlvZipCode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCountry>Aken</DlvCountry>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1395500</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000150</RouteID>
+    <Qty>67.000000000000</Qty>
+    <ItemID>VP258289</ItemID>
+    <InventoryOrderID>000207402</InventoryOrderID>
+    <DeliveryDate>2026-08-28T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395502</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030150</InventTransRefID>
+    <DeliveryAdress>Ringlaan 134 81876 Aken Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Premium Omvormer Pro</Note>
+    <MultiComponentItemID>VP258289</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 134 81876 Aken Germany</DlvAddress>
+    <DlvStreet>Ringlaan 134</DlvStreet>
+    <DlvZipCode>81876</DlvZipCode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCountry>Aken</DlvCountry>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1395500</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000150</RouteID>
+    <Qty>50.000000000000</Qty>
+    <ItemID>BU449116</ItemID>
+    <InventoryOrderID>000207403</InventoryOrderID>
+    <DeliveryDate>2026-08-28T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395503</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030150</InventTransRefID>
+    <DeliveryAdress>Ringlaan 134 81876 Aken Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Precisie Kabel Mini</Note>
+    <MultiComponentItemID>BU449116</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 134 81876 Aken Germany</DlvAddress>
+    <DlvStreet>Ringlaan 134</DlvStreet>
+    <DlvZipCode>81876</DlvZipCode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCountry>Aken</DlvCountry>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1395500</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

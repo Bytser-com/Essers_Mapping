@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120112</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22112</CustomerNumber>
+    <DeliveryAddress>Kanaalweg 36 Gebouw U 14570 Esch-sur-Alzette Luxembourg</DeliveryAddress>
+    <ShipmentName />
+    <Name>Willems Solutions</Name>
+    <WarehouseID>LU10</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-15T08:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kanaalweg 36 Gebouw U</DlvStreet>
+    <DlvZipcode>14570</DlvZipcode>
+    <DlvCity>Esch-sur-Alzette</DlvCity>
+    <DlvCounty>Esch-sur-Alzette</DlvCounty>
+    <DlvState>Esch-sur-Alzette</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <Recipient>Lucas Willems</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706112</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000112</RouteID>
+    <Qty>57.000000000000</Qty>
+    <ItemID>BU942225</ItemID>
+    <InventoryOrderID>000207021</InventoryOrderID>
+    <DeliveryDate>2026-08-17T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395121</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030112</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 36 Gebouw U 14570 Esch-sur-Alzette Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Modulair Lader X2</Note>
+    <MultiComponentItemID>BU942225</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 36 Gebouw U 14570 Esch-sur-Alzette Luxembourg</DlvAddress>
+    <DlvStreet>Kanaalweg 36 Gebouw U</DlvStreet>
+    <DlvZipCode>14570</DlvZipCode>
+    <DlvCity>Esch-sur-Alzette</DlvCity>
+    <DlvCountry>Esch-sur-Alzette</DlvCountry>
+    <DlvState>Esch-sur-Alzette</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1395120</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000112</RouteID>
+    <Qty>8.000000000000</Qty>
+    <ItemID>XE911016</ItemID>
+    <InventoryOrderID>000207022</InventoryOrderID>
+    <DeliveryDate>2026-08-17T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395122</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030112</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 36 Gebouw U 14570 Esch-sur-Alzette Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Precisie Scanner Max</Note>
+    <MultiComponentItemID>XE911016</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 36 Gebouw U 14570 Esch-sur-Alzette Luxembourg</DlvAddress>
+    <DlvStreet>Kanaalweg 36 Gebouw U</DlvStreet>
+    <DlvZipCode>14570</DlvZipCode>
+    <DlvCity>Esch-sur-Alzette</DlvCity>
+    <DlvCountry>Esch-sur-Alzette</DlvCountry>
+    <DlvState>Esch-sur-Alzette</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1395120</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000112</RouteID>
+    <Qty>80.000000000000</Qty>
+    <ItemID>XB230784</ItemID>
+    <InventoryOrderID>000207023</InventoryOrderID>
+    <DeliveryDate>2026-08-17T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395123</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030112</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 36 Gebouw U 14570 Esch-sur-Alzette Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Ergonomisch Adapter X2</Note>
+    <MultiComponentItemID>XB230784</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 36 Gebouw U 14570 Esch-sur-Alzette Luxembourg</DlvAddress>
+    <DlvStreet>Kanaalweg 36 Gebouw U</DlvStreet>
+    <DlvZipCode>14570</DlvZipCode>
+    <DlvCity>Esch-sur-Alzette</DlvCity>
+    <DlvCountry>Esch-sur-Alzette</DlvCountry>
+    <DlvState>Esch-sur-Alzette</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1395120</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000112</RouteID>
+    <Qty>35.000000000000</Qty>
+    <ItemID>WR617655</ItemID>
+    <InventoryOrderID>000207024</InventoryOrderID>
+    <DeliveryDate>2026-08-17T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395124</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030112</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 36 Gebouw U 14570 Esch-sur-Alzette Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Sterk Afdichting Set</Note>
+    <MultiComponentItemID>WR617655</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 36 Gebouw U 14570 Esch-sur-Alzette Luxembourg</DlvAddress>
+    <DlvStreet>Kanaalweg 36 Gebouw U</DlvStreet>
+    <DlvZipCode>14570</DlvZipCode>
+    <DlvCity>Esch-sur-Alzette</DlvCity>
+    <DlvCountry>Esch-sur-Alzette</DlvCountry>
+    <DlvState>Esch-sur-Alzette</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1395120</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000112</RouteID>
+    <Qty>15.000000000000</Qty>
+    <ItemID>AK047928</ItemID>
+    <InventoryOrderID>000207025</InventoryOrderID>
+    <DeliveryDate>2026-08-17T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395125</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030112</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 36 Gebouw U 14570 Esch-sur-Alzette Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Compact Motor Mini</Note>
+    <MultiComponentItemID>AK047928</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 36 Gebouw U 14570 Esch-sur-Alzette Luxembourg</DlvAddress>
+    <DlvStreet>Kanaalweg 36 Gebouw U</DlvStreet>
+    <DlvZipCode>14570</DlvZipCode>
+    <DlvCity>Esch-sur-Alzette</DlvCity>
+    <DlvCountry>Esch-sur-Alzette</DlvCountry>
+    <DlvState>Esch-sur-Alzette</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1395120</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

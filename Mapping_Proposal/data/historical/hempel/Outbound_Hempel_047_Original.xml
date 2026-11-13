@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120047</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22047</CustomerNumber>
+    <DeliveryAddress>Nieuwstraat 267 Unit 34 48771 Aken Germany</DeliveryAddress>
+    <ShipmentName />
+    <Name>Peeters Solutions</Name>
+    <WarehouseID>DE20</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-07T05:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Nieuwstraat 267 Unit 34</DlvStreet>
+    <DlvZipcode>48771</DlvZipcode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCounty>Aken</DlvCounty>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <Recipient>Mats Peeters</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706047</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000047</RouteID>
+    <Qty>7.000000000000</Qty>
+    <ItemID>AB961583</ItemID>
+    <InventoryOrderID>000206371</InventoryOrderID>
+    <DeliveryDate>2026-08-16T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394471</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030047</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 267 Unit 34 48771 Aken Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Premium Lader V2</Note>
+    <MultiComponentItemID>AB961583</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 267 Unit 34 48771 Aken Germany</DlvAddress>
+    <DlvStreet>Nieuwstraat 267 Unit 34</DlvStreet>
+    <DlvZipCode>48771</DlvZipCode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCountry>Aken</DlvCountry>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394470</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000047</RouteID>
+    <Qty>17.000000000000</Qty>
+    <ItemID>HB357965</ItemID>
+    <InventoryOrderID>000206372</InventoryOrderID>
+    <DeliveryDate>2026-08-16T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394472</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030047</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 267 Unit 34 48771 Aken Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Modulair Controller Mini</Note>
+    <MultiComponentItemID>HB357965</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 267 Unit 34 48771 Aken Germany</DlvAddress>
+    <DlvStreet>Nieuwstraat 267 Unit 34</DlvStreet>
+    <DlvZipCode>48771</DlvZipCode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCountry>Aken</DlvCountry>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394470</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000047</RouteID>
+    <Qty>17.000000000000</Qty>
+    <ItemID>KI186698</ItemID>
+    <InventoryOrderID>000206373</InventoryOrderID>
+    <DeliveryDate>2026-08-16T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394473</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030047</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 267 Unit 34 48771 Aken Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Premium Meetset Pro</Note>
+    <MultiComponentItemID>KI186698</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 267 Unit 34 48771 Aken Germany</DlvAddress>
+    <DlvStreet>Nieuwstraat 267 Unit 34</DlvStreet>
+    <DlvZipCode>48771</DlvZipCode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCountry>Aken</DlvCountry>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394470</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000047</RouteID>
+    <Qty>53.000000000000</Qty>
+    <ItemID>VZ148007</ItemID>
+    <InventoryOrderID>000206374</InventoryOrderID>
+    <DeliveryDate>2026-08-16T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394474</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030047</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 267 Unit 34 48771 Aken Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Universeel Adapter Set</Note>
+    <MultiComponentItemID>VZ148007</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 267 Unit 34 48771 Aken Germany</DlvAddress>
+    <DlvStreet>Nieuwstraat 267 Unit 34</DlvStreet>
+    <DlvZipCode>48771</DlvZipCode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCountry>Aken</DlvCountry>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394470</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

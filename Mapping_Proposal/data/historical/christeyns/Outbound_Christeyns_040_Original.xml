@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root>
+  <MessageType>Outbound Delivery</MessageType>
+  <DocHeader>
+    <OutboundNumber>SO270000039</OutboundNumber>
+    <DocumentNumber>SO270000039</DocumentNumber>
+    <Reference>600039 /70039</Reference>
+    <DeliveryDate>25/10/2026</DeliveryDate>
+    <ShipByDate>18/10/2026</ShipByDate>
+    <RushIndicator>N</RushIndicator>
+    <Carrier>KLG</Carrier>
+    <ShipToCode>200039</ShipToCode>
+    <Name1>Finn Jacobs</Name1>
+    <Name2>Jacobs Consulting</Name2>
+    <Address1>Schoolstraat 289</Address1>
+    <Address2>Gebouw P</Address2>
+    <PostalCode>83727</PostalCode>
+    <City>Valencia</City>
+    <County />
+    <Country>ES</Country>
+    <LanguageCode>ES</LanguageCode>
+    <CommentCustomer />
+    <CommentOrder>
+      <Comment>Customer Reference: 800039</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>INCO:FCA</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>T4T : +32 11 59 69 79</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>Open: Ma-Di-Wo-Do-Vr 08:00-16:00</Comment>
+    </CommentOrder>
+    <TransportInstruction>
+      <Comment>T4T : +32 11 59 69 79</Comment>
+    </TransportInstruction>
+    <TransportInstruction>
+      <Comment>F92 : 1 08001600 2 08001600 3 08001600 4 08001600 5 08001600</Comment>
+    </TransportInstruction>
+    <WarehouseInstruction />
+  </DocHeader>
+  <DocLine>
+    <OrderLine>1</OrderLine>
+    <Product>NG876657</Product>
+    <Quantity>16</Quantity>
+    <UOM>DRM</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>22</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>2</OrderLine>
+    <Product>SO106299</Product>
+    <Quantity>19</Quantity>
+    <UOM>CAN</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>0</VOCContent>
+    <BiocideCode>47040</BiocideCode>
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>3</OrderLine>
+    <Product>PB426900</Product>
+    <Quantity>22</Quantity>
+    <UOM>BOX</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>3.4</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>4</OrderLine>
+    <Product>JG420566</Product>
+    <Quantity>1</Quantity>
+    <UOM>PCS</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>5.6</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>5</OrderLine>
+    <Product>UL312740</Product>
+    <Quantity>4</Quantity>
+    <UOM>PAL</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>12</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>6</OrderLine>
+    <Product>ET534228</Product>
+    <Quantity>7</Quantity>
+    <UOM>DRM</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>22</VOCContent>
+    <BiocideCode>47044</BiocideCode>
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>7</OrderLine>
+    <Product>KH666066</Product>
+    <Quantity>10</Quantity>
+    <UOM>CAN</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>0</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+</Root>

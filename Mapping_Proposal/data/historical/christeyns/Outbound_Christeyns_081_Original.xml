@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root>
+  <MessageType>Outbound Delivery</MessageType>
+  <DocHeader>
+    <OutboundNumber>SO270000080</OutboundNumber>
+    <DocumentNumber>SO270000080</DocumentNumber>
+    <Reference>600080 /70080</Reference>
+    <DeliveryDate>11/01/2027</DeliveryDate>
+    <ShipByDate>08/01/2027</ShipByDate>
+    <RushIndicator>Y</RushIndicator>
+    <Carrier>XPO</Carrier>
+    <ShipToCode>200080</ShipToCode>
+    <Name1>Finn Maes</Name1>
+    <Name2>Maes Transport</Name2>
+    <Address1>Industrieweg 32</Address1>
+    <Address2>Bus 26</Address2>
+    <PostalCode>89845</PostalCode>
+    <City>Valencia</City>
+    <County />
+    <Country>ES</Country>
+    <LanguageCode>ES</LanguageCode>
+    <CommentCustomer />
+    <CommentOrder>
+      <Comment>Customer Reference: 800080</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>INCO:EXW</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>T4T : +32 11 30 50 70</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>Open: Ma-Di-Wo-Do-Vr 08:00-16:00</Comment>
+    </CommentOrder>
+    <TransportInstruction>
+      <Comment>T4T : +32 11 30 50 70</Comment>
+    </TransportInstruction>
+    <TransportInstruction>
+      <Comment>F92 : 1 08001600 2 08001600 3 08001600 4 08001600 5 08001600</Comment>
+    </TransportInstruction>
+    <WarehouseInstruction />
+  </DocHeader>
+  <DocLine>
+    <OrderLine>1</OrderLine>
+    <Product>WR199910</Product>
+    <Quantity>9</Quantity>
+    <UOM>CAN</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>0</VOCContent>
+    <BiocideCode>47080</BiocideCode>
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>2</OrderLine>
+    <Product>OB091368</Product>
+    <Quantity>12</Quantity>
+    <UOM>BOX</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>3.4</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>3</OrderLine>
+    <Product>BD064650</Product>
+    <Quantity>15</Quantity>
+    <UOM>PCS</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>5.6</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>4</OrderLine>
+    <Product>RS465117</Product>
+    <Quantity>18</Quantity>
+    <UOM>PAL</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>12</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>5</OrderLine>
+    <Product>ZR768731</Product>
+    <Quantity>21</Quantity>
+    <UOM>DRM</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>22</VOCContent>
+    <BiocideCode>47084</BiocideCode>
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>6</OrderLine>
+    <Product>WR617655</Product>
+    <Quantity>24</Quantity>
+    <UOM>CAN</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>0</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>7</OrderLine>
+    <Product>SD941083</Product>
+    <Quantity>3</Quantity>
+    <UOM>BOX</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>3.4</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>8</OrderLine>
+    <Product>YG044822</Product>
+    <Quantity>6</Quantity>
+    <UOM>PCS</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>5.6</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+</Root>

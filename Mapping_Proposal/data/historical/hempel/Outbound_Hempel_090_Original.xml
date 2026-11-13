@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120090</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22090</CustomerNumber>
+    <DeliveryAddress>Marktplein 284 Afdeling 12 72524 Bonn Germany</DeliveryAddress>
+    <ShipmentName />
+    <Name>Vermeulen Consulting</Name>
+    <WarehouseID>DE20</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-12T14:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Marktplein 284 Afdeling 12</DlvStreet>
+    <DlvZipcode>72524</DlvZipcode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCounty>Bonn</DlvCounty>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <Recipient>Sara Vermeulen</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706090</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000090</RouteID>
+    <Qty>14.000000000000</Qty>
+    <ItemID>QX510331</ItemID>
+    <InventoryOrderID>000206801</InventoryOrderID>
+    <DeliveryDate>2026-08-16T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394901</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030090</InventTransRefID>
+    <DeliveryAdress>Marktplein 284 Afdeling 12 72524 Bonn Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Slim Module X2</Note>
+    <MultiComponentItemID>QX510331</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 284 Afdeling 12 72524 Bonn Germany</DlvAddress>
+    <DlvStreet>Marktplein 284 Afdeling 12</DlvStreet>
+    <DlvZipCode>72524</DlvZipCode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCountry>Bonn</DlvCountry>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394900</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000090</RouteID>
+    <Qty>79.000000000000</Qty>
+    <ItemID>ZY129981</ItemID>
+    <InventoryOrderID>000206802</InventoryOrderID>
+    <DeliveryDate>2026-08-16T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394902</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030090</InventTransRefID>
+    <DeliveryAdress>Marktplein 284 Afdeling 12 72524 Bonn Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Veilig Omvormer Mini</Note>
+    <MultiComponentItemID>ZY129981</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 284 Afdeling 12 72524 Bonn Germany</DlvAddress>
+    <DlvStreet>Marktplein 284 Afdeling 12</DlvStreet>
+    <DlvZipCode>72524</DlvZipCode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCountry>Bonn</DlvCountry>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394900</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000090</RouteID>
+    <Qty>53.000000000000</Qty>
+    <ItemID>UE253935</ItemID>
+    <InventoryOrderID>000206803</InventoryOrderID>
+    <DeliveryDate>2026-08-16T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394903</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030090</InventTransRefID>
+    <DeliveryAdress>Marktplein 284 Afdeling 12 72524 Bonn Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Robuust Module Max</Note>
+    <MultiComponentItemID>UE253935</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 284 Afdeling 12 72524 Bonn Germany</DlvAddress>
+    <DlvStreet>Marktplein 284 Afdeling 12</DlvStreet>
+    <DlvZipCode>72524</DlvZipCode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCountry>Bonn</DlvCountry>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394900</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

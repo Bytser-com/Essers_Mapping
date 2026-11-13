@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root>
+  <MessageType>Outbound Delivery</MessageType>
+  <DocHeader>
+    <OutboundNumber>SO270000030</OutboundNumber>
+    <DocumentNumber>SO270000030</DocumentNumber>
+    <Reference>600030 /70030</Reference>
+    <DeliveryDate>03/10/2026</DeliveryDate>
+    <ShipByDate>30/09/2026</ShipByDate>
+    <RushIndicator>Y</RushIndicator>
+    <Carrier>XPO</Carrier>
+    <ShipToCode>200030</ShipToCode>
+    <Name1>Sara Leroy</Name1>
+    <Name2>Leroy Supply</Name2>
+    <Address1>Bosweg 36</Address1>
+    <Address2>Unit 28</Address2>
+    <PostalCode>64686</PostalCode>
+    <City>Lissabon</City>
+    <County />
+    <Country>PT</Country>
+    <LanguageCode>PT</LanguageCode>
+    <CommentCustomer />
+    <CommentOrder>
+      <Comment>Customer Reference: 800030</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>INCO:EXW</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>T4T : +32 11 50 60 70</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>Open: Ma-Di-Wo-Do-Vr 08:00-16:00</Comment>
+    </CommentOrder>
+    <TransportInstruction>
+      <Comment>T4T : +32 11 50 60 70</Comment>
+    </TransportInstruction>
+    <TransportInstruction>
+      <Comment>F92 : 1 08001600 2 08001600 3 08001600 4 08001600 5 08001600</Comment>
+    </TransportInstruction>
+    <WarehouseInstruction />
+  </DocHeader>
+  <DocLine>
+    <OrderLine>1</OrderLine>
+    <Product>CZ760592</Product>
+    <Quantity>7</Quantity>
+    <UOM>CAN</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>0</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>2</OrderLine>
+    <Product>VY055032</Product>
+    <Quantity>10</Quantity>
+    <UOM>BOX</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>3.4</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>3</OrderLine>
+    <Product>XC541848</Product>
+    <Quantity>13</Quantity>
+    <UOM>PCS</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>5.6</VOCContent>
+    <BiocideCode>47032</BiocideCode>
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>4</OrderLine>
+    <Product>FH618011</Product>
+    <Quantity>16</Quantity>
+    <UOM>PAL</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>12</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>5</OrderLine>
+    <Product>FK969425</Product>
+    <Quantity>19</Quantity>
+    <UOM>DRM</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>22</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>6</OrderLine>
+    <Product>FV079975</Product>
+    <Quantity>22</Quantity>
+    <UOM>CAN</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>0</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+</Root>

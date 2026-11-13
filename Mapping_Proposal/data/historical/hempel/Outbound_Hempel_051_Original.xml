@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120051</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22051</CustomerNumber>
+    <DeliveryAddress>Kasteelstraat 72 49056 Lyon France</DeliveryAddress>
+    <ShipmentName />
+    <Name>Simon Services</Name>
+    <WarehouseID>FR30</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-07T17:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kasteelstraat 72</DlvStreet>
+    <DlvZipcode>49056</DlvZipcode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCounty>Lyon</DlvCounty>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <Recipient>Sofia Simon</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706051</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000051</RouteID>
+    <Qty>68.000000000000</Qty>
+    <ItemID>OJ146459</ItemID>
+    <InventoryOrderID>000206411</InventoryOrderID>
+    <DeliveryDate>2026-08-12T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394511</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030051</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 72 49056 Lyon France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Sterk Pomp Basic</Note>
+    <MultiComponentItemID>OJ146459</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 72 49056 Lyon France</DlvAddress>
+    <DlvStreet>Kasteelstraat 72</DlvStreet>
+    <DlvZipCode>49056</DlvZipCode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCountry>Lyon</DlvCountry>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394510</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000051</RouteID>
+    <Qty>2.000000000000</Qty>
+    <ItemID>XQ052919</ItemID>
+    <InventoryOrderID>000206412</InventoryOrderID>
+    <DeliveryDate>2026-08-12T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394512</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030051</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 72 49056 Lyon France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Industrieel Pomp Set</Note>
+    <MultiComponentItemID>XQ052919</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 72 49056 Lyon France</DlvAddress>
+    <DlvStreet>Kasteelstraat 72</DlvStreet>
+    <DlvZipCode>49056</DlvZipCode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCountry>Lyon</DlvCountry>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394510</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000051</RouteID>
+    <Qty>79.000000000000</Qty>
+    <ItemID>PJ928686</ItemID>
+    <InventoryOrderID>000206413</InventoryOrderID>
+    <DeliveryDate>2026-08-12T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394513</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030051</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 72 49056 Lyon France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Sterk Meetset Plus</Note>
+    <MultiComponentItemID>PJ928686</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 72 49056 Lyon France</DlvAddress>
+    <DlvStreet>Kasteelstraat 72</DlvStreet>
+    <DlvZipCode>49056</DlvZipCode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCountry>Lyon</DlvCountry>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394510</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000051</RouteID>
+    <Qty>95.000000000000</Qty>
+    <ItemID>ZA225708</ItemID>
+    <InventoryOrderID>000206414</InventoryOrderID>
+    <DeliveryDate>2026-08-12T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394514</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030051</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 72 49056 Lyon France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Modulair Pomp Plus</Note>
+    <MultiComponentItemID>ZA225708</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 72 49056 Lyon France</DlvAddress>
+    <DlvStreet>Kasteelstraat 72</DlvStreet>
+    <DlvZipCode>49056</DlvZipCode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCountry>Lyon</DlvCountry>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394510</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

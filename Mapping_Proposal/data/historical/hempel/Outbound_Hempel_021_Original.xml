@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120021</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22021</CustomerNumber>
+    <DeliveryAddress>Schoolstraat 151 39138 Bonn Germany</DeliveryAddress>
+    <ShipmentName />
+    <Name>Lambert Trading</Name>
+    <WarehouseID>DE20</WarehouseID>
+    <CompanyID>E223</CompanyID>
+    <PublishedByAX>2026-08-03T23:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Schoolstraat 151</DlvStreet>
+    <DlvZipcode>39138</DlvZipcode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCounty>Bonn</DlvCounty>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <Recipient>Yara Lambert</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706021</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000021</RouteID>
+    <Qty>3.000000000000</Qty>
+    <ItemID>QX125589</ItemID>
+    <InventoryOrderID>000206111</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394211</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030021</InventTransRefID>
+    <DeliveryAdress>Schoolstraat 151 39138 Bonn Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Automatisch Filter Pro</Note>
+    <MultiComponentItemID>QX125589</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Schoolstraat 151 39138 Bonn Germany</DlvAddress>
+    <DlvStreet>Schoolstraat 151</DlvStreet>
+    <DlvZipCode>39138</DlvZipCode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCountry>Bonn</DlvCountry>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394210</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000021</RouteID>
+    <Qty>48.000000000000</Qty>
+    <ItemID>BQ463244</ItemID>
+    <InventoryOrderID>000206112</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394212</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030021</InventTransRefID>
+    <DeliveryAdress>Schoolstraat 151 39138 Bonn Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Veilig Meetset X1</Note>
+    <MultiComponentItemID>BQ463244</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Schoolstraat 151 39138 Bonn Germany</DlvAddress>
+    <DlvStreet>Schoolstraat 151</DlvStreet>
+    <DlvZipCode>39138</DlvZipCode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCountry>Bonn</DlvCountry>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394210</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

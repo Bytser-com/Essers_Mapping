@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120139</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22139</CustomerNumber>
+    <DeliveryAddress>Marktplein 225 Afdeling 12 93689 Barcelona Spain</DeliveryAddress>
+    <ShipmentName />
+    <Name>Claes Supply</Name>
+    <WarehouseID>ES30</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-18T17:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Marktplein 225 Afdeling 12</DlvStreet>
+    <DlvZipcode>93689</DlvZipcode>
+    <DlvCity>Barcelona</DlvCity>
+    <DlvCounty>Barcelona</DlvCounty>
+    <DlvState>Barcelona</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <Recipient>Sofia Claes</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706139</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000139</RouteID>
+    <Qty>67.000000000000</Qty>
+    <ItemID>YD268665</ItemID>
+    <InventoryOrderID>000207291</InventoryOrderID>
+    <DeliveryDate>2026-08-23T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395391</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030139</InventTransRefID>
+    <DeliveryAdress>Marktplein 225 Afdeling 12 93689 Barcelona Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Professioneel Connector Set</Note>
+    <MultiComponentItemID>YD268665</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 225 Afdeling 12 93689 Barcelona Spain</DlvAddress>
+    <DlvStreet>Marktplein 225 Afdeling 12</DlvStreet>
+    <DlvZipCode>93689</DlvZipCode>
+    <DlvCity>Barcelona</DlvCity>
+    <DlvCountry>Barcelona</DlvCountry>
+    <DlvState>Barcelona</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1395390</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000139</RouteID>
+    <Qty>22.000000000000</Qty>
+    <ItemID>UF808158</ItemID>
+    <InventoryOrderID>000207292</InventoryOrderID>
+    <DeliveryDate>2026-08-23T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395392</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030139</InventTransRefID>
+    <DeliveryAdress>Marktplein 225 Afdeling 12 93689 Barcelona Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Universeel Filter Kit</Note>
+    <MultiComponentItemID>UF808158</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 225 Afdeling 12 93689 Barcelona Spain</DlvAddress>
+    <DlvStreet>Marktplein 225 Afdeling 12</DlvStreet>
+    <DlvZipCode>93689</DlvZipCode>
+    <DlvCity>Barcelona</DlvCity>
+    <DlvCountry>Barcelona</DlvCountry>
+    <DlvState>Barcelona</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1395390</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000139</RouteID>
+    <Qty>40.000000000000</Qty>
+    <ItemID>IU413225</ItemID>
+    <InventoryOrderID>000207293</InventoryOrderID>
+    <DeliveryDate>2026-08-23T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395393</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030139</InventTransRefID>
+    <DeliveryAdress>Marktplein 225 Afdeling 12 93689 Barcelona Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Snel Lader Set</Note>
+    <MultiComponentItemID>IU413225</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 225 Afdeling 12 93689 Barcelona Spain</DlvAddress>
+    <DlvStreet>Marktplein 225 Afdeling 12</DlvStreet>
+    <DlvZipCode>93689</DlvZipCode>
+    <DlvCity>Barcelona</DlvCity>
+    <DlvCountry>Barcelona</DlvCountry>
+    <DlvState>Barcelona</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1395390</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000139</RouteID>
+    <Qty>91.000000000000</Qty>
+    <ItemID>RR176677</ItemID>
+    <InventoryOrderID>000207294</InventoryOrderID>
+    <DeliveryDate>2026-08-23T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395394</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030139</InventTransRefID>
+    <DeliveryAdress>Marktplein 225 Afdeling 12 93689 Barcelona Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Slim Scanner Plus</Note>
+    <MultiComponentItemID>RR176677</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 225 Afdeling 12 93689 Barcelona Spain</DlvAddress>
+    <DlvStreet>Marktplein 225 Afdeling 12</DlvStreet>
+    <DlvZipCode>93689</DlvZipCode>
+    <DlvCity>Barcelona</DlvCity>
+    <DlvCountry>Barcelona</DlvCountry>
+    <DlvState>Barcelona</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1395390</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

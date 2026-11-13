@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120032</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22032</CustomerNumber>
+    <DeliveryAddress>Kanaalweg 201 Afdeling 4 95081 Hasselt Belgium</DeliveryAddress>
+    <ShipmentName />
+    <Name>Visser Logistics</Name>
+    <WarehouseID>BE10</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-05T08:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kanaalweg 201 Afdeling 4</DlvStreet>
+    <DlvZipcode>95081</DlvZipcode>
+    <DlvCity>Hasselt</DlvCity>
+    <DlvCounty>Hasselt</DlvCounty>
+    <DlvState>Hasselt</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <Recipient>Liam Visser</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706032</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000032</RouteID>
+    <Qty>65.000000000000</Qty>
+    <ItemID>XT661406</ItemID>
+    <InventoryOrderID>000206221</InventoryOrderID>
+    <DeliveryDate>2026-08-07T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394321</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030032</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 201 Afdeling 4 95081 Hasselt Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Compact Filter Pro</Note>
+    <MultiComponentItemID>XT661406</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 201 Afdeling 4 95081 Hasselt Belgium</DlvAddress>
+    <DlvStreet>Kanaalweg 201 Afdeling 4</DlvStreet>
+    <DlvZipCode>95081</DlvZipCode>
+    <DlvCity>Hasselt</DlvCity>
+    <DlvCountry>Hasselt</DlvCountry>
+    <DlvState>Hasselt</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394320</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000032</RouteID>
+    <Qty>57.000000000000</Qty>
+    <ItemID>BR995348</ItemID>
+    <InventoryOrderID>000206222</InventoryOrderID>
+    <DeliveryDate>2026-08-07T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394322</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030032</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 201 Afdeling 4 95081 Hasselt Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Snel Meetset X1</Note>
+    <MultiComponentItemID>BR995348</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 201 Afdeling 4 95081 Hasselt Belgium</DlvAddress>
+    <DlvStreet>Kanaalweg 201 Afdeling 4</DlvStreet>
+    <DlvZipCode>95081</DlvZipCode>
+    <DlvCity>Hasselt</DlvCity>
+    <DlvCountry>Hasselt</DlvCountry>
+    <DlvState>Hasselt</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394320</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000032</RouteID>
+    <Qty>72.000000000000</Qty>
+    <ItemID>QF735852</ItemID>
+    <InventoryOrderID>000206223</InventoryOrderID>
+    <DeliveryDate>2026-08-07T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394323</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030032</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 201 Afdeling 4 95081 Hasselt Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Licht Controller X2</Note>
+    <MultiComponentItemID>QF735852</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 201 Afdeling 4 95081 Hasselt Belgium</DlvAddress>
+    <DlvStreet>Kanaalweg 201 Afdeling 4</DlvStreet>
+    <DlvZipCode>95081</DlvZipCode>
+    <DlvCity>Hasselt</DlvCity>
+    <DlvCountry>Hasselt</DlvCountry>
+    <DlvState>Hasselt</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394320</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000032</RouteID>
+    <Qty>48.000000000000</Qty>
+    <ItemID>ZY129981</ItemID>
+    <InventoryOrderID>000206224</InventoryOrderID>
+    <DeliveryDate>2026-08-07T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394324</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030032</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 201 Afdeling 4 95081 Hasselt Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Veilig Omvormer Mini</Note>
+    <MultiComponentItemID>ZY129981</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 201 Afdeling 4 95081 Hasselt Belgium</DlvAddress>
+    <DlvStreet>Kanaalweg 201 Afdeling 4</DlvStreet>
+    <DlvZipCode>95081</DlvZipCode>
+    <DlvCity>Hasselt</DlvCity>
+    <DlvCountry>Hasselt</DlvCountry>
+    <DlvState>Hasselt</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394320</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000032</RouteID>
+    <Qty>1.000000000000</Qty>
+    <ItemID>PJ543141</ItemID>
+    <InventoryOrderID>000206225</InventoryOrderID>
+    <DeliveryDate>2026-08-07T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394325</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030032</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 201 Afdeling 4 95081 Hasselt Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Automatisch Adapter X2</Note>
+    <MultiComponentItemID>PJ543141</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 201 Afdeling 4 95081 Hasselt Belgium</DlvAddress>
+    <DlvStreet>Kanaalweg 201 Afdeling 4</DlvStreet>
+    <DlvZipCode>95081</DlvZipCode>
+    <DlvCity>Hasselt</DlvCity>
+    <DlvCountry>Hasselt</DlvCountry>
+    <DlvState>Hasselt</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394320</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

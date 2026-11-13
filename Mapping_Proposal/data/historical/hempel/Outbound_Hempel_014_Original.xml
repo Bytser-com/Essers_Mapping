@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120014</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22014</CustomerNumber>
+    <DeliveryAddress>Industrieweg 9 Gebouw R 25432 Bologna Italy</DeliveryAddress>
+    <ShipmentName />
+    <Name>Martin Logistics</Name>
+    <WarehouseID>IT20</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-03T02:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Industrieweg 9 Gebouw R</DlvStreet>
+    <DlvZipcode>25432</DlvZipcode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCounty>Bologna</DlvCounty>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <Recipient>Victor Martin</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706014</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000014</RouteID>
+    <Qty>94.000000000000</Qty>
+    <ItemID>PJ543141</ItemID>
+    <InventoryOrderID>000206041</InventoryOrderID>
+    <DeliveryDate>2026-08-11T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394141</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030014</InventTransRefID>
+    <DeliveryAdress>Industrieweg 9 Gebouw R 25432 Bologna Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Automatisch Adapter X2</Note>
+    <MultiComponentItemID>PJ543141</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 9 Gebouw R 25432 Bologna Italy</DlvAddress>
+    <DlvStreet>Industrieweg 9 Gebouw R</DlvStreet>
+    <DlvZipCode>25432</DlvZipCode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCountry>Bologna</DlvCountry>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394140</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000014</RouteID>
+    <Qty>37.000000000000</Qty>
+    <ItemID>OS829664</ItemID>
+    <InventoryOrderID>000206042</InventoryOrderID>
+    <DeliveryDate>2026-08-11T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394142</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030014</InventTransRefID>
+    <DeliveryAdress>Industrieweg 9 Gebouw R 25432 Bologna Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Universeel Pomp Plus</Note>
+    <MultiComponentItemID>OS829664</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 9 Gebouw R 25432 Bologna Italy</DlvAddress>
+    <DlvStreet>Industrieweg 9 Gebouw R</DlvStreet>
+    <DlvZipCode>25432</DlvZipCode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCountry>Bologna</DlvCountry>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394140</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000014</RouteID>
+    <Qty>39.000000000000</Qty>
+    <ItemID>OP206335</ItemID>
+    <InventoryOrderID>000206043</InventoryOrderID>
+    <DeliveryDate>2026-08-11T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394143</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030014</InventTransRefID>
+    <DeliveryAdress>Industrieweg 9 Gebouw R 25432 Bologna Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Modulair Sensor Basic</Note>
+    <MultiComponentItemID>OP206335</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 9 Gebouw R 25432 Bologna Italy</DlvAddress>
+    <DlvStreet>Industrieweg 9 Gebouw R</DlvStreet>
+    <DlvZipCode>25432</DlvZipCode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCountry>Bologna</DlvCountry>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394140</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

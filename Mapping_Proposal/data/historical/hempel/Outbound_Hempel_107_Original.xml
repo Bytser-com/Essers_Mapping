@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120107</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22107</CustomerNumber>
+    <DeliveryAddress>Havenlaan 107 Afdeling 4 23343 Bilbao Spain</DeliveryAddress>
+    <ShipmentName />
+    <Name>Mertens Supply</Name>
+    <WarehouseID>ES30</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-14T17:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Havenlaan 107 Afdeling 4</DlvStreet>
+    <DlvZipcode>23343</DlvZipcode>
+    <DlvCity>Bilbao</DlvCity>
+    <DlvCounty>Bilbao</DlvCounty>
+    <DlvState>Bilbao</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <Recipient>Liam Mertens</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706107</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000107</RouteID>
+    <Qty>77.000000000000</Qty>
+    <ItemID>PJ928686</ItemID>
+    <InventoryOrderID>000206971</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395071</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030107</InventTransRefID>
+    <DeliveryAdress>Havenlaan 107 Afdeling 4 23343 Bilbao Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Sterk Meetset Plus</Note>
+    <MultiComponentItemID>PJ928686</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Havenlaan 107 Afdeling 4 23343 Bilbao Spain</DlvAddress>
+    <DlvStreet>Havenlaan 107 Afdeling 4</DlvStreet>
+    <DlvZipCode>23343</DlvZipCode>
+    <DlvCity>Bilbao</DlvCity>
+    <DlvCountry>Bilbao</DlvCountry>
+    <DlvState>Bilbao</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1395070</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000107</RouteID>
+    <Qty>31.000000000000</Qty>
+    <ItemID>MM230317</ItemID>
+    <InventoryOrderID>000206972</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395072</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030107</InventTransRefID>
+    <DeliveryAdress>Havenlaan 107 Afdeling 4 23343 Bilbao Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Modulair Meetset Plus</Note>
+    <MultiComponentItemID>MM230317</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Havenlaan 107 Afdeling 4 23343 Bilbao Spain</DlvAddress>
+    <DlvStreet>Havenlaan 107 Afdeling 4</DlvStreet>
+    <DlvZipCode>23343</DlvZipCode>
+    <DlvCity>Bilbao</DlvCity>
+    <DlvCountry>Bilbao</DlvCountry>
+    <DlvState>Bilbao</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1395070</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000107</RouteID>
+    <Qty>29.000000000000</Qty>
+    <ItemID>YN194052</ItemID>
+    <InventoryOrderID>000206973</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395073</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030107</InventTransRefID>
+    <DeliveryAdress>Havenlaan 107 Afdeling 4 23343 Bilbao Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Premium Omvormer X1</Note>
+    <MultiComponentItemID>YN194052</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Havenlaan 107 Afdeling 4 23343 Bilbao Spain</DlvAddress>
+    <DlvStreet>Havenlaan 107 Afdeling 4</DlvStreet>
+    <DlvZipCode>23343</DlvZipCode>
+    <DlvCity>Bilbao</DlvCity>
+    <DlvCountry>Bilbao</DlvCountry>
+    <DlvState>Bilbao</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1395070</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000107</RouteID>
+    <Qty>39.000000000000</Qty>
+    <ItemID>WK236695</ItemID>
+    <InventoryOrderID>000206974</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395074</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030107</InventTransRefID>
+    <DeliveryAdress>Havenlaan 107 Afdeling 4 23343 Bilbao Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Flexibel Lader V2</Note>
+    <MultiComponentItemID>WK236695</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Havenlaan 107 Afdeling 4 23343 Bilbao Spain</DlvAddress>
+    <DlvStreet>Havenlaan 107 Afdeling 4</DlvStreet>
+    <DlvZipCode>23343</DlvZipCode>
+    <DlvCity>Bilbao</DlvCity>
+    <DlvCountry>Bilbao</DlvCountry>
+    <DlvState>Bilbao</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1395070</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

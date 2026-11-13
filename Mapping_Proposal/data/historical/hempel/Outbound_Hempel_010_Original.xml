@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120010</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22010</CustomerNumber>
+    <DeliveryAddress>Kasteelstraat 241 Bus 10 87756 Lille France</DeliveryAddress>
+    <ShipmentName />
+    <Name>Schmidt Industries</Name>
+    <WarehouseID>FR30</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-02T14:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kasteelstraat 241 Bus 10</DlvStreet>
+    <DlvZipcode>87756</DlvZipcode>
+    <DlvCity>Lille</DlvCity>
+    <DlvCounty>Lille</DlvCounty>
+    <DlvState>Lille</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <Recipient>Ella Schmidt</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706010</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000010</RouteID>
+    <Qty>81.000000000000</Qty>
+    <ItemID>WJ326171</ItemID>
+    <InventoryOrderID>000206001</InventoryOrderID>
+    <DeliveryDate>2026-08-06T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394101</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030010</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 241 Bus 10 87756 Lille France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Precisie Adapter X2</Note>
+    <MultiComponentItemID>WJ326171</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 241 Bus 10 87756 Lille France</DlvAddress>
+    <DlvStreet>Kasteelstraat 241 Bus 10</DlvStreet>
+    <DlvZipCode>87756</DlvZipCode>
+    <DlvCity>Lille</DlvCity>
+    <DlvCountry>Lille</DlvCountry>
+    <DlvState>Lille</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394100</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000010</RouteID>
+    <Qty>69.000000000000</Qty>
+    <ItemID>OU487588</ItemID>
+    <InventoryOrderID>000206002</InventoryOrderID>
+    <DeliveryDate>2026-08-06T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394102</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030010</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 241 Bus 10 87756 Lille France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Compact Module Basic</Note>
+    <MultiComponentItemID>OU487588</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 241 Bus 10 87756 Lille France</DlvAddress>
+    <DlvStreet>Kasteelstraat 241 Bus 10</DlvStreet>
+    <DlvZipCode>87756</DlvZipCode>
+    <DlvCity>Lille</DlvCity>
+    <DlvCountry>Lille</DlvCountry>
+    <DlvState>Lille</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394100</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000010</RouteID>
+    <Qty>60.000000000000</Qty>
+    <ItemID>QF735852</ItemID>
+    <InventoryOrderID>000206003</InventoryOrderID>
+    <DeliveryDate>2026-08-06T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394103</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030010</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 241 Bus 10 87756 Lille France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Licht Controller X2</Note>
+    <MultiComponentItemID>QF735852</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 241 Bus 10 87756 Lille France</DlvAddress>
+    <DlvStreet>Kasteelstraat 241 Bus 10</DlvStreet>
+    <DlvZipCode>87756</DlvZipCode>
+    <DlvCity>Lille</DlvCity>
+    <DlvCountry>Lille</DlvCountry>
+    <DlvState>Lille</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394100</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120037</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22037</CustomerNumber>
+    <DeliveryAddress>Molenweg 10 Unit 20 10973 Eindhoven Netherlands</DeliveryAddress>
+    <ShipmentName />
+    <Name>De Smet Supply</Name>
+    <WarehouseID>NL20</WarehouseID>
+    <CompanyID>E223</CompanyID>
+    <PublishedByAX>2026-08-05T23:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Molenweg 10 Unit 20</DlvStreet>
+    <DlvZipcode>10973</DlvZipcode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCounty>Eindhoven</DlvCounty>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <Recipient>Sara De Smet</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706037</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000037</RouteID>
+    <Qty>71.000000000000</Qty>
+    <ItemID>FK969425</ItemID>
+    <InventoryOrderID>000206271</InventoryOrderID>
+    <DeliveryDate>2026-08-12T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394371</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030037</InventTransRefID>
+    <DeliveryAdress>Molenweg 10 Unit 20 10973 Eindhoven Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Sterk Kabel Max</Note>
+    <MultiComponentItemID>FK969425</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 10 Unit 20 10973 Eindhoven Netherlands</DlvAddress>
+    <DlvStreet>Molenweg 10 Unit 20</DlvStreet>
+    <DlvZipCode>10973</DlvZipCode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCountry>Eindhoven</DlvCountry>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1394370</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000037</RouteID>
+    <Qty>89.000000000000</Qty>
+    <ItemID>LI953172</ItemID>
+    <InventoryOrderID>000206272</InventoryOrderID>
+    <DeliveryDate>2026-08-12T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394372</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030037</InventTransRefID>
+    <DeliveryAdress>Molenweg 10 Unit 20 10973 Eindhoven Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Digitaal Controller Max</Note>
+    <MultiComponentItemID>LI953172</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 10 Unit 20 10973 Eindhoven Netherlands</DlvAddress>
+    <DlvStreet>Molenweg 10 Unit 20</DlvStreet>
+    <DlvZipCode>10973</DlvZipCode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCountry>Eindhoven</DlvCountry>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1394370</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>
