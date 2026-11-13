@@ -1,0 +1,89 @@
+name: Version Control CI
+
+on:
+  pull_request:
+    branches: [main, Testing, Development]
+  push:
+    branches: [main, Testing, Development]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  packages: write
+
+concurrency:
+  group: version-control-ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    name: Detect version control changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      changed: ${{ steps.changes.outputs.changed }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Detect version control changes
+        id: changes
+        uses: ./.github/actions/service-changes
+        with:
+          service-path: Version_Control
+          workflow-path: .github/workflows/version-control-ci.yml
+          shared-paths: |
+            Scripts/detect-service-changes.py
+            .github/workflows/java-service-ci.yml
+            .github/actions/dependency-audit
+            Scripts/dependency-inventory.py
+            .github/workflows/version-control-cd.yml
+            .github/workflows/service-cd.yml
+            Scripts/smoke-service-image.sh
+            Scripts/registry-pull-secret.py
+            Scripts/cleanup-deployment-overrides.py
+
+  checks:
+    name: Version Control checks
+    needs: changes
+    if: needs.changes.outputs.changed == 'true'
+    uses: ./.github/workflows/java-service-ci.yml
+    with:
+      service-path: Version_Control
+      artifact-prefix: version-control
+
+  quality-gate:
+    name: Version Control CI Gate
+    needs: [changes, checks]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require successful change detection
+        env:
+          RESULT: ${{ needs.changes.result }}
+        run: test "$RESULT" = success
+
+      - name: Require successful checks when the service changed
+        if: needs.changes.outputs.changed != 'false'
+        env:
+          RESULT: ${{ needs.checks.result }}
+        run: test "$RESULT" = success
+
+  delivery:
+    name: Version Control CD
+    needs: [changes, checks, quality-gate]
+    if: github.event_name == 'push' && (github.ref_name == 'Testing' || github.ref_name == 'main') && needs.changes.outputs.changed == 'true'
+    uses: ./.github/workflows/service-cd.yml
+    with:
+      service-path: Version_Control
+      image-name: version-control-backend
+      deployment: version-control-backend
+      ci-workflow: version-control-ci.yml
+      artifact-name: version-control-jar
+      artifact-path: 'Version_Control/target'
+    secrets: inherit
