@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root>
+  <MessageType>Outbound Delivery</MessageType>
+  <DocHeader>
+    <OutboundNumber>SO270000097</OutboundNumber>
+    <DocumentNumber>SO270000097</DocumentNumber>
+    <Reference>600097 /70097</Reference>
+    <DeliveryDate>16/02/2027</DeliveryDate>
+    <ShipByDate>11/02/2027</ShipByDate>
+    <RushIndicator>N</RushIndicator>
+    <Carrier>DHL</Carrier>
+    <ShipToCode>200097</ShipToCode>
+    <Name1>Jules Mertens</Name1>
+    <Name2>Mertens Supply</Name2>
+    <Address1>Kerkstraat 60</Address1>
+    <Address2>Bus 7</Address2>
+    <PostalCode>24481</PostalCode>
+    <City>Lille</City>
+    <County />
+    <Country>FR</Country>
+    <LanguageCode>FR</LanguageCode>
+    <CommentCustomer />
+    <CommentOrder>
+      <Comment>Customer Reference: 800097</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>INCO:DAP</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>T4T : +32 11 47 67 87</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>Open: Ma-Di-Wo-Do-Vr 08:00-16:00</Comment>
+    </CommentOrder>
+    <TransportInstruction>
+      <Comment>T4T : +32 11 47 67 87</Comment>
+    </TransportInstruction>
+    <TransportInstruction>
+      <Comment>F92 : 1 08001600 2 08001600 3 08001600 4 08001600 5 08001600</Comment>
+    </TransportInstruction>
+    <WarehouseInstruction />
+  </DocHeader>
+  <DocLine>
+    <OrderLine>1</OrderLine>
+    <Product>JO119261</Product>
+    <Quantity>2</Quantity>
+    <UOM>PCS</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>5.6</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+</Root>

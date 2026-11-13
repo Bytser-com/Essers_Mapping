@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120050</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22050</CustomerNumber>
+    <DeliveryAddress>Ringlaan 64 Afdeling 2 44377 Brussel Belgium</DeliveryAddress>
+    <ShipmentName />
+    <Name>De Smet Transport</Name>
+    <WarehouseID>BE10</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-07T14:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Ringlaan 64 Afdeling 2</DlvStreet>
+    <DlvZipcode>44377</DlvZipcode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCounty>Brussel</DlvCounty>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <Recipient>Mats De Smet</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706050</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000050</RouteID>
+    <Qty>90.000000000000</Qty>
+    <ItemID>XE911016</ItemID>
+    <InventoryOrderID>000206401</InventoryOrderID>
+    <DeliveryDate>2026-08-11T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394501</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030050</InventTransRefID>
+    <DeliveryAdress>Ringlaan 64 Afdeling 2 44377 Brussel Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Precisie Scanner Max</Note>
+    <MultiComponentItemID>XE911016</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 64 Afdeling 2 44377 Brussel Belgium</DlvAddress>
+    <DlvStreet>Ringlaan 64 Afdeling 2</DlvStreet>
+    <DlvZipCode>44377</DlvZipCode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCountry>Brussel</DlvCountry>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394500</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000050</RouteID>
+    <Qty>59.000000000000</Qty>
+    <ItemID>BJ925857</ItemID>
+    <InventoryOrderID>000206402</InventoryOrderID>
+    <DeliveryDate>2026-08-11T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394502</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030050</InventTransRefID>
+    <DeliveryAdress>Ringlaan 64 Afdeling 2 44377 Brussel Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Universeel Houder Max</Note>
+    <MultiComponentItemID>BJ925857</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 64 Afdeling 2 44377 Brussel Belgium</DlvAddress>
+    <DlvStreet>Ringlaan 64 Afdeling 2</DlvStreet>
+    <DlvZipCode>44377</DlvZipCode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCountry>Brussel</DlvCountry>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394500</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000050</RouteID>
+    <Qty>76.000000000000</Qty>
+    <ItemID>HB528294</ItemID>
+    <InventoryOrderID>000206403</InventoryOrderID>
+    <DeliveryDate>2026-08-11T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394503</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030050</InventTransRefID>
+    <DeliveryAdress>Ringlaan 64 Afdeling 2 44377 Brussel Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Modulair Filter Basic</Note>
+    <MultiComponentItemID>HB528294</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 64 Afdeling 2 44377 Brussel Belgium</DlvAddress>
+    <DlvStreet>Ringlaan 64 Afdeling 2</DlvStreet>
+    <DlvZipCode>44377</DlvZipCode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCountry>Brussel</DlvCountry>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394500</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

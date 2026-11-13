@@ -1,0 +1,280 @@
+<?xml version='1.0' encoding='utf-8'?>
+<SHP_OBDLV_SAVE_REPLICA05 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <IDOC BEGIN="1">
+    <EDI_DC40 SEGMENT="1">
+      <TABNAM>EDI_DC40</TABNAM>
+      <DIRECT>1</DIRECT>
+      <IDOCTYP>SHP_OBDLV_SAVE_REPLICA05</IDOCTYP>
+      <MESTYP>SHP_OBDLV_SAVE_REPLICA</MESTYP>
+    </EDI_DC40>
+    <E1SHP_OBDLV_SAVE_REPLICA SEGMENT="1">
+      <E1BPOBDLVHDR SEGMENT="1">
+        <DELIV_NUMB>30120026</DELIV_NUMB>
+        <INCOTERMS1>CIF</INCOTERMS1>
+        <DLV_TYPE>TSB24</DLV_TYPE>
+        <ROUTE>P000026</ROUTE>
+      </E1BPOBDLVHDR>
+      <E1BPDLVPARTNER SEGMENT="1">
+        <PARTN_ROLE>WE</PARTN_ROLE>
+        <PARTNER_NO>000706026</PARTNER_NO>
+        <ADDRESS_NO>WE</ADDRESS_NO>
+      </E1BPDLVPARTNER>
+      <E1BPDLVDEADLN SEGMENT="1">
+        <TIMETYPE>WSHDRWADAT</TIMETYPE>
+        <TIMESTAMP_UTC>20260808000000</TIMESTAMP_UTC>
+        <TIMEZONE>CET</TIMEZONE>
+      </E1BPDLVDEADLN>
+      <E1BPADR1 SEGMENT="1">
+        <ADDR_NO>WE</ADDR_NO>
+        <NAME>Schmidt Trading</NAME>
+        <STREET>Industrieweg 23</STREET>
+        <STR_SUPPL1>Afdeling 4</STR_SUPPL1>
+        <STR_SUPPL2>Ella Schmidt</STR_SUPPL2>
+        <POSTL_COD1>29571</POSTL_COD1>
+        <CITY>Bilbao</CITY>
+        <COUNTRY>ESP</COUNTRY>
+        <NAME_3 />
+      </E1BPADR1>
+      <E1BPEXT>
+        <PARAM>0030120026</PARAM>
+        <ROW>1</ROW>
+        <FIELD>WHID</FIELD>
+        <VALUE>ES30</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026</PARAM>
+        <ROW>1</ROW>
+        <FIELD>COMPID</FIELD>
+        <VALUE>E224</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026</PARAM>
+        <ROW>1</ROW>
+        <FIELD>SPI</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026</PARAM>
+        <ROW>1</ROW>
+        <FIELD>WHI</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026</PARAM>
+        <ROW>1</ROW>
+        <FIELD>COUNTY_WE</FIELD>
+        <VALUE>Bilbao</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026</PARAM>
+        <ROW>1</ROW>
+        <FIELD>STATE_WE</FIELD>
+        <VALUE>Bilbao</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026</PARAM>
+        <ROW>1</ROW>
+        <FIELD>F99</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026</PARAM>
+        <ROW>1</ROW>
+        <FIELD>ISMT</FIELD>
+        <VALUE>0</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026</PARAM>
+        <ROW>1</ROW>
+        <FIELD>TRA</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026</PARAM>
+        <ROW>1</ROW>
+        <FIELD>TRANS_CAT</FIELD>
+        <VALUE>00</VALUE>
+      </E1BPEXT>
+      <E1BPOBDLVITEM SEGMENT="1">
+        <DELIV_NUMB>30120026</DELIV_NUMB>
+        <ITM_NUMBER>000001</ITM_NUMBER>
+        <MATERIAL>NL338526</MATERIAL>
+        <BATCH />
+        <DLV_QTY_STOCK>53.000000000000</DLV_QTY_STOCK>
+        <BASE_UOM>EA</BASE_UOM>
+      </E1BPOBDLVITEM>
+      <E1BPOBDLVITEM SEGMENT="1">
+        <DELIV_NUMB>30120026</DELIV_NUMB>
+        <ITM_NUMBER>000002</ITM_NUMBER>
+        <MATERIAL>OE221132</MATERIAL>
+        <BATCH />
+        <DLV_QTY_STOCK>54.000000000000</DLV_QTY_STOCK>
+        <BASE_UOM>EA</BASE_UOM>
+      </E1BPOBDLVITEM>
+      <E1BPOBDLVITEM SEGMENT="1">
+        <DELIV_NUMB>30120026</DELIV_NUMB>
+        <ITM_NUMBER>000003</ITM_NUMBER>
+        <MATERIAL>ZD987507</MATERIAL>
+        <BATCH />
+        <DLV_QTY_STOCK>93.000000000000</DLV_QTY_STOCK>
+        <BASE_UOM>EA</BASE_UOM>
+      </E1BPOBDLVITEM>
+      <E1BPOBDLVITEMORG SEGMENT="1">
+        <ITM_NUMBER>000001</ITM_NUMBER>
+        <STGE_LOC>ES30</STGE_LOC>
+      </E1BPOBDLVITEMORG>
+      <E1BPOBDLVITEMORG SEGMENT="1">
+        <ITM_NUMBER>000002</ITM_NUMBER>
+        <STGE_LOC>ES30</STGE_LOC>
+      </E1BPOBDLVITEMORG>
+      <E1BPOBDLVITEMORG SEGMENT="1">
+        <ITM_NUMBER>000003</ITM_NUMBER>
+        <STGE_LOC>ES30</STGE_LOC>
+      </E1BPOBDLVITEMORG>
+      <E1BPEXT>
+        <PARAM>0030120026000001</PARAM>
+        <ROW>1</ROW>
+        <FIELD>DES</FIELD>
+        <VALUE>Industrieel Connector Max</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000001</PARAM>
+        <ROW>1</ROW>
+        <FIELD>CMP</FIELD>
+        <VALUE>e224</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000001</PARAM>
+        <ROW>1</ROW>
+        <FIELD>COL</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000001</PARAM>
+        <ROW>1</ROW>
+        <FIELD>CR2</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000001</PARAM>
+        <ROW>1</ROW>
+        <FIELD>MCL</FIELD>
+        <VALUE>1</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000001</PARAM>
+        <ROW>1</ROW>
+        <FIELD>SON</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000001</PARAM>
+        <ROW>1</ROW>
+        <FIELD>AQP</FIELD>
+        <VALUE>0</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000001</PARAM>
+        <ROW>1</ROW>
+        <FIELD>WHI</FIELD>
+        <VALUE>ES30</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000002</PARAM>
+        <ROW>1</ROW>
+        <FIELD>DES</FIELD>
+        <VALUE>Professioneel Kabel Mini</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000002</PARAM>
+        <ROW>1</ROW>
+        <FIELD>CMP</FIELD>
+        <VALUE>e224</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000002</PARAM>
+        <ROW>1</ROW>
+        <FIELD>COL</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000002</PARAM>
+        <ROW>1</ROW>
+        <FIELD>CR2</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000002</PARAM>
+        <ROW>1</ROW>
+        <FIELD>MCL</FIELD>
+        <VALUE>1</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000002</PARAM>
+        <ROW>1</ROW>
+        <FIELD>SON</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000002</PARAM>
+        <ROW>1</ROW>
+        <FIELD>AQP</FIELD>
+        <VALUE>0</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000002</PARAM>
+        <ROW>1</ROW>
+        <FIELD>WHI</FIELD>
+        <VALUE>ES30</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000003</PARAM>
+        <ROW>1</ROW>
+        <FIELD>DES</FIELD>
+        <VALUE>Robuust Lader Plus</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000003</PARAM>
+        <ROW>1</ROW>
+        <FIELD>CMP</FIELD>
+        <VALUE>e224</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000003</PARAM>
+        <ROW>1</ROW>
+        <FIELD>COL</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000003</PARAM>
+        <ROW>1</ROW>
+        <FIELD>CR2</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000003</PARAM>
+        <ROW>1</ROW>
+        <FIELD>MCL</FIELD>
+        <VALUE>1</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000003</PARAM>
+        <ROW>1</ROW>
+        <FIELD>SON</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000003</PARAM>
+        <ROW>1</ROW>
+        <FIELD>AQP</FIELD>
+        <VALUE>0</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120026000003</PARAM>
+        <ROW>1</ROW>
+        <FIELD>WHI</FIELD>
+        <VALUE>ES30</VALUE>
+      </E1BPEXT>
+    </E1SHP_OBDLV_SAVE_REPLICA>
+  </IDOC>
+</SHP_OBDLV_SAVE_REPLICA05>

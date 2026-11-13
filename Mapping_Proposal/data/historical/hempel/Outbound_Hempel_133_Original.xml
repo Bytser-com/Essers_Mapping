@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120133</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22133</CustomerNumber>
+    <DeliveryAddress>Ringlaan 37 Unit 9 36386 Bologna Italy</DeliveryAddress>
+    <ShipmentName />
+    <Name>Leclercq Trading</Name>
+    <WarehouseID>IT20</WarehouseID>
+    <CompanyID>E223</CompanyID>
+    <PublishedByAX>2026-08-17T23:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Ringlaan 37 Unit 9</DlvStreet>
+    <DlvZipcode>36386</DlvZipcode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCounty>Bologna</DlvCounty>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <Recipient>Lina Leclercq</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706133</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000133</RouteID>
+    <Qty>87.000000000000</Qty>
+    <ItemID>CB881402</ItemID>
+    <InventoryOrderID>000207231</InventoryOrderID>
+    <DeliveryDate>2026-08-24T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395331</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030133</InventTransRefID>
+    <DeliveryAdress>Ringlaan 37 Unit 9 36386 Bologna Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Precisie Filter Kit</Note>
+    <MultiComponentItemID>CB881402</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 37 Unit 9 36386 Bologna Italy</DlvAddress>
+    <DlvStreet>Ringlaan 37 Unit 9</DlvStreet>
+    <DlvZipCode>36386</DlvZipCode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCountry>Bologna</DlvCountry>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395330</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000133</RouteID>
+    <Qty>88.000000000000</Qty>
+    <ItemID>KL754984</ItemID>
+    <InventoryOrderID>000207232</InventoryOrderID>
+    <DeliveryDate>2026-08-24T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395332</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030133</InventTransRefID>
+    <DeliveryAdress>Ringlaan 37 Unit 9 36386 Bologna Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Eco Ventiel X2</Note>
+    <MultiComponentItemID>KL754984</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 37 Unit 9 36386 Bologna Italy</DlvAddress>
+    <DlvStreet>Ringlaan 37 Unit 9</DlvStreet>
+    <DlvZipCode>36386</DlvZipCode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCountry>Bologna</DlvCountry>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395330</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120067</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22067</CustomerNumber>
+    <DeliveryAddress>Parklaan 93 Afdeling 1 27848 Genk Belgium</DeliveryAddress>
+    <ShipmentName />
+    <Name>Vermeulen Industries</Name>
+    <WarehouseID>BE10</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-09T17:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Parklaan 93 Afdeling 1</DlvStreet>
+    <DlvZipcode>27848</DlvZipcode>
+    <DlvCity>Genk</DlvCity>
+    <DlvCounty>Genk</DlvCounty>
+    <DlvState>Genk</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <Recipient>Mats Vermeulen</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706067</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000067</RouteID>
+    <Qty>67.000000000000</Qty>
+    <ItemID>UL312740</ItemID>
+    <InventoryOrderID>000206571</InventoryOrderID>
+    <DeliveryDate>2026-08-14T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394671</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030067</InventTransRefID>
+    <DeliveryAdress>Parklaan 93 Afdeling 1 27848 Genk Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Precisie Omvormer Max</Note>
+    <MultiComponentItemID>UL312740</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Parklaan 93 Afdeling 1 27848 Genk Belgium</DlvAddress>
+    <DlvStreet>Parklaan 93 Afdeling 1</DlvStreet>
+    <DlvZipCode>27848</DlvZipCode>
+    <DlvCity>Genk</DlvCity>
+    <DlvCountry>Genk</DlvCountry>
+    <DlvState>Genk</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394670</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000067</RouteID>
+    <Qty>90.000000000000</Qty>
+    <ItemID>JO119261</ItemID>
+    <InventoryOrderID>000206572</InventoryOrderID>
+    <DeliveryDate>2026-08-14T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394672</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030067</InventTransRefID>
+    <DeliveryAdress>Parklaan 93 Afdeling 1 27848 Genk Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Compact Adapter Mini</Note>
+    <MultiComponentItemID>JO119261</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Parklaan 93 Afdeling 1 27848 Genk Belgium</DlvAddress>
+    <DlvStreet>Parklaan 93 Afdeling 1</DlvStreet>
+    <DlvZipCode>27848</DlvZipCode>
+    <DlvCity>Genk</DlvCity>
+    <DlvCountry>Genk</DlvCountry>
+    <DlvState>Genk</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394670</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000067</RouteID>
+    <Qty>92.000000000000</Qty>
+    <ItemID>TV691955</ItemID>
+    <InventoryOrderID>000206573</InventoryOrderID>
+    <DeliveryDate>2026-08-14T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394673</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030067</InventTransRefID>
+    <DeliveryAdress>Parklaan 93 Afdeling 1 27848 Genk Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Professioneel Sensor Mini</Note>
+    <MultiComponentItemID>TV691955</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Parklaan 93 Afdeling 1 27848 Genk Belgium</DlvAddress>
+    <DlvStreet>Parklaan 93 Afdeling 1</DlvStreet>
+    <DlvZipCode>27848</DlvZipCode>
+    <DlvCity>Genk</DlvCity>
+    <DlvCountry>Genk</DlvCountry>
+    <DlvState>Genk</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394670</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000067</RouteID>
+    <Qty>40.000000000000</Qty>
+    <ItemID>ZK304024</ItemID>
+    <InventoryOrderID>000206574</InventoryOrderID>
+    <DeliveryDate>2026-08-14T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394674</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030067</InventTransRefID>
+    <DeliveryAdress>Parklaan 93 Afdeling 1 27848 Genk Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Mobiel Connector Kit</Note>
+    <MultiComponentItemID>ZK304024</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Parklaan 93 Afdeling 1 27848 Genk Belgium</DlvAddress>
+    <DlvStreet>Parklaan 93 Afdeling 1</DlvStreet>
+    <DlvZipCode>27848</DlvZipCode>
+    <DlvCity>Genk</DlvCity>
+    <DlvCountry>Genk</DlvCountry>
+    <DlvState>Genk</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394670</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

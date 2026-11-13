@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root>
+  <MessageType>Outbound Delivery</MessageType>
+  <DocHeader>
+    <OutboundNumber>SO270000032</OutboundNumber>
+    <DocumentNumber>SO270000032</DocumentNumber>
+    <Reference>600032 /70032</Reference>
+    <DeliveryDate>09/10/2026</DeliveryDate>
+    <ShipByDate>04/10/2026</ShipByDate>
+    <RushIndicator>N</RushIndicator>
+    <Carrier>DHL</Carrier>
+    <ShipToCode>200032</ShipToCode>
+    <Name1>Liam Visser</Name1>
+    <Name2>Visser Logistics</Name2>
+    <Address1>Kanaalweg 201</Address1>
+    <Address2>Afdeling 4</Address2>
+    <PostalCode>95081</PostalCode>
+    <City>Hasselt</City>
+    <County />
+    <Country>BE</Country>
+    <LanguageCode>FR</LanguageCode>
+    <CommentCustomer />
+    <CommentOrder>
+      <Comment>Customer Reference: 800032</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>INCO:DAP</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>T4T : +32 11 52 62 72</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>Open: Ma-Di-Wo-Do-Vr 08:00-16:00</Comment>
+    </CommentOrder>
+    <TransportInstruction>
+      <Comment>T4T : +32 11 52 62 72</Comment>
+    </TransportInstruction>
+    <TransportInstruction>
+      <Comment>F92 : 1 08001600 2 08001600 3 08001600 4 08001600 5 08001600</Comment>
+    </TransportInstruction>
+    <WarehouseInstruction />
+  </DocHeader>
+  <DocLine>
+    <OrderLine>1</OrderLine>
+    <Product>TZ451902</Product>
+    <Quantity>9</Quantity>
+    <UOM>PCS</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>5.6</VOCContent>
+    <BiocideCode>47032</BiocideCode>
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>2</OrderLine>
+    <Product>VL001652</Product>
+    <Quantity>12</Quantity>
+    <UOM>PAL</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>12</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>3</OrderLine>
+    <Product>BU942225</Product>
+    <Quantity>15</Quantity>
+    <UOM>DRM</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>22</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>4</OrderLine>
+    <Product>PK515644</Product>
+    <Quantity>18</Quantity>
+    <UOM>CAN</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>0</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>5</OrderLine>
+    <Product>HN586974</Product>
+    <Quantity>21</Quantity>
+    <UOM>BOX</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>3.4</VOCContent>
+    <BiocideCode>47036</BiocideCode>
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>6</OrderLine>
+    <Product>ZZ409088</Product>
+    <Quantity>24</Quantity>
+    <UOM>PCS</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>5.6</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>7</OrderLine>
+    <Product>DK308401</Product>
+    <Quantity>3</Quantity>
+    <UOM>PAL</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>12</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>8</OrderLine>
+    <Product>WR012433</Product>
+    <Quantity>6</Quantity>
+    <UOM>DRM</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>22</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+</Root>

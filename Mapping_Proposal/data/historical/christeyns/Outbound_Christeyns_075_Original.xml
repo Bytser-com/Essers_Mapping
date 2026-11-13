@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root>
+  <MessageType>Outbound Delivery</MessageType>
+  <DocHeader>
+    <OutboundNumber>SO270000074</OutboundNumber>
+    <DocumentNumber>SO270000074</DocumentNumber>
+    <Reference>600074 /70074</Reference>
+    <DeliveryDate>03/01/2027</DeliveryDate>
+    <ShipByDate>27/12/2026</ShipByDate>
+    <RushIndicator>N</RushIndicator>
+    <Carrier>KLG</Carrier>
+    <ShipToCode>200074</ShipToCode>
+    <Name1>Yara Vermeulen</Name1>
+    <Name2>Vermeulen Trading</Name2>
+    <Address1>Kasteelstraat 256</Address1>
+    <Address2>Gebouw B</Address2>
+    <PostalCode>44688</PostalCode>
+    <City>Genk</City>
+    <County />
+    <Country>BE</Country>
+    <LanguageCode>NL</LanguageCode>
+    <CommentCustomer />
+    <CommentOrder>
+      <Comment>Customer Reference: 800074</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>INCO:FCA</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>T4T : +32 11 24 44 64</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>Open: Ma-Di-Wo-Do-Vr 08:00-16:00</Comment>
+    </CommentOrder>
+    <TransportInstruction>
+      <Comment>T4T : +32 11 24 44 64</Comment>
+    </TransportInstruction>
+    <TransportInstruction>
+      <Comment>F92 : 1 08001600 2 08001600 3 08001600 4 08001600 5 08001600</Comment>
+    </TransportInstruction>
+    <WarehouseInstruction />
+  </DocHeader>
+  <DocLine>
+    <OrderLine>1</OrderLine>
+    <Product>CD836380</Product>
+    <Quantity>3</Quantity>
+    <UOM>DRM</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>22</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>2</OrderLine>
+    <Product>SQ624032</Product>
+    <Quantity>6</Quantity>
+    <UOM>CAN</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>0</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+</Root>

@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120001</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22001</CustomerNumber>
+    <DeliveryAddress>Kanaalweg 172 34622 Gent Belgium</DeliveryAddress>
+    <ShipmentName />
+    <Name>Bakker Services</Name>
+    <WarehouseID>BE10</WarehouseID>
+    <CompanyID>E223</CompanyID>
+    <PublishedByAX>2026-08-01T11:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kanaalweg 172</DlvStreet>
+    <DlvZipcode>34622</DlvZipcode>
+    <DlvCity>Gent</DlvCity>
+    <DlvCounty>Gent</DlvCounty>
+    <DlvState>Gent</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <Recipient>Sofia Bakker</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706001</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000001</RouteID>
+    <Qty>11.000000000000</Qty>
+    <ItemID>JT790668</ItemID>
+    <InventoryOrderID>000205911</InventoryOrderID>
+    <DeliveryDate>2026-08-04T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394011</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030001</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 172 34622 Gent Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Mobiel Houder Pro</Note>
+    <MultiComponentItemID>JT790668</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 172 34622 Gent Belgium</DlvAddress>
+    <DlvStreet>Kanaalweg 172</DlvStreet>
+    <DlvZipCode>34622</DlvZipCode>
+    <DlvCity>Gent</DlvCity>
+    <DlvCountry>Gent</DlvCountry>
+    <DlvState>Gent</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394010</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000001</RouteID>
+    <Qty>87.000000000000</Qty>
+    <ItemID>BC136419</ItemID>
+    <InventoryOrderID>000205912</InventoryOrderID>
+    <DeliveryDate>2026-08-04T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394012</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030001</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 172 34622 Gent Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Compact Terminal Basic</Note>
+    <MultiComponentItemID>BC136419</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 172 34622 Gent Belgium</DlvAddress>
+    <DlvStreet>Kanaalweg 172</DlvStreet>
+    <DlvZipCode>34622</DlvZipCode>
+    <DlvCity>Gent</DlvCity>
+    <DlvCountry>Gent</DlvCountry>
+    <DlvState>Gent</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394010</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

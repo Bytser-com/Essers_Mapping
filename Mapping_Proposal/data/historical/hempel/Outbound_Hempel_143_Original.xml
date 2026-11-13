@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120143</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22143</CustomerNumber>
+    <DeliveryAddress>Marktplein 196 Gebouw O 41722 Metz France</DeliveryAddress>
+    <ShipmentName />
+    <Name>Jacobs Industries</Name>
+    <WarehouseID>FR30</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-19T05:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Marktplein 196 Gebouw O</DlvStreet>
+    <DlvZipcode>41722</DlvZipcode>
+    <DlvCity>Metz</DlvCity>
+    <DlvCounty>Metz</DlvCounty>
+    <DlvState>Metz</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <Recipient>Sara Jacobs</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706143</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000143</RouteID>
+    <Qty>91.000000000000</Qty>
+    <ItemID>ZD987507</ItemID>
+    <InventoryOrderID>000207331</InventoryOrderID>
+    <DeliveryDate>2026-08-28T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395431</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030143</InventTransRefID>
+    <DeliveryAdress>Marktplein 196 Gebouw O 41722 Metz France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Robuust Lader Plus</Note>
+    <MultiComponentItemID>ZD987507</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 196 Gebouw O 41722 Metz France</DlvAddress>
+    <DlvStreet>Marktplein 196 Gebouw O</DlvStreet>
+    <DlvZipCode>41722</DlvZipCode>
+    <DlvCity>Metz</DlvCity>
+    <DlvCountry>Metz</DlvCountry>
+    <DlvState>Metz</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395430</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000143</RouteID>
+    <Qty>8.000000000000</Qty>
+    <ItemID>KF381039</ItemID>
+    <InventoryOrderID>000207332</InventoryOrderID>
+    <DeliveryDate>2026-08-28T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395432</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030143</InventTransRefID>
+    <DeliveryAdress>Marktplein 196 Gebouw O 41722 Metz France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Sterk Meetset Kit</Note>
+    <MultiComponentItemID>KF381039</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 196 Gebouw O 41722 Metz France</DlvAddress>
+    <DlvStreet>Marktplein 196 Gebouw O</DlvStreet>
+    <DlvZipCode>41722</DlvZipCode>
+    <DlvCity>Metz</DlvCity>
+    <DlvCountry>Metz</DlvCountry>
+    <DlvState>Metz</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395430</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000143</RouteID>
+    <Qty>62.000000000000</Qty>
+    <ItemID>KI030474</ItemID>
+    <InventoryOrderID>000207333</InventoryOrderID>
+    <DeliveryDate>2026-08-28T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395433</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030143</InventTransRefID>
+    <DeliveryAdress>Marktplein 196 Gebouw O 41722 Metz France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Veilig Scanner Pro</Note>
+    <MultiComponentItemID>KI030474</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 196 Gebouw O 41722 Metz France</DlvAddress>
+    <DlvStreet>Marktplein 196 Gebouw O</DlvStreet>
+    <DlvZipCode>41722</DlvZipCode>
+    <DlvCity>Metz</DlvCity>
+    <DlvCountry>Metz</DlvCountry>
+    <DlvState>Metz</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395430</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000143</RouteID>
+    <Qty>95.000000000000</Qty>
+    <ItemID>FT484450</ItemID>
+    <InventoryOrderID>000207334</InventoryOrderID>
+    <DeliveryDate>2026-08-28T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395434</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030143</InventTransRefID>
+    <DeliveryAdress>Marktplein 196 Gebouw O 41722 Metz France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Precisie Afdichting Kit</Note>
+    <MultiComponentItemID>FT484450</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 196 Gebouw O 41722 Metz France</DlvAddress>
+    <DlvStreet>Marktplein 196 Gebouw O</DlvStreet>
+    <DlvZipCode>41722</DlvZipCode>
+    <DlvCity>Metz</DlvCity>
+    <DlvCountry>Metz</DlvCountry>
+    <DlvState>Metz</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395430</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

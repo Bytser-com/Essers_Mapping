@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root>
+  <MessageType>Outbound Delivery</MessageType>
+  <DocHeader>
+    <OutboundNumber>SO270000006</OutboundNumber>
+    <DocumentNumber>SO270000006</DocumentNumber>
+    <Reference>600006 /70006</Reference>
+    <DeliveryDate>17/08/2026</DeliveryDate>
+    <ShipByDate>13/08/2026</ShipByDate>
+    <RushIndicator>N</RushIndicator>
+    <Carrier>DAC</Carrier>
+    <ShipToCode>200006</ShipToCode>
+    <Name1>Emma Simon</Name1>
+    <Name2>Simon Industries</Name2>
+    <Address1>Bosweg 191</Address1>
+    <Address2>Gebouw N</Address2>
+    <PostalCode>39855</PostalCode>
+    <City>Utrecht</City>
+    <County />
+    <Country>NL</Country>
+    <LanguageCode>NL</LanguageCode>
+    <CommentCustomer />
+    <CommentOrder>
+      <Comment>Customer Reference: 800006</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>INCO:DDP</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>T4T : +32 11 26 36 46</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>Open: Ma-Di-Wo-Do-Vr 08:00-16:00</Comment>
+    </CommentOrder>
+    <TransportInstruction>
+      <Comment>T4T : +32 11 26 36 46</Comment>
+    </TransportInstruction>
+    <TransportInstruction>
+      <Comment>F92 : 1 08001600 2 08001600 3 08001600 4 08001600 5 08001600</Comment>
+    </TransportInstruction>
+    <WarehouseInstruction />
+  </DocHeader>
+  <DocLine>
+    <OrderLine>1</OrderLine>
+    <Product>SP039959</Product>
+    <Quantity>7</Quantity>
+    <UOM>BOX</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>3.4</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>2</OrderLine>
+    <Product>IQ989718</Product>
+    <Quantity>10</Quantity>
+    <UOM>PCS</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>5.6</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>3</OrderLine>
+    <Product>YS422563</Product>
+    <Quantity>13</Quantity>
+    <UOM>PAL</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>12</VOCContent>
+    <BiocideCode>47008</BiocideCode>
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>4</OrderLine>
+    <Product>SQ643496</Product>
+    <Quantity>16</Quantity>
+    <UOM>DRM</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>22</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>5</OrderLine>
+    <Product>TX796924</Product>
+    <Quantity>19</Quantity>
+    <UOM>CAN</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>0</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>6</OrderLine>
+    <Product>JO119261</Product>
+    <Quantity>22</Quantity>
+    <UOM>BOX</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>3.4</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+</Root>

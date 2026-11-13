@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120101</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22101</CustomerNumber>
+    <DeliveryAddress>Kerkstraat 188 Unit 9 54040 Turijn Italy</DeliveryAddress>
+    <ShipmentName />
+    <Name>Lambert Consulting</Name>
+    <WarehouseID>IT20</WarehouseID>
+    <CompanyID>E223</CompanyID>
+    <PublishedByAX>2026-08-13T23:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kerkstraat 188 Unit 9</DlvStreet>
+    <DlvZipcode>54040</DlvZipcode>
+    <DlvCity>Turijn</DlvCity>
+    <DlvCounty>Turijn</DlvCounty>
+    <DlvState>Turijn</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <Recipient>Lina Lambert</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706101</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000101</RouteID>
+    <Qty>48.000000000000</Qty>
+    <ItemID>II790218</ItemID>
+    <InventoryOrderID>000206911</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395011</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030101</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 188 Unit 9 54040 Turijn Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Universeel Omvormer Plus</Note>
+    <MultiComponentItemID>II790218</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 188 Unit 9 54040 Turijn Italy</DlvAddress>
+    <DlvStreet>Kerkstraat 188 Unit 9</DlvStreet>
+    <DlvZipCode>54040</DlvZipCode>
+    <DlvCity>Turijn</DlvCity>
+    <DlvCountry>Turijn</DlvCountry>
+    <DlvState>Turijn</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395010</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000101</RouteID>
+    <Qty>7.000000000000</Qty>
+    <ItemID>MY489300</ItemID>
+    <InventoryOrderID>000206912</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395012</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030101</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 188 Unit 9 54040 Turijn Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Universeel Ventiel Mini</Note>
+    <MultiComponentItemID>MY489300</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 188 Unit 9 54040 Turijn Italy</DlvAddress>
+    <DlvStreet>Kerkstraat 188 Unit 9</DlvStreet>
+    <DlvZipCode>54040</DlvZipCode>
+    <DlvCity>Turijn</DlvCity>
+    <DlvCountry>Turijn</DlvCountry>
+    <DlvState>Turijn</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395010</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

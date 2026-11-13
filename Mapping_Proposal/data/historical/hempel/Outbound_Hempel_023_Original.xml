@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120023</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22023</CustomerNumber>
+    <DeliveryAddress>Kanaalweg 230 Gebouw O 82302 Aken Germany</DeliveryAddress>
+    <ShipmentName />
+    <Name>Maes Services</Name>
+    <WarehouseID>DE20</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-04T05:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kanaalweg 230 Gebouw O</DlvStreet>
+    <DlvZipcode>82302</DlvZipcode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCounty>Aken</DlvCounty>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <Recipient>Sara Maes</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706023</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000023</RouteID>
+    <Qty>83.000000000000</Qty>
+    <ItemID>SO106299</ItemID>
+    <InventoryOrderID>000206131</InventoryOrderID>
+    <DeliveryDate>2026-08-13T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394231</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030023</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 230 Gebouw O 82302 Aken Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Slim Beugel Set</Note>
+    <MultiComponentItemID>SO106299</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 230 Gebouw O 82302 Aken Germany</DlvAddress>
+    <DlvStreet>Kanaalweg 230 Gebouw O</DlvStreet>
+    <DlvZipCode>82302</DlvZipCode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCountry>Aken</DlvCountry>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394230</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000023</RouteID>
+    <Qty>90.000000000000</Qty>
+    <ItemID>VZ546734</ItemID>
+    <InventoryOrderID>000206132</InventoryOrderID>
+    <DeliveryDate>2026-08-13T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394232</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030023</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 230 Gebouw O 82302 Aken Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Digitaal Afdichting Set</Note>
+    <MultiComponentItemID>VZ546734</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 230 Gebouw O 82302 Aken Germany</DlvAddress>
+    <DlvStreet>Kanaalweg 230 Gebouw O</DlvStreet>
+    <DlvZipCode>82302</DlvZipCode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCountry>Aken</DlvCountry>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394230</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000023</RouteID>
+    <Qty>81.000000000000</Qty>
+    <ItemID>XE911016</ItemID>
+    <InventoryOrderID>000206133</InventoryOrderID>
+    <DeliveryDate>2026-08-13T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394233</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030023</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 230 Gebouw O 82302 Aken Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Precisie Scanner Max</Note>
+    <MultiComponentItemID>XE911016</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 230 Gebouw O 82302 Aken Germany</DlvAddress>
+    <DlvStreet>Kanaalweg 230 Gebouw O</DlvStreet>
+    <DlvZipCode>82302</DlvZipCode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCountry>Aken</DlvCountry>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394230</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000023</RouteID>
+    <Qty>89.000000000000</Qty>
+    <ItemID>TI757503</ItemID>
+    <InventoryOrderID>000206134</InventoryOrderID>
+    <DeliveryDate>2026-08-13T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394234</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030023</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 230 Gebouw O 82302 Aken Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Modulair Houder Mini</Note>
+    <MultiComponentItemID>TI757503</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 230 Gebouw O 82302 Aken Germany</DlvAddress>
+    <DlvStreet>Kanaalweg 230 Gebouw O</DlvStreet>
+    <DlvZipCode>82302</DlvZipCode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCountry>Aken</DlvCountry>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394230</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

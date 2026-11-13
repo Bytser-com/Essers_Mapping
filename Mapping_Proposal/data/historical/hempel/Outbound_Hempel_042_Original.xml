@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120042</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22042</CustomerNumber>
+    <DeliveryAddress>Bosweg 41 Afdeling 4 50360 Lyon France</DeliveryAddress>
+    <ShipmentName />
+    <Name>Peeters Services</Name>
+    <WarehouseID>FR30</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-06T14:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Bosweg 41 Afdeling 4</DlvStreet>
+    <DlvZipcode>50360</DlvZipcode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCounty>Lyon</DlvCounty>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <Recipient>Emma Peeters</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706042</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000042</RouteID>
+    <Qty>24.000000000000</Qty>
+    <ItemID>AY887586</ItemID>
+    <InventoryOrderID>000206321</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394421</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030042</InventTransRefID>
+    <DeliveryAdress>Bosweg 41 Afdeling 4 50360 Lyon France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Universeel Schakelaar Basic</Note>
+    <MultiComponentItemID>AY887586</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 41 Afdeling 4 50360 Lyon France</DlvAddress>
+    <DlvStreet>Bosweg 41 Afdeling 4</DlvStreet>
+    <DlvZipCode>50360</DlvZipCode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCountry>Lyon</DlvCountry>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394420</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000042</RouteID>
+    <Qty>6.000000000000</Qty>
+    <ItemID>PJ509206</ItemID>
+    <InventoryOrderID>000206322</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394422</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030042</InventTransRefID>
+    <DeliveryAdress>Bosweg 41 Afdeling 4 50360 Lyon France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Digitaal Schakelaar Set</Note>
+    <MultiComponentItemID>PJ509206</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 41 Afdeling 4 50360 Lyon France</DlvAddress>
+    <DlvStreet>Bosweg 41 Afdeling 4</DlvStreet>
+    <DlvZipCode>50360</DlvZipCode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCountry>Lyon</DlvCountry>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394420</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000042</RouteID>
+    <Qty>87.000000000000</Qty>
+    <ItemID>KK854616</ItemID>
+    <InventoryOrderID>000206323</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394423</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030042</InventTransRefID>
+    <DeliveryAdress>Bosweg 41 Afdeling 4 50360 Lyon France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Digitaal Ventiel Basic</Note>
+    <MultiComponentItemID>KK854616</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 41 Afdeling 4 50360 Lyon France</DlvAddress>
+    <DlvStreet>Bosweg 41 Afdeling 4</DlvStreet>
+    <DlvZipCode>50360</DlvZipCode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCountry>Lyon</DlvCountry>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394420</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

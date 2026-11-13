@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root>
+  <MessageType>Outbound Delivery</MessageType>
+  <DocHeader>
+    <OutboundNumber>SO270000034</OutboundNumber>
+    <DocumentNumber>SO270000034</DocumentNumber>
+    <Reference>600034 /70034</Reference>
+    <DeliveryDate>15/10/2026</DeliveryDate>
+    <ShipByDate>08/10/2026</ShipByDate>
+    <RushIndicator>N</RushIndicator>
+    <Carrier>KLG</Carrier>
+    <ShipToCode>200034</ShipToCode>
+    <Name1>Adam Claes</Name1>
+    <Name2>Claes Technics</Name2>
+    <Address1>Nieuwstraat 105</Address1>
+    <Address2 />
+    <PostalCode>30928</PostalCode>
+    <City>Porto</City>
+    <County />
+    <Country>PT</Country>
+    <LanguageCode>PT</LanguageCode>
+    <CommentCustomer />
+    <CommentOrder>
+      <Comment>Customer Reference: 800034</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>INCO:FCA</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>T4T : +32 11 54 64 74</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>Open: Ma-Di-Wo-Do-Vr 08:00-16:00</Comment>
+    </CommentOrder>
+    <TransportInstruction>
+      <Comment>T4T : +32 11 54 64 74</Comment>
+    </TransportInstruction>
+    <TransportInstruction>
+      <Comment>F92 : 1 08001600 2 08001600 3 08001600 4 08001600 5 08001600</Comment>
+    </TransportInstruction>
+    <WarehouseInstruction />
+  </DocHeader>
+  <DocLine>
+    <OrderLine>1</OrderLine>
+    <Product>CD836380</Product>
+    <Quantity>11</Quantity>
+    <UOM>DRM</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>22</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>2</OrderLine>
+    <Product>SQ624032</Product>
+    <Quantity>14</Quantity>
+    <UOM>CAN</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>0</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+</Root>

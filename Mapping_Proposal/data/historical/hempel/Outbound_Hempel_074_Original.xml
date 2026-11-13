@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120074</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22074</CustomerNumber>
+    <DeliveryAddress>Kasteelstraat 256 Gebouw B 44688 Genk Belgium</DeliveryAddress>
+    <ShipmentName />
+    <Name>Vermeulen Trading</Name>
+    <WarehouseID>BE10</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-10T14:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kasteelstraat 256 Gebouw B</DlvStreet>
+    <DlvZipcode>44688</DlvZipcode>
+    <DlvCity>Genk</DlvCity>
+    <DlvCounty>Genk</DlvCounty>
+    <DlvState>Genk</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <Recipient>Yara Vermeulen</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706074</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000074</RouteID>
+    <Qty>59.000000000000</Qty>
+    <ItemID>AY887586</ItemID>
+    <InventoryOrderID>000206641</InventoryOrderID>
+    <DeliveryDate>2026-08-14T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394741</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030074</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 256 Gebouw B 44688 Genk Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Universeel Schakelaar Basic</Note>
+    <MultiComponentItemID>AY887586</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 256 Gebouw B 44688 Genk Belgium</DlvAddress>
+    <DlvStreet>Kasteelstraat 256 Gebouw B</DlvStreet>
+    <DlvZipCode>44688</DlvZipCode>
+    <DlvCity>Genk</DlvCity>
+    <DlvCountry>Genk</DlvCountry>
+    <DlvState>Genk</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394740</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000074</RouteID>
+    <Qty>43.000000000000</Qty>
+    <ItemID>PO078254</ItemID>
+    <InventoryOrderID>000206642</InventoryOrderID>
+    <DeliveryDate>2026-08-14T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394742</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030074</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 256 Gebouw B 44688 Genk Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Flexibel Scanner Max</Note>
+    <MultiComponentItemID>PO078254</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 256 Gebouw B 44688 Genk Belgium</DlvAddress>
+    <DlvStreet>Kasteelstraat 256 Gebouw B</DlvStreet>
+    <DlvZipCode>44688</DlvZipCode>
+    <DlvCity>Genk</DlvCity>
+    <DlvCountry>Genk</DlvCountry>
+    <DlvState>Genk</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394740</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000074</RouteID>
+    <Qty>24.000000000000</Qty>
+    <ItemID>LJ519434</ItemID>
+    <InventoryOrderID>000206643</InventoryOrderID>
+    <DeliveryDate>2026-08-14T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394743</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030074</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 256 Gebouw B 44688 Genk Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Slim Filter X2</Note>
+    <MultiComponentItemID>LJ519434</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 256 Gebouw B 44688 Genk Belgium</DlvAddress>
+    <DlvStreet>Kasteelstraat 256 Gebouw B</DlvStreet>
+    <DlvZipCode>44688</DlvZipCode>
+    <DlvCity>Genk</DlvCity>
+    <DlvCountry>Genk</DlvCountry>
+    <DlvState>Genk</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394740</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

@@ -263,6 +263,21 @@ class SftpProposalStorageServiceTest {
     }
 
     @Test
+    @DisplayName("TC-86-02 the overview sends the customer name from proposal.json next to the folder name")
+    void listProposals_allCompanies_returnsCustomerNameFromProposalJson() {
+        mockCompanies("klant-b");
+        mockVersions("klant-b", "v1");
+        mockVersionWithProposalJson("/Proposals/klant-b/v1",
+                "{\"customer\": \"Klant B\", \"uploaded_at\": \"2026-10-22T10:00:00+02:00\", \"status\": \"READY_FOR_REVIEW\"}");
+
+        List<CompanyProposalOverviewDto> results = service.listProposals(null);
+
+        assertEquals(1, results.size());
+        assertEquals("klant-b", results.get(0).company());
+        assertEquals("Klant B", results.get(0).customerName());
+    }
+
+    @Test
     @DisplayName("TC-57-01 a proposal with missing or invalid data is skipped, the others are shown")
     void listProposals_allCompanies_skipsInvalidProposals() {
         mockCompanies("KlantB", "BadJson", "UnknownStatus", "NoUploadTime", "NoProposalJson");

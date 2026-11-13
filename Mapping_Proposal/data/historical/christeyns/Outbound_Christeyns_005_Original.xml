@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root>
+  <MessageType>Outbound Delivery</MessageType>
+  <DocHeader>
+    <OutboundNumber>SO270000004</OutboundNumber>
+    <DocumentNumber>SO270000004</DocumentNumber>
+    <Reference>600004 /70004</Reference>
+    <DeliveryDate>16/08/2026</DeliveryDate>
+    <ShipByDate>09/08/2026</ShipByDate>
+    <RushIndicator>N</RushIndicator>
+    <Carrier>KLG</Carrier>
+    <ShipToCode>200004</ShipToCode>
+    <Name1>Jules Lambert</Name1>
+    <Name2>Lambert Solutions</Name2>
+    <Address1>Kerkstraat 290</Address1>
+    <Address2>Afdeling 8</Address2>
+    <PostalCode>85309</PostalCode>
+    <City>Genk</City>
+    <County />
+    <Country>BE</Country>
+    <LanguageCode>FR</LanguageCode>
+    <CommentCustomer />
+    <CommentOrder>
+      <Comment>Customer Reference: 800004</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>INCO:FCA</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>T4T : +32 11 24 34 44</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>Open: Ma-Di-Wo-Do-Vr 08:00-16:00</Comment>
+    </CommentOrder>
+    <TransportInstruction>
+      <Comment>T4T : +32 11 24 34 44</Comment>
+    </TransportInstruction>
+    <TransportInstruction>
+      <Comment>F92 : 1 08001600 2 08001600 3 08001600 4 08001600 5 08001600</Comment>
+    </TransportInstruction>
+    <WarehouseInstruction />
+  </DocHeader>
+  <DocLine>
+    <OrderLine>1</OrderLine>
+    <Product>CB112982</Product>
+    <Quantity>5</Quantity>
+    <UOM>DRM</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>22</VOCContent>
+    <BiocideCode>47004</BiocideCode>
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>2</OrderLine>
+    <Product>FS673376</Product>
+    <Quantity>8</Quantity>
+    <UOM>CAN</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>0</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>3</OrderLine>
+    <Product>TU125378</Product>
+    <Quantity>11</Quantity>
+    <UOM>BOX</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>3.4</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>4</OrderLine>
+    <Product>VT147670</Product>
+    <Quantity>14</Quantity>
+    <UOM>PCS</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>5.6</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+</Root>

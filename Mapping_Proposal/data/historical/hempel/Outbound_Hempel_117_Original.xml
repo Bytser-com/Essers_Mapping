@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120117</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22117</CustomerNumber>
+    <DeliveryAddress>Stationslaan 280 Unit 25 26583 Leuven Belgium</DeliveryAddress>
+    <ShipmentName />
+    <Name>Willems Systems</Name>
+    <WarehouseID>BE10</WarehouseID>
+    <CompanyID>E223</CompanyID>
+    <PublishedByAX>2026-08-15T23:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Stationslaan 280 Unit 25</DlvStreet>
+    <DlvZipcode>26583</DlvZipcode>
+    <DlvCity>Leuven</DlvCity>
+    <DlvCounty>Leuven</DlvCounty>
+    <DlvState>Leuven</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <Recipient>Emma Willems</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706117</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000117</RouteID>
+    <Qty>69.000000000000</Qty>
+    <ItemID>TX796924</ItemID>
+    <InventoryOrderID>000207071</InventoryOrderID>
+    <DeliveryDate>2026-08-22T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395171</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030117</InventTransRefID>
+    <DeliveryAdress>Stationslaan 280 Unit 25 26583 Leuven Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Eco Adapter X2</Note>
+    <MultiComponentItemID>TX796924</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Stationslaan 280 Unit 25 26583 Leuven Belgium</DlvAddress>
+    <DlvStreet>Stationslaan 280 Unit 25</DlvStreet>
+    <DlvZipCode>26583</DlvZipCode>
+    <DlvCity>Leuven</DlvCity>
+    <DlvCountry>Leuven</DlvCountry>
+    <DlvState>Leuven</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1395170</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000117</RouteID>
+    <Qty>47.000000000000</Qty>
+    <ItemID>HZ664835</ItemID>
+    <InventoryOrderID>000207072</InventoryOrderID>
+    <DeliveryDate>2026-08-22T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395172</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030117</InventTransRefID>
+    <DeliveryAdress>Stationslaan 280 Unit 25 26583 Leuven Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Compact Ventiel X2</Note>
+    <MultiComponentItemID>HZ664835</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Stationslaan 280 Unit 25 26583 Leuven Belgium</DlvAddress>
+    <DlvStreet>Stationslaan 280 Unit 25</DlvStreet>
+    <DlvZipCode>26583</DlvZipCode>
+    <DlvCity>Leuven</DlvCity>
+    <DlvCountry>Leuven</DlvCountry>
+    <DlvState>Leuven</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1395170</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

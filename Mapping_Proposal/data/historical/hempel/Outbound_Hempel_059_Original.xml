@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120059</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22059</CustomerNumber>
+    <DeliveryAddress>Molenweg 187 Gebouw K 75543 Lyon France</DeliveryAddress>
+    <ShipmentName />
+    <Name>Goossens Technics</Name>
+    <WarehouseID>FR30</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-08T17:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Molenweg 187 Gebouw K</DlvStreet>
+    <DlvZipcode>75543</DlvZipcode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCounty>Lyon</DlvCounty>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <Recipient>Sara Goossens</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706059</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000059</RouteID>
+    <Qty>69.000000000000</Qty>
+    <ItemID>CL362276</ItemID>
+    <InventoryOrderID>000206491</InventoryOrderID>
+    <DeliveryDate>2026-08-13T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394591</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030059</InventTransRefID>
+    <DeliveryAdress>Molenweg 187 Gebouw K 75543 Lyon France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Universeel Terminal X2</Note>
+    <MultiComponentItemID>CL362276</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 187 Gebouw K 75543 Lyon France</DlvAddress>
+    <DlvStreet>Molenweg 187 Gebouw K</DlvStreet>
+    <DlvZipCode>75543</DlvZipCode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCountry>Lyon</DlvCountry>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394590</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000059</RouteID>
+    <Qty>42.000000000000</Qty>
+    <ItemID>XQ052919</ItemID>
+    <InventoryOrderID>000206492</InventoryOrderID>
+    <DeliveryDate>2026-08-13T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394592</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030059</InventTransRefID>
+    <DeliveryAdress>Molenweg 187 Gebouw K 75543 Lyon France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Industrieel Pomp Set</Note>
+    <MultiComponentItemID>XQ052919</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 187 Gebouw K 75543 Lyon France</DlvAddress>
+    <DlvStreet>Molenweg 187 Gebouw K</DlvStreet>
+    <DlvZipCode>75543</DlvZipCode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCountry>Lyon</DlvCountry>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394590</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000059</RouteID>
+    <Qty>12.000000000000</Qty>
+    <ItemID>SQ643496</ItemID>
+    <InventoryOrderID>000206493</InventoryOrderID>
+    <DeliveryDate>2026-08-13T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394593</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030059</InventTransRefID>
+    <DeliveryAdress>Molenweg 187 Gebouw K 75543 Lyon France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Compact Meetset Mini</Note>
+    <MultiComponentItemID>SQ643496</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 187 Gebouw K 75543 Lyon France</DlvAddress>
+    <DlvStreet>Molenweg 187 Gebouw K</DlvStreet>
+    <DlvZipCode>75543</DlvZipCode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCountry>Lyon</DlvCountry>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394590</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000059</RouteID>
+    <Qty>38.000000000000</Qty>
+    <ItemID>SO106299</ItemID>
+    <InventoryOrderID>000206494</InventoryOrderID>
+    <DeliveryDate>2026-08-13T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394594</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030059</InventTransRefID>
+    <DeliveryAdress>Molenweg 187 Gebouw K 75543 Lyon France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Slim Beugel Set</Note>
+    <MultiComponentItemID>SO106299</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 187 Gebouw K 75543 Lyon France</DlvAddress>
+    <DlvStreet>Molenweg 187 Gebouw K</DlvStreet>
+    <DlvZipCode>75543</DlvZipCode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCountry>Lyon</DlvCountry>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394590</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

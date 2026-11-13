@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120072</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22072</CustomerNumber>
+    <DeliveryAddress>Veldweg 212 Unit 8 74887 Luik Belgium</DeliveryAddress>
+    <ShipmentName />
+    <Name>Visser Trading</Name>
+    <WarehouseID>BE10</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-10T08:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Veldweg 212 Unit 8</DlvStreet>
+    <DlvZipcode>74887</DlvZipcode>
+    <DlvCity>Luik</DlvCity>
+    <DlvCounty>Luik</DlvCounty>
+    <DlvState>Luik</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <Recipient>Emma Visser</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706072</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000072</RouteID>
+    <Qty>53.000000000000</Qty>
+    <ItemID>TA179917</ItemID>
+    <InventoryOrderID>000206621</InventoryOrderID>
+    <DeliveryDate>2026-08-12T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394721</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030072</InventTransRefID>
+    <DeliveryAdress>Veldweg 212 Unit 8 74887 Luik Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Duurzaam Afdichting Mini</Note>
+    <MultiComponentItemID>TA179917</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 212 Unit 8 74887 Luik Belgium</DlvAddress>
+    <DlvStreet>Veldweg 212 Unit 8</DlvStreet>
+    <DlvZipCode>74887</DlvZipCode>
+    <DlvCity>Luik</DlvCity>
+    <DlvCountry>Luik</DlvCountry>
+    <DlvState>Luik</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394720</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000072</RouteID>
+    <Qty>85.000000000000</Qty>
+    <ItemID>YD268665</ItemID>
+    <InventoryOrderID>000206622</InventoryOrderID>
+    <DeliveryDate>2026-08-12T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394722</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030072</InventTransRefID>
+    <DeliveryAdress>Veldweg 212 Unit 8 74887 Luik Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Professioneel Connector Set</Note>
+    <MultiComponentItemID>YD268665</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 212 Unit 8 74887 Luik Belgium</DlvAddress>
+    <DlvStreet>Veldweg 212 Unit 8</DlvStreet>
+    <DlvZipCode>74887</DlvZipCode>
+    <DlvCity>Luik</DlvCity>
+    <DlvCountry>Luik</DlvCountry>
+    <DlvState>Luik</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394720</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000072</RouteID>
+    <Qty>45.000000000000</Qty>
+    <ItemID>AK047928</ItemID>
+    <InventoryOrderID>000206623</InventoryOrderID>
+    <DeliveryDate>2026-08-12T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394723</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030072</InventTransRefID>
+    <DeliveryAdress>Veldweg 212 Unit 8 74887 Luik Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Compact Motor Mini</Note>
+    <MultiComponentItemID>AK047928</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 212 Unit 8 74887 Luik Belgium</DlvAddress>
+    <DlvStreet>Veldweg 212 Unit 8</DlvStreet>
+    <DlvZipCode>74887</DlvZipCode>
+    <DlvCity>Luik</DlvCity>
+    <DlvCountry>Luik</DlvCountry>
+    <DlvState>Luik</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394720</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000072</RouteID>
+    <Qty>70.000000000000</Qty>
+    <ItemID>LC592499</ItemID>
+    <InventoryOrderID>000206624</InventoryOrderID>
+    <DeliveryDate>2026-08-12T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394724</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030072</InventTransRefID>
+    <DeliveryAdress>Veldweg 212 Unit 8 74887 Luik Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Eco Meetset Max</Note>
+    <MultiComponentItemID>LC592499</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 212 Unit 8 74887 Luik Belgium</DlvAddress>
+    <DlvStreet>Veldweg 212 Unit 8</DlvStreet>
+    <DlvZipCode>74887</DlvZipCode>
+    <DlvCity>Luik</DlvCity>
+    <DlvCountry>Luik</DlvCountry>
+    <DlvState>Luik</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394720</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000072</RouteID>
+    <Qty>82.000000000000</Qty>
+    <ItemID>BC136419</ItemID>
+    <InventoryOrderID>000206625</InventoryOrderID>
+    <DeliveryDate>2026-08-12T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394725</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030072</InventTransRefID>
+    <DeliveryAdress>Veldweg 212 Unit 8 74887 Luik Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Compact Terminal Basic</Note>
+    <MultiComponentItemID>BC136419</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 212 Unit 8 74887 Luik Belgium</DlvAddress>
+    <DlvStreet>Veldweg 212 Unit 8</DlvStreet>
+    <DlvZipCode>74887</DlvZipCode>
+    <DlvCity>Luik</DlvCity>
+    <DlvCountry>Luik</DlvCountry>
+    <DlvState>Luik</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394720</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

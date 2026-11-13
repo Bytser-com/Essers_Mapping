@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120082</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22082</CustomerNumber>
+    <DeliveryAddress>Molenweg 27 Unit 10 90599 Dudelange Luxembourg</DeliveryAddress>
+    <ShipmentName />
+    <Name>Maes Consulting</Name>
+    <WarehouseID>LU10</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-11T14:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Molenweg 27 Unit 10</DlvStreet>
+    <DlvZipcode>90599</DlvZipcode>
+    <DlvCity>Dudelange</DlvCity>
+    <DlvCounty>Dudelange</DlvCounty>
+    <DlvState>Dudelange</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <Recipient>Nora Maes</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706082</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000082</RouteID>
+    <Qty>91.000000000000</Qty>
+    <ItemID>EN301631</ItemID>
+    <InventoryOrderID>000206721</InventoryOrderID>
+    <DeliveryDate>2026-08-15T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394821</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030082</InventTransRefID>
+    <DeliveryAdress>Molenweg 27 Unit 10 90599 Dudelange Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Mobiel Paneel Plus</Note>
+    <MultiComponentItemID>EN301631</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 27 Unit 10 90599 Dudelange Luxembourg</DlvAddress>
+    <DlvStreet>Molenweg 27 Unit 10</DlvStreet>
+    <DlvZipCode>90599</DlvZipCode>
+    <DlvCity>Dudelange</DlvCity>
+    <DlvCountry>Dudelange</DlvCountry>
+    <DlvState>Dudelange</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1394820</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000082</RouteID>
+    <Qty>19.000000000000</Qty>
+    <ItemID>OJ484800</ItemID>
+    <InventoryOrderID>000206722</InventoryOrderID>
+    <DeliveryDate>2026-08-15T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394822</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030082</InventTransRefID>
+    <DeliveryAdress>Molenweg 27 Unit 10 90599 Dudelange Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Slim Connector V2</Note>
+    <MultiComponentItemID>OJ484800</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 27 Unit 10 90599 Dudelange Luxembourg</DlvAddress>
+    <DlvStreet>Molenweg 27 Unit 10</DlvStreet>
+    <DlvZipCode>90599</DlvZipCode>
+    <DlvCity>Dudelange</DlvCity>
+    <DlvCountry>Dudelange</DlvCountry>
+    <DlvState>Dudelange</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1394820</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000082</RouteID>
+    <Qty>18.000000000000</Qty>
+    <ItemID>QD446580</ItemID>
+    <InventoryOrderID>000206723</InventoryOrderID>
+    <DeliveryDate>2026-08-15T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394823</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030082</InventTransRefID>
+    <DeliveryAdress>Molenweg 27 Unit 10 90599 Dudelange Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Veilig Meetset Pro</Note>
+    <MultiComponentItemID>QD446580</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 27 Unit 10 90599 Dudelange Luxembourg</DlvAddress>
+    <DlvStreet>Molenweg 27 Unit 10</DlvStreet>
+    <DlvZipCode>90599</DlvZipCode>
+    <DlvCity>Dudelange</DlvCity>
+    <DlvCountry>Dudelange</DlvCountry>
+    <DlvState>Dudelange</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1394820</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

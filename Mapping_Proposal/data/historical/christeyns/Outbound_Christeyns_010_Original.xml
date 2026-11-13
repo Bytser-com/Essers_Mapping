@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root>
+  <MessageType>Outbound Delivery</MessageType>
+  <DocHeader>
+    <OutboundNumber>SO270000009</OutboundNumber>
+    <DocumentNumber>SO270000009</DocumentNumber>
+    <Reference>600009 /70009</Reference>
+    <DeliveryDate>26/08/2026</DeliveryDate>
+    <ShipByDate>19/08/2026</ShipByDate>
+    <RushIndicator>N</RushIndicator>
+    <Carrier>KLG</Carrier>
+    <ShipToCode>200009</ShipToCode>
+    <Name1>Mats Simon</Name1>
+    <Name2>Simon Solutions</Name2>
+    <Address1>Marktplein 1</Address1>
+    <Address2>Afdeling 5</Address2>
+    <PostalCode>39030</PostalCode>
+    <City>Dusseldorf</City>
+    <County />
+    <Country>DE</Country>
+    <LanguageCode>DE</LanguageCode>
+    <CommentCustomer />
+    <CommentOrder>
+      <Comment>Customer Reference: 800009</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>INCO:FCA</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>T4T : +32 11 29 39 49</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>Open: Ma-Di-Wo-Do-Vr 08:00-16:00</Comment>
+    </CommentOrder>
+    <TransportInstruction>
+      <Comment>T4T : +32 11 29 39 49</Comment>
+    </TransportInstruction>
+    <TransportInstruction>
+      <Comment>F92 : 1 08001600 2 08001600 3 08001600 4 08001600 5 08001600</Comment>
+    </TransportInstruction>
+    <WarehouseInstruction />
+  </DocHeader>
+  <DocLine>
+    <OrderLine>1</OrderLine>
+    <Product>ZA831199</Product>
+    <Quantity>10</Quantity>
+    <UOM>DRM</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>22</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+</Root>

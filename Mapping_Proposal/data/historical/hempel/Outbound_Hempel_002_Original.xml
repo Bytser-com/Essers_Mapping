@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120002</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22002</CustomerNumber>
+    <DeliveryAddress>Havenlaan 129 Afdeling 11 94043 Aken Germany</DeliveryAddress>
+    <ShipmentName />
+    <Name>Simon Solutions</Name>
+    <WarehouseID>DE20</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-01T14:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Havenlaan 129 Afdeling 11</DlvStreet>
+    <DlvZipcode>94043</DlvZipcode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCounty>Aken</DlvCounty>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <Recipient>Lina Simon</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706002</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000002</RouteID>
+    <Qty>37.000000000000</Qty>
+    <ItemID>UE253935</ItemID>
+    <InventoryOrderID>000205921</InventoryOrderID>
+    <DeliveryDate>2026-08-05T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394021</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030002</InventTransRefID>
+    <DeliveryAdress>Havenlaan 129 Afdeling 11 94043 Aken Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Robuust Module Max</Note>
+    <MultiComponentItemID>UE253935</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Havenlaan 129 Afdeling 11 94043 Aken Germany</DlvAddress>
+    <DlvStreet>Havenlaan 129 Afdeling 11</DlvStreet>
+    <DlvZipCode>94043</DlvZipCode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCountry>Aken</DlvCountry>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394020</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000002</RouteID>
+    <Qty>14.000000000000</Qty>
+    <ItemID>DK308401</ItemID>
+    <InventoryOrderID>000205922</InventoryOrderID>
+    <DeliveryDate>2026-08-05T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394022</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030002</InventTransRefID>
+    <DeliveryAdress>Havenlaan 129 Afdeling 11 94043 Aken Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Industrieel Motor Kit</Note>
+    <MultiComponentItemID>DK308401</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Havenlaan 129 Afdeling 11 94043 Aken Germany</DlvAddress>
+    <DlvStreet>Havenlaan 129 Afdeling 11</DlvStreet>
+    <DlvZipCode>94043</DlvZipCode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCountry>Aken</DlvCountry>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394020</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000002</RouteID>
+    <Qty>11.000000000000</Qty>
+    <ItemID>FT484450</ItemID>
+    <InventoryOrderID>000205923</InventoryOrderID>
+    <DeliveryDate>2026-08-05T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394023</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030002</InventTransRefID>
+    <DeliveryAdress>Havenlaan 129 Afdeling 11 94043 Aken Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Precisie Afdichting Kit</Note>
+    <MultiComponentItemID>FT484450</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Havenlaan 129 Afdeling 11 94043 Aken Germany</DlvAddress>
+    <DlvStreet>Havenlaan 129 Afdeling 11</DlvStreet>
+    <DlvZipCode>94043</DlvZipCode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCountry>Aken</DlvCountry>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394020</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>
