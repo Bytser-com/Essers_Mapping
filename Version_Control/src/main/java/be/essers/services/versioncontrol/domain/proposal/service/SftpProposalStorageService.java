@@ -675,6 +675,8 @@ public class SftpProposalStorageService implements ProposalStorageService {
         String description = (metadata != null) ? metadata.description() : null;
         String status = (metadata != null) ? metadata.status() : null;
         String aiStatus = (metadata != null) ? metadata.aiStatus() : null;
+        // Name as entered at the upload ("Klant B"); the folder name ("klant-b") stays in company
+        String customerName = (metadata != null) ? metadata.company() : null;
 
         return new CompanyProposalOverviewDto(
                 companyName,
@@ -685,7 +687,8 @@ public class SftpProposalStorageService implements ProposalStorageService {
                 createdBy,
                 description,
                 status,
-                aiStatus
+                aiStatus,
+                customerName
         );
     }
 
