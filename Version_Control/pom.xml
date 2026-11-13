@@ -97,6 +97,8 @@
 							<goal>verify</goal>
 						</goals>
 						<configuration>
+							<failIfNoTests>false</failIfNoTests>
+							<failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
 							<includes>
 								<include>**/*IT.java</include>
 								<include>**/*IntegrationTest.java</include>

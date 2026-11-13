@@ -93,6 +93,19 @@ describe('labels', () => {
     expect(prop.customer).toBe('vanroey')
     expect(prop.version).toBe(2)
   })
+
+  it('TC-86-02 shows the customer name from the upload, the link keeps the folder name', () => {
+    const raw = {
+      company: 'klant-b',
+      customerName: 'Klant B',
+      latestVersion: 'v1',
+      status: 'READY_FOR_REVIEW',
+      createdDate: '2026-10-30T10:00:00Z',
+    }
+    const prop = toProposal(raw)
+    expect(prop.customer).toBe('Klant B')
+    expect(proposalPath(prop)).toBe('/proposals/klant-b')
+  })
 })
 
 describe('formatUploadedAt', () => {

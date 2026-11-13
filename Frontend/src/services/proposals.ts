@@ -29,6 +29,8 @@ export type CompanyProposalOverview = {
   description?: string | null
   status?: ProposalStatus | string | null
   aiStatus?: AiStatus | string | null
+  // Name as entered at the upload ("Klant B"); company is the folder name ("klant-b")
+  customerName?: string | null
 }
 
 export type ProposalFileDetails = {
@@ -125,7 +127,7 @@ export function toProposal(item: CompanyProposalOverview | Proposal): Proposal {
 
   return {
     id: `${ov.company}/${ov.latestVersion}`,
-    customer: ov.company,
+    customer: ov.customerName || ov.company,
     version: versionNum,
     uploaded_at: ov.createdDate || new Date().toISOString(),
     status,
