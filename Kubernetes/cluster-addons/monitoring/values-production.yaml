@@ -223,6 +223,27 @@ alertmanager:
         cpu: 200m
         memory: 256Mi
 
+  config:
+    global:
+      resolve_timeout: 5m
+    route:
+      group_by: ["alertname", "namespace", "job"]
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 4h
+      receiver: "discord-notifications"
+      routes:
+        - matchers:
+            - severity =~ "critical|warning"
+          receiver: "discord-notifications"
+    receivers:
+      - name: "discord-notifications"
+        discord_configs:
+          - webhook_url: "https://discord.com/api/webhooks/PLACEHOLDER_DISCORD_WEBHOOK_URL"
+            send_resolved: true
+            title: '{{ if eq .Status "firing" }}🚨 [FIRING:{{ .Alerts.Firing | len }}]{{ else }}✅ [RESOLVED]{{ end }} {{ .CommonLabels.alertname }} ({{ .CommonLabels.namespace }})'
+            message: '{{ range .Alerts }}**Alert:** {{ .Annotations.summary }}\n**Description:** {{ .Annotations.description }}\n**Severity:** `{{ .Labels.severity }}`\n**Pod:** `{{ .Labels.pod }}`\n\n{{ end }}'
+
 # ------------------------------------------------------------------------------
 # 4. KUBE-STATE-METRICS & EXPORTERS (CLUSTER INFRASTRUCTURE TELEMETRY)
 # ------------------------------------------------------------------------------

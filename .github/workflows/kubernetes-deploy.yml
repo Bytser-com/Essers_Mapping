@@ -90,8 +90,9 @@ jobs:
       DOMAIN_NAME: ${{ vars.DOMAIN_NAME || 'your-domain.example.com' }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
-      # --- Grafana Admin Secret ---
+      # --- Grafana Admin Secret & Alert Notifications ---
       GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
       # --- Manual Options ---
       SKIP_ADDONS: ${{ inputs.skip_addons || false }}
@@ -370,6 +371,12 @@ jobs:
                 --from-literal=admin-user=essers-admin \
                 --from-literal=admin-password="$PROD_PASS" \
                 --dry-run=client -o yaml | kubectl apply -f -
+            fi
+
+            # Inject Discord Webhook URL into Alertmanager values if configured
+            if [ -n "${DISCORD_WEBHOOK_URL:-}" ]; then
+              echo "Configuring Discord notification webhook for Alertmanager..."
+              perl -pi -e '$w = $ENV{DISCORD_WEBHOOK_URL}; s|https://discord.com/api/webhooks/PLACEHOLDER_DISCORD_WEBHOOK_URL|$w|g' "$MONITORING_VALUES"
             fi
 
             helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update

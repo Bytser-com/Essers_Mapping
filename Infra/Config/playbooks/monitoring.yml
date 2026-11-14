@@ -121,6 +121,13 @@
       changed_when: false
       when: monitoring_env == 'production'
 
+    - name: Configure Discord notification webhook in monitoring values if provided
+      ansible.builtin.replace:
+        path: "{{ monitoring_dest_dir }}/values-{{ monitoring_env }}.yaml"
+        regexp: 'https://discord\.com/api/webhooks/PLACEHOLDER_DISCORD_WEBHOOK_URL'
+        replace: "{{ lookup('env', 'DISCORD_WEBHOOK_URL') }}"
+      when: lookup('env', 'DISCORD_WEBHOOK_URL') | length > 0
+
     - name: Add prometheus-community Helm repository
       ansible.builtin.command:
         cmd: "helm repo add prometheus-community {{ monitoring_helm_repo_url }} --force-update"
