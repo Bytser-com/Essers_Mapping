@@ -47,7 +47,6 @@ data:
           "fieldConfig": {
             "defaults": {
               "color": { "mode": "thresholds" },
-              "mappings": [],
               "max": 100,
               "min": 0,
               "thresholds": {
@@ -120,11 +119,6 @@ data:
               "unit": "none"
             }
           },
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "textMode": "auto"
-          },
           "targets": [
             {
               "expr": "sum(kube_node_status_condition{condition=\"Ready\",status=\"true\"})",
@@ -145,9 +139,7 @@ data:
               "color": { "mode": "thresholds" },
               "thresholds": {
                 "mode": "absolute",
-                "steps": [
-                  { "color": "blue", "value": null }
-                ]
+                "steps": [{ "color": "blue", "value": null }]
               },
               "unit": "none"
             }
@@ -229,7 +221,7 @@ data:
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 6 },
           "id": 11,
           "title": "CPU Usage per Node",
           "type": "timeseries",
@@ -250,7 +242,7 @@ data:
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 6 },
           "id": 12,
           "title": "Memory Usage per Node",
           "type": "timeseries",
@@ -276,68 +268,16 @@ data:
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
-          "id": 13,
-          "title": "Network Traffic per Node (Bytes/sec)",
-          "type": "timeseries",
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "custom": { "drawStyle": "line" },
-              "unit": "Bps"
-            }
-          },
-          "targets": [
-            {
-              "expr": "sum by (instance) (rate(node_network_receive_bytes_total{device!~\"lo|veth.*|cali.*\"}[5m]))",
-              "legendFormat": "{{instance}} (RX)",
-              "refId": "A"
-            },
-            {
-              "expr": "sum by (instance) (rate(node_network_transmit_bytes_total{device!~\"lo|veth.*|cali.*\"}[5m]))",
-              "legendFormat": "{{instance}} (TX)",
-              "refId": "B"
-            }
-          ]
-        },
-        {
-          "collapsed": false,
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
-          "id": 14,
-          "title": "Disk I/O Wait & Storage Bandwidth",
-          "type": "timeseries",
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "custom": { "drawStyle": "line" },
-              "unit": "Bps"
-            }
-          },
-          "targets": [
-            {
-              "expr": "sum by (instance) (rate(node_disk_read_bytes_total[5m]))",
-              "legendFormat": "{{instance}} Read",
-              "refId": "A"
-            },
-            {
-              "expr": "sum by (instance) (rate(node_disk_written_bytes_total[5m]))",
-              "legendFormat": "{{instance}} Write",
-              "refId": "B"
-            }
-          ]
-        },
-        {
-          "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 22 },
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 },
           "id": 102,
-          "title": "ESSERS WORKLOADS & ZONE METRICS",
+          "title": "POD METRICS: CPU, RAM, DISK I/O, DISK SPACE & NETWORK",
           "type": "row"
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 23 },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
           "id": 21,
-          "title": "Pod CPU Usage by Service (Cores)",
+          "title": "Pod CPU Usage (Cores)",
           "type": "timeseries",
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
@@ -348,7 +288,7 @@ data:
           },
           "targets": [
             {
-              "expr": "sum by (pod, namespace) (rate(container_cpu_usage_seconds_total{namespace=~\"$namespace\", container!=\"\", container!=\"POD\"}[5m]))",
+              "expr": "sum by (pod, namespace) (rate(container_cpu_usage_seconds_total{namespace=~\"$namespace\", pod=~\"$pod\", container!=\"\", container!=\"POD\"}[5m]))",
               "legendFormat": "{{namespace}} / {{pod}}",
               "refId": "A"
             }
@@ -356,7 +296,7 @@ data:
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 23 },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
           "id": 22,
           "title": "Pod Memory Usage (Working Set)",
           "type": "timeseries",
@@ -369,7 +309,7 @@ data:
           },
           "targets": [
             {
-              "expr": "sum by (pod, namespace) (container_memory_working_set_bytes{namespace=~\"$namespace\", container!=\"\", container!=\"POD\"})",
+              "expr": "sum by (pod, namespace) (container_memory_working_set_bytes{namespace=~\"$namespace\", pod=~\"$pod\", container!=\"\", container!=\"POD\"})",
               "legendFormat": "{{namespace}} / {{pod}}",
               "refId": "A"
             }
@@ -377,38 +317,61 @@ data:
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 31 },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 22 },
           "id": 23,
-          "title": "Deployment Replicas: Desired vs Available",
-          "type": "table",
+          "title": "Pod Disk I/O (Read & Write Bytes/sec)",
+          "type": "timeseries",
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
             "defaults": {
-              "custom": { "align": "auto" }
+              "custom": { "drawStyle": "line" },
+              "unit": "Bps"
             }
           },
           "targets": [
             {
-              "expr": "kube_deployment_status_replicas_available{namespace=~\"$namespace\"}",
-              "format": "table",
-              "instant": true,
-              "legendFormat": "Available",
+              "expr": "sum by (pod) (rate(container_fs_reads_bytes_total{namespace=~\"$namespace\", pod=~\"$pod\", container!=\"\", container!=\"POD\"}[5m]))",
+              "legendFormat": "{{pod}} (Read)",
               "refId": "A"
             },
             {
-              "expr": "kube_deployment_spec_replicas{namespace=~\"$namespace\"}",
-              "format": "table",
-              "instant": true,
-              "legendFormat": "Desired",
+              "expr": "sum by (pod) (rate(container_fs_writes_bytes_total{namespace=~\"$namespace\", pod=~\"$pod\", container!=\"\", container!=\"POD\"}[5m]))",
+              "legendFormat": "{{pod}} (Write)",
               "refId": "B"
             }
           ]
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 31 },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 22 },
           "id": 24,
-          "title": "Longhorn Persistent Volume Claims (PVC) Capacity & Usage",
+          "title": "Pod Network Traffic (RX & TX Bytes/sec)",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line" },
+              "unit": "Bps"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum by (pod) (rate(container_network_receive_bytes_total{namespace=~\"$namespace\", pod=~\"$pod\"}[5m]))",
+              "legendFormat": "{{pod}} (RX)",
+              "refId": "A"
+            },
+            {
+              "expr": "sum by (pod) (rate(container_network_transmit_bytes_total{namespace=~\"$namespace\", pod=~\"$pod\"}[5m]))",
+              "legendFormat": "{{pod}} (TX)",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 6, "w": 12, "x": 0, "y": 30 },
+          "id": 25,
+          "title": "Longhorn Persistent Volume Claims (PVC) Capacity & Used Space",
           "type": "table",
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
@@ -435,14 +398,75 @@ data:
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 39 },
+          "gridPos": { "h": 6, "w": 12, "x": 12, "y": 30 },
+          "id": 26,
+          "title": "Deployment Replicas (Desired vs Available)",
+          "type": "table",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "align": "auto" }
+            }
+          },
+          "targets": [
+            {
+              "expr": "kube_deployment_status_replicas_available{namespace=~\"$namespace\"}",
+              "format": "table",
+              "instant": true,
+              "legendFormat": "Available",
+              "refId": "A"
+            },
+            {
+              "expr": "kube_deployment_spec_replicas{namespace=~\"$namespace\"}",
+              "format": "table",
+              "instant": true,
+              "legendFormat": "Desired",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 36 },
           "id": 103,
+          "title": "LIVE POD CONTAINER LOGS (LOKI LOG EXPLORATION)",
+          "type": "row"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 12, "w": 24, "x": 0, "y": 37 },
+          "id": 35,
+          "title": "Live Container Logs (${namespace} / ${pod})",
+          "type": "logs",
+          "datasource": { "type": "loki", "uid": "loki" },
+          "options": {
+            "dedupStrategy": "none",
+            "enableLogDetails": true,
+            "prettifyLogMessage": true,
+            "showCommonLabels": false,
+            "showLabels": true,
+            "showTime": true,
+            "sortOrder": "Descending",
+            "wrapLogMessage": true
+          },
+          "targets": [
+            {
+              "expr": "{namespace=~\"$namespace\", pod=~\"$pod\"} |= \"$log_filter\"",
+              "legendFormat": "",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 49 },
+          "id": 104,
           "title": "EDGE INGRESS & NETWORK GATEWAY (192.168.100.101 / .201)",
           "type": "row"
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 7, "w": 8, "x": 0, "y": 40 },
+          "gridPos": { "h": 7, "w": 8, "x": 0, "y": 50 },
           "id": 31,
           "title": "Ingress Request Rate (req/sec)",
           "type": "timeseries",
@@ -463,7 +487,7 @@ data:
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 7, "w": 8, "x": 8, "y": 40 },
+          "gridPos": { "h": 7, "w": 8, "x": 8, "y": 50 },
           "id": 32,
           "title": "Ingress HTTP Status Codes (2xx / 3xx / 4xx / 5xx)",
           "type": "timeseries",
@@ -484,7 +508,7 @@ data:
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 7, "w": 8, "x": 16, "y": 40 },
+          "gridPos": { "h": 7, "w": 8, "x": 16, "y": 50 },
           "id": 33,
           "title": "Ingress Latency (p95 & p99)",
           "type": "timeseries",
@@ -512,7 +536,7 @@ data:
       "refresh": "10s",
       "schemaVersion": 38,
       "style": "dark",
-      "tags": ["kubernetes", "essers", "infrastructure", "overview"],
+      "tags": ["kubernetes", "essers", "infrastructure", "metrics", "logs"],
       "templating": {
         "list": [
           {
@@ -539,6 +563,30 @@ data:
             "refresh": 2,
             "sort": 1,
             "type": "query"
+          },
+          {
+            "allValue": ".*",
+            "current": { "selected": true, "text": "All", "value": "$__all" },
+            "datasource": { "type": "prometheus", "uid": "${datasource}" },
+            "definition": "label_values(kube_pod_info{namespace=~\"$namespace\"}, pod)",
+            "hide": 0,
+            "includeAll": true,
+            "label": "Pod",
+            "name": "pod",
+            "options": [],
+            "query": { "query": "label_values(kube_pod_info{namespace=~\"$namespace\"}, pod)", "refId": "PodQuery" },
+            "refresh": 2,
+            "sort": 1,
+            "type": "query"
+          },
+          {
+            "current": { "selected": false, "value": "" },
+            "hide": 0,
+            "label": "Log Search Filter",
+            "name": "log_filter",
+            "options": [],
+            "query": "",
+            "type": "textbox"
           }
         ]
       },
@@ -552,5 +600,5 @@ data:
       "timezone": "browser",
       "title": "Kubernetes Cluster & Workload Health",
       "uid": "essers-k8s-cluster-overview",
-      "version": 1
+      "version": 2
     }

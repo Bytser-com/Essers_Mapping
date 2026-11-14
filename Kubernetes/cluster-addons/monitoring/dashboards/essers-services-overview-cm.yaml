@@ -151,7 +151,7 @@ data:
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 5 },
+          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 5 },
           "id": 111,
           "title": "Preparation Zone CPU Utilization",
           "type": "timeseries",
@@ -172,7 +172,7 @@ data:
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 5 },
+          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 5 },
           "id": 112,
           "title": "Preparation Zone Memory Utilization",
           "type": "timeseries",
@@ -193,14 +193,14 @@ data:
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 },
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 12 },
           "id": 201,
           "title": "ZONE 2 & 3: SHARED STORAGE & RUNTIME STAGE TELEMETRY",
           "type": "row"
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 4, "w": 8, "x": 0, "y": 14 },
+          "gridPos": { "h": 4, "w": 8, "x": 0, "y": 13 },
           "id": 202,
           "title": "SFTP Shared Replicas (.102 / .202)",
           "type": "stat",
@@ -228,7 +228,7 @@ data:
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 4, "w": 8, "x": 8, "y": 14 },
+          "gridPos": { "h": 4, "w": 8, "x": 8, "y": 13 },
           "id": 203,
           "title": "Runtime Backend Replicas",
           "type": "stat",
@@ -256,7 +256,7 @@ data:
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 4, "w": 8, "x": 16, "y": 14 },
+          "gridPos": { "h": 4, "w": 8, "x": 16, "y": 13 },
           "id": 204,
           "title": "SFTP Runtime Replicas (.103 / .203)",
           "type": "stat",
@@ -284,7 +284,7 @@ data:
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 18 },
+          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 17 },
           "id": 211,
           "title": "Shared & Runtime Storage (Longhorn PVC Usage %)",
           "type": "gauge",
@@ -315,35 +315,40 @@ data:
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 18 },
+          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 17 },
           "id": 212,
-          "title": "Runtime Backend & SFTP CPU/RAM Footprint",
+          "title": "Storage & Runtime Pod Network I/O (RX & TX)",
           "type": "timeseries",
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
             "defaults": {
-              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
-              "unit": "bytes"
+              "custom": { "drawStyle": "line" },
+              "unit": "Bps"
             }
           },
           "targets": [
             {
-              "expr": "sum by (pod) (container_memory_working_set_bytes{namespace=~\"$namespace\", pod=~\"(runtime-backend|sftp-shared|sftp-runtime)-.*\", container!=\"\", container!=\"POD\"})",
-              "legendFormat": "{{pod}} (RAM)",
+              "expr": "sum by (pod) (rate(container_network_receive_bytes_total{namespace=~\"$namespace\", pod=~\"(runtime-backend|sftp-shared|sftp-runtime)-.*\"}[5m]))",
+              "legendFormat": "{{pod}} (RX)",
               "refId": "A"
+            },
+            {
+              "expr": "sum by (pod) (rate(container_network_transmit_bytes_total{namespace=~\"$namespace\", pod=~\"(runtime-backend|sftp-shared|sftp-runtime)-.*\"}[5m]))",
+              "legendFormat": "{{pod}} (TX)",
+              "refId": "B"
             }
           ]
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 26 },
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 24 },
           "id": 300,
           "title": "APPLICATION RUNTIME HEALTH (JVM & PYTHON ENGINES)",
           "type": "row"
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 27 },
+          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 25 },
           "id": 301,
           "title": "Spring Boot JVM Heap Memory (Java Backends)",
           "type": "timeseries",
@@ -369,7 +374,7 @@ data:
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 27 },
+          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 25 },
           "id": 302,
           "title": "JVM Live Threads & Garbage Collection Pauses",
           "type": "timeseries",
@@ -392,12 +397,44 @@ data:
               "refId": "B"
             }
           ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 32 },
+          "id": 400,
+          "title": "LIVE APPLICATION LOGS (ALL ESSERS SERVICES)",
+          "type": "row"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 12, "w": 24, "x": 0, "y": 33 },
+          "id": 401,
+          "title": "Live Application Logs (Namespace: ${namespace})",
+          "type": "logs",
+          "datasource": { "type": "loki", "uid": "loki" },
+          "options": {
+            "dedupStrategy": "none",
+            "enableLogDetails": true,
+            "prettifyLogMessage": true,
+            "showCommonLabels": false,
+            "showLabels": true,
+            "showTime": true,
+            "sortOrder": "Descending",
+            "wrapLogMessage": true
+          },
+          "targets": [
+            {
+              "expr": "{namespace=~\"$namespace\"} |= \"$log_filter\"",
+              "legendFormat": "",
+              "refId": "A"
+            }
+          ]
         }
       ],
       "refresh": "10s",
       "schemaVersion": 38,
       "style": "dark",
-      "tags": ["essers", "microservices", "spring-boot", "python", "sftpgo"],
+      "tags": ["essers", "microservices", "spring-boot", "python", "sftpgo", "logs"],
       "templating": {
         "list": [
           {
@@ -424,6 +461,15 @@ data:
             "refresh": 2,
             "sort": 1,
             "type": "query"
+          },
+          {
+            "current": { "selected": false, "value": "" },
+            "hide": 0,
+            "label": "Log Search Filter",
+            "name": "log_filter",
+            "options": [],
+            "query": "",
+            "type": "textbox"
           }
         ]
       },
@@ -437,5 +483,5 @@ data:
       "timezone": "browser",
       "title": "Essers Mapping End-to-End Zone Telemetry",
       "uid": "essers-services-overview",
-      "version": 1
+      "version": 2
     }

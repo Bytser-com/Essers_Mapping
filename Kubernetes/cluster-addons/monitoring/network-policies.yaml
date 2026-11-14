@@ -141,3 +141,55 @@ spec:
           port: 8000
         - protocol: TCP
           port: 8080
+---
+# 5. LOKI INGRESS: Allow log ingestion from Alloy and log queries from Grafana
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-to-loki
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: loki
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: grafana
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: alloy-k8s
+        - ipBlock:
+            cidr: 192.168.100.0/24
+      ports:
+        - protocol: TCP
+          port: 3100
+---
+# 6. ALLOY DAEMONSET EGRESS: Allow streaming logs to Loki & resolving DNS
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-alloy-egress
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: alloy-k8s
+  policyTypes:
+    - Egress
+  egress:
+    - ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: loki
+      ports:
+        - protocol: TCP
+          port: 3100

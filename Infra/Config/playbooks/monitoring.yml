@@ -152,6 +152,21 @@
         cmd: "kubectl apply -f {{ monitoring_dest_dir }}/service-monitors/"
       changed_when: false
 
+    - name: Deploy Grafana Loki log aggregation engine
+      ansible.builtin.command:
+        cmd: "kubectl apply -k {{ monitoring_dest_dir }}/loki/"
+      changed_when: false
+
+    - name: Deploy Grafana Alloy Kubernetes container log collector DaemonSet
+      ansible.builtin.command:
+        cmd: "kubectl apply -k {{ monitoring_dest_dir }}/alloy/"
+      changed_when: false
+
+    - name: Deploy Grafana Loki datasource
+      ansible.builtin.command:
+        cmd: "kubectl apply -k {{ monitoring_dest_dir }}/datasources/"
+      changed_when: false
+
     - name: Deploy GitOps Grafana Dashboards as ConfigMaps
       ansible.builtin.command:
         cmd: "kubectl apply -k {{ monitoring_dest_dir }}/dashboards/"
@@ -160,6 +175,20 @@
     - name: Verify Grafana rollout status
       ansible.builtin.command: >-
         kubectl rollout status deployment/{{ monitoring_helm_release }}-grafana
+        --namespace {{ monitoring_namespace }}
+        --timeout=180s
+      changed_when: false
+
+    - name: Verify Grafana Loki rollout status
+      ansible.builtin.command: >-
+        kubectl rollout status statefulset/loki
+        --namespace {{ monitoring_namespace }}
+        --timeout=180s
+      changed_when: false
+
+    - name: Verify Grafana Alloy DaemonSet rollout status
+      ansible.builtin.command: >-
+        kubectl rollout status daemonset/alloy-k8s
         --namespace {{ monitoring_namespace }}
         --timeout=180s
       changed_when: false

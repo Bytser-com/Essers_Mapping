@@ -391,6 +391,23 @@ jobs:
               kubectl apply -f "cluster-addons/monitoring/service-monitors/"
             fi
 
+            if [ -d "cluster-addons/monitoring/loki" ]; then
+              echo "Deploying Grafana Loki log aggregation engine..."
+              kubectl apply -k "cluster-addons/monitoring/loki/"
+              kubectl rollout status statefulset/loki -n monitoring --timeout=180s
+            fi
+
+            if [ -d "cluster-addons/monitoring/alloy" ]; then
+              echo "Deploying Grafana Alloy Kubernetes container log collector DaemonSet..."
+              kubectl apply -k "cluster-addons/monitoring/alloy/"
+              kubectl rollout status daemonset/alloy-k8s -n monitoring --timeout=180s
+            fi
+
+            if [ -d "cluster-addons/monitoring/datasources" ]; then
+              echo "Deploying Grafana Loki datasource..."
+              kubectl apply -k "cluster-addons/monitoring/datasources/"
+            fi
+
             if [ -d "cluster-addons/monitoring/dashboards" ]; then
               echo "Deploying GitOps Grafana Dashboards..."
               kubectl apply -k "cluster-addons/monitoring/dashboards/"

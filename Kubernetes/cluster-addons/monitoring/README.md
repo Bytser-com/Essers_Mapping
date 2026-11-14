@@ -71,10 +71,23 @@ Kubernetes/cluster-addons/monitoring/
 ├── service-monitors/
 │   ├── essers-mapping-servicemonitor.yaml    # Scrapes frontend, python backends, java backends, & SFTPGo
 │   └── ingress-nginx-servicemonitor.yaml     # Scrapes NGINX Ingress Controller traffic & latency metrics
+├── loki/
+│   ├── kustomization.yaml                    # Kustomize manifest for Grafana Loki
+│   ├── loki-config.yaml                      # Single-binary filesystem storage configuration
+│   ├── loki-service.yaml                     # ClusterIP service on port 3100
+│   └── loki-statefulset.yaml                 # StatefulSet with Longhorn PVC persistent log storage
+├── alloy/
+│   ├── kustomization.yaml                    # Kustomize manifest for Alloy DaemonSet
+│   ├── alloy-rbac.yaml                       # ServiceAccount & ClusterRole for Kubernetes discovery
+│   ├── alloy-config.yaml                     # River configuration for container log scraping
+│   └── alloy-daemonset.yaml                  # DaemonSet tailing /var/log/pods across worker nodes
+├── datasources/
+│   ├── kustomization.yaml                    # Kustomize manifest for datasources
+│   └── loki-datasource-cm.yaml               # Auto-provisioned Loki datasource for Grafana
 └── dashboards/
     ├── kustomization.yaml                    # Kustomize manifest to apply dashboards
-    ├── k8s-cluster-overview-cm.yaml          # All-in-one Kubernetes cluster & workload health dashboard
-    └── essers-services-overview-cm.yaml      # Essers multi-zone microservices & storage telemetry dashboard
+    ├── k8s-cluster-overview-cm.yaml          # All-in-one Kubernetes cluster, metrics, and logs dashboard
+    └── essers-services-overview-cm.yaml      # Essers multi-zone microservices, telemetry, and app logs
 ```
 
 ---
@@ -106,7 +119,12 @@ kubectl apply -f Kubernetes/cluster-addons/monitoring/network-policies.yaml
 # 4. Apply ServiceMonitors for automated metric discovery
 kubectl apply -f Kubernetes/cluster-addons/monitoring/service-monitors/
 
-# 5. Deploy GitOps Dashboards
+# 5. Deploy Loki Log Engine & Alloy Container Log Collector DaemonSet
+kubectl apply -k Kubernetes/cluster-addons/monitoring/loki/
+kubectl apply -k Kubernetes/cluster-addons/monitoring/alloy/
+kubectl apply -k Kubernetes/cluster-addons/monitoring/datasources/
+
+# 6. Deploy GitOps Dashboards
 kubectl apply -k Kubernetes/cluster-addons/monitoring/dashboards/
 ```
 
@@ -138,7 +156,12 @@ kubectl apply -f Kubernetes/cluster-addons/monitoring/network-policies.yaml
 # 5. Apply ServiceMonitors for automated metric discovery
 kubectl apply -f Kubernetes/cluster-addons/monitoring/service-monitors/
 
-# 6. Deploy GitOps Dashboards
+# 6. Deploy Loki Log Engine & Alloy Container Log Collector DaemonSet
+kubectl apply -k Kubernetes/cluster-addons/monitoring/loki/
+kubectl apply -k Kubernetes/cluster-addons/monitoring/alloy/
+kubectl apply -k Kubernetes/cluster-addons/monitoring/datasources/
+
+# 7. Deploy GitOps Dashboards
 kubectl apply -k Kubernetes/cluster-addons/monitoring/dashboards/
 ```
 
