@@ -18,6 +18,7 @@ def load(name, filename):
 
 registry = load("registry_pull_secret", "registry-pull-secret.py")
 images = load("preserve_cd_images", "preserve-cd-images.py")
+cleanup = load("cleanup_deployment_overrides", "cleanup-deployment-overrides.py")
 DIGEST = "ghcr.io/example/repo/frontend@sha256:" + "a" * 64
 
 
@@ -104,6 +105,40 @@ class ServiceCdTests(unittest.TestCase):
         self.assertEqual(loaded["kind"], "List")
         self.assertEqual(len(loaded["items"]), 1)
         self.assertEqual(loaded["items"][0]["kind"], "Deployment")
+
+    def test_cleanup_deployment_overrides_removes_command_and_args(self):
+        dep = {
+            "spec": {
+                "template": {
+                    "spec": {
+                        "containers": [
+                            {"name": "sidecar", "image": "busybox"},
+                            {"name": "runtime-backend", "image": "busybox", "command": ["/bin/sh"], "args": ["run"]},
+                        ]
+                    }
+                }
+            }
+        }
+        ops = cleanup.build_removal_patch(dep, "runtime-backend")
+        self.assertEqual(ops, [
+            {"op": "remove", "path": "/spec/template/spec/containers/1/command"},
+            {"op": "remove", "path": "/spec/template/spec/containers/1/args"},
+        ])
+
+    def test_cleanup_deployment_overrides_noop_when_no_overrides(self):
+        dep = {
+            "spec": {
+                "template": {
+                    "spec": {
+                        "containers": [
+                            {"name": "runtime-backend", "image": "app:v1"}
+                        ]
+                    }
+                }
+            }
+        }
+        self.assertEqual(cleanup.build_removal_patch(dep, "runtime-backend"), [])
+        self.assertEqual(cleanup.build_removal_patch(dep, "non-existent"), [])
 
 
 if __name__ == "__main__":

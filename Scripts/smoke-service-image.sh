@@ -5,7 +5,7 @@ set -euo pipefail
 
 case "$SERVICE_PATH" in
   Frontend) port=8080; health=/healthz ;;
-  Runtime) port=8080; health=/actuator/health ;;
+  Runtime|Version_Control) port=8080; health=/actuator/health ;;
   Mapping_Proposal|Mapping_Converter) port=8000; health=/health ;;
   *) echo 'Unsupported service' >&2; exit 1 ;;
 esac
