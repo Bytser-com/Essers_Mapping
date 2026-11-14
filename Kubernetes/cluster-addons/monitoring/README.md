@@ -196,31 +196,61 @@ Monitors the microservices across all 3 architectural zones:
 
 ---
 
-## 6. How to Add New Features & Dashboards Later (Best Practices)
+## 6. How to Export & Import Dashboards and Alerts (GitOps Workflow)
 
-To add more features, alerts, or panels in the future without manual UI clicking:
+No manual imports in Grafana UI are needed on testing or production clusters! Everything is managed as code:
 
-1. **Create or Export a Dashboard JSON**: Design or modify panels in Grafana, then click **Dashboard Settings $\rightarrow$ JSON Model** and copy the JSON.
-2. **Package as a Kubernetes ConfigMap**:
+### A. Exporting & Importing Dashboards
+
+1. **Design or Tweak in Grafana**:
+   In your testing/local Grafana, create or edit panels.
+2. **Export the Dashboard JSON**:
+   Click **Dashboard Settings (Gear icon) $\rightarrow$ JSON Model $\rightarrow$ Copy to Clipboard** (or **Share $\rightarrow$ Export $\rightarrow$ Save to file**).
+3. **Import via the Helper Script**:
+   Save your file as `my-dashboard.json` and run:
+   ```bash
+   python3 Scripts/import-grafana-dashboard.py my-dashboard.json --name "Order Processing"
+   ```
+   This automatically wraps the JSON into a GitOps ConfigMap with `grafana_dashboard: "1"` under `Kubernetes/cluster-addons/monitoring/dashboards/` and registers it in `kustomization.yaml`.
+4. **Commit & Push**:
+   ```bash
+   git add Kubernetes/cluster-addons/monitoring/dashboards/
+   git commit -m "feat(monitoring): add order processing dashboard"
+   git push origin Feature/<your-feature>
+   ```
+   Your **GitHub Actions pipeline** or **Ansible playbook** automatically applies the changes. Grafana's sidecar discovers the new dashboard within 5 seconds with **zero downtime or manual steps**!
+
+---
+
+### B. Defining & Importing Prometheus Alerts (`PrometheusRule`)
+
+All alerting rules are declarative Kubernetes objects managed under [`Kubernetes/cluster-addons/monitoring/alerts/`](./alerts/):
+
+1. **Add an Alert Definition**:
+   Create or edit a rule in `Kubernetes/cluster-addons/monitoring/alerts/essers-alerts.yaml`:
    ```yaml
-   apiVersion: v1
-   kind: ConfigMap
+   apiVersion: monitoring.coreos.com/v1
+   kind: PrometheusRule
    metadata:
-     name: grafana-dashboard-my-new-feature
+     name: my-custom-alerts
      namespace: monitoring
      labels:
-       grafana_dashboard: "1"                 # Required for sidecar detection
-     annotations:
-       k8s-sidecar-target-directory: "/tmp/dashboards/essers"
-   data:
-     my-new-feature.json: |
-       <paste dashboard JSON here>
+       role: alert-rules
+       release: kube-prometheus-stack
+   spec:
+     groups:
+       - name: custom-alerts
+         rules:
+           - alert: MyServiceHighLatency
+             expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 2
+             for: 5m
+             labels:
+               severity: warning
+             annotations:
+               summary: "Service p95 latency exceeds 2 seconds"
    ```
-3. **Apply via `kubectl` or GitOps**:
-   ```bash
-   kubectl apply -f my-dashboard.yaml
-   ```
-   Within 10 seconds, Grafana's sidecar automatically detects the ConfigMap, parses the JSON, and publishes the dashboard in the Grafana UI without any pod restart or downtime!
+2. **Commit & Deploy**:
+   Once pushed, the CI/CD pipeline and Ansible automatically apply the alert rules, and Prometheus Operator immediately begins evaluating them. Alerts trigger notifications via Alertmanager.
 
 ---
 

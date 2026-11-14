@@ -391,6 +391,11 @@ jobs:
               kubectl apply -f "cluster-addons/monitoring/service-monitors/"
             fi
 
+            if [ -d "cluster-addons/monitoring/alerts" ]; then
+              echo "Deploying Prometheus alerting rules..."
+              kubectl apply -k "cluster-addons/monitoring/alerts/"
+            fi
+
             if [ -d "cluster-addons/monitoring/loki" ]; then
               echo "Deploying Grafana Loki log aggregation engine..."
               kubectl apply -k "cluster-addons/monitoring/loki/"

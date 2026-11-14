@@ -152,6 +152,11 @@
         cmd: "kubectl apply -f {{ monitoring_dest_dir }}/service-monitors/"
       changed_when: false
 
+    - name: Deploy Prometheus alerting rules
+      ansible.builtin.command:
+        cmd: "kubectl apply -k {{ monitoring_dest_dir }}/alerts/"
+      changed_when: false
+
     - name: Deploy Grafana Loki log aggregation engine
       ansible.builtin.command:
         cmd: "kubectl apply -k {{ monitoring_dest_dir }}/loki/"
