@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120027</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22027</CustomerNumber>
+    <DeliveryAddress>Havenlaan 98 Unit 39 10996 Bonn Germany</DeliveryAddress>
+    <ShipmentName />
+    <Name>Janssens Supply</Name>
+    <WarehouseID>DE20</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-04T17:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Havenlaan 98 Unit 39</DlvStreet>
+    <DlvZipcode>10996</DlvZipcode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCounty>Bonn</DlvCounty>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <Recipient>Noah Janssens</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706027</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000027</RouteID>
+    <Qty>72.000000000000</Qty>
+    <ItemID>BD965006</ItemID>
+    <InventoryOrderID>000206171</InventoryOrderID>
+    <DeliveryDate>2026-08-09T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394271</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030027</InventTransRefID>
+    <DeliveryAdress>Havenlaan 98 Unit 39 10996 Bonn Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Snel Lader X2</Note>
+    <MultiComponentItemID>BD965006</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Havenlaan 98 Unit 39 10996 Bonn Germany</DlvAddress>
+    <DlvStreet>Havenlaan 98 Unit 39</DlvStreet>
+    <DlvZipCode>10996</DlvZipCode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCountry>Bonn</DlvCountry>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394270</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000027</RouteID>
+    <Qty>50.000000000000</Qty>
+    <ItemID>BQ614397</ItemID>
+    <InventoryOrderID>000206172</InventoryOrderID>
+    <DeliveryDate>2026-08-09T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394272</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030027</InventTransRefID>
+    <DeliveryAdress>Havenlaan 98 Unit 39 10996 Bonn Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Duurzaam Paneel Pro</Note>
+    <MultiComponentItemID>BQ614397</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Havenlaan 98 Unit 39 10996 Bonn Germany</DlvAddress>
+    <DlvStreet>Havenlaan 98 Unit 39</DlvStreet>
+    <DlvZipCode>10996</DlvZipCode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCountry>Bonn</DlvCountry>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394270</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000027</RouteID>
+    <Qty>76.000000000000</Qty>
+    <ItemID>TU125378</ItemID>
+    <InventoryOrderID>000206173</InventoryOrderID>
+    <DeliveryDate>2026-08-09T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394273</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030027</InventTransRefID>
+    <DeliveryAdress>Havenlaan 98 Unit 39 10996 Bonn Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Sterk Pomp Basic</Note>
+    <MultiComponentItemID>TU125378</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Havenlaan 98 Unit 39 10996 Bonn Germany</DlvAddress>
+    <DlvStreet>Havenlaan 98 Unit 39</DlvStreet>
+    <DlvZipCode>10996</DlvZipCode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCountry>Bonn</DlvCountry>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394270</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000027</RouteID>
+    <Qty>91.000000000000</Qty>
+    <ItemID>ZR768731</ItemID>
+    <InventoryOrderID>000206174</InventoryOrderID>
+    <DeliveryDate>2026-08-09T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394274</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030027</InventTransRefID>
+    <DeliveryAdress>Havenlaan 98 Unit 39 10996 Bonn Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Duurzaam Ventiel Basic</Note>
+    <MultiComponentItemID>ZR768731</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Havenlaan 98 Unit 39 10996 Bonn Germany</DlvAddress>
+    <DlvStreet>Havenlaan 98 Unit 39</DlvStreet>
+    <DlvZipCode>10996</DlvZipCode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCountry>Bonn</DlvCountry>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394270</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

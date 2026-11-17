@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120065</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22065</CustomerNumber>
+    <DeliveryAddress>Nieuwstraat 102 Bus 7 63797 Verona Italy</DeliveryAddress>
+    <ShipmentName />
+    <Name>Leroy Trading</Name>
+    <WarehouseID>IT20</WarehouseID>
+    <CompanyID>E223</CompanyID>
+    <PublishedByAX>2026-08-09T11:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Nieuwstraat 102 Bus 7</DlvStreet>
+    <DlvZipcode>63797</DlvZipcode>
+    <DlvCity>Verona</DlvCity>
+    <DlvCounty>Verona</DlvCounty>
+    <DlvState>Verona</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <Recipient>Mats Leroy</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706065</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000065</RouteID>
+    <Qty>43.000000000000</Qty>
+    <ItemID>GW111649</ItemID>
+    <InventoryOrderID>000206551</InventoryOrderID>
+    <DeliveryDate>2026-08-12T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394651</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030065</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 102 Bus 7 63797 Verona Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Eco Controller Plus</Note>
+    <MultiComponentItemID>GW111649</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 102 Bus 7 63797 Verona Italy</DlvAddress>
+    <DlvStreet>Nieuwstraat 102 Bus 7</DlvStreet>
+    <DlvZipCode>63797</DlvZipCode>
+    <DlvCity>Verona</DlvCity>
+    <DlvCountry>Verona</DlvCountry>
+    <DlvState>Verona</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394650</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000065</RouteID>
+    <Qty>31.000000000000</Qty>
+    <ItemID>CD836380</ItemID>
+    <InventoryOrderID>000206552</InventoryOrderID>
+    <DeliveryDate>2026-08-12T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394652</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030065</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 102 Bus 7 63797 Verona Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Digitaal Lader Basic</Note>
+    <MultiComponentItemID>CD836380</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 102 Bus 7 63797 Verona Italy</DlvAddress>
+    <DlvStreet>Nieuwstraat 102 Bus 7</DlvStreet>
+    <DlvZipCode>63797</DlvZipCode>
+    <DlvCity>Verona</DlvCity>
+    <DlvCountry>Verona</DlvCountry>
+    <DlvState>Verona</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394650</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

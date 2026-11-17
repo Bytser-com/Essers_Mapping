@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120109</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22109</CustomerNumber>
+    <DeliveryAddress>Kerkstraat 228 Gebouw N 66005 Milaan Italy</DeliveryAddress>
+    <ShipmentName />
+    <Name>Leroy Logistics</Name>
+    <WarehouseID>IT20</WarehouseID>
+    <CompanyID>E223</CompanyID>
+    <PublishedByAX>2026-08-14T23:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kerkstraat 228 Gebouw N</DlvStreet>
+    <DlvZipcode>66005</DlvZipcode>
+    <DlvCity>Milaan</DlvCity>
+    <DlvCounty>Milaan</DlvCounty>
+    <DlvState>Milaan</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <Recipient>Amelie Leroy</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706109</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000109</RouteID>
+    <Qty>77.000000000000</Qty>
+    <ItemID>BQ614397</ItemID>
+    <InventoryOrderID>000206991</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395091</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030109</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 228 Gebouw N 66005 Milaan Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Duurzaam Paneel Pro</Note>
+    <MultiComponentItemID>BQ614397</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 228 Gebouw N 66005 Milaan Italy</DlvAddress>
+    <DlvStreet>Kerkstraat 228 Gebouw N</DlvStreet>
+    <DlvZipCode>66005</DlvZipCode>
+    <DlvCity>Milaan</DlvCity>
+    <DlvCountry>Milaan</DlvCountry>
+    <DlvState>Milaan</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395090</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000109</RouteID>
+    <Qty>58.000000000000</Qty>
+    <ItemID>TV691955</ItemID>
+    <InventoryOrderID>000206992</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395092</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030109</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 228 Gebouw N 66005 Milaan Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Professioneel Sensor Mini</Note>
+    <MultiComponentItemID>TV691955</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 228 Gebouw N 66005 Milaan Italy</DlvAddress>
+    <DlvStreet>Kerkstraat 228 Gebouw N</DlvStreet>
+    <DlvZipCode>66005</DlvZipCode>
+    <DlvCity>Milaan</DlvCity>
+    <DlvCountry>Milaan</DlvCountry>
+    <DlvState>Milaan</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395090</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

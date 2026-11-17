@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120085</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22085</CustomerNumber>
+    <DeliveryAddress>Dorpsstraat 292 Bus 24 62634 Metz France</DeliveryAddress>
+    <ShipmentName />
+    <Name>Willems Industries</Name>
+    <WarehouseID>FR30</WarehouseID>
+    <CompanyID>E223</CompanyID>
+    <PublishedByAX>2026-08-11T23:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Dorpsstraat 292 Bus 24</DlvStreet>
+    <DlvZipcode>62634</DlvZipcode>
+    <DlvCity>Metz</DlvCity>
+    <DlvCounty>Metz</DlvCounty>
+    <DlvState>Metz</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <Recipient>Jules Willems</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706085</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000085</RouteID>
+    <Qty>6.000000000000</Qty>
+    <ItemID>FH618011</ItemID>
+    <InventoryOrderID>000206751</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394851</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030085</InventTransRefID>
+    <DeliveryAdress>Dorpsstraat 292 Bus 24 62634 Metz France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Professioneel Kabel Plus</Note>
+    <MultiComponentItemID>FH618011</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Dorpsstraat 292 Bus 24 62634 Metz France</DlvAddress>
+    <DlvStreet>Dorpsstraat 292 Bus 24</DlvStreet>
+    <DlvZipCode>62634</DlvZipCode>
+    <DlvCity>Metz</DlvCity>
+    <DlvCountry>Metz</DlvCountry>
+    <DlvState>Metz</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394850</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000085</RouteID>
+    <Qty>15.000000000000</Qty>
+    <ItemID>SD941083</ItemID>
+    <InventoryOrderID>000206752</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394852</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030085</InventTransRefID>
+    <DeliveryAdress>Dorpsstraat 292 Bus 24 62634 Metz France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Duurzaam Motor Kit</Note>
+    <MultiComponentItemID>SD941083</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Dorpsstraat 292 Bus 24 62634 Metz France</DlvAddress>
+    <DlvStreet>Dorpsstraat 292 Bus 24</DlvStreet>
+    <DlvZipCode>62634</DlvZipCode>
+    <DlvCity>Metz</DlvCity>
+    <DlvCountry>Metz</DlvCountry>
+    <DlvState>Metz</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394850</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

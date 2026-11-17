@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120094</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22094</CustomerNumber>
+    <DeliveryAddress>Marktplein 95 84324 Rotterdam Netherlands</DeliveryAddress>
+    <ShipmentName />
+    <Name>Jacobs Supply</Name>
+    <WarehouseID>NL20</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-13T02:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Marktplein 95</DlvStreet>
+    <DlvZipcode>84324</DlvZipcode>
+    <DlvCity>Rotterdam</DlvCity>
+    <DlvCounty>Rotterdam</DlvCounty>
+    <DlvState>Rotterdam</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <Recipient>Jules Jacobs</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706094</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000094</RouteID>
+    <Qty>32.000000000000</Qty>
+    <ItemID>SG082851</ItemID>
+    <InventoryOrderID>000206841</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394941</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030094</InventTransRefID>
+    <DeliveryAdress>Marktplein 95 84324 Rotterdam Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Precisie Filter Plus</Note>
+    <MultiComponentItemID>SG082851</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 95 84324 Rotterdam Netherlands</DlvAddress>
+    <DlvStreet>Marktplein 95</DlvStreet>
+    <DlvZipCode>84324</DlvZipCode>
+    <DlvCity>Rotterdam</DlvCity>
+    <DlvCountry>Rotterdam</DlvCountry>
+    <DlvState>Rotterdam</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1394940</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000094</RouteID>
+    <Qty>50.000000000000</Qty>
+    <ItemID>RR176677</ItemID>
+    <InventoryOrderID>000206842</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394942</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030094</InventTransRefID>
+    <DeliveryAdress>Marktplein 95 84324 Rotterdam Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Slim Scanner Plus</Note>
+    <MultiComponentItemID>RR176677</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 95 84324 Rotterdam Netherlands</DlvAddress>
+    <DlvStreet>Marktplein 95</DlvStreet>
+    <DlvZipCode>84324</DlvZipCode>
+    <DlvCity>Rotterdam</DlvCity>
+    <DlvCountry>Rotterdam</DlvCountry>
+    <DlvState>Rotterdam</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1394940</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000094</RouteID>
+    <Qty>77.000000000000</Qty>
+    <ItemID>KA613008</ItemID>
+    <InventoryOrderID>000206843</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394943</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030094</InventTransRefID>
+    <DeliveryAdress>Marktplein 95 84324 Rotterdam Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Mobiel Connector V2</Note>
+    <MultiComponentItemID>KA613008</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 95 84324 Rotterdam Netherlands</DlvAddress>
+    <DlvStreet>Marktplein 95</DlvStreet>
+    <DlvZipCode>84324</DlvZipCode>
+    <DlvCity>Rotterdam</DlvCity>
+    <DlvCountry>Rotterdam</DlvCountry>
+    <DlvState>Rotterdam</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1394940</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

@@ -1,0 +1,13 @@
+---
+galaxy_info:
+  role_name: github_runner
+  author: Essers Infrastructure Team
+  description: Configures GitHub Actions Self-Hosted Runner, Terraform state storage, and CI/CD tooling (Terraform, Ansible, kubectl, Helm, Docker)
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Debian
+      versions:
+        - trixie
+        - bookworm
+dependencies: []

@@ -1,0 +1,31 @@
+---
+# ==============================================================================
+# CONTAINERD TASKS: KERNEL MODULES & SYSCTL
+# ==============================================================================
+
+- name: Persist required Kubernetes kernel modules across reboots
+  ansible.builtin.copy:
+    content: |
+      # Managed by Ansible (roles/containerd)
+      {% for mod in k8s_kernel_modules %}
+      {{ mod }}
+      {% endfor %}
+    dest: /etc/modules-load.d/k8s.conf
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Load required kernel modules immediately
+  community.general.modprobe:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ k8s_kernel_modules }}"
+
+- name: Configure sysctl parameters required for Kubernetes networking
+  ansible.posix.sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    sysctl_file: /etc/sysctl.d/99-kubernetes-cri.conf
+    state: present
+    reload: true
+  loop: "{{ k8s_sysctl_params | dict2items }}"

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root>
+  <MessageType>Outbound Delivery</MessageType>
+  <DocHeader>
+    <OutboundNumber>SO270000025</OutboundNumber>
+    <DocumentNumber>SO270000025</DocumentNumber>
+    <Reference>600025 /70025</Reference>
+    <DeliveryDate>23/09/2026</DeliveryDate>
+    <ShipByDate>20/09/2026</ShipByDate>
+    <RushIndicator>N</RushIndicator>
+    <Carrier>XPO</Carrier>
+    <ShipToCode>200025</ShipToCode>
+    <Name1>Victor Lambert</Name1>
+    <Name2>Lambert Trading</Name2>
+    <Address1>Dorpsstraat 89</Address1>
+    <Address2>Afdeling 3</Address2>
+    <PostalCode>54346</PostalCode>
+    <City>Porto</City>
+    <County />
+    <Country>PT</Country>
+    <LanguageCode>PT</LanguageCode>
+    <CommentCustomer />
+    <CommentOrder>
+      <Comment>Customer Reference: 800025</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>INCO:EXW</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>T4T : +32 11 45 55 65</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>Open: Ma-Di-Wo-Do-Vr 08:00-16:00</Comment>
+    </CommentOrder>
+    <TransportInstruction>
+      <Comment>T4T : +32 11 45 55 65</Comment>
+    </TransportInstruction>
+    <TransportInstruction>
+      <Comment>F92 : 1 08001600 2 08001600 3 08001600 4 08001600 5 08001600</Comment>
+    </TransportInstruction>
+    <WarehouseInstruction />
+  </DocHeader>
+  <DocLine>
+    <OrderLine>1</OrderLine>
+    <Product>KI030474</Product>
+    <Quantity>2</Quantity>
+    <UOM>CAN</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>0</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+</Root>

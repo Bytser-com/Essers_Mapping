@@ -1,0 +1,81 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: essers-mapping-testing
+
+labels:
+  - includeSelectors: false
+    pairs:
+      environment: testing
+
+resources:
+  - ../../base
+  - hpa.yaml
+
+# ==============================================================================
+# REPLICA SCALING (TESTING WITH +1 HOT SPARE)
+# - Preparation Services: 1 min + 1 hot spare = 2 baseline replicas (max 3 via HPA)
+# - Shared SFTPGo:        1 min + 1 hot spare = 2 baseline replicas (max 3 via HPA)
+# - Runtime Services:     2 min + 1 hot spare = 3 baseline replicas (max 5 via HPA)
+# ==============================================================================
+replicas:
+  - name: frontend
+    count: 2
+  - name: mapping-converter
+    count: 2
+  - name: mapping-proposal
+    count: 2
+  - name: version-control-backend
+    count: 2
+  - name: sftp-shared
+    count: 2
+  - name: runtime-backend
+    count: 3
+  - name: sftp-runtime
+    count: 3
+
+# ==============================================================================
+# CONTAINER IMAGES (TESTING: Mutable `:latest` tag for all services)
+# Paired with `imagePullPolicy: Always` in patches/resources-patch.yaml so
+# `kubectl rollout restart deployment -n essers-mapping-testing` always pulls
+# the newest `:latest` image from GHCR.
+# ==============================================================================
+images:
+  - name: ghcr.io/bytser-com/essers_mapping/frontend
+    newTag: latest
+  - name: ghcr.io/bytser-com/essers_mapping/mapping-converter
+    newTag: latest
+  - name: ghcr.io/bytser-com/essers_mapping/mapping-proposal
+    newTag: latest
+  - name: ghcr.io/bytser-com/essers_mapping/version-control-backend
+    newTag: latest
+  - name: ghcr.io/bytser-com/essers_mapping/runtime-backend
+    newTag: latest
+
+# ==============================================================================
+# ENVIRONMENT-SPECIFIC CONFIGMAP OVERRIDES
+# ==============================================================================
+configMapGenerator:
+  - name: common-config
+    behavior: merge
+    literals:
+      - ENVIRONMENT=testing
+      - LOG_LEVEL=DEBUG
+      - SPRING_PROFILES_ACTIVE=testing
+      - PUBLIC_FRONTEND_IP=192.168.100.101
+      - PUBLIC_SFTP_SHARED_IP=192.168.100.102
+      - PUBLIC_SFTP_RUNTIME_IP=192.168.100.103
+
+# ==============================================================================
+# STRATEGIC MERGE PATCHES FOR TESTING
+# ==============================================================================
+patches:
+  - path: patches/resources-patch.yaml
+  - path: patches/loadbalancer-ips-patch.yaml
+  - target:
+      kind: Namespace
+      name: essers-mapping
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: essers-mapping-testing

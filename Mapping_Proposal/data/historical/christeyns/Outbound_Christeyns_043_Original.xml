@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root>
+  <MessageType>Outbound Delivery</MessageType>
+  <DocHeader>
+    <OutboundNumber>SO270000042</OutboundNumber>
+    <DocumentNumber>SO270000042</DocumentNumber>
+    <Reference>600042 /70042</Reference>
+    <DeliveryDate>29/10/2026</DeliveryDate>
+    <ShipByDate>24/10/2026</ShipByDate>
+    <RushIndicator>N</RushIndicator>
+    <Carrier>DHL</Carrier>
+    <ShipToCode>200042</ShipToCode>
+    <Name1>Emma Peeters</Name1>
+    <Name2>Peeters Services</Name2>
+    <Address1>Bosweg 41</Address1>
+    <Address2>Afdeling 4</Address2>
+    <PostalCode>50360</PostalCode>
+    <City>Lyon</City>
+    <County />
+    <Country>FR</Country>
+    <LanguageCode>FR</LanguageCode>
+    <CommentCustomer />
+    <CommentOrder>
+      <Comment>Customer Reference: 800042</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>INCO:DAP</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>T4T : +32 11 62 72 82</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>Open: Ma-Di-Wo-Do-Vr 08:00-16:00</Comment>
+    </CommentOrder>
+    <TransportInstruction>
+      <Comment>T4T : +32 11 62 72 82</Comment>
+    </TransportInstruction>
+    <TransportInstruction>
+      <Comment>F92 : 1 08001600 2 08001600 3 08001600 4 08001600 5 08001600</Comment>
+    </TransportInstruction>
+    <WarehouseInstruction />
+  </DocHeader>
+  <DocLine>
+    <OrderLine>1</OrderLine>
+    <Product>AI776574</Product>
+    <Quantity>19</Quantity>
+    <UOM>PCS</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>5.6</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>2</OrderLine>
+    <Product>AY887586</Product>
+    <Quantity>22</Quantity>
+    <UOM>PAL</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>12</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+</Root>

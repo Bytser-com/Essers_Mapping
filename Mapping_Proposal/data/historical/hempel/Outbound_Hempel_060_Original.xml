@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120060</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22060</CustomerNumber>
+    <DeliveryAddress>Bosweg 31 29472 Bonn Germany</DeliveryAddress>
+    <ShipmentName />
+    <Name>Schmidt Transport</Name>
+    <WarehouseID>DE20</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-08T20:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Bosweg 31</DlvStreet>
+    <DlvZipcode>29472</DlvZipcode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCounty>Bonn</DlvCounty>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <Recipient>Noah Schmidt</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706060</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000060</RouteID>
+    <Qty>50.000000000000</Qty>
+    <ItemID>LJ519434</ItemID>
+    <InventoryOrderID>000206501</InventoryOrderID>
+    <DeliveryDate>2026-08-14T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394601</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030060</InventTransRefID>
+    <DeliveryAdress>Bosweg 31 29472 Bonn Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Slim Filter X2</Note>
+    <MultiComponentItemID>LJ519434</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 31 29472 Bonn Germany</DlvAddress>
+    <DlvStreet>Bosweg 31</DlvStreet>
+    <DlvZipCode>29472</DlvZipCode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCountry>Bonn</DlvCountry>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394600</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000060</RouteID>
+    <Qty>84.000000000000</Qty>
+    <ItemID>FV079975</ItemID>
+    <InventoryOrderID>000206502</InventoryOrderID>
+    <DeliveryDate>2026-08-14T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394602</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030060</InventTransRefID>
+    <DeliveryAdress>Bosweg 31 29472 Bonn Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Robuust Afdichting Kit</Note>
+    <MultiComponentItemID>FV079975</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 31 29472 Bonn Germany</DlvAddress>
+    <DlvStreet>Bosweg 31</DlvStreet>
+    <DlvZipCode>29472</DlvZipCode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCountry>Bonn</DlvCountry>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394600</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000060</RouteID>
+    <Qty>59.000000000000</Qty>
+    <ItemID>VZ148007</ItemID>
+    <InventoryOrderID>000206503</InventoryOrderID>
+    <DeliveryDate>2026-08-14T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394603</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030060</InventTransRefID>
+    <DeliveryAdress>Bosweg 31 29472 Bonn Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Universeel Adapter Set</Note>
+    <MultiComponentItemID>VZ148007</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 31 29472 Bonn Germany</DlvAddress>
+    <DlvStreet>Bosweg 31</DlvStreet>
+    <DlvZipCode>29472</DlvZipCode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCountry>Bonn</DlvCountry>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394600</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000060</RouteID>
+    <Qty>60.000000000000</Qty>
+    <ItemID>RR176677</ItemID>
+    <InventoryOrderID>000206504</InventoryOrderID>
+    <DeliveryDate>2026-08-14T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394604</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030060</InventTransRefID>
+    <DeliveryAdress>Bosweg 31 29472 Bonn Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Slim Scanner Plus</Note>
+    <MultiComponentItemID>RR176677</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 31 29472 Bonn Germany</DlvAddress>
+    <DlvStreet>Bosweg 31</DlvStreet>
+    <DlvZipCode>29472</DlvZipCode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCountry>Bonn</DlvCountry>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394600</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000060</RouteID>
+    <Qty>41.000000000000</Qty>
+    <ItemID>TZ451902</ItemID>
+    <InventoryOrderID>000206505</InventoryOrderID>
+    <DeliveryDate>2026-08-14T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394605</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030060</InventTransRefID>
+    <DeliveryAdress>Bosweg 31 29472 Bonn Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Ergonomisch Terminal Basic</Note>
+    <MultiComponentItemID>TZ451902</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 31 29472 Bonn Germany</DlvAddress>
+    <DlvStreet>Bosweg 31</DlvStreet>
+    <DlvZipCode>29472</DlvZipCode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCountry>Bonn</DlvCountry>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394600</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

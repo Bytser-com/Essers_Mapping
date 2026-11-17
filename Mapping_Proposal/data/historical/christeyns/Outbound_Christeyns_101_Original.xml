@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root>
+  <MessageType>Outbound Delivery</MessageType>
+  <DocHeader>
+    <OutboundNumber>SO270000100</OutboundNumber>
+    <DocumentNumber>SO270000100</DocumentNumber>
+    <Reference>600100 /70100</Reference>
+    <DeliveryDate>20/02/2027</DeliveryDate>
+    <ShipByDate>17/02/2027</ShipByDate>
+    <RushIndicator>Y</RushIndicator>
+    <Carrier>XPO</Carrier>
+    <ShipToCode>200100</ShipToCode>
+    <Name1>Sara Peeters</Name1>
+    <Name2>Peeters Consulting</Name2>
+    <Address1>Schoolstraat 195</Address1>
+    <Address2 />
+    <PostalCode>73867</PostalCode>
+    <City>Lissabon</City>
+    <County />
+    <Country>PT</Country>
+    <LanguageCode>PT</LanguageCode>
+    <CommentCustomer />
+    <CommentOrder>
+      <Comment>Customer Reference: 800100</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>INCO:EXW</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>T4T : +32 11 50 70 40</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>Open: Ma-Di-Wo-Do-Vr 08:00-16:00</Comment>
+    </CommentOrder>
+    <TransportInstruction>
+      <Comment>T4T : +32 11 50 70 40</Comment>
+    </TransportInstruction>
+    <TransportInstruction>
+      <Comment>F92 : 1 08001600 2 08001600 3 08001600 4 08001600 5 08001600</Comment>
+    </TransportInstruction>
+    <WarehouseInstruction />
+  </DocHeader>
+  <DocLine>
+    <OrderLine>1</OrderLine>
+    <Product>NL338526</Product>
+    <Quantity>5</Quantity>
+    <UOM>CAN</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>0</VOCContent>
+    <BiocideCode>47100</BiocideCode>
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>2</OrderLine>
+    <Product>JX326146</Product>
+    <Quantity>8</Quantity>
+    <UOM>BOX</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>3.4</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>3</OrderLine>
+    <Product>KL754984</Product>
+    <Quantity>11</Quantity>
+    <UOM>PCS</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>5.6</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>4</OrderLine>
+    <Product>CQ876045</Product>
+    <Quantity>14</Quantity>
+    <UOM>PAL</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>12</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+</Root>

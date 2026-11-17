@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root>
+  <MessageType>Outbound Delivery</MessageType>
+  <DocHeader>
+    <OutboundNumber>SO270000057</OutboundNumber>
+    <DocumentNumber>SO270000057</DocumentNumber>
+    <Reference>600057 /70057</Reference>
+    <DeliveryDate>28/11/2026</DeliveryDate>
+    <ShipByDate>23/11/2026</ShipByDate>
+    <RushIndicator>N</RushIndicator>
+    <Carrier>DHL</Carrier>
+    <ShipToCode>200057</ShipToCode>
+    <Name1>Lucas Leroy</Name1>
+    <Name2>Leroy Services</Name2>
+    <Address1>Nieuwstraat 212</Address1>
+    <Address2>Afdeling 4</Address2>
+    <PostalCode>98650</PostalCode>
+    <City>Bilbao</City>
+    <County />
+    <Country>ES</Country>
+    <LanguageCode>ES</LanguageCode>
+    <CommentCustomer />
+    <CommentOrder>
+      <Comment>Customer Reference: 800057</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>INCO:DAP</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>T4T : +32 11 77 87 47</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>Open: Ma-Di-Wo-Do-Vr 08:00-16:00</Comment>
+    </CommentOrder>
+    <TransportInstruction>
+      <Comment>T4T : +32 11 77 87 47</Comment>
+    </TransportInstruction>
+    <TransportInstruction>
+      <Comment>F92 : 1 08001600 2 08001600 3 08001600 4 08001600 5 08001600</Comment>
+    </TransportInstruction>
+    <WarehouseInstruction />
+  </DocHeader>
+  <DocLine>
+    <OrderLine>1</OrderLine>
+    <Product>JO119261</Product>
+    <Quantity>10</Quantity>
+    <UOM>PCS</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>5.6</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+</Root>

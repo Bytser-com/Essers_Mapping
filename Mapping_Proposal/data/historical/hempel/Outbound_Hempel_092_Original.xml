@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120092</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22092</CustomerNumber>
+    <DeliveryAddress>Veldweg 9 Bus 14 40072 Bilbao Spain</DeliveryAddress>
+    <ShipmentName />
+    <Name>Willems Logistics</Name>
+    <WarehouseID>ES30</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-12T20:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Veldweg 9 Bus 14</DlvStreet>
+    <DlvZipcode>40072</DlvZipcode>
+    <DlvCity>Bilbao</DlvCity>
+    <DlvCounty>Bilbao</DlvCounty>
+    <DlvState>Bilbao</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <Recipient>Lina Willems</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706092</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000092</RouteID>
+    <Qty>3.000000000000</Qty>
+    <ItemID>AX016556</ItemID>
+    <InventoryOrderID>000206821</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394921</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030092</InventTransRefID>
+    <DeliveryAdress>Veldweg 9 Bus 14 40072 Bilbao Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Modulair Paneel V2</Note>
+    <MultiComponentItemID>AX016556</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 9 Bus 14 40072 Bilbao Spain</DlvAddress>
+    <DlvStreet>Veldweg 9 Bus 14</DlvStreet>
+    <DlvZipCode>40072</DlvZipCode>
+    <DlvCity>Bilbao</DlvCity>
+    <DlvCountry>Bilbao</DlvCountry>
+    <DlvState>Bilbao</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394920</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000092</RouteID>
+    <Qty>28.000000000000</Qty>
+    <ItemID>VL001652</ItemID>
+    <InventoryOrderID>000206822</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394922</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030092</InventTransRefID>
+    <DeliveryAdress>Veldweg 9 Bus 14 40072 Bilbao Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Professioneel Beugel Set</Note>
+    <MultiComponentItemID>VL001652</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 9 Bus 14 40072 Bilbao Spain</DlvAddress>
+    <DlvStreet>Veldweg 9 Bus 14</DlvStreet>
+    <DlvZipCode>40072</DlvZipCode>
+    <DlvCity>Bilbao</DlvCity>
+    <DlvCountry>Bilbao</DlvCountry>
+    <DlvState>Bilbao</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394920</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000092</RouteID>
+    <Qty>91.000000000000</Qty>
+    <ItemID>CD836380</ItemID>
+    <InventoryOrderID>000206823</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394923</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030092</InventTransRefID>
+    <DeliveryAdress>Veldweg 9 Bus 14 40072 Bilbao Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Digitaal Lader Basic</Note>
+    <MultiComponentItemID>CD836380</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 9 Bus 14 40072 Bilbao Spain</DlvAddress>
+    <DlvStreet>Veldweg 9 Bus 14</DlvStreet>
+    <DlvZipCode>40072</DlvZipCode>
+    <DlvCity>Bilbao</DlvCity>
+    <DlvCountry>Bilbao</DlvCountry>
+    <DlvState>Bilbao</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394920</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000092</RouteID>
+    <Qty>11.000000000000</Qty>
+    <ItemID>GR532480</ItemID>
+    <InventoryOrderID>000206824</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394924</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030092</InventTransRefID>
+    <DeliveryAdress>Veldweg 9 Bus 14 40072 Bilbao Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Ergonomisch Afdichting Set</Note>
+    <MultiComponentItemID>GR532480</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 9 Bus 14 40072 Bilbao Spain</DlvAddress>
+    <DlvStreet>Veldweg 9 Bus 14</DlvStreet>
+    <DlvZipCode>40072</DlvZipCode>
+    <DlvCity>Bilbao</DlvCity>
+    <DlvCountry>Bilbao</DlvCountry>
+    <DlvState>Bilbao</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394920</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000092</RouteID>
+    <Qty>62.000000000000</Qty>
+    <ItemID>DK308401</ItemID>
+    <InventoryOrderID>000206825</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394925</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030092</InventTransRefID>
+    <DeliveryAdress>Veldweg 9 Bus 14 40072 Bilbao Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Industrieel Motor Kit</Note>
+    <MultiComponentItemID>DK308401</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 9 Bus 14 40072 Bilbao Spain</DlvAddress>
+    <DlvStreet>Veldweg 9 Bus 14</DlvStreet>
+    <DlvZipCode>40072</DlvZipCode>
+    <DlvCity>Bilbao</DlvCity>
+    <DlvCountry>Bilbao</DlvCountry>
+    <DlvState>Bilbao</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394920</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

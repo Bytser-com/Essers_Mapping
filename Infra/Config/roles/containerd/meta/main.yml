@@ -1,0 +1,13 @@
+---
+galaxy_info:
+  role_name: containerd
+  author: Essers Infrastructure Team
+  description: Containerd CRI runtime installation, kernel modules, sysctl networking, and swap disablement for Kubernetes
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Debian
+      versions:
+        - trixie
+        - bookworm
+dependencies: []

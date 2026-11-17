@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120019</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22019</CustomerNumber>
+    <DeliveryAddress>Schoolstraat 123 Gebouw P 74972 Madrid Spain</DeliveryAddress>
+    <ShipmentName />
+    <Name>Claes Services</Name>
+    <WarehouseID>ES30</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-03T17:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Schoolstraat 123 Gebouw P</DlvStreet>
+    <DlvZipcode>74972</DlvZipcode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCounty>Madrid</DlvCounty>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <Recipient>Mats Claes</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706019</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000019</RouteID>
+    <Qty>11.000000000000</Qty>
+    <ItemID>OJ484800</ItemID>
+    <InventoryOrderID>000206091</InventoryOrderID>
+    <DeliveryDate>2026-08-08T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394191</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030019</InventTransRefID>
+    <DeliveryAdress>Schoolstraat 123 Gebouw P 74972 Madrid Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Slim Connector V2</Note>
+    <MultiComponentItemID>OJ484800</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Schoolstraat 123 Gebouw P 74972 Madrid Spain</DlvAddress>
+    <DlvStreet>Schoolstraat 123 Gebouw P</DlvStreet>
+    <DlvZipCode>74972</DlvZipCode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCountry>Madrid</DlvCountry>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394190</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000019</RouteID>
+    <Qty>30.000000000000</Qty>
+    <ItemID>BC136419</ItemID>
+    <InventoryOrderID>000206092</InventoryOrderID>
+    <DeliveryDate>2026-08-08T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394192</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030019</InventTransRefID>
+    <DeliveryAdress>Schoolstraat 123 Gebouw P 74972 Madrid Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Compact Terminal Basic</Note>
+    <MultiComponentItemID>BC136419</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Schoolstraat 123 Gebouw P 74972 Madrid Spain</DlvAddress>
+    <DlvStreet>Schoolstraat 123 Gebouw P</DlvStreet>
+    <DlvZipCode>74972</DlvZipCode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCountry>Madrid</DlvCountry>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394190</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000019</RouteID>
+    <Qty>53.000000000000</Qty>
+    <ItemID>RP735586</ItemID>
+    <InventoryOrderID>000206093</InventoryOrderID>
+    <DeliveryDate>2026-08-08T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394193</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030019</InventTransRefID>
+    <DeliveryAdress>Schoolstraat 123 Gebouw P 74972 Madrid Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Professioneel Paneel Kit</Note>
+    <MultiComponentItemID>RP735586</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Schoolstraat 123 Gebouw P 74972 Madrid Spain</DlvAddress>
+    <DlvStreet>Schoolstraat 123 Gebouw P</DlvStreet>
+    <DlvZipCode>74972</DlvZipCode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCountry>Madrid</DlvCountry>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394190</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000019</RouteID>
+    <Qty>48.000000000000</Qty>
+    <ItemID>RS465117</ItemID>
+    <InventoryOrderID>000206094</InventoryOrderID>
+    <DeliveryDate>2026-08-08T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394194</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030019</InventTransRefID>
+    <DeliveryAdress>Schoolstraat 123 Gebouw P 74972 Madrid Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Eco Beugel X1</Note>
+    <MultiComponentItemID>RS465117</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Schoolstraat 123 Gebouw P 74972 Madrid Spain</DlvAddress>
+    <DlvStreet>Schoolstraat 123 Gebouw P</DlvStreet>
+    <DlvZipCode>74972</DlvZipCode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCountry>Madrid</DlvCountry>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394190</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120035</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22035</CustomerNumber>
+    <DeliveryAddress>Kerkstraat 85 Afdeling 1 58820 Aken Germany</DeliveryAddress>
+    <ShipmentName />
+    <Name>Jacobs Solutions</Name>
+    <WarehouseID>DE20</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-05T17:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kerkstraat 85 Afdeling 1</DlvStreet>
+    <DlvZipcode>58820</DlvZipcode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCounty>Aken</DlvCounty>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <Recipient>Lucas Jacobs</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706035</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000035</RouteID>
+    <Qty>61.000000000000</Qty>
+    <ItemID>RW173809</ItemID>
+    <InventoryOrderID>000206251</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394351</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030035</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 85 Afdeling 1 58820 Aken Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Automatisch Meetset V2</Note>
+    <MultiComponentItemID>RW173809</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 85 Afdeling 1 58820 Aken Germany</DlvAddress>
+    <DlvStreet>Kerkstraat 85 Afdeling 1</DlvStreet>
+    <DlvZipCode>58820</DlvZipCode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCountry>Aken</DlvCountry>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394350</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000035</RouteID>
+    <Qty>86.000000000000</Qty>
+    <ItemID>EN301631</ItemID>
+    <InventoryOrderID>000206252</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394352</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030035</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 85 Afdeling 1 58820 Aken Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Mobiel Paneel Plus</Note>
+    <MultiComponentItemID>EN301631</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 85 Afdeling 1 58820 Aken Germany</DlvAddress>
+    <DlvStreet>Kerkstraat 85 Afdeling 1</DlvStreet>
+    <DlvZipCode>58820</DlvZipCode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCountry>Aken</DlvCountry>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394350</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000035</RouteID>
+    <Qty>49.000000000000</Qty>
+    <ItemID>HR272357</ItemID>
+    <InventoryOrderID>000206253</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394353</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030035</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 85 Afdeling 1 58820 Aken Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Digitaal Pomp Max</Note>
+    <MultiComponentItemID>HR272357</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 85 Afdeling 1 58820 Aken Germany</DlvAddress>
+    <DlvStreet>Kerkstraat 85 Afdeling 1</DlvStreet>
+    <DlvZipCode>58820</DlvZipCode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCountry>Aken</DlvCountry>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394350</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000035</RouteID>
+    <Qty>66.000000000000</Qty>
+    <ItemID>CD836380</ItemID>
+    <InventoryOrderID>000206254</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394354</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030035</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 85 Afdeling 1 58820 Aken Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Digitaal Lader Basic</Note>
+    <MultiComponentItemID>CD836380</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 85 Afdeling 1 58820 Aken Germany</DlvAddress>
+    <DlvStreet>Kerkstraat 85 Afdeling 1</DlvStreet>
+    <DlvZipCode>58820</DlvZipCode>
+    <DlvCity>Aken</DlvCity>
+    <DlvCountry>Aken</DlvCountry>
+    <DlvState>Aken</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394350</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

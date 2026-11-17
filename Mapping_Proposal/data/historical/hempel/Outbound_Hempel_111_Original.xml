@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120111</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22111</CustomerNumber>
+    <DeliveryAddress>Nieuwstraat 125 Bus 8 98817 Eindhoven Netherlands</DeliveryAddress>
+    <ShipmentName />
+    <Name>Peeters Solutions</Name>
+    <WarehouseID>NL20</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-15T05:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Nieuwstraat 125 Bus 8</DlvStreet>
+    <DlvZipcode>98817</DlvZipcode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCounty>Eindhoven</DlvCounty>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <Recipient>Amelie Peeters</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706111</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000111</RouteID>
+    <Qty>69.000000000000</Qty>
+    <ItemID>OJ484800</ItemID>
+    <InventoryOrderID>000207011</InventoryOrderID>
+    <DeliveryDate>2026-08-24T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395111</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030111</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 125 Bus 8 98817 Eindhoven Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Slim Connector V2</Note>
+    <MultiComponentItemID>OJ484800</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 125 Bus 8 98817 Eindhoven Netherlands</DlvAddress>
+    <DlvStreet>Nieuwstraat 125 Bus 8</DlvStreet>
+    <DlvZipCode>98817</DlvZipCode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCountry>Eindhoven</DlvCountry>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395110</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000111</RouteID>
+    <Qty>58.000000000000</Qty>
+    <ItemID>VJ389680</ItemID>
+    <InventoryOrderID>000207012</InventoryOrderID>
+    <DeliveryDate>2026-08-24T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395112</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030111</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 125 Bus 8 98817 Eindhoven Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Licht Omvormer X2</Note>
+    <MultiComponentItemID>VJ389680</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 125 Bus 8 98817 Eindhoven Netherlands</DlvAddress>
+    <DlvStreet>Nieuwstraat 125 Bus 8</DlvStreet>
+    <DlvZipCode>98817</DlvZipCode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCountry>Eindhoven</DlvCountry>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395110</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000111</RouteID>
+    <Qty>71.000000000000</Qty>
+    <ItemID>QX510331</ItemID>
+    <InventoryOrderID>000207013</InventoryOrderID>
+    <DeliveryDate>2026-08-24T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395113</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030111</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 125 Bus 8 98817 Eindhoven Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Slim Module X2</Note>
+    <MultiComponentItemID>QX510331</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 125 Bus 8 98817 Eindhoven Netherlands</DlvAddress>
+    <DlvStreet>Nieuwstraat 125 Bus 8</DlvStreet>
+    <DlvZipCode>98817</DlvZipCode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCountry>Eindhoven</DlvCountry>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395110</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000111</RouteID>
+    <Qty>67.000000000000</Qty>
+    <ItemID>IQ989718</ItemID>
+    <InventoryOrderID>000207014</InventoryOrderID>
+    <DeliveryDate>2026-08-24T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395114</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030111</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 125 Bus 8 98817 Eindhoven Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Automatisch Ventiel Basic</Note>
+    <MultiComponentItemID>IQ989718</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 125 Bus 8 98817 Eindhoven Netherlands</DlvAddress>
+    <DlvStreet>Nieuwstraat 125 Bus 8</DlvStreet>
+    <DlvZipCode>98817</DlvZipCode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCountry>Eindhoven</DlvCountry>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395110</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

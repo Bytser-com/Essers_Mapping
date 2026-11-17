@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120008</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22008</CustomerNumber>
+    <DeliveryAddress>Veldweg 44 Gebouw W 65354 Bologna Italy</DeliveryAddress>
+    <ShipmentName />
+    <Name>Visser Consulting</Name>
+    <WarehouseID>IT20</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-02T08:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Veldweg 44 Gebouw W</DlvStreet>
+    <DlvZipcode>65354</DlvZipcode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCounty>Bologna</DlvCounty>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <Recipient>Louise Visser</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706008</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000008</RouteID>
+    <Qty>22.000000000000</Qty>
+    <ItemID>OE221132</ItemID>
+    <InventoryOrderID>000205981</InventoryOrderID>
+    <DeliveryDate>2026-08-04T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394081</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030008</InventTransRefID>
+    <DeliveryAdress>Veldweg 44 Gebouw W 65354 Bologna Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Professioneel Kabel Mini</Note>
+    <MultiComponentItemID>OE221132</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 44 Gebouw W 65354 Bologna Italy</DlvAddress>
+    <DlvStreet>Veldweg 44 Gebouw W</DlvStreet>
+    <DlvZipCode>65354</DlvZipCode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCountry>Bologna</DlvCountry>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394080</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000008</RouteID>
+    <Qty>29.000000000000</Qty>
+    <ItemID>NL338526</ItemID>
+    <InventoryOrderID>000205982</InventoryOrderID>
+    <DeliveryDate>2026-08-04T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394082</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030008</InventTransRefID>
+    <DeliveryAdress>Veldweg 44 Gebouw W 65354 Bologna Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Industrieel Connector Max</Note>
+    <MultiComponentItemID>NL338526</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 44 Gebouw W 65354 Bologna Italy</DlvAddress>
+    <DlvStreet>Veldweg 44 Gebouw W</DlvStreet>
+    <DlvZipCode>65354</DlvZipCode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCountry>Bologna</DlvCountry>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394080</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000008</RouteID>
+    <Qty>84.000000000000</Qty>
+    <ItemID>NG876657</ItemID>
+    <InventoryOrderID>000205983</InventoryOrderID>
+    <DeliveryDate>2026-08-04T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394083</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030008</InventTransRefID>
+    <DeliveryAdress>Veldweg 44 Gebouw W 65354 Bologna Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Professioneel Omvormer Set</Note>
+    <MultiComponentItemID>NG876657</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 44 Gebouw W 65354 Bologna Italy</DlvAddress>
+    <DlvStreet>Veldweg 44 Gebouw W</DlvStreet>
+    <DlvZipCode>65354</DlvZipCode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCountry>Bologna</DlvCountry>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394080</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000008</RouteID>
+    <Qty>64.000000000000</Qty>
+    <ItemID>AB961583</ItemID>
+    <InventoryOrderID>000205984</InventoryOrderID>
+    <DeliveryDate>2026-08-04T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394084</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030008</InventTransRefID>
+    <DeliveryAdress>Veldweg 44 Gebouw W 65354 Bologna Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Premium Lader V2</Note>
+    <MultiComponentItemID>AB961583</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 44 Gebouw W 65354 Bologna Italy</DlvAddress>
+    <DlvStreet>Veldweg 44 Gebouw W</DlvStreet>
+    <DlvZipCode>65354</DlvZipCode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCountry>Bologna</DlvCountry>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394080</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000008</RouteID>
+    <Qty>79.000000000000</Qty>
+    <ItemID>CL362276</ItemID>
+    <InventoryOrderID>000205985</InventoryOrderID>
+    <DeliveryDate>2026-08-04T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394085</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030008</InventTransRefID>
+    <DeliveryAdress>Veldweg 44 Gebouw W 65354 Bologna Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Universeel Terminal X2</Note>
+    <MultiComponentItemID>CL362276</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 44 Gebouw W 65354 Bologna Italy</DlvAddress>
+    <DlvStreet>Veldweg 44 Gebouw W</DlvStreet>
+    <DlvZipCode>65354</DlvZipCode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCountry>Bologna</DlvCountry>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394080</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

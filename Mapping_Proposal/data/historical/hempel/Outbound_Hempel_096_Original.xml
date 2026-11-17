@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120096</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22096</CustomerNumber>
+    <DeliveryAddress>Bosweg 277 98900 Parijs France</DeliveryAddress>
+    <ShipmentName />
+    <Name>Dubois Transport</Name>
+    <WarehouseID>FR30</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-13T08:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Bosweg 277</DlvStreet>
+    <DlvZipcode>98900</DlvZipcode>
+    <DlvCity>Parijs</DlvCity>
+    <DlvCounty>Parijs</DlvCounty>
+    <DlvState>Parijs</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <Recipient>Mila Dubois</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706096</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000096</RouteID>
+    <Qty>18.000000000000</Qty>
+    <ItemID>VZ546734</ItemID>
+    <InventoryOrderID>000206861</InventoryOrderID>
+    <DeliveryDate>2026-08-15T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394961</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030096</InventTransRefID>
+    <DeliveryAdress>Bosweg 277 98900 Parijs France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Digitaal Afdichting Set</Note>
+    <MultiComponentItemID>VZ546734</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 277 98900 Parijs France</DlvAddress>
+    <DlvStreet>Bosweg 277</DlvStreet>
+    <DlvZipCode>98900</DlvZipCode>
+    <DlvCity>Parijs</DlvCity>
+    <DlvCountry>Parijs</DlvCountry>
+    <DlvState>Parijs</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394960</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000096</RouteID>
+    <Qty>78.000000000000</Qty>
+    <ItemID>RW173809</ItemID>
+    <InventoryOrderID>000206862</InventoryOrderID>
+    <DeliveryDate>2026-08-15T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394962</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030096</InventTransRefID>
+    <DeliveryAdress>Bosweg 277 98900 Parijs France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Automatisch Meetset V2</Note>
+    <MultiComponentItemID>RW173809</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 277 98900 Parijs France</DlvAddress>
+    <DlvStreet>Bosweg 277</DlvStreet>
+    <DlvZipCode>98900</DlvZipCode>
+    <DlvCity>Parijs</DlvCity>
+    <DlvCountry>Parijs</DlvCountry>
+    <DlvState>Parijs</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394960</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000096</RouteID>
+    <Qty>29.000000000000</Qty>
+    <ItemID>YG044822</ItemID>
+    <InventoryOrderID>000206863</InventoryOrderID>
+    <DeliveryDate>2026-08-15T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394963</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030096</InventTransRefID>
+    <DeliveryAdress>Bosweg 277 98900 Parijs France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Ergonomisch Adapter Kit</Note>
+    <MultiComponentItemID>YG044822</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 277 98900 Parijs France</DlvAddress>
+    <DlvStreet>Bosweg 277</DlvStreet>
+    <DlvZipCode>98900</DlvZipCode>
+    <DlvCity>Parijs</DlvCity>
+    <DlvCountry>Parijs</DlvCountry>
+    <DlvState>Parijs</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394960</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000096</RouteID>
+    <Qty>9.000000000000</Qty>
+    <ItemID>XQ052919</ItemID>
+    <InventoryOrderID>000206864</InventoryOrderID>
+    <DeliveryDate>2026-08-15T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394964</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030096</InventTransRefID>
+    <DeliveryAdress>Bosweg 277 98900 Parijs France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Industrieel Pomp Set</Note>
+    <MultiComponentItemID>XQ052919</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 277 98900 Parijs France</DlvAddress>
+    <DlvStreet>Bosweg 277</DlvStreet>
+    <DlvZipCode>98900</DlvZipCode>
+    <DlvCity>Parijs</DlvCity>
+    <DlvCountry>Parijs</DlvCountry>
+    <DlvState>Parijs</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394960</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000096</RouteID>
+    <Qty>21.000000000000</Qty>
+    <ItemID>MM230317</ItemID>
+    <InventoryOrderID>000206865</InventoryOrderID>
+    <DeliveryDate>2026-08-15T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394965</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030096</InventTransRefID>
+    <DeliveryAdress>Bosweg 277 98900 Parijs France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Modulair Meetset Plus</Note>
+    <MultiComponentItemID>MM230317</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 277 98900 Parijs France</DlvAddress>
+    <DlvStreet>Bosweg 277</DlvStreet>
+    <DlvZipCode>98900</DlvZipCode>
+    <DlvCity>Parijs</DlvCity>
+    <DlvCountry>Parijs</DlvCountry>
+    <DlvState>Parijs</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394960</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

@@ -1,0 +1,8 @@
+# Managed by Ansible (roles/common) - Do not edit manually
+[sshd]
+enabled  = true
+port     = {{ security_ssh_port }}
+backend  = systemd
+bantime  = {{ security_fail2ban_bantime }}
+findtime = {{ security_fail2ban_findtime }}
+maxretry = {{ security_fail2ban_maxretry }}

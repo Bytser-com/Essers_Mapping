@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120041</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22041</CustomerNumber>
+    <DeliveryAddress>Kerkstraat 129 Gebouw H 26242 Dudelange Luxembourg</DeliveryAddress>
+    <ShipmentName />
+    <Name>Peeters Industries</Name>
+    <WarehouseID>LU10</WarehouseID>
+    <CompanyID>E223</CompanyID>
+    <PublishedByAX>2026-08-06T11:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kerkstraat 129 Gebouw H</DlvStreet>
+    <DlvZipcode>26242</DlvZipcode>
+    <DlvCity>Dudelange</DlvCity>
+    <DlvCounty>Dudelange</DlvCounty>
+    <DlvState>Dudelange</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <Recipient>Arthur Peeters</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706041</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000041</RouteID>
+    <Qty>80.000000000000</Qty>
+    <ItemID>UF808158</ItemID>
+    <InventoryOrderID>000206311</InventoryOrderID>
+    <DeliveryDate>2026-08-09T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394411</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030041</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 129 Gebouw H 26242 Dudelange Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Universeel Filter Kit</Note>
+    <MultiComponentItemID>UF808158</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 129 Gebouw H 26242 Dudelange Luxembourg</DlvAddress>
+    <DlvStreet>Kerkstraat 129 Gebouw H</DlvStreet>
+    <DlvZipCode>26242</DlvZipCode>
+    <DlvCity>Dudelange</DlvCity>
+    <DlvCountry>Dudelange</DlvCountry>
+    <DlvState>Dudelange</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1394410</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000041</RouteID>
+    <Qty>38.000000000000</Qty>
+    <ItemID>BT745093</ItemID>
+    <InventoryOrderID>000206312</InventoryOrderID>
+    <DeliveryDate>2026-08-09T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394412</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030041</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 129 Gebouw H 26242 Dudelange Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Precisie Kabel V2</Note>
+    <MultiComponentItemID>BT745093</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 129 Gebouw H 26242 Dudelange Luxembourg</DlvAddress>
+    <DlvStreet>Kerkstraat 129 Gebouw H</DlvStreet>
+    <DlvZipCode>26242</DlvZipCode>
+    <DlvCity>Dudelange</DlvCity>
+    <DlvCountry>Dudelange</DlvCountry>
+    <DlvState>Dudelange</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1394410</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120026</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22026</CustomerNumber>
+    <DeliveryAddress>Industrieweg 23 Afdeling 4 29571 Bilbao Spain</DeliveryAddress>
+    <ShipmentName />
+    <Name>Schmidt Trading</Name>
+    <WarehouseID>ES30</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-04T14:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Industrieweg 23 Afdeling 4</DlvStreet>
+    <DlvZipcode>29571</DlvZipcode>
+    <DlvCity>Bilbao</DlvCity>
+    <DlvCounty>Bilbao</DlvCounty>
+    <DlvState>Bilbao</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <Recipient>Ella Schmidt</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706026</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000026</RouteID>
+    <Qty>53.000000000000</Qty>
+    <ItemID>NL338526</ItemID>
+    <InventoryOrderID>000206161</InventoryOrderID>
+    <DeliveryDate>2026-08-08T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394261</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030026</InventTransRefID>
+    <DeliveryAdress>Industrieweg 23 Afdeling 4 29571 Bilbao Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Industrieel Connector Max</Note>
+    <MultiComponentItemID>NL338526</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 23 Afdeling 4 29571 Bilbao Spain</DlvAddress>
+    <DlvStreet>Industrieweg 23 Afdeling 4</DlvStreet>
+    <DlvZipCode>29571</DlvZipCode>
+    <DlvCity>Bilbao</DlvCity>
+    <DlvCountry>Bilbao</DlvCountry>
+    <DlvState>Bilbao</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394260</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000026</RouteID>
+    <Qty>54.000000000000</Qty>
+    <ItemID>OE221132</ItemID>
+    <InventoryOrderID>000206162</InventoryOrderID>
+    <DeliveryDate>2026-08-08T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394262</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030026</InventTransRefID>
+    <DeliveryAdress>Industrieweg 23 Afdeling 4 29571 Bilbao Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Professioneel Kabel Mini</Note>
+    <MultiComponentItemID>OE221132</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 23 Afdeling 4 29571 Bilbao Spain</DlvAddress>
+    <DlvStreet>Industrieweg 23 Afdeling 4</DlvStreet>
+    <DlvZipCode>29571</DlvZipCode>
+    <DlvCity>Bilbao</DlvCity>
+    <DlvCountry>Bilbao</DlvCountry>
+    <DlvState>Bilbao</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394260</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000026</RouteID>
+    <Qty>93.000000000000</Qty>
+    <ItemID>ZD987507</ItemID>
+    <InventoryOrderID>000206163</InventoryOrderID>
+    <DeliveryDate>2026-08-08T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394263</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030026</InventTransRefID>
+    <DeliveryAdress>Industrieweg 23 Afdeling 4 29571 Bilbao Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Robuust Lader Plus</Note>
+    <MultiComponentItemID>ZD987507</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 23 Afdeling 4 29571 Bilbao Spain</DlvAddress>
+    <DlvStreet>Industrieweg 23 Afdeling 4</DlvStreet>
+    <DlvZipCode>29571</DlvZipCode>
+    <DlvCity>Bilbao</DlvCity>
+    <DlvCountry>Bilbao</DlvCountry>
+    <DlvState>Bilbao</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394260</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

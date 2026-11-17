@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120142</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22142</CustomerNumber>
+    <DeliveryAddress>Nieuwstraat 76 66926 Esch-sur-Alzette Luxembourg</DeliveryAddress>
+    <ShipmentName />
+    <Name>Muller Logistics</Name>
+    <WarehouseID>LU10</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-19T02:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Nieuwstraat 76</DlvStreet>
+    <DlvZipcode>66926</DlvZipcode>
+    <DlvCity>Esch-sur-Alzette</DlvCity>
+    <DlvCounty>Esch-sur-Alzette</DlvCounty>
+    <DlvState>Esch-sur-Alzette</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <Recipient>Ella Muller</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706142</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000142</RouteID>
+    <Qty>34.000000000000</Qty>
+    <ItemID>ZM090224</ItemID>
+    <InventoryOrderID>000207321</InventoryOrderID>
+    <DeliveryDate>2026-08-27T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395421</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030142</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 76 66926 Esch-sur-Alzette Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Modulair Sensor Plus</Note>
+    <MultiComponentItemID>ZM090224</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 76 66926 Esch-sur-Alzette Luxembourg</DlvAddress>
+    <DlvStreet>Nieuwstraat 76</DlvStreet>
+    <DlvZipCode>66926</DlvZipCode>
+    <DlvCity>Esch-sur-Alzette</DlvCity>
+    <DlvCountry>Esch-sur-Alzette</DlvCountry>
+    <DlvState>Esch-sur-Alzette</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1395420</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000142</RouteID>
+    <Qty>4.000000000000</Qty>
+    <ItemID>QX125589</ItemID>
+    <InventoryOrderID>000207322</InventoryOrderID>
+    <DeliveryDate>2026-08-27T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395422</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030142</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 76 66926 Esch-sur-Alzette Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Automatisch Filter Pro</Note>
+    <MultiComponentItemID>QX125589</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 76 66926 Esch-sur-Alzette Luxembourg</DlvAddress>
+    <DlvStreet>Nieuwstraat 76</DlvStreet>
+    <DlvZipCode>66926</DlvZipCode>
+    <DlvCity>Esch-sur-Alzette</DlvCity>
+    <DlvCountry>Esch-sur-Alzette</DlvCountry>
+    <DlvState>Esch-sur-Alzette</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1395420</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000142</RouteID>
+    <Qty>81.000000000000</Qty>
+    <ItemID>VJ623227</ItemID>
+    <InventoryOrderID>000207323</InventoryOrderID>
+    <DeliveryDate>2026-08-27T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395423</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030142</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 76 66926 Esch-sur-Alzette Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Eco Beugel Plus</Note>
+    <MultiComponentItemID>VJ623227</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 76 66926 Esch-sur-Alzette Luxembourg</DlvAddress>
+    <DlvStreet>Nieuwstraat 76</DlvStreet>
+    <DlvZipCode>66926</DlvZipCode>
+    <DlvCity>Esch-sur-Alzette</DlvCity>
+    <DlvCountry>Esch-sur-Alzette</DlvCountry>
+    <DlvState>Esch-sur-Alzette</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1395420</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

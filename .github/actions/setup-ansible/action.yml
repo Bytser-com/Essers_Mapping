@@ -1,0 +1,73 @@
+name: Setup Ansible
+description: >-
+  Installs pinned ansible-core + ansible-lint into a fresh Python virtualenv
+  on the runner and installs Galaxy requirements in an isolated workspace.
+
+inputs:
+  ansible-core-version:
+    description: "pip version specifier for ansible-core"
+    required: false
+    default: "~=2.18.0"
+  ansible-lint-version:
+    description: "pip version specifier for ansible-lint"
+    required: false
+    default: ">=25,<26"
+  working-directory:
+    description: "Directory containing the Ansible project (requirements.yml, ansible.cfg, ...)"
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Create fresh Ansible virtualenv
+      shell: bash
+      env:
+        ANSIBLE_CORE_VERSION: ${{ inputs.ansible-core-version }}
+        ANSIBLE_LINT_VERSION: ${{ inputs.ansible-lint-version }}
+      run: |
+        set -euo pipefail
+
+        # Use job-scoped temp directory so each run has a clean environment
+        VENV="${RUNNER_TEMP}/ansible-venv"
+        rm -rf "$VENV"
+
+        echo "Creating fresh Ansible virtualenv at $VENV..."
+        python3 -m venv "$VENV"
+        "$VENV/bin/pip" install --no-cache-dir --upgrade pip wheel
+        "$VENV/bin/pip" install --no-cache-dir \
+          "ansible-core${ANSIBLE_CORE_VERSION}" \
+          "ansible-lint${ANSIBLE_LINT_VERSION}" \
+          netaddr \
+          jmespath \
+          cryptography \
+          kubernetes \
+          requests
+
+        echo "$VENV/bin" >> "$GITHUB_PATH"
+
+    - name: Install Galaxy requirements
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        set -euo pipefail
+        
+        GALAXY_DIR="${RUNNER_TEMP}/ansible-galaxy"
+        rm -rf "$GALAXY_DIR"
+        mkdir -p "$GALAXY_DIR/collections" "$GALAXY_DIR/roles"
+
+        echo "ANSIBLE_COLLECTIONS_PATH=$GALAXY_DIR/collections" >> "$GITHUB_ENV"
+        echo "ANSIBLE_ROLES_PATH=$PWD/roles:$GALAXY_DIR/roles" >> "$GITHUB_ENV"
+
+        for req in requirements.yml collections/requirements.yml roles/requirements.yml; do
+          if [ -f "$req" ]; then
+            echo "Installing Galaxy requirements from $req..."
+            ansible-galaxy role install -r "$req" -p "$GALAXY_DIR/roles"
+            ansible-galaxy collection install -r "$req" -p "$GALAXY_DIR/collections"
+          fi
+        done
+
+    - name: Show versions
+      shell: bash
+      run: |
+        ansible --version
+        ansible-lint --version

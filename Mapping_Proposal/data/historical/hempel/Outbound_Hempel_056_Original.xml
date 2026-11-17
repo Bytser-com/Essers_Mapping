@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120056</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22056</CustomerNumber>
+    <DeliveryAddress>Industrieweg 144 Gebouw P 62749 Barcelona Spain</DeliveryAddress>
+    <ShipmentName />
+    <Name>Simon Consulting</Name>
+    <WarehouseID>ES30</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-08T08:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Industrieweg 144 Gebouw P</DlvStreet>
+    <DlvZipcode>62749</DlvZipcode>
+    <DlvCity>Barcelona</DlvCity>
+    <DlvCounty>Barcelona</DlvCounty>
+    <DlvState>Barcelona</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <Recipient>Lucas Simon</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706056</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000056</RouteID>
+    <Qty>50.000000000000</Qty>
+    <ItemID>BQ463244</ItemID>
+    <InventoryOrderID>000206461</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394561</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030056</InventTransRefID>
+    <DeliveryAdress>Industrieweg 144 Gebouw P 62749 Barcelona Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Veilig Meetset X1</Note>
+    <MultiComponentItemID>BQ463244</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 144 Gebouw P 62749 Barcelona Spain</DlvAddress>
+    <DlvStreet>Industrieweg 144 Gebouw P</DlvStreet>
+    <DlvZipCode>62749</DlvZipCode>
+    <DlvCity>Barcelona</DlvCity>
+    <DlvCountry>Barcelona</DlvCountry>
+    <DlvState>Barcelona</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394560</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000056</RouteID>
+    <Qty>45.000000000000</Qty>
+    <ItemID>KF153246</ItemID>
+    <InventoryOrderID>000206462</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394562</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030056</InventTransRefID>
+    <DeliveryAdress>Industrieweg 144 Gebouw P 62749 Barcelona Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Eco Ventiel X1</Note>
+    <MultiComponentItemID>KF153246</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 144 Gebouw P 62749 Barcelona Spain</DlvAddress>
+    <DlvStreet>Industrieweg 144 Gebouw P</DlvStreet>
+    <DlvZipCode>62749</DlvZipCode>
+    <DlvCity>Barcelona</DlvCity>
+    <DlvCountry>Barcelona</DlvCountry>
+    <DlvState>Barcelona</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394560</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000056</RouteID>
+    <Qty>12.000000000000</Qty>
+    <ItemID>TU125378</ItemID>
+    <InventoryOrderID>000206463</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394563</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030056</InventTransRefID>
+    <DeliveryAdress>Industrieweg 144 Gebouw P 62749 Barcelona Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Sterk Pomp Basic</Note>
+    <MultiComponentItemID>TU125378</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 144 Gebouw P 62749 Barcelona Spain</DlvAddress>
+    <DlvStreet>Industrieweg 144 Gebouw P</DlvStreet>
+    <DlvZipCode>62749</DlvZipCode>
+    <DlvCity>Barcelona</DlvCity>
+    <DlvCountry>Barcelona</DlvCountry>
+    <DlvState>Barcelona</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394560</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000056</RouteID>
+    <Qty>80.000000000000</Qty>
+    <ItemID>XF623697</ItemID>
+    <InventoryOrderID>000206464</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394564</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030056</InventTransRefID>
+    <DeliveryAdress>Industrieweg 144 Gebouw P 62749 Barcelona Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Sterk Connector Max</Note>
+    <MultiComponentItemID>XF623697</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 144 Gebouw P 62749 Barcelona Spain</DlvAddress>
+    <DlvStreet>Industrieweg 144 Gebouw P</DlvStreet>
+    <DlvZipCode>62749</DlvZipCode>
+    <DlvCity>Barcelona</DlvCity>
+    <DlvCountry>Barcelona</DlvCountry>
+    <DlvState>Barcelona</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394560</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000056</RouteID>
+    <Qty>16.000000000000</Qty>
+    <ItemID>XD445348</ItemID>
+    <InventoryOrderID>000206465</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394565</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030056</InventTransRefID>
+    <DeliveryAdress>Industrieweg 144 Gebouw P 62749 Barcelona Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Snel Module Mini</Note>
+    <MultiComponentItemID>XD445348</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 144 Gebouw P 62749 Barcelona Spain</DlvAddress>
+    <DlvStreet>Industrieweg 144 Gebouw P</DlvStreet>
+    <DlvZipCode>62749</DlvZipCode>
+    <DlvCity>Barcelona</DlvCity>
+    <DlvCountry>Barcelona</DlvCountry>
+    <DlvState>Barcelona</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394560</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

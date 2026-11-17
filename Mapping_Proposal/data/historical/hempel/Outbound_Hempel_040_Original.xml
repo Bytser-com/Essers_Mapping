@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120040</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22040</CustomerNumber>
+    <DeliveryAddress>Stationslaan 127 38871 Lyon France</DeliveryAddress>
+    <ShipmentName />
+    <Name>Mertens Supply</Name>
+    <WarehouseID>FR30</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-06T08:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Stationslaan 127</DlvStreet>
+    <DlvZipcode>38871</DlvZipcode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCounty>Lyon</DlvCounty>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <Recipient>Finn Mertens</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706040</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000040</RouteID>
+    <Qty>44.000000000000</Qty>
+    <ItemID>TX796924</ItemID>
+    <InventoryOrderID>000206301</InventoryOrderID>
+    <DeliveryDate>2026-08-08T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394401</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030040</InventTransRefID>
+    <DeliveryAdress>Stationslaan 127 38871 Lyon France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Eco Adapter X2</Note>
+    <MultiComponentItemID>TX796924</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Stationslaan 127 38871 Lyon France</DlvAddress>
+    <DlvStreet>Stationslaan 127</DlvStreet>
+    <DlvZipCode>38871</DlvZipCode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCountry>Lyon</DlvCountry>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394400</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000040</RouteID>
+    <Qty>58.000000000000</Qty>
+    <ItemID>ST712664</ItemID>
+    <InventoryOrderID>000206302</InventoryOrderID>
+    <DeliveryDate>2026-08-08T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394402</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030040</InventTransRefID>
+    <DeliveryAdress>Stationslaan 127 38871 Lyon France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Robuust Paneel Max</Note>
+    <MultiComponentItemID>ST712664</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Stationslaan 127 38871 Lyon France</DlvAddress>
+    <DlvStreet>Stationslaan 127</DlvStreet>
+    <DlvZipCode>38871</DlvZipCode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCountry>Lyon</DlvCountry>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394400</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000040</RouteID>
+    <Qty>18.000000000000</Qty>
+    <ItemID>FS673376</ItemID>
+    <InventoryOrderID>000206303</InventoryOrderID>
+    <DeliveryDate>2026-08-08T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394403</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030040</InventTransRefID>
+    <DeliveryAdress>Stationslaan 127 38871 Lyon France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Modulair Paneel Basic</Note>
+    <MultiComponentItemID>FS673376</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Stationslaan 127 38871 Lyon France</DlvAddress>
+    <DlvStreet>Stationslaan 127</DlvStreet>
+    <DlvZipCode>38871</DlvZipCode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCountry>Lyon</DlvCountry>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394400</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000040</RouteID>
+    <Qty>26.000000000000</Qty>
+    <ItemID>JM382882</ItemID>
+    <InventoryOrderID>000206304</InventoryOrderID>
+    <DeliveryDate>2026-08-08T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394404</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030040</InventTransRefID>
+    <DeliveryAdress>Stationslaan 127 38871 Lyon France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Flexibel Schakelaar Kit</Note>
+    <MultiComponentItemID>JM382882</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Stationslaan 127 38871 Lyon France</DlvAddress>
+    <DlvStreet>Stationslaan 127</DlvStreet>
+    <DlvZipCode>38871</DlvZipCode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCountry>Lyon</DlvCountry>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394400</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000040</RouteID>
+    <Qty>47.000000000000</Qty>
+    <ItemID>BJ925857</ItemID>
+    <InventoryOrderID>000206305</InventoryOrderID>
+    <DeliveryDate>2026-08-08T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394405</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030040</InventTransRefID>
+    <DeliveryAdress>Stationslaan 127 38871 Lyon France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Universeel Houder Max</Note>
+    <MultiComponentItemID>BJ925857</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Stationslaan 127 38871 Lyon France</DlvAddress>
+    <DlvStreet>Stationslaan 127</DlvStreet>
+    <DlvZipCode>38871</DlvZipCode>
+    <DlvCity>Lyon</DlvCity>
+    <DlvCountry>Lyon</DlvCountry>
+    <DlvState>Lyon</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394400</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

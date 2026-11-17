@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120146</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22146</CustomerNumber>
+    <DeliveryAddress>Parklaan 186 Afdeling 6 63245 Rotterdam Netherlands</DeliveryAddress>
+    <ShipmentName />
+    <Name>Visser Transport</Name>
+    <WarehouseID>NL20</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-19T14:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Parklaan 186 Afdeling 6</DlvStreet>
+    <DlvZipcode>63245</DlvZipcode>
+    <DlvCity>Rotterdam</DlvCity>
+    <DlvCounty>Rotterdam</DlvCounty>
+    <DlvState>Rotterdam</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <Recipient>Lina Visser</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706146</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000146</RouteID>
+    <Qty>34.000000000000</Qty>
+    <ItemID>PJ543141</ItemID>
+    <InventoryOrderID>000207361</InventoryOrderID>
+    <DeliveryDate>2026-08-23T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395461</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030146</InventTransRefID>
+    <DeliveryAdress>Parklaan 186 Afdeling 6 63245 Rotterdam Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Automatisch Adapter X2</Note>
+    <MultiComponentItemID>PJ543141</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Parklaan 186 Afdeling 6 63245 Rotterdam Netherlands</DlvAddress>
+    <DlvStreet>Parklaan 186 Afdeling 6</DlvStreet>
+    <DlvZipCode>63245</DlvZipCode>
+    <DlvCity>Rotterdam</DlvCity>
+    <DlvCountry>Rotterdam</DlvCountry>
+    <DlvState>Rotterdam</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395460</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000146</RouteID>
+    <Qty>76.000000000000</Qty>
+    <ItemID>SG082851</ItemID>
+    <InventoryOrderID>000207362</InventoryOrderID>
+    <DeliveryDate>2026-08-23T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395462</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030146</InventTransRefID>
+    <DeliveryAdress>Parklaan 186 Afdeling 6 63245 Rotterdam Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Precisie Filter Plus</Note>
+    <MultiComponentItemID>SG082851</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Parklaan 186 Afdeling 6 63245 Rotterdam Netherlands</DlvAddress>
+    <DlvStreet>Parklaan 186 Afdeling 6</DlvStreet>
+    <DlvZipCode>63245</DlvZipCode>
+    <DlvCity>Rotterdam</DlvCity>
+    <DlvCountry>Rotterdam</DlvCountry>
+    <DlvState>Rotterdam</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395460</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000146</RouteID>
+    <Qty>40.000000000000</Qty>
+    <ItemID>TU125378</ItemID>
+    <InventoryOrderID>000207363</InventoryOrderID>
+    <DeliveryDate>2026-08-23T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395463</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030146</InventTransRefID>
+    <DeliveryAdress>Parklaan 186 Afdeling 6 63245 Rotterdam Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Sterk Pomp Basic</Note>
+    <MultiComponentItemID>TU125378</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Parklaan 186 Afdeling 6 63245 Rotterdam Netherlands</DlvAddress>
+    <DlvStreet>Parklaan 186 Afdeling 6</DlvStreet>
+    <DlvZipCode>63245</DlvZipCode>
+    <DlvCity>Rotterdam</DlvCity>
+    <DlvCountry>Rotterdam</DlvCountry>
+    <DlvState>Rotterdam</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395460</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

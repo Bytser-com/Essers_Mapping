@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120063</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22063</CustomerNumber>
+    <DeliveryAddress>Kanaalweg 171 Bus 24 55900 Braga Portugal</DeliveryAddress>
+    <ShipmentName />
+    <Name>Mertens Logistics</Name>
+    <WarehouseID>PT10</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-09T05:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kanaalweg 171 Bus 24</DlvStreet>
+    <DlvZipcode>55900</DlvZipcode>
+    <DlvCity>Braga</DlvCity>
+    <DlvCounty>Braga</DlvCounty>
+    <DlvState>Braga</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <Recipient>Mila Mertens</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706063</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000063</RouteID>
+    <Qty>4.000000000000</Qty>
+    <ItemID>CZ760592</ItemID>
+    <InventoryOrderID>000206531</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394631</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030063</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 171 Bus 24 55900 Braga Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Precisie Terminal Kit</Note>
+    <MultiComponentItemID>CZ760592</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 171 Bus 24 55900 Braga Portugal</DlvAddress>
+    <DlvStreet>Kanaalweg 171 Bus 24</DlvStreet>
+    <DlvZipCode>55900</DlvZipCode>
+    <DlvCity>Braga</DlvCity>
+    <DlvCountry>Braga</DlvCountry>
+    <DlvState>Braga</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1394630</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000063</RouteID>
+    <Qty>69.000000000000</Qty>
+    <ItemID>UL312740</ItemID>
+    <InventoryOrderID>000206532</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394632</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030063</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 171 Bus 24 55900 Braga Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Precisie Omvormer Max</Note>
+    <MultiComponentItemID>UL312740</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 171 Bus 24 55900 Braga Portugal</DlvAddress>
+    <DlvStreet>Kanaalweg 171 Bus 24</DlvStreet>
+    <DlvZipCode>55900</DlvZipCode>
+    <DlvCity>Braga</DlvCity>
+    <DlvCountry>Braga</DlvCountry>
+    <DlvState>Braga</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1394630</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000063</RouteID>
+    <Qty>39.000000000000</Qty>
+    <ItemID>JG420566</ItemID>
+    <InventoryOrderID>000206533</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394633</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030063</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 171 Bus 24 55900 Braga Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Industrieel Filter Set</Note>
+    <MultiComponentItemID>JG420566</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 171 Bus 24 55900 Braga Portugal</DlvAddress>
+    <DlvStreet>Kanaalweg 171 Bus 24</DlvStreet>
+    <DlvZipCode>55900</DlvZipCode>
+    <DlvCity>Braga</DlvCity>
+    <DlvCountry>Braga</DlvCountry>
+    <DlvState>Braga</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1394630</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000063</RouteID>
+    <Qty>75.000000000000</Qty>
+    <ItemID>FV755196</ItemID>
+    <InventoryOrderID>000206534</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394634</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030063</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 171 Bus 24 55900 Braga Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Compact Schakelaar Kit</Note>
+    <MultiComponentItemID>FV755196</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 171 Bus 24 55900 Braga Portugal</DlvAddress>
+    <DlvStreet>Kanaalweg 171 Bus 24</DlvStreet>
+    <DlvZipCode>55900</DlvZipCode>
+    <DlvCity>Braga</DlvCity>
+    <DlvCountry>Braga</DlvCountry>
+    <DlvState>Braga</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1394630</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

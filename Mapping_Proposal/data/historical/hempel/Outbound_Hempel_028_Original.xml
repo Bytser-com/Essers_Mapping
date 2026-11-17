@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120028</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22028</CustomerNumber>
+    <DeliveryAddress>Ringlaan 44 Gebouw C 88873 Eindhoven Netherlands</DeliveryAddress>
+    <ShipmentName />
+    <Name>Dubois Technics</Name>
+    <WarehouseID>NL20</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-04T20:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Ringlaan 44 Gebouw C</DlvStreet>
+    <DlvZipcode>88873</DlvZipcode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCounty>Eindhoven</DlvCounty>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <Recipient>Louis Dubois</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706028</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000028</RouteID>
+    <Qty>15.000000000000</Qty>
+    <ItemID>CZ760592</ItemID>
+    <InventoryOrderID>000206181</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394281</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030028</InventTransRefID>
+    <DeliveryAdress>Ringlaan 44 Gebouw C 88873 Eindhoven Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Precisie Terminal Kit</Note>
+    <MultiComponentItemID>CZ760592</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 44 Gebouw C 88873 Eindhoven Netherlands</DlvAddress>
+    <DlvStreet>Ringlaan 44 Gebouw C</DlvStreet>
+    <DlvZipCode>88873</DlvZipCode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCountry>Eindhoven</DlvCountry>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1394280</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000028</RouteID>
+    <Qty>31.000000000000</Qty>
+    <ItemID>BK402958</ItemID>
+    <InventoryOrderID>000206182</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394282</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030028</InventTransRefID>
+    <DeliveryAdress>Ringlaan 44 Gebouw C 88873 Eindhoven Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Modulair Kabel Basic</Note>
+    <MultiComponentItemID>BK402958</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 44 Gebouw C 88873 Eindhoven Netherlands</DlvAddress>
+    <DlvStreet>Ringlaan 44 Gebouw C</DlvStreet>
+    <DlvZipCode>88873</DlvZipCode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCountry>Eindhoven</DlvCountry>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1394280</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000028</RouteID>
+    <Qty>66.000000000000</Qty>
+    <ItemID>XI237326</ItemID>
+    <InventoryOrderID>000206183</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394283</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030028</InventTransRefID>
+    <DeliveryAdress>Ringlaan 44 Gebouw C 88873 Eindhoven Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Eco Controller Set</Note>
+    <MultiComponentItemID>XI237326</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 44 Gebouw C 88873 Eindhoven Netherlands</DlvAddress>
+    <DlvStreet>Ringlaan 44 Gebouw C</DlvStreet>
+    <DlvZipCode>88873</DlvZipCode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCountry>Eindhoven</DlvCountry>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1394280</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000028</RouteID>
+    <Qty>60.000000000000</Qty>
+    <ItemID>MY489300</ItemID>
+    <InventoryOrderID>000206184</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394284</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030028</InventTransRefID>
+    <DeliveryAdress>Ringlaan 44 Gebouw C 88873 Eindhoven Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Universeel Ventiel Mini</Note>
+    <MultiComponentItemID>MY489300</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 44 Gebouw C 88873 Eindhoven Netherlands</DlvAddress>
+    <DlvStreet>Ringlaan 44 Gebouw C</DlvStreet>
+    <DlvZipCode>88873</DlvZipCode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCountry>Eindhoven</DlvCountry>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1394280</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000028</RouteID>
+    <Qty>18.000000000000</Qty>
+    <ItemID>YG044822</ItemID>
+    <InventoryOrderID>000206185</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394285</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030028</InventTransRefID>
+    <DeliveryAdress>Ringlaan 44 Gebouw C 88873 Eindhoven Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Ergonomisch Adapter Kit</Note>
+    <MultiComponentItemID>YG044822</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 44 Gebouw C 88873 Eindhoven Netherlands</DlvAddress>
+    <DlvStreet>Ringlaan 44 Gebouw C</DlvStreet>
+    <DlvZipCode>88873</DlvZipCode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCountry>Eindhoven</DlvCountry>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1394280</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

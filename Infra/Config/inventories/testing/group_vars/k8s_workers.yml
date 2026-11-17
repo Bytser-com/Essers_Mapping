@@ -1,0 +1,9 @@
+---
+# ==============================================================================
+# KUBERNETES WORKER VARIABLES - TESTING ENVIRONMENT
+# Specific to k8s_workers group
+# ==============================================================================
+
+k8s_worker_node_labels:
+  node-role.kubernetes.io/worker: "worker"
+  environment: "{{ env_name }}"

@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120115</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22115</CustomerNumber>
+    <DeliveryAddress>Havenlaan 35 10432 Metz France</DeliveryAddress>
+    <ShipmentName />
+    <Name>Vermeulen Systems</Name>
+    <WarehouseID>FR30</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-15T17:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Havenlaan 35</DlvStreet>
+    <DlvZipcode>10432</DlvZipcode>
+    <DlvCity>Metz</DlvCity>
+    <DlvCounty>Metz</DlvCounty>
+    <DlvState>Metz</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <Recipient>Jules Vermeulen</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706115</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000115</RouteID>
+    <Qty>30.000000000000</Qty>
+    <ItemID>BW836044</ItemID>
+    <InventoryOrderID>000207051</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395151</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030115</InventTransRefID>
+    <DeliveryAdress>Havenlaan 35 10432 Metz France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Sterk Lader Set</Note>
+    <MultiComponentItemID>BW836044</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Havenlaan 35 10432 Metz France</DlvAddress>
+    <DlvStreet>Havenlaan 35</DlvStreet>
+    <DlvZipCode>10432</DlvZipCode>
+    <DlvCity>Metz</DlvCity>
+    <DlvCountry>Metz</DlvCountry>
+    <DlvState>Metz</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395150</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000115</RouteID>
+    <Qty>31.000000000000</Qty>
+    <ItemID>QE513196</ItemID>
+    <InventoryOrderID>000207052</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395152</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030115</InventTransRefID>
+    <DeliveryAdress>Havenlaan 35 10432 Metz France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Universeel Meetset V2</Note>
+    <MultiComponentItemID>QE513196</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Havenlaan 35 10432 Metz France</DlvAddress>
+    <DlvStreet>Havenlaan 35</DlvStreet>
+    <DlvZipCode>10432</DlvZipCode>
+    <DlvCity>Metz</DlvCity>
+    <DlvCountry>Metz</DlvCountry>
+    <DlvState>Metz</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395150</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000115</RouteID>
+    <Qty>75.000000000000</Qty>
+    <ItemID>ET534228</ItemID>
+    <InventoryOrderID>000207053</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395153</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030115</InventTransRefID>
+    <DeliveryAdress>Havenlaan 35 10432 Metz France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Industrieel Meetset V2</Note>
+    <MultiComponentItemID>ET534228</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Havenlaan 35 10432 Metz France</DlvAddress>
+    <DlvStreet>Havenlaan 35</DlvStreet>
+    <DlvZipCode>10432</DlvZipCode>
+    <DlvCity>Metz</DlvCity>
+    <DlvCountry>Metz</DlvCountry>
+    <DlvState>Metz</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395150</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000115</RouteID>
+    <Qty>5.000000000000</Qty>
+    <ItemID>JM382882</ItemID>
+    <InventoryOrderID>000207054</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395154</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030115</InventTransRefID>
+    <DeliveryAdress>Havenlaan 35 10432 Metz France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Flexibel Schakelaar Kit</Note>
+    <MultiComponentItemID>JM382882</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Havenlaan 35 10432 Metz France</DlvAddress>
+    <DlvStreet>Havenlaan 35</DlvStreet>
+    <DlvZipCode>10432</DlvZipCode>
+    <DlvCity>Metz</DlvCity>
+    <DlvCountry>Metz</DlvCountry>
+    <DlvState>Metz</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395150</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

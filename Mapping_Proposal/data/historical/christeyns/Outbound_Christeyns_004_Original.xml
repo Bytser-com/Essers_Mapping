@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root>
+  <MessageType>Outbound Delivery</MessageType>
+  <DocHeader>
+    <OutboundNumber>SO270000003</OutboundNumber>
+    <DocumentNumber>SO270000003</DocumentNumber>
+    <Reference>600003 /70003</Reference>
+    <DeliveryDate>13/08/2026</DeliveryDate>
+    <ShipByDate>07/08/2026</ShipByDate>
+    <RushIndicator>N</RushIndicator>
+    <Carrier>DSV</Carrier>
+    <ShipToCode>200003</ShipToCode>
+    <Name1>Nora Peeters</Name1>
+    <Name2>Peeters Solutions</Name2>
+    <Address1>Kasteelstraat 233</Address1>
+    <Address2>Bus 6</Address2>
+    <PostalCode>10356</PostalCode>
+    <City>Dudelange</City>
+    <County />
+    <Country>LU</Country>
+    <LanguageCode>FR</LanguageCode>
+    <CommentCustomer />
+    <CommentOrder>
+      <Comment>Customer Reference: 800003</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>INCO:CPT</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>T4T : +32 11 23 33 43</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>Open: Ma-Di-Wo-Do-Vr 08:00-16:00</Comment>
+    </CommentOrder>
+    <TransportInstruction>
+      <Comment>T4T : +32 11 23 33 43</Comment>
+    </TransportInstruction>
+    <TransportInstruction>
+      <Comment>F92 : 1 08001600 2 08001600 3 08001600 4 08001600 5 08001600</Comment>
+    </TransportInstruction>
+    <WarehouseInstruction />
+  </DocHeader>
+  <DocLine>
+    <OrderLine>1</OrderLine>
+    <Product>ZZ409088</Product>
+    <Quantity>4</Quantity>
+    <UOM>PAL</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>12</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>2</OrderLine>
+    <Product>DK308401</Product>
+    <Quantity>7</Quantity>
+    <UOM>DRM</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>22</VOCContent>
+    <BiocideCode>47004</BiocideCode>
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>3</OrderLine>
+    <Product>WR012433</Product>
+    <Quantity>10</Quantity>
+    <UOM>CAN</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>0</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+</Root>

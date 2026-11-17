@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120116</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22116</CustomerNumber>
+    <DeliveryAddress>Schoolstraat 126 Unit 10 96301 Porto Portugal</DeliveryAddress>
+    <ShipmentName />
+    <Name>Lambert Industries</Name>
+    <WarehouseID>PT10</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-15T20:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Schoolstraat 126 Unit 10</DlvStreet>
+    <DlvZipcode>96301</DlvZipcode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCounty>Porto</DlvCounty>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <Recipient>Nora Lambert</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706116</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000116</RouteID>
+    <Qty>43.000000000000</Qty>
+    <ItemID>SQ643496</ItemID>
+    <InventoryOrderID>000207061</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395161</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030116</InventTransRefID>
+    <DeliveryAdress>Schoolstraat 126 Unit 10 96301 Porto Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Compact Meetset Mini</Note>
+    <MultiComponentItemID>SQ643496</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Schoolstraat 126 Unit 10 96301 Porto Portugal</DlvAddress>
+    <DlvStreet>Schoolstraat 126 Unit 10</DlvStreet>
+    <DlvZipCode>96301</DlvZipCode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCountry>Porto</DlvCountry>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395160</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000116</RouteID>
+    <Qty>81.000000000000</Qty>
+    <ItemID>PB305971</ItemID>
+    <InventoryOrderID>000207062</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395162</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030116</InventTransRefID>
+    <DeliveryAdress>Schoolstraat 126 Unit 10 96301 Porto Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Snel Afdichting X2</Note>
+    <MultiComponentItemID>PB305971</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Schoolstraat 126 Unit 10 96301 Porto Portugal</DlvAddress>
+    <DlvStreet>Schoolstraat 126 Unit 10</DlvStreet>
+    <DlvZipCode>96301</DlvZipCode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCountry>Porto</DlvCountry>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395160</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000116</RouteID>
+    <Qty>30.000000000000</Qty>
+    <ItemID>WC586997</ItemID>
+    <InventoryOrderID>000207063</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395163</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030116</InventTransRefID>
+    <DeliveryAdress>Schoolstraat 126 Unit 10 96301 Porto Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Automatisch Sensor Plus</Note>
+    <MultiComponentItemID>WC586997</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Schoolstraat 126 Unit 10 96301 Porto Portugal</DlvAddress>
+    <DlvStreet>Schoolstraat 126 Unit 10</DlvStreet>
+    <DlvZipCode>96301</DlvZipCode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCountry>Porto</DlvCountry>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395160</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000116</RouteID>
+    <Qty>48.000000000000</Qty>
+    <ItemID>AB961583</ItemID>
+    <InventoryOrderID>000207064</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395164</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030116</InventTransRefID>
+    <DeliveryAdress>Schoolstraat 126 Unit 10 96301 Porto Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Premium Lader V2</Note>
+    <MultiComponentItemID>AB961583</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Schoolstraat 126 Unit 10 96301 Porto Portugal</DlvAddress>
+    <DlvStreet>Schoolstraat 126 Unit 10</DlvStreet>
+    <DlvZipCode>96301</DlvZipCode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCountry>Porto</DlvCountry>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395160</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000116</RouteID>
+    <Qty>5.000000000000</Qty>
+    <ItemID>BY521684</ItemID>
+    <InventoryOrderID>000207065</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395165</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030116</InventTransRefID>
+    <DeliveryAdress>Schoolstraat 126 Unit 10 96301 Porto Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Sterk Meetset X2</Note>
+    <MultiComponentItemID>BY521684</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Schoolstraat 126 Unit 10 96301 Porto Portugal</DlvAddress>
+    <DlvStreet>Schoolstraat 126 Unit 10</DlvStreet>
+    <DlvZipCode>96301</DlvZipCode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCountry>Porto</DlvCountry>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395160</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

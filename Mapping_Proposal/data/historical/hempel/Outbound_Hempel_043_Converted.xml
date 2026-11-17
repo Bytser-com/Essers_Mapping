@@ -1,0 +1,340 @@
+<?xml version='1.0' encoding='utf-8'?>
+<SHP_OBDLV_SAVE_REPLICA05 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <IDOC BEGIN="1">
+    <EDI_DC40 SEGMENT="1">
+      <TABNAM>EDI_DC40</TABNAM>
+      <DIRECT>1</DIRECT>
+      <IDOCTYP>SHP_OBDLV_SAVE_REPLICA05</IDOCTYP>
+      <MESTYP>SHP_OBDLV_SAVE_REPLICA</MESTYP>
+    </EDI_DC40>
+    <E1SHP_OBDLV_SAVE_REPLICA SEGMENT="1">
+      <E1BPOBDLVHDR SEGMENT="1">
+        <DELIV_NUMB>30120043</DELIV_NUMB>
+        <INCOTERMS1>FCA</INCOTERMS1>
+        <DLV_TYPE>AIR</DLV_TYPE>
+        <ROUTE>P000043</ROUTE>
+      </E1BPOBDLVHDR>
+      <E1BPDLVPARTNER SEGMENT="1">
+        <PARTN_ROLE>WE</PARTN_ROLE>
+        <PARTNER_NO>000706043</PARTNER_NO>
+        <ADDRESS_NO>WE</ADDRESS_NO>
+      </E1BPDLVPARTNER>
+      <E1BPDLVDEADLN SEGMENT="1">
+        <TIMETYPE>WSHDRWADAT</TIMETYPE>
+        <TIMESTAMP_UTC>20260811000000</TIMESTAMP_UTC>
+        <TIMEZONE>CET</TIMEZONE>
+      </E1BPDLVDEADLN>
+      <E1BPADR1 SEGMENT="1">
+        <ADDR_NO>WE</ADDR_NO>
+        <NAME>Visser Solutions</NAME>
+        <STREET>Ringlaan 273</STREET>
+        <STR_SUPPL1 />
+        <STR_SUPPL2>Louis Visser</STR_SUPPL2>
+        <POSTL_COD1>22322</POSTL_COD1>
+        <CITY>Lissabon</CITY>
+        <COUNTRY>PRT</COUNTRY>
+        <NAME_3 />
+      </E1BPADR1>
+      <E1BPEXT>
+        <PARAM>0030120043</PARAM>
+        <ROW>1</ROW>
+        <FIELD>WHID</FIELD>
+        <VALUE>PT10</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043</PARAM>
+        <ROW>1</ROW>
+        <FIELD>COMPID</FIELD>
+        <VALUE>E310</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043</PARAM>
+        <ROW>1</ROW>
+        <FIELD>SPI</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043</PARAM>
+        <ROW>1</ROW>
+        <FIELD>WHI</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043</PARAM>
+        <ROW>1</ROW>
+        <FIELD>COUNTY_WE</FIELD>
+        <VALUE>Lissabon</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043</PARAM>
+        <ROW>1</ROW>
+        <FIELD>STATE_WE</FIELD>
+        <VALUE>Lissabon</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043</PARAM>
+        <ROW>1</ROW>
+        <FIELD>F99</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043</PARAM>
+        <ROW>1</ROW>
+        <FIELD>ISMT</FIELD>
+        <VALUE>0</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043</PARAM>
+        <ROW>1</ROW>
+        <FIELD>TRA</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043</PARAM>
+        <ROW>1</ROW>
+        <FIELD>TRANS_CAT</FIELD>
+        <VALUE>00</VALUE>
+      </E1BPEXT>
+      <E1BPOBDLVITEM SEGMENT="1">
+        <DELIV_NUMB>30120043</DELIV_NUMB>
+        <ITM_NUMBER>000001</ITM_NUMBER>
+        <MATERIAL>YS422563</MATERIAL>
+        <BATCH />
+        <DLV_QTY_STOCK>75.000000000000</DLV_QTY_STOCK>
+        <BASE_UOM>EA</BASE_UOM>
+      </E1BPOBDLVITEM>
+      <E1BPOBDLVITEM SEGMENT="1">
+        <DELIV_NUMB>30120043</DELIV_NUMB>
+        <ITM_NUMBER>000002</ITM_NUMBER>
+        <MATERIAL>FK969425</MATERIAL>
+        <BATCH />
+        <DLV_QTY_STOCK>70.000000000000</DLV_QTY_STOCK>
+        <BASE_UOM>EA</BASE_UOM>
+      </E1BPOBDLVITEM>
+      <E1BPOBDLVITEM SEGMENT="1">
+        <DELIV_NUMB>30120043</DELIV_NUMB>
+        <ITM_NUMBER>000003</ITM_NUMBER>
+        <MATERIAL>TV691955</MATERIAL>
+        <BATCH />
+        <DLV_QTY_STOCK>3.000000000000</DLV_QTY_STOCK>
+        <BASE_UOM>EA</BASE_UOM>
+      </E1BPOBDLVITEM>
+      <E1BPOBDLVITEM SEGMENT="1">
+        <DELIV_NUMB>30120043</DELIV_NUMB>
+        <ITM_NUMBER>000004</ITM_NUMBER>
+        <MATERIAL>IT621806</MATERIAL>
+        <BATCH />
+        <DLV_QTY_STOCK>8.000000000000</DLV_QTY_STOCK>
+        <BASE_UOM>EA</BASE_UOM>
+      </E1BPOBDLVITEM>
+      <E1BPOBDLVITEMORG SEGMENT="1">
+        <ITM_NUMBER>000001</ITM_NUMBER>
+        <STGE_LOC>PT10</STGE_LOC>
+      </E1BPOBDLVITEMORG>
+      <E1BPOBDLVITEMORG SEGMENT="1">
+        <ITM_NUMBER>000002</ITM_NUMBER>
+        <STGE_LOC>PT10</STGE_LOC>
+      </E1BPOBDLVITEMORG>
+      <E1BPOBDLVITEMORG SEGMENT="1">
+        <ITM_NUMBER>000003</ITM_NUMBER>
+        <STGE_LOC>PT10</STGE_LOC>
+      </E1BPOBDLVITEMORG>
+      <E1BPOBDLVITEMORG SEGMENT="1">
+        <ITM_NUMBER>000004</ITM_NUMBER>
+        <STGE_LOC>PT10</STGE_LOC>
+      </E1BPOBDLVITEMORG>
+      <E1BPEXT>
+        <PARAM>0030120043000001</PARAM>
+        <ROW>1</ROW>
+        <FIELD>DES</FIELD>
+        <VALUE>Duurzaam Omvormer Set</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000001</PARAM>
+        <ROW>1</ROW>
+        <FIELD>CMP</FIELD>
+        <VALUE>e310</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000001</PARAM>
+        <ROW>1</ROW>
+        <FIELD>COL</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000001</PARAM>
+        <ROW>1</ROW>
+        <FIELD>CR2</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000001</PARAM>
+        <ROW>1</ROW>
+        <FIELD>MCL</FIELD>
+        <VALUE>1</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000001</PARAM>
+        <ROW>1</ROW>
+        <FIELD>SON</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000001</PARAM>
+        <ROW>1</ROW>
+        <FIELD>AQP</FIELD>
+        <VALUE>0</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000001</PARAM>
+        <ROW>1</ROW>
+        <FIELD>WHI</FIELD>
+        <VALUE>PT10</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000002</PARAM>
+        <ROW>1</ROW>
+        <FIELD>DES</FIELD>
+        <VALUE>Sterk Kabel Max</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000002</PARAM>
+        <ROW>1</ROW>
+        <FIELD>CMP</FIELD>
+        <VALUE>e310</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000002</PARAM>
+        <ROW>1</ROW>
+        <FIELD>COL</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000002</PARAM>
+        <ROW>1</ROW>
+        <FIELD>CR2</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000002</PARAM>
+        <ROW>1</ROW>
+        <FIELD>MCL</FIELD>
+        <VALUE>1</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000002</PARAM>
+        <ROW>1</ROW>
+        <FIELD>SON</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000002</PARAM>
+        <ROW>1</ROW>
+        <FIELD>AQP</FIELD>
+        <VALUE>0</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000002</PARAM>
+        <ROW>1</ROW>
+        <FIELD>WHI</FIELD>
+        <VALUE>PT10</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000003</PARAM>
+        <ROW>1</ROW>
+        <FIELD>DES</FIELD>
+        <VALUE>Professioneel Sensor Mini</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000003</PARAM>
+        <ROW>1</ROW>
+        <FIELD>CMP</FIELD>
+        <VALUE>e310</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000003</PARAM>
+        <ROW>1</ROW>
+        <FIELD>COL</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000003</PARAM>
+        <ROW>1</ROW>
+        <FIELD>CR2</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000003</PARAM>
+        <ROW>1</ROW>
+        <FIELD>MCL</FIELD>
+        <VALUE>1</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000003</PARAM>
+        <ROW>1</ROW>
+        <FIELD>SON</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000003</PARAM>
+        <ROW>1</ROW>
+        <FIELD>AQP</FIELD>
+        <VALUE>0</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000003</PARAM>
+        <ROW>1</ROW>
+        <FIELD>WHI</FIELD>
+        <VALUE>PT10</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000004</PARAM>
+        <ROW>1</ROW>
+        <FIELD>DES</FIELD>
+        <VALUE>Digitaal Beugel V2</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000004</PARAM>
+        <ROW>1</ROW>
+        <FIELD>CMP</FIELD>
+        <VALUE>e310</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000004</PARAM>
+        <ROW>1</ROW>
+        <FIELD>COL</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000004</PARAM>
+        <ROW>1</ROW>
+        <FIELD>CR2</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000004</PARAM>
+        <ROW>1</ROW>
+        <FIELD>MCL</FIELD>
+        <VALUE>1</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000004</PARAM>
+        <ROW>1</ROW>
+        <FIELD>SON</FIELD>
+        <VALUE />
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000004</PARAM>
+        <ROW>1</ROW>
+        <FIELD>AQP</FIELD>
+        <VALUE>0</VALUE>
+      </E1BPEXT>
+      <E1BPEXT>
+        <PARAM>0030120043000004</PARAM>
+        <ROW>1</ROW>
+        <FIELD>WHI</FIELD>
+        <VALUE>PT10</VALUE>
+      </E1BPEXT>
+    </E1SHP_OBDLV_SAVE_REPLICA>
+  </IDOC>
+</SHP_OBDLV_SAVE_REPLICA05>

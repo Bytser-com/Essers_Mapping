@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120104</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22104</CustomerNumber>
+    <DeliveryAddress>Stationslaan 156 Bus 18 60547 Porto Portugal</DeliveryAddress>
+    <ShipmentName />
+    <Name>Leclercq Systems</Name>
+    <WarehouseID>PT10</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-14T08:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Stationslaan 156 Bus 18</DlvStreet>
+    <DlvZipcode>60547</DlvZipcode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCounty>Porto</DlvCounty>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <Recipient>Louise Leclercq</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706104</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000104</RouteID>
+    <Qty>27.000000000000</Qty>
+    <ItemID>ZM090224</ItemID>
+    <InventoryOrderID>000206941</InventoryOrderID>
+    <DeliveryDate>2026-08-16T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395041</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030104</InventTransRefID>
+    <DeliveryAdress>Stationslaan 156 Bus 18 60547 Porto Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Modulair Sensor Plus</Note>
+    <MultiComponentItemID>ZM090224</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Stationslaan 156 Bus 18 60547 Porto Portugal</DlvAddress>
+    <DlvStreet>Stationslaan 156 Bus 18</DlvStreet>
+    <DlvZipCode>60547</DlvZipCode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCountry>Porto</DlvCountry>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395040</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000104</RouteID>
+    <Qty>65.000000000000</Qty>
+    <ItemID>VL001652</ItemID>
+    <InventoryOrderID>000206942</InventoryOrderID>
+    <DeliveryDate>2026-08-16T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395042</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030104</InventTransRefID>
+    <DeliveryAdress>Stationslaan 156 Bus 18 60547 Porto Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Professioneel Beugel Set</Note>
+    <MultiComponentItemID>VL001652</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Stationslaan 156 Bus 18 60547 Porto Portugal</DlvAddress>
+    <DlvStreet>Stationslaan 156 Bus 18</DlvStreet>
+    <DlvZipCode>60547</DlvZipCode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCountry>Porto</DlvCountry>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395040</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000104</RouteID>
+    <Qty>13.000000000000</Qty>
+    <ItemID>JG420566</ItemID>
+    <InventoryOrderID>000206943</InventoryOrderID>
+    <DeliveryDate>2026-08-16T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395043</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030104</InventTransRefID>
+    <DeliveryAdress>Stationslaan 156 Bus 18 60547 Porto Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Industrieel Filter Set</Note>
+    <MultiComponentItemID>JG420566</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Stationslaan 156 Bus 18 60547 Porto Portugal</DlvAddress>
+    <DlvStreet>Stationslaan 156 Bus 18</DlvStreet>
+    <DlvZipCode>60547</DlvZipCode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCountry>Porto</DlvCountry>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395040</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000104</RouteID>
+    <Qty>59.000000000000</Qty>
+    <ItemID>JC723778</ItemID>
+    <InventoryOrderID>000206944</InventoryOrderID>
+    <DeliveryDate>2026-08-16T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395044</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030104</InventTransRefID>
+    <DeliveryAdress>Stationslaan 156 Bus 18 60547 Porto Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Digitaal Lader Pro</Note>
+    <MultiComponentItemID>JC723778</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Stationslaan 156 Bus 18 60547 Porto Portugal</DlvAddress>
+    <DlvStreet>Stationslaan 156 Bus 18</DlvStreet>
+    <DlvZipCode>60547</DlvZipCode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCountry>Porto</DlvCountry>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395040</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000104</RouteID>
+    <Qty>38.000000000000</Qty>
+    <ItemID>TN351017</ItemID>
+    <InventoryOrderID>000206945</InventoryOrderID>
+    <DeliveryDate>2026-08-16T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395045</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030104</InventTransRefID>
+    <DeliveryAdress>Stationslaan 156 Bus 18 60547 Porto Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Mobiel Schakelaar X1</Note>
+    <MultiComponentItemID>TN351017</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Stationslaan 156 Bus 18 60547 Porto Portugal</DlvAddress>
+    <DlvStreet>Stationslaan 156 Bus 18</DlvStreet>
+    <DlvZipCode>60547</DlvZipCode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCountry>Porto</DlvCountry>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395040</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

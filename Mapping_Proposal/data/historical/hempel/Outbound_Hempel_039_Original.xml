@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120039</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22039</CustomerNumber>
+    <DeliveryAddress>Schoolstraat 289 Gebouw P 83727 Valencia Spain</DeliveryAddress>
+    <ShipmentName />
+    <Name>Jacobs Consulting</Name>
+    <WarehouseID>ES30</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-06T05:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Schoolstraat 289 Gebouw P</DlvStreet>
+    <DlvZipcode>83727</DlvZipcode>
+    <DlvCity>Valencia</DlvCity>
+    <DlvCounty>Valencia</DlvCounty>
+    <DlvState>Valencia</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <Recipient>Finn Jacobs</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706039</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000039</RouteID>
+    <Qty>73.000000000000</Qty>
+    <ItemID>FG853367</ItemID>
+    <InventoryOrderID>000206291</InventoryOrderID>
+    <DeliveryDate>2026-08-15T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394391</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030039</InventTransRefID>
+    <DeliveryAdress>Schoolstraat 289 Gebouw P 83727 Valencia Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Snel Paneel Basic</Note>
+    <MultiComponentItemID>FG853367</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Schoolstraat 289 Gebouw P 83727 Valencia Spain</DlvAddress>
+    <DlvStreet>Schoolstraat 289 Gebouw P</DlvStreet>
+    <DlvZipCode>83727</DlvZipCode>
+    <DlvCity>Valencia</DlvCity>
+    <DlvCountry>Valencia</DlvCountry>
+    <DlvState>Valencia</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394390</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000039</RouteID>
+    <Qty>87.000000000000</Qty>
+    <ItemID>LI953172</ItemID>
+    <InventoryOrderID>000206292</InventoryOrderID>
+    <DeliveryDate>2026-08-15T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394392</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030039</InventTransRefID>
+    <DeliveryAdress>Schoolstraat 289 Gebouw P 83727 Valencia Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Digitaal Controller Max</Note>
+    <MultiComponentItemID>LI953172</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Schoolstraat 289 Gebouw P 83727 Valencia Spain</DlvAddress>
+    <DlvStreet>Schoolstraat 289 Gebouw P</DlvStreet>
+    <DlvZipCode>83727</DlvZipCode>
+    <DlvCity>Valencia</DlvCity>
+    <DlvCountry>Valencia</DlvCountry>
+    <DlvState>Valencia</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394390</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000039</RouteID>
+    <Qty>71.000000000000</Qty>
+    <ItemID>NG876657</ItemID>
+    <InventoryOrderID>000206293</InventoryOrderID>
+    <DeliveryDate>2026-08-15T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394393</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030039</InventTransRefID>
+    <DeliveryAdress>Schoolstraat 289 Gebouw P 83727 Valencia Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Professioneel Omvormer Set</Note>
+    <MultiComponentItemID>NG876657</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Schoolstraat 289 Gebouw P 83727 Valencia Spain</DlvAddress>
+    <DlvStreet>Schoolstraat 289 Gebouw P</DlvStreet>
+    <DlvZipCode>83727</DlvZipCode>
+    <DlvCity>Valencia</DlvCity>
+    <DlvCountry>Valencia</DlvCountry>
+    <DlvState>Valencia</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394390</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000039</RouteID>
+    <Qty>11.000000000000</Qty>
+    <ItemID>CS380192</ItemID>
+    <InventoryOrderID>000206294</InventoryOrderID>
+    <DeliveryDate>2026-08-15T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394394</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030039</InventTransRefID>
+    <DeliveryAdress>Schoolstraat 289 Gebouw P 83727 Valencia Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Professioneel Terminal Max</Note>
+    <MultiComponentItemID>CS380192</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Schoolstraat 289 Gebouw P 83727 Valencia Spain</DlvAddress>
+    <DlvStreet>Schoolstraat 289 Gebouw P</DlvStreet>
+    <DlvZipCode>83727</DlvZipCode>
+    <DlvCity>Valencia</DlvCity>
+    <DlvCountry>Valencia</DlvCountry>
+    <DlvState>Valencia</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394390</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

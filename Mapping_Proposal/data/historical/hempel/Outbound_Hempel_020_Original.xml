@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120020</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22020</CustomerNumber>
+    <DeliveryAddress>Parklaan 144 92134 Utrecht Netherlands</DeliveryAddress>
+    <ShipmentName />
+    <Name>Lambert Services</Name>
+    <WarehouseID>NL20</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-03T20:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Parklaan 144</DlvStreet>
+    <DlvZipcode>92134</DlvZipcode>
+    <DlvCity>Utrecht</DlvCity>
+    <DlvCounty>Utrecht</DlvCounty>
+    <DlvState>Utrecht</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <Recipient>Emma Lambert</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706020</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000020</RouteID>
+    <Qty>28.000000000000</Qty>
+    <ItemID>KK854616</ItemID>
+    <InventoryOrderID>000206101</InventoryOrderID>
+    <DeliveryDate>2026-08-09T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394201</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030020</InventTransRefID>
+    <DeliveryAdress>Parklaan 144 92134 Utrecht Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Digitaal Ventiel Basic</Note>
+    <MultiComponentItemID>KK854616</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Parklaan 144 92134 Utrecht Netherlands</DlvAddress>
+    <DlvStreet>Parklaan 144</DlvStreet>
+    <DlvZipCode>92134</DlvZipCode>
+    <DlvCity>Utrecht</DlvCity>
+    <DlvCountry>Utrecht</DlvCountry>
+    <DlvState>Utrecht</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1394200</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000020</RouteID>
+    <Qty>92.000000000000</Qty>
+    <ItemID>GD445598</ItemID>
+    <InventoryOrderID>000206102</InventoryOrderID>
+    <DeliveryDate>2026-08-09T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394202</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030020</InventTransRefID>
+    <DeliveryAdress>Parklaan 144 92134 Utrecht Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Licht Controller Set</Note>
+    <MultiComponentItemID>GD445598</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Parklaan 144 92134 Utrecht Netherlands</DlvAddress>
+    <DlvStreet>Parklaan 144</DlvStreet>
+    <DlvZipCode>92134</DlvZipCode>
+    <DlvCity>Utrecht</DlvCity>
+    <DlvCountry>Utrecht</DlvCountry>
+    <DlvState>Utrecht</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1394200</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000020</RouteID>
+    <Qty>78.000000000000</Qty>
+    <ItemID>CK382707</ItemID>
+    <InventoryOrderID>000206103</InventoryOrderID>
+    <DeliveryDate>2026-08-09T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394203</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030020</InventTransRefID>
+    <DeliveryAdress>Parklaan 144 92134 Utrecht Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Ergonomisch Kabel Set</Note>
+    <MultiComponentItemID>CK382707</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Parklaan 144 92134 Utrecht Netherlands</DlvAddress>
+    <DlvStreet>Parklaan 144</DlvStreet>
+    <DlvZipCode>92134</DlvZipCode>
+    <DlvCity>Utrecht</DlvCity>
+    <DlvCountry>Utrecht</DlvCountry>
+    <DlvState>Utrecht</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1394200</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000020</RouteID>
+    <Qty>84.000000000000</Qty>
+    <ItemID>ZM090224</ItemID>
+    <InventoryOrderID>000206104</InventoryOrderID>
+    <DeliveryDate>2026-08-09T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394204</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030020</InventTransRefID>
+    <DeliveryAdress>Parklaan 144 92134 Utrecht Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Modulair Sensor Plus</Note>
+    <MultiComponentItemID>ZM090224</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Parklaan 144 92134 Utrecht Netherlands</DlvAddress>
+    <DlvStreet>Parklaan 144</DlvStreet>
+    <DlvZipCode>92134</DlvZipCode>
+    <DlvCity>Utrecht</DlvCity>
+    <DlvCountry>Utrecht</DlvCountry>
+    <DlvState>Utrecht</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1394200</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000020</RouteID>
+    <Qty>83.000000000000</Qty>
+    <ItemID>FV755196</ItemID>
+    <InventoryOrderID>000206105</InventoryOrderID>
+    <DeliveryDate>2026-08-09T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394205</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030020</InventTransRefID>
+    <DeliveryAdress>Parklaan 144 92134 Utrecht Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Compact Schakelaar Kit</Note>
+    <MultiComponentItemID>FV755196</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Parklaan 144 92134 Utrecht Netherlands</DlvAddress>
+    <DlvStreet>Parklaan 144</DlvStreet>
+    <DlvZipCode>92134</DlvZipCode>
+    <DlvCity>Utrecht</DlvCity>
+    <DlvCountry>Utrecht</DlvCountry>
+    <DlvState>Utrecht</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1394200</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120121</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22121</CustomerNumber>
+    <DeliveryAddress>Kerkstraat 144 Unit 6 70624 Esch-sur-Alzette Luxembourg</DeliveryAddress>
+    <ShipmentName />
+    <Name>Vermeulen Consulting</Name>
+    <WarehouseID>LU10</WarehouseID>
+    <CompanyID>E223</CompanyID>
+    <PublishedByAX>2026-08-16T11:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kerkstraat 144 Unit 6</DlvStreet>
+    <DlvZipcode>70624</DlvZipcode>
+    <DlvCity>Esch-sur-Alzette</DlvCity>
+    <DlvCounty>Esch-sur-Alzette</DlvCounty>
+    <DlvState>Esch-sur-Alzette</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <Recipient>Mats Vermeulen</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706121</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000121</RouteID>
+    <Qty>54.000000000000</Qty>
+    <ItemID>ID366363</ItemID>
+    <InventoryOrderID>000207111</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395211</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030121</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 144 Unit 6 70624 Esch-sur-Alzette Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Universeel Kabel Mini</Note>
+    <MultiComponentItemID>ID366363</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 144 Unit 6 70624 Esch-sur-Alzette Luxembourg</DlvAddress>
+    <DlvStreet>Kerkstraat 144 Unit 6</DlvStreet>
+    <DlvZipCode>70624</DlvZipCode>
+    <DlvCity>Esch-sur-Alzette</DlvCity>
+    <DlvCountry>Esch-sur-Alzette</DlvCountry>
+    <DlvState>Esch-sur-Alzette</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1395210</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000121</RouteID>
+    <Qty>12.000000000000</Qty>
+    <ItemID>HB357965</ItemID>
+    <InventoryOrderID>000207112</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395212</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030121</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 144 Unit 6 70624 Esch-sur-Alzette Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Modulair Controller Mini</Note>
+    <MultiComponentItemID>HB357965</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 144 Unit 6 70624 Esch-sur-Alzette Luxembourg</DlvAddress>
+    <DlvStreet>Kerkstraat 144 Unit 6</DlvStreet>
+    <DlvZipCode>70624</DlvZipCode>
+    <DlvCity>Esch-sur-Alzette</DlvCity>
+    <DlvCountry>Esch-sur-Alzette</DlvCountry>
+    <DlvState>Esch-sur-Alzette</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1395210</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

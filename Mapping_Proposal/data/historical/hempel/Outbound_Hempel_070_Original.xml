@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120070</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22070</CustomerNumber>
+    <DeliveryAddress>Industrieweg 214 Afdeling 10 93852 Braga Portugal</DeliveryAddress>
+    <ShipmentName />
+    <Name>Lambert Consulting</Name>
+    <WarehouseID>PT10</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-10T02:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Industrieweg 214 Afdeling 10</DlvStreet>
+    <DlvZipcode>93852</DlvZipcode>
+    <DlvCity>Braga</DlvCity>
+    <DlvCounty>Braga</DlvCounty>
+    <DlvState>Braga</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <Recipient>Louise Lambert</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706070</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000070</RouteID>
+    <Qty>73.000000000000</Qty>
+    <ItemID>MV783354</ItemID>
+    <InventoryOrderID>000206601</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394701</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030070</InventTransRefID>
+    <DeliveryAdress>Industrieweg 214 Afdeling 10 93852 Braga Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Modulair Kabel Set</Note>
+    <MultiComponentItemID>MV783354</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 214 Afdeling 10 93852 Braga Portugal</DlvAddress>
+    <DlvStreet>Industrieweg 214 Afdeling 10</DlvStreet>
+    <DlvZipCode>93852</DlvZipCode>
+    <DlvCity>Braga</DlvCity>
+    <DlvCountry>Braga</DlvCountry>
+    <DlvState>Braga</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1394700</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000070</RouteID>
+    <Qty>62.000000000000</Qty>
+    <ItemID>VZ148007</ItemID>
+    <InventoryOrderID>000206602</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394702</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030070</InventTransRefID>
+    <DeliveryAdress>Industrieweg 214 Afdeling 10 93852 Braga Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Universeel Adapter Set</Note>
+    <MultiComponentItemID>VZ148007</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 214 Afdeling 10 93852 Braga Portugal</DlvAddress>
+    <DlvStreet>Industrieweg 214 Afdeling 10</DlvStreet>
+    <DlvZipCode>93852</DlvZipCode>
+    <DlvCity>Braga</DlvCity>
+    <DlvCountry>Braga</DlvCountry>
+    <DlvState>Braga</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1394700</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000070</RouteID>
+    <Qty>93.000000000000</Qty>
+    <ItemID>XF623697</ItemID>
+    <InventoryOrderID>000206603</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394703</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030070</InventTransRefID>
+    <DeliveryAdress>Industrieweg 214 Afdeling 10 93852 Braga Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Sterk Connector Max</Note>
+    <MultiComponentItemID>XF623697</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 214 Afdeling 10 93852 Braga Portugal</DlvAddress>
+    <DlvStreet>Industrieweg 214 Afdeling 10</DlvStreet>
+    <DlvZipCode>93852</DlvZipCode>
+    <DlvCity>Braga</DlvCity>
+    <DlvCountry>Braga</DlvCountry>
+    <DlvState>Braga</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1394700</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

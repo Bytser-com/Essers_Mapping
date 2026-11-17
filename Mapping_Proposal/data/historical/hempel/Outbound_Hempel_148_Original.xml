@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120148</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22148</CustomerNumber>
+    <DeliveryAddress>Industrieweg 257 Afdeling 5 57684 Madrid Spain</DeliveryAddress>
+    <ShipmentName />
+    <Name>Lambert Services</Name>
+    <WarehouseID>ES30</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-19T20:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Industrieweg 257 Afdeling 5</DlvStreet>
+    <DlvZipcode>57684</DlvZipcode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCounty>Madrid</DlvCounty>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <Recipient>Mila Lambert</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706148</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000148</RouteID>
+    <Qty>53.000000000000</Qty>
+    <ItemID>JM382882</ItemID>
+    <InventoryOrderID>000207381</InventoryOrderID>
+    <DeliveryDate>2026-08-25T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395481</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030148</InventTransRefID>
+    <DeliveryAdress>Industrieweg 257 Afdeling 5 57684 Madrid Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Flexibel Schakelaar Kit</Note>
+    <MultiComponentItemID>JM382882</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 257 Afdeling 5 57684 Madrid Spain</DlvAddress>
+    <DlvStreet>Industrieweg 257 Afdeling 5</DlvStreet>
+    <DlvZipCode>57684</DlvZipCode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCountry>Madrid</DlvCountry>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1395480</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000148</RouteID>
+    <Qty>20.000000000000</Qty>
+    <ItemID>LU579927</ItemID>
+    <InventoryOrderID>000207382</InventoryOrderID>
+    <DeliveryDate>2026-08-25T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395482</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030148</InventTransRefID>
+    <DeliveryAdress>Industrieweg 257 Afdeling 5 57684 Madrid Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Automatisch Module Pro</Note>
+    <MultiComponentItemID>LU579927</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 257 Afdeling 5 57684 Madrid Spain</DlvAddress>
+    <DlvStreet>Industrieweg 257 Afdeling 5</DlvStreet>
+    <DlvZipCode>57684</DlvZipCode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCountry>Madrid</DlvCountry>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1395480</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000148</RouteID>
+    <Qty>82.000000000000</Qty>
+    <ItemID>GB769389</ItemID>
+    <InventoryOrderID>000207383</InventoryOrderID>
+    <DeliveryDate>2026-08-25T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395483</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030148</InventTransRefID>
+    <DeliveryAdress>Industrieweg 257 Afdeling 5 57684 Madrid Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Slim Sensor Mini</Note>
+    <MultiComponentItemID>GB769389</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 257 Afdeling 5 57684 Madrid Spain</DlvAddress>
+    <DlvStreet>Industrieweg 257 Afdeling 5</DlvStreet>
+    <DlvZipCode>57684</DlvZipCode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCountry>Madrid</DlvCountry>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1395480</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000148</RouteID>
+    <Qty>6.000000000000</Qty>
+    <ItemID>FK969425</ItemID>
+    <InventoryOrderID>000207384</InventoryOrderID>
+    <DeliveryDate>2026-08-25T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395484</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030148</InventTransRefID>
+    <DeliveryAdress>Industrieweg 257 Afdeling 5 57684 Madrid Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Sterk Kabel Max</Note>
+    <MultiComponentItemID>FK969425</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 257 Afdeling 5 57684 Madrid Spain</DlvAddress>
+    <DlvStreet>Industrieweg 257 Afdeling 5</DlvStreet>
+    <DlvZipCode>57684</DlvZipCode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCountry>Madrid</DlvCountry>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1395480</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000148</RouteID>
+    <Qty>1.000000000000</Qty>
+    <ItemID>IS087659</ItemID>
+    <InventoryOrderID>000207385</InventoryOrderID>
+    <DeliveryDate>2026-08-25T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395485</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030148</InventTransRefID>
+    <DeliveryAdress>Industrieweg 257 Afdeling 5 57684 Madrid Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Precisie Houder X1</Note>
+    <MultiComponentItemID>IS087659</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 257 Afdeling 5 57684 Madrid Spain</DlvAddress>
+    <DlvStreet>Industrieweg 257 Afdeling 5</DlvStreet>
+    <DlvZipCode>57684</DlvZipCode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCountry>Madrid</DlvCountry>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1395480</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120080</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22080</CustomerNumber>
+    <DeliveryAddress>Industrieweg 32 Bus 26 89845 Valencia Spain</DeliveryAddress>
+    <ShipmentName />
+    <Name>Maes Transport</Name>
+    <WarehouseID>ES30</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-11T08:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Industrieweg 32 Bus 26</DlvStreet>
+    <DlvZipcode>89845</DlvZipcode>
+    <DlvCity>Valencia</DlvCity>
+    <DlvCounty>Valencia</DlvCounty>
+    <DlvState>Valencia</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <Recipient>Finn Maes</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706080</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000080</RouteID>
+    <Qty>17.000000000000</Qty>
+    <ItemID>YN194052</ItemID>
+    <InventoryOrderID>000206701</InventoryOrderID>
+    <DeliveryDate>2026-08-13T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394801</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030080</InventTransRefID>
+    <DeliveryAdress>Industrieweg 32 Bus 26 89845 Valencia Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Premium Omvormer X1</Note>
+    <MultiComponentItemID>YN194052</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 32 Bus 26 89845 Valencia Spain</DlvAddress>
+    <DlvStreet>Industrieweg 32 Bus 26</DlvStreet>
+    <DlvZipCode>89845</DlvZipCode>
+    <DlvCity>Valencia</DlvCity>
+    <DlvCountry>Valencia</DlvCountry>
+    <DlvState>Valencia</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394800</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000080</RouteID>
+    <Qty>69.000000000000</Qty>
+    <ItemID>FG853367</ItemID>
+    <InventoryOrderID>000206702</InventoryOrderID>
+    <DeliveryDate>2026-08-13T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394802</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030080</InventTransRefID>
+    <DeliveryAdress>Industrieweg 32 Bus 26 89845 Valencia Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Snel Paneel Basic</Note>
+    <MultiComponentItemID>FG853367</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 32 Bus 26 89845 Valencia Spain</DlvAddress>
+    <DlvStreet>Industrieweg 32 Bus 26</DlvStreet>
+    <DlvZipCode>89845</DlvZipCode>
+    <DlvCity>Valencia</DlvCity>
+    <DlvCountry>Valencia</DlvCountry>
+    <DlvState>Valencia</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394800</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000080</RouteID>
+    <Qty>36.000000000000</Qty>
+    <ItemID>NO330349</ItemID>
+    <InventoryOrderID>000206703</InventoryOrderID>
+    <DeliveryDate>2026-08-13T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394803</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030080</InventTransRefID>
+    <DeliveryAdress>Industrieweg 32 Bus 26 89845 Valencia Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Automatisch Sensor V2</Note>
+    <MultiComponentItemID>NO330349</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 32 Bus 26 89845 Valencia Spain</DlvAddress>
+    <DlvStreet>Industrieweg 32 Bus 26</DlvStreet>
+    <DlvZipCode>89845</DlvZipCode>
+    <DlvCity>Valencia</DlvCity>
+    <DlvCountry>Valencia</DlvCountry>
+    <DlvState>Valencia</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394800</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000080</RouteID>
+    <Qty>67.000000000000</Qty>
+    <ItemID>KF153246</ItemID>
+    <InventoryOrderID>000206704</InventoryOrderID>
+    <DeliveryDate>2026-08-13T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394804</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030080</InventTransRefID>
+    <DeliveryAdress>Industrieweg 32 Bus 26 89845 Valencia Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Eco Ventiel X1</Note>
+    <MultiComponentItemID>KF153246</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 32 Bus 26 89845 Valencia Spain</DlvAddress>
+    <DlvStreet>Industrieweg 32 Bus 26</DlvStreet>
+    <DlvZipCode>89845</DlvZipCode>
+    <DlvCity>Valencia</DlvCity>
+    <DlvCountry>Valencia</DlvCountry>
+    <DlvState>Valencia</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394800</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000080</RouteID>
+    <Qty>48.000000000000</Qty>
+    <ItemID>WK236695</ItemID>
+    <InventoryOrderID>000206705</InventoryOrderID>
+    <DeliveryDate>2026-08-13T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394805</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030080</InventTransRefID>
+    <DeliveryAdress>Industrieweg 32 Bus 26 89845 Valencia Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Flexibel Lader V2</Note>
+    <MultiComponentItemID>WK236695</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Industrieweg 32 Bus 26 89845 Valencia Spain</DlvAddress>
+    <DlvStreet>Industrieweg 32 Bus 26</DlvStreet>
+    <DlvZipCode>89845</DlvZipCode>
+    <DlvCity>Valencia</DlvCity>
+    <DlvCountry>Valencia</DlvCountry>
+    <DlvState>Valencia</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394800</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

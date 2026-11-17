@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120013</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22013</CustomerNumber>
+    <DeliveryAddress>Bosweg 59 Afdeling 3 39847 Dusseldorf Germany</DeliveryAddress>
+    <ShipmentName />
+    <Name>Dubois Supply</Name>
+    <WarehouseID>DE20</WarehouseID>
+    <CompanyID>E223</CompanyID>
+    <PublishedByAX>2026-08-02T23:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Bosweg 59 Afdeling 3</DlvStreet>
+    <DlvZipcode>39847</DlvZipcode>
+    <DlvCity>Dusseldorf</DlvCity>
+    <DlvCounty>Dusseldorf</DlvCounty>
+    <DlvState>Dusseldorf</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <Recipient>Adam Dubois</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706013</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000013</RouteID>
+    <Qty>11.000000000000</Qty>
+    <ItemID>IE392137</ItemID>
+    <InventoryOrderID>000206031</InventoryOrderID>
+    <DeliveryDate>2026-08-09T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394131</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030013</InventTransRefID>
+    <DeliveryAdress>Bosweg 59 Afdeling 3 39847 Dusseldorf Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Universeel Meetset X2</Note>
+    <MultiComponentItemID>IE392137</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 59 Afdeling 3 39847 Dusseldorf Germany</DlvAddress>
+    <DlvStreet>Bosweg 59 Afdeling 3</DlvStreet>
+    <DlvZipCode>39847</DlvZipCode>
+    <DlvCity>Dusseldorf</DlvCity>
+    <DlvCountry>Dusseldorf</DlvCountry>
+    <DlvState>Dusseldorf</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394130</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000013</RouteID>
+    <Qty>22.000000000000</Qty>
+    <ItemID>CB881402</ItemID>
+    <InventoryOrderID>000206032</InventoryOrderID>
+    <DeliveryDate>2026-08-09T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394132</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030013</InventTransRefID>
+    <DeliveryAdress>Bosweg 59 Afdeling 3 39847 Dusseldorf Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Precisie Filter Kit</Note>
+    <MultiComponentItemID>CB881402</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 59 Afdeling 3 39847 Dusseldorf Germany</DlvAddress>
+    <DlvStreet>Bosweg 59 Afdeling 3</DlvStreet>
+    <DlvZipCode>39847</DlvZipCode>
+    <DlvCity>Dusseldorf</DlvCity>
+    <DlvCountry>Dusseldorf</DlvCountry>
+    <DlvState>Dusseldorf</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394130</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120127</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22127</CustomerNumber>
+    <DeliveryAddress>Molenweg 94 Unit 32 19070 Luxemburg Luxembourg</DeliveryAddress>
+    <ShipmentName />
+    <Name>De Smet Systems</Name>
+    <WarehouseID>LU10</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-17T05:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Molenweg 94 Unit 32</DlvStreet>
+    <DlvZipcode>19070</DlvZipcode>
+    <DlvCity>Luxemburg</DlvCity>
+    <DlvCounty>Luxemburg</DlvCounty>
+    <DlvState>Luxemburg</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <Recipient>Lucas De Smet</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706127</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000127</RouteID>
+    <Qty>31.000000000000</Qty>
+    <ItemID>IS087659</ItemID>
+    <InventoryOrderID>000207171</InventoryOrderID>
+    <DeliveryDate>2026-08-26T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395271</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030127</InventTransRefID>
+    <DeliveryAdress>Molenweg 94 Unit 32 19070 Luxemburg Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Precisie Houder X1</Note>
+    <MultiComponentItemID>IS087659</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 94 Unit 32 19070 Luxemburg Luxembourg</DlvAddress>
+    <DlvStreet>Molenweg 94 Unit 32</DlvStreet>
+    <DlvZipCode>19070</DlvZipCode>
+    <DlvCity>Luxemburg</DlvCity>
+    <DlvCountry>Luxemburg</DlvCountry>
+    <DlvState>Luxemburg</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1395270</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000127</RouteID>
+    <Qty>17.000000000000</Qty>
+    <ItemID>QC637319</ItemID>
+    <InventoryOrderID>000207172</InventoryOrderID>
+    <DeliveryDate>2026-08-26T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395272</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030127</InventTransRefID>
+    <DeliveryAdress>Molenweg 94 Unit 32 19070 Luxemburg Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Robuust Ventiel Kit</Note>
+    <MultiComponentItemID>QC637319</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 94 Unit 32 19070 Luxemburg Luxembourg</DlvAddress>
+    <DlvStreet>Molenweg 94 Unit 32</DlvStreet>
+    <DlvZipCode>19070</DlvZipCode>
+    <DlvCity>Luxemburg</DlvCity>
+    <DlvCountry>Luxemburg</DlvCountry>
+    <DlvState>Luxemburg</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1395270</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000127</RouteID>
+    <Qty>40.000000000000</Qty>
+    <ItemID>FT484450</ItemID>
+    <InventoryOrderID>000207173</InventoryOrderID>
+    <DeliveryDate>2026-08-26T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395273</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030127</InventTransRefID>
+    <DeliveryAdress>Molenweg 94 Unit 32 19070 Luxemburg Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Precisie Afdichting Kit</Note>
+    <MultiComponentItemID>FT484450</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 94 Unit 32 19070 Luxemburg Luxembourg</DlvAddress>
+    <DlvStreet>Molenweg 94 Unit 32</DlvStreet>
+    <DlvZipCode>19070</DlvZipCode>
+    <DlvCity>Luxemburg</DlvCity>
+    <DlvCountry>Luxemburg</DlvCountry>
+    <DlvState>Luxemburg</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1395270</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000127</RouteID>
+    <Qty>12.000000000000</Qty>
+    <ItemID>WR012433</ItemID>
+    <InventoryOrderID>000207174</InventoryOrderID>
+    <DeliveryDate>2026-08-26T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395274</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030127</InventTransRefID>
+    <DeliveryAdress>Molenweg 94 Unit 32 19070 Luxemburg Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Robuust Pomp Mini</Note>
+    <MultiComponentItemID>WR012433</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 94 Unit 32 19070 Luxemburg Luxembourg</DlvAddress>
+    <DlvStreet>Molenweg 94 Unit 32</DlvStreet>
+    <DlvZipCode>19070</DlvZipCode>
+    <DlvCity>Luxemburg</DlvCity>
+    <DlvCountry>Luxemburg</DlvCountry>
+    <DlvState>Luxemburg</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1395270</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

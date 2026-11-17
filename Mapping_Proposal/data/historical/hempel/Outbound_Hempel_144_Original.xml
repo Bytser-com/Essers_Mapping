@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120144</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22144</CustomerNumber>
+    <DeliveryAddress>Kerkstraat 207 Gebouw E 88090 Bonn Germany</DeliveryAddress>
+    <ShipmentName />
+    <Name>Goossens Industries</Name>
+    <WarehouseID>DE20</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-19T08:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kerkstraat 207 Gebouw E</DlvStreet>
+    <DlvZipcode>88090</DlvZipcode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCounty>Bonn</DlvCounty>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <Recipient>Lina Goossens</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706144</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000144</RouteID>
+    <Qty>6.000000000000</Qty>
+    <ItemID>HZ664835</ItemID>
+    <InventoryOrderID>000207341</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395441</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030144</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 207 Gebouw E 88090 Bonn Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Compact Ventiel X2</Note>
+    <MultiComponentItemID>HZ664835</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 207 Gebouw E 88090 Bonn Germany</DlvAddress>
+    <DlvStreet>Kerkstraat 207 Gebouw E</DlvStreet>
+    <DlvZipCode>88090</DlvZipCode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCountry>Bonn</DlvCountry>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1395440</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000144</RouteID>
+    <Qty>7.000000000000</Qty>
+    <ItemID>ID366363</ItemID>
+    <InventoryOrderID>000207342</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395442</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030144</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 207 Gebouw E 88090 Bonn Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Universeel Kabel Mini</Note>
+    <MultiComponentItemID>ID366363</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 207 Gebouw E 88090 Bonn Germany</DlvAddress>
+    <DlvStreet>Kerkstraat 207 Gebouw E</DlvStreet>
+    <DlvZipCode>88090</DlvZipCode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCountry>Bonn</DlvCountry>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1395440</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000144</RouteID>
+    <Qty>26.000000000000</Qty>
+    <ItemID>CB112982</ItemID>
+    <InventoryOrderID>000207343</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395443</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030144</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 207 Gebouw E 88090 Bonn Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Mobiel Schakelaar X1</Note>
+    <MultiComponentItemID>CB112982</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 207 Gebouw E 88090 Bonn Germany</DlvAddress>
+    <DlvStreet>Kerkstraat 207 Gebouw E</DlvStreet>
+    <DlvZipCode>88090</DlvZipCode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCountry>Bonn</DlvCountry>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1395440</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000144</RouteID>
+    <Qty>83.000000000000</Qty>
+    <ItemID>SD941083</ItemID>
+    <InventoryOrderID>000207344</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395444</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030144</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 207 Gebouw E 88090 Bonn Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Duurzaam Motor Kit</Note>
+    <MultiComponentItemID>SD941083</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 207 Gebouw E 88090 Bonn Germany</DlvAddress>
+    <DlvStreet>Kerkstraat 207 Gebouw E</DlvStreet>
+    <DlvZipCode>88090</DlvZipCode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCountry>Bonn</DlvCountry>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1395440</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000144</RouteID>
+    <Qty>44.000000000000</Qty>
+    <ItemID>KK854616</ItemID>
+    <InventoryOrderID>000207345</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395445</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030144</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 207 Gebouw E 88090 Bonn Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Digitaal Ventiel Basic</Note>
+    <MultiComponentItemID>KK854616</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 207 Gebouw E 88090 Bonn Germany</DlvAddress>
+    <DlvStreet>Kerkstraat 207 Gebouw E</DlvStreet>
+    <DlvZipCode>88090</DlvZipCode>
+    <DlvCity>Bonn</DlvCity>
+    <DlvCountry>Bonn</DlvCountry>
+    <DlvState>Bonn</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1395440</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

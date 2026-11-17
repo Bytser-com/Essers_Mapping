@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120006</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22006</CustomerNumber>
+    <DeliveryAddress>Bosweg 191 Gebouw N 39855 Utrecht Netherlands</DeliveryAddress>
+    <ShipmentName />
+    <Name>Simon Industries</Name>
+    <WarehouseID>NL20</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-02T02:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Bosweg 191 Gebouw N</DlvStreet>
+    <DlvZipcode>39855</DlvZipcode>
+    <DlvCity>Utrecht</DlvCity>
+    <DlvCounty>Utrecht</DlvCounty>
+    <DlvState>Utrecht</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <Recipient>Emma Simon</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706006</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000006</RouteID>
+    <Qty>9.000000000000</Qty>
+    <ItemID>SQ643496</ItemID>
+    <InventoryOrderID>000205961</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394061</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030006</InventTransRefID>
+    <DeliveryAdress>Bosweg 191 Gebouw N 39855 Utrecht Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Compact Meetset Mini</Note>
+    <MultiComponentItemID>SQ643496</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 191 Gebouw N 39855 Utrecht Netherlands</DlvAddress>
+    <DlvStreet>Bosweg 191 Gebouw N</DlvStreet>
+    <DlvZipCode>39855</DlvZipCode>
+    <DlvCity>Utrecht</DlvCity>
+    <DlvCountry>Utrecht</DlvCountry>
+    <DlvState>Utrecht</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1394060</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000006</RouteID>
+    <Qty>64.000000000000</Qty>
+    <ItemID>AL537812</ItemID>
+    <InventoryOrderID>000205962</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394062</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030006</InventTransRefID>
+    <DeliveryAdress>Bosweg 191 Gebouw N 39855 Utrecht Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Slim Schakelaar Set</Note>
+    <MultiComponentItemID>AL537812</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 191 Gebouw N 39855 Utrecht Netherlands</DlvAddress>
+    <DlvStreet>Bosweg 191 Gebouw N</DlvStreet>
+    <DlvZipCode>39855</DlvZipCode>
+    <DlvCity>Utrecht</DlvCity>
+    <DlvCountry>Utrecht</DlvCountry>
+    <DlvState>Utrecht</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1394060</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000006</RouteID>
+    <Qty>30.000000000000</Qty>
+    <ItemID>YW241404</ItemID>
+    <InventoryOrderID>000205963</InventoryOrderID>
+    <DeliveryDate>2026-08-10T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394063</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030006</InventTransRefID>
+    <DeliveryAdress>Bosweg 191 Gebouw N 39855 Utrecht Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Veilig Afdichting Mini</Note>
+    <MultiComponentItemID>YW241404</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 191 Gebouw N 39855 Utrecht Netherlands</DlvAddress>
+    <DlvStreet>Bosweg 191 Gebouw N</DlvStreet>
+    <DlvZipCode>39855</DlvZipCode>
+    <DlvCity>Utrecht</DlvCity>
+    <DlvCountry>Utrecht</DlvCountry>
+    <DlvState>Utrecht</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1394060</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120003</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22003</CustomerNumber>
+    <DeliveryAddress>Kasteelstraat 233 Bus 6 10356 Dudelange Luxembourg</DeliveryAddress>
+    <ShipmentName />
+    <Name>Peeters Solutions</Name>
+    <WarehouseID>LU10</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-01T17:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kasteelstraat 233 Bus 6</DlvStreet>
+    <DlvZipcode>10356</DlvZipcode>
+    <DlvCity>Dudelange</DlvCity>
+    <DlvCounty>Dudelange</DlvCounty>
+    <DlvState>Dudelange</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <Recipient>Nora Peeters</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706003</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000003</RouteID>
+    <Qty>58.000000000000</Qty>
+    <ItemID>KL754984</ItemID>
+    <InventoryOrderID>000205931</InventoryOrderID>
+    <DeliveryDate>2026-08-06T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394031</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030003</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 233 Bus 6 10356 Dudelange Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Eco Ventiel X2</Note>
+    <MultiComponentItemID>KL754984</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 233 Bus 6 10356 Dudelange Luxembourg</DlvAddress>
+    <DlvStreet>Kasteelstraat 233 Bus 6</DlvStreet>
+    <DlvZipCode>10356</DlvZipCode>
+    <DlvCity>Dudelange</DlvCity>
+    <DlvCountry>Dudelange</DlvCountry>
+    <DlvState>Dudelange</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1394030</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000003</RouteID>
+    <Qty>72.000000000000</Qty>
+    <ItemID>AC409779</ItemID>
+    <InventoryOrderID>000205932</InventoryOrderID>
+    <DeliveryDate>2026-08-06T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394032</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030003</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 233 Bus 6 10356 Dudelange Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Snel Paneel Basic</Note>
+    <MultiComponentItemID>AC409779</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 233 Bus 6 10356 Dudelange Luxembourg</DlvAddress>
+    <DlvStreet>Kasteelstraat 233 Bus 6</DlvStreet>
+    <DlvZipCode>10356</DlvZipCode>
+    <DlvCity>Dudelange</DlvCity>
+    <DlvCountry>Dudelange</DlvCountry>
+    <DlvState>Dudelange</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1394030</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000003</RouteID>
+    <Qty>2.000000000000</Qty>
+    <ItemID>BU449116</ItemID>
+    <InventoryOrderID>000205933</InventoryOrderID>
+    <DeliveryDate>2026-08-06T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394033</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030003</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 233 Bus 6 10356 Dudelange Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Precisie Kabel Mini</Note>
+    <MultiComponentItemID>BU449116</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 233 Bus 6 10356 Dudelange Luxembourg</DlvAddress>
+    <DlvStreet>Kasteelstraat 233 Bus 6</DlvStreet>
+    <DlvZipCode>10356</DlvZipCode>
+    <DlvCity>Dudelange</DlvCity>
+    <DlvCountry>Dudelange</DlvCountry>
+    <DlvState>Dudelange</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1394030</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000003</RouteID>
+    <Qty>38.000000000000</Qty>
+    <ItemID>RS465117</ItemID>
+    <InventoryOrderID>000205934</InventoryOrderID>
+    <DeliveryDate>2026-08-06T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394034</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030003</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 233 Bus 6 10356 Dudelange Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Eco Beugel X1</Note>
+    <MultiComponentItemID>RS465117</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 233 Bus 6 10356 Dudelange Luxembourg</DlvAddress>
+    <DlvStreet>Kasteelstraat 233 Bus 6</DlvStreet>
+    <DlvZipCode>10356</DlvZipCode>
+    <DlvCity>Dudelange</DlvCity>
+    <DlvCountry>Dudelange</DlvCountry>
+    <DlvState>Dudelange</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1394030</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

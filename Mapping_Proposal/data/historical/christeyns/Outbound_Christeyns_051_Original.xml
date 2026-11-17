@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root>
+  <MessageType>Outbound Delivery</MessageType>
+  <DocHeader>
+    <OutboundNumber>SO270000050</OutboundNumber>
+    <DocumentNumber>SO270000050</DocumentNumber>
+    <Reference>600050 /70050</Reference>
+    <DeliveryDate>12/11/2026</DeliveryDate>
+    <ShipByDate>09/11/2026</ShipByDate>
+    <RushIndicator>Y</RushIndicator>
+    <Carrier>XPO</Carrier>
+    <ShipToCode>200050</ShipToCode>
+    <Name1>Mats De Smet</Name1>
+    <Name2>De Smet Transport</Name2>
+    <Address1>Ringlaan 64</Address1>
+    <Address2>Afdeling 2</Address2>
+    <PostalCode>44377</PostalCode>
+    <City>Brussel</City>
+    <County />
+    <Country>BE</Country>
+    <LanguageCode>NL</LanguageCode>
+    <CommentCustomer />
+    <CommentOrder>
+      <Comment>Customer Reference: 800050</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>INCO:EXW</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>T4T : +32 11 70 80 40</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>Open: Ma-Di-Wo-Do-Vr 08:00-16:00</Comment>
+    </CommentOrder>
+    <TransportInstruction>
+      <Comment>T4T : +32 11 70 80 40</Comment>
+    </TransportInstruction>
+    <TransportInstruction>
+      <Comment>F92 : 1 08001600 2 08001600 3 08001600 4 08001600 5 08001600</Comment>
+    </TransportInstruction>
+    <WarehouseInstruction />
+  </DocHeader>
+  <DocLine>
+    <OrderLine>1</OrderLine>
+    <Product>ET534228</Product>
+    <Quantity>3</Quantity>
+    <UOM>CAN</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>0</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+  <DocLine>
+    <OrderLine>2</OrderLine>
+    <Product>KH666066</Product>
+    <Quantity>6</Quantity>
+    <UOM>BOX</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>3.4</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+</Root>

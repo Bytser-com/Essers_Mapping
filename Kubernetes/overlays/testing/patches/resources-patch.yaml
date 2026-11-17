@@ -1,0 +1,143 @@
+# ==============================================================================
+# TESTING ENVIRONMENT: RESOURCE & STORAGE SIZING PATCHES
+# Lower CPU/Memory limits & smaller PVCs suitable for a Testing VM
+# ==============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  template:
+    spec:
+      nodeSelector:
+        environment: testing
+      containers:
+        - name: frontend
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mapping-converter
+spec:
+  template:
+    spec:
+      nodeSelector:
+        environment: testing
+      containers:
+        - name: mapping-converter
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mapping-proposal
+spec:
+  template:
+    spec:
+      nodeSelector:
+        environment: testing
+      containers:
+        - name: mapping-proposal
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: version-control-backend
+spec:
+  template:
+    spec:
+      nodeSelector:
+        environment: testing
+      containers:
+        - name: version-control-backend
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 150m
+              memory: 384Mi
+            limits:
+              cpu: 500m
+              memory: 768Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: runtime-backend
+spec:
+  template:
+    spec:
+      nodeSelector:
+        environment: testing
+      containers:
+        - name: runtime-backend
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 150m
+              memory: 384Mi
+            limits:
+              cpu: 500m
+              memory: 768Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sftp-shared
+spec:
+  template:
+    spec:
+      nodeSelector:
+        environment: testing
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sftp-runtime
+spec:
+  template:
+    spec:
+      nodeSelector:
+        environment: testing
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sftp-shared-pvc
+spec:
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sftp-runtime-pvc
+spec:
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 10Gi

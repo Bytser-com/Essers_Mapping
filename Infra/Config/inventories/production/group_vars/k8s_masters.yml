@@ -1,0 +1,12 @@
+---
+# ==============================================================================
+# KUBERNETES CONTROL PLANE VARIABLES - PRODUCTION ENVIRONMENT
+# Specific to k8s_masters group
+# ==============================================================================
+
+k8s_apiserver_bind_port: 6443
+k8s_control_plane_endpoint: "{{ hostvars[groups['k8s_masters'][0]]['ansible_host'] }}:{{ k8s_apiserver_bind_port }}"
+k8s_allow_workloads_on_master: false
+k8s_install_helm: true
+k8s_kubeconfig_users:
+  - "{{ ansible_user }}"

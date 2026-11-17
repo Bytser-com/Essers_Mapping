@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120018</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22018</CustomerNumber>
+    <DeliveryAddress>Bosweg 225 Bus 23 22579 Turijn Italy</DeliveryAddress>
+    <ShipmentName />
+    <Name>Simon Logistics</Name>
+    <WarehouseID>IT20</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-03T14:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Bosweg 225 Bus 23</DlvStreet>
+    <DlvZipcode>22579</DlvZipcode>
+    <DlvCity>Turijn</DlvCity>
+    <DlvCounty>Turijn</DlvCounty>
+    <DlvState>Turijn</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <Recipient>Sofia Simon</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706018</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000018</RouteID>
+    <Qty>17.000000000000</Qty>
+    <ItemID>MM230317</ItemID>
+    <InventoryOrderID>000206081</InventoryOrderID>
+    <DeliveryDate>2026-08-07T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394181</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030018</InventTransRefID>
+    <DeliveryAdress>Bosweg 225 Bus 23 22579 Turijn Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Modulair Meetset Plus</Note>
+    <MultiComponentItemID>MM230317</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 225 Bus 23 22579 Turijn Italy</DlvAddress>
+    <DlvStreet>Bosweg 225 Bus 23</DlvStreet>
+    <DlvZipCode>22579</DlvZipCode>
+    <DlvCity>Turijn</DlvCity>
+    <DlvCountry>Turijn</DlvCountry>
+    <DlvState>Turijn</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394180</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000018</RouteID>
+    <Qty>95.000000000000</Qty>
+    <ItemID>ZR768731</ItemID>
+    <InventoryOrderID>000206082</InventoryOrderID>
+    <DeliveryDate>2026-08-07T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394182</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030018</InventTransRefID>
+    <DeliveryAdress>Bosweg 225 Bus 23 22579 Turijn Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Duurzaam Ventiel Basic</Note>
+    <MultiComponentItemID>ZR768731</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 225 Bus 23 22579 Turijn Italy</DlvAddress>
+    <DlvStreet>Bosweg 225 Bus 23</DlvStreet>
+    <DlvZipCode>22579</DlvZipCode>
+    <DlvCity>Turijn</DlvCity>
+    <DlvCountry>Turijn</DlvCountry>
+    <DlvState>Turijn</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394180</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000018</RouteID>
+    <Qty>14.000000000000</Qty>
+    <ItemID>YN957839</ItemID>
+    <InventoryOrderID>000206083</InventoryOrderID>
+    <DeliveryDate>2026-08-07T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394183</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030018</InventTransRefID>
+    <DeliveryAdress>Bosweg 225 Bus 23 22579 Turijn Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Modulair Beugel Max</Note>
+    <MultiComponentItemID>YN957839</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 225 Bus 23 22579 Turijn Italy</DlvAddress>
+    <DlvStreet>Bosweg 225 Bus 23</DlvStreet>
+    <DlvZipCode>22579</DlvZipCode>
+    <DlvCity>Turijn</DlvCity>
+    <DlvCountry>Turijn</DlvCountry>
+    <DlvState>Turijn</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394180</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

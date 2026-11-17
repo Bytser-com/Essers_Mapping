@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120108</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22108</CustomerNumber>
+    <DeliveryAddress>Dorpsstraat 270 Bus 21 49313 Eindhoven Netherlands</DeliveryAddress>
+    <ShipmentName />
+    <Name>Mertens Industries</Name>
+    <WarehouseID>NL20</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-14T20:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Dorpsstraat 270 Bus 21</DlvStreet>
+    <DlvZipcode>49313</DlvZipcode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCounty>Eindhoven</DlvCounty>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <Recipient>Adam Mertens</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706108</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000108</RouteID>
+    <Qty>8.000000000000</Qty>
+    <ItemID>AC409779</ItemID>
+    <InventoryOrderID>000206981</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395081</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030108</InventTransRefID>
+    <DeliveryAdress>Dorpsstraat 270 Bus 21 49313 Eindhoven Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Snel Paneel Basic</Note>
+    <MultiComponentItemID>AC409779</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Dorpsstraat 270 Bus 21 49313 Eindhoven Netherlands</DlvAddress>
+    <DlvStreet>Dorpsstraat 270 Bus 21</DlvStreet>
+    <DlvZipCode>49313</DlvZipCode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCountry>Eindhoven</DlvCountry>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395080</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000108</RouteID>
+    <Qty>6.000000000000</Qty>
+    <ItemID>BT745093</ItemID>
+    <InventoryOrderID>000206982</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395082</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030108</InventTransRefID>
+    <DeliveryAdress>Dorpsstraat 270 Bus 21 49313 Eindhoven Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Precisie Kabel V2</Note>
+    <MultiComponentItemID>BT745093</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Dorpsstraat 270 Bus 21 49313 Eindhoven Netherlands</DlvAddress>
+    <DlvStreet>Dorpsstraat 270 Bus 21</DlvStreet>
+    <DlvZipCode>49313</DlvZipCode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCountry>Eindhoven</DlvCountry>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395080</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000108</RouteID>
+    <Qty>60.000000000000</Qty>
+    <ItemID>PK515644</ItemID>
+    <InventoryOrderID>000206983</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395083</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030108</InventTransRefID>
+    <DeliveryAdress>Dorpsstraat 270 Bus 21 49313 Eindhoven Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Snel Lader Set</Note>
+    <MultiComponentItemID>PK515644</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Dorpsstraat 270 Bus 21 49313 Eindhoven Netherlands</DlvAddress>
+    <DlvStreet>Dorpsstraat 270 Bus 21</DlvStreet>
+    <DlvZipCode>49313</DlvZipCode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCountry>Eindhoven</DlvCountry>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395080</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000108</RouteID>
+    <Qty>75.000000000000</Qty>
+    <ItemID>WR199910</ItemID>
+    <InventoryOrderID>000206984</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395084</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030108</InventTransRefID>
+    <DeliveryAdress>Dorpsstraat 270 Bus 21 49313 Eindhoven Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Industrieel Omvormer Set</Note>
+    <MultiComponentItemID>WR199910</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Dorpsstraat 270 Bus 21 49313 Eindhoven Netherlands</DlvAddress>
+    <DlvStreet>Dorpsstraat 270 Bus 21</DlvStreet>
+    <DlvZipCode>49313</DlvZipCode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCountry>Eindhoven</DlvCountry>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395080</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000108</RouteID>
+    <Qty>57.000000000000</Qty>
+    <ItemID>KA613008</ItemID>
+    <InventoryOrderID>000206985</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395085</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030108</InventTransRefID>
+    <DeliveryAdress>Dorpsstraat 270 Bus 21 49313 Eindhoven Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Mobiel Connector V2</Note>
+    <MultiComponentItemID>KA613008</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Dorpsstraat 270 Bus 21 49313 Eindhoven Netherlands</DlvAddress>
+    <DlvStreet>Dorpsstraat 270 Bus 21</DlvStreet>
+    <DlvZipCode>49313</DlvZipCode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCountry>Eindhoven</DlvCountry>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395080</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120038</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22038</CustomerNumber>
+    <DeliveryAddress>Kanaalweg 192 Gebouw W 74142 Madrid Spain</DeliveryAddress>
+    <ShipmentName />
+    <Name>Bakker Logistics</Name>
+    <WarehouseID>ES30</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-06T02:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kanaalweg 192 Gebouw W</DlvStreet>
+    <DlvZipcode>74142</DlvZipcode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCounty>Madrid</DlvCounty>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <Recipient>Emma Bakker</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706038</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000038</RouteID>
+    <Qty>32.000000000000</Qty>
+    <ItemID>CJ191323</ItemID>
+    <InventoryOrderID>000206281</InventoryOrderID>
+    <DeliveryDate>2026-08-14T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394381</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030038</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 192 Gebouw W 74142 Madrid Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Automatisch Meetset Basic</Note>
+    <MultiComponentItemID>CJ191323</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 192 Gebouw W 74142 Madrid Spain</DlvAddress>
+    <DlvStreet>Kanaalweg 192 Gebouw W</DlvStreet>
+    <DlvZipCode>74142</DlvZipCode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCountry>Madrid</DlvCountry>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394380</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000038</RouteID>
+    <Qty>8.000000000000</Qty>
+    <ItemID>VP258289</ItemID>
+    <InventoryOrderID>000206282</InventoryOrderID>
+    <DeliveryDate>2026-08-14T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394382</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030038</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 192 Gebouw W 74142 Madrid Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Premium Omvormer Pro</Note>
+    <MultiComponentItemID>VP258289</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 192 Gebouw W 74142 Madrid Spain</DlvAddress>
+    <DlvStreet>Kanaalweg 192 Gebouw W</DlvStreet>
+    <DlvZipCode>74142</DlvZipCode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCountry>Madrid</DlvCountry>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394380</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000038</RouteID>
+    <Qty>52.000000000000</Qty>
+    <ItemID>MP559950</ItemID>
+    <InventoryOrderID>000206283</InventoryOrderID>
+    <DeliveryDate>2026-08-14T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394383</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030038</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 192 Gebouw W 74142 Madrid Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Digitaal Lader Kit</Note>
+    <MultiComponentItemID>MP559950</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 192 Gebouw W 74142 Madrid Spain</DlvAddress>
+    <DlvStreet>Kanaalweg 192 Gebouw W</DlvStreet>
+    <DlvZipCode>74142</DlvZipCode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCountry>Madrid</DlvCountry>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394380</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

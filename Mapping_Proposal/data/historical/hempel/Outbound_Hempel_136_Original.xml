@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120136</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22136</CustomerNumber>
+    <DeliveryAddress>Dorpsstraat 165 Bus 8 14820 Bologna Italy</DeliveryAddress>
+    <ShipmentName />
+    <Name>Leroy Supply</Name>
+    <WarehouseID>IT20</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-18T08:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Dorpsstraat 165 Bus 8</DlvStreet>
+    <DlvZipcode>14820</DlvZipcode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCounty>Bologna</DlvCounty>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <Recipient>Adam Leroy</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706136</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000136</RouteID>
+    <Qty>84.000000000000</Qty>
+    <ItemID>VT147670</ItemID>
+    <InventoryOrderID>000207261</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395361</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030136</InventTransRefID>
+    <DeliveryAdress>Dorpsstraat 165 Bus 8 14820 Bologna Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Premium Terminal X2</Note>
+    <MultiComponentItemID>VT147670</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Dorpsstraat 165 Bus 8 14820 Bologna Italy</DlvAddress>
+    <DlvStreet>Dorpsstraat 165 Bus 8</DlvStreet>
+    <DlvZipCode>14820</DlvZipCode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCountry>Bologna</DlvCountry>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395360</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000136</RouteID>
+    <Qty>73.000000000000</Qty>
+    <ItemID>RM209745</ItemID>
+    <InventoryOrderID>000207262</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395362</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030136</InventTransRefID>
+    <DeliveryAdress>Dorpsstraat 165 Bus 8 14820 Bologna Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Precisie Paneel Plus</Note>
+    <MultiComponentItemID>RM209745</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Dorpsstraat 165 Bus 8 14820 Bologna Italy</DlvAddress>
+    <DlvStreet>Dorpsstraat 165 Bus 8</DlvStreet>
+    <DlvZipCode>14820</DlvZipCode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCountry>Bologna</DlvCountry>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395360</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000136</RouteID>
+    <Qty>53.000000000000</Qty>
+    <ItemID>KF153246</ItemID>
+    <InventoryOrderID>000207263</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395363</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030136</InventTransRefID>
+    <DeliveryAdress>Dorpsstraat 165 Bus 8 14820 Bologna Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Eco Ventiel X1</Note>
+    <MultiComponentItemID>KF153246</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Dorpsstraat 165 Bus 8 14820 Bologna Italy</DlvAddress>
+    <DlvStreet>Dorpsstraat 165 Bus 8</DlvStreet>
+    <DlvZipCode>14820</DlvZipCode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCountry>Bologna</DlvCountry>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395360</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000136</RouteID>
+    <Qty>30.000000000000</Qty>
+    <ItemID>LI953172</ItemID>
+    <InventoryOrderID>000207264</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395364</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030136</InventTransRefID>
+    <DeliveryAdress>Dorpsstraat 165 Bus 8 14820 Bologna Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Digitaal Controller Max</Note>
+    <MultiComponentItemID>LI953172</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Dorpsstraat 165 Bus 8 14820 Bologna Italy</DlvAddress>
+    <DlvStreet>Dorpsstraat 165 Bus 8</DlvStreet>
+    <DlvZipCode>14820</DlvZipCode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCountry>Bologna</DlvCountry>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395360</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000136</RouteID>
+    <Qty>69.000000000000</Qty>
+    <ItemID>II790218</ItemID>
+    <InventoryOrderID>000207265</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395365</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030136</InventTransRefID>
+    <DeliveryAdress>Dorpsstraat 165 Bus 8 14820 Bologna Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Universeel Omvormer Plus</Note>
+    <MultiComponentItemID>II790218</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Dorpsstraat 165 Bus 8 14820 Bologna Italy</DlvAddress>
+    <DlvStreet>Dorpsstraat 165 Bus 8</DlvStreet>
+    <DlvZipCode>14820</DlvZipCode>
+    <DlvCity>Bologna</DlvCity>
+    <DlvCountry>Bologna</DlvCountry>
+    <DlvState>Bologna</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1395360</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

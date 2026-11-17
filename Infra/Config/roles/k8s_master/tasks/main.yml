@@ -1,0 +1,40 @@
+---
+# ==============================================================================
+# ROLE TASKS ENTRYPOINT: k8s_master
+# ==============================================================================
+
+- name: Initialize Kubernetes Control Plane with kubeadm
+  ansible.builtin.import_tasks: init.yml
+  tags:
+    - k8s
+    - k8s_master
+    - k8s_init
+
+- name: Configure kubeconfig for root and administrative users
+  ansible.builtin.import_tasks: kubeconfig.yml
+  tags:
+    - k8s
+    - k8s_master
+    - kubeconfig
+
+- name: Deploy CNI cluster networking plugin
+  ansible.builtin.import_tasks: cni.yml
+  tags:
+    - k8s
+    - k8s_master
+    - cni
+
+- name: Install Helm package manager on Control Plane
+  ansible.builtin.import_tasks: helm.yml
+  tags:
+    - k8s
+    - k8s_master
+    - helm
+
+- name: Generate cluster join command for worker nodes
+  ansible.builtin.import_tasks: join_token.yml
+  tags:
+    - k8s
+    - k8s_master
+    - k8s_worker
+    - join_token

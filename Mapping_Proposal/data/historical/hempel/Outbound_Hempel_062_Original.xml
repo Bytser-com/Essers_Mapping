@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120062</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22062</CustomerNumber>
+    <DeliveryAddress>Veldweg 297 Gebouw L 88899 Keulen Germany</DeliveryAddress>
+    <ShipmentName />
+    <Name>Muller Trading</Name>
+    <WarehouseID>DE20</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-09T02:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Veldweg 297 Gebouw L</DlvStreet>
+    <DlvZipcode>88899</DlvZipcode>
+    <DlvCity>Keulen</DlvCity>
+    <DlvCounty>Keulen</DlvCounty>
+    <DlvState>Keulen</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <Recipient>Lucas Muller</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706062</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000062</RouteID>
+    <Qty>39.000000000000</Qty>
+    <ItemID>CB881402</ItemID>
+    <InventoryOrderID>000206521</InventoryOrderID>
+    <DeliveryDate>2026-08-17T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394621</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030062</InventTransRefID>
+    <DeliveryAdress>Veldweg 297 Gebouw L 88899 Keulen Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Precisie Filter Kit</Note>
+    <MultiComponentItemID>CB881402</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 297 Gebouw L 88899 Keulen Germany</DlvAddress>
+    <DlvStreet>Veldweg 297 Gebouw L</DlvStreet>
+    <DlvZipCode>88899</DlvZipCode>
+    <DlvCity>Keulen</DlvCity>
+    <DlvCountry>Keulen</DlvCountry>
+    <DlvState>Keulen</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394620</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000062</RouteID>
+    <Qty>30.000000000000</Qty>
+    <ItemID>VL001652</ItemID>
+    <InventoryOrderID>000206522</InventoryOrderID>
+    <DeliveryDate>2026-08-17T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394622</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030062</InventTransRefID>
+    <DeliveryAdress>Veldweg 297 Gebouw L 88899 Keulen Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Professioneel Beugel Set</Note>
+    <MultiComponentItemID>VL001652</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 297 Gebouw L 88899 Keulen Germany</DlvAddress>
+    <DlvStreet>Veldweg 297 Gebouw L</DlvStreet>
+    <DlvZipCode>88899</DlvZipCode>
+    <DlvCity>Keulen</DlvCity>
+    <DlvCountry>Keulen</DlvCountry>
+    <DlvState>Keulen</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394620</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000062</RouteID>
+    <Qty>12.000000000000</Qty>
+    <ItemID>UE253935</ItemID>
+    <InventoryOrderID>000206523</InventoryOrderID>
+    <DeliveryDate>2026-08-17T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394623</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030062</InventTransRefID>
+    <DeliveryAdress>Veldweg 297 Gebouw L 88899 Keulen Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Robuust Module Max</Note>
+    <MultiComponentItemID>UE253935</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 297 Gebouw L 88899 Keulen Germany</DlvAddress>
+    <DlvStreet>Veldweg 297 Gebouw L</DlvStreet>
+    <DlvZipCode>88899</DlvZipCode>
+    <DlvCity>Keulen</DlvCity>
+    <DlvCountry>Keulen</DlvCountry>
+    <DlvState>Keulen</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394620</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120066</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22066</CustomerNumber>
+    <DeliveryAddress>Bosweg 101 27338 Madrid Spain</DeliveryAddress>
+    <ShipmentName />
+    <Name>Schmidt Logistics</Name>
+    <WarehouseID>ES30</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-09T14:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Bosweg 101</DlvStreet>
+    <DlvZipcode>27338</DlvZipcode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCounty>Madrid</DlvCounty>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <Recipient>Sofia Schmidt</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706066</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000066</RouteID>
+    <Qty>30.000000000000</Qty>
+    <ItemID>PT793500</ItemID>
+    <InventoryOrderID>000206561</InventoryOrderID>
+    <DeliveryDate>2026-08-13T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394661</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030066</InventTransRefID>
+    <DeliveryAdress>Bosweg 101 27338 Madrid Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Industrieel Connector Set</Note>
+    <MultiComponentItemID>PT793500</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 101 27338 Madrid Spain</DlvAddress>
+    <DlvStreet>Bosweg 101</DlvStreet>
+    <DlvZipCode>27338</DlvZipCode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCountry>Madrid</DlvCountry>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394660</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000066</RouteID>
+    <Qty>45.000000000000</Qty>
+    <ItemID>MV783354</ItemID>
+    <InventoryOrderID>000206562</InventoryOrderID>
+    <DeliveryDate>2026-08-13T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394662</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030066</InventTransRefID>
+    <DeliveryAdress>Bosweg 101 27338 Madrid Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Modulair Kabel Set</Note>
+    <MultiComponentItemID>MV783354</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 101 27338 Madrid Spain</DlvAddress>
+    <DlvStreet>Bosweg 101</DlvStreet>
+    <DlvZipCode>27338</DlvZipCode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCountry>Madrid</DlvCountry>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394660</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000066</RouteID>
+    <Qty>48.000000000000</Qty>
+    <ItemID>GW877339</ItemID>
+    <InventoryOrderID>000206563</InventoryOrderID>
+    <DeliveryDate>2026-08-13T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394663</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030066</InventTransRefID>
+    <DeliveryAdress>Bosweg 101 27338 Madrid Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Mobiel Lader Basic</Note>
+    <MultiComponentItemID>GW877339</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 101 27338 Madrid Spain</DlvAddress>
+    <DlvStreet>Bosweg 101</DlvStreet>
+    <DlvZipCode>27338</DlvZipCode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCountry>Madrid</DlvCountry>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1394660</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

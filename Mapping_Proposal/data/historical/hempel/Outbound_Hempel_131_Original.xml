@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120131</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22131</CustomerNumber>
+    <DeliveryAddress>Molenweg 129 Afdeling 3 23035 Luxemburg Luxembourg</DeliveryAddress>
+    <ShipmentName />
+    <Name>Goossens Services</Name>
+    <WarehouseID>LU10</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-17T17:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Molenweg 129 Afdeling 3</DlvStreet>
+    <DlvZipcode>23035</DlvZipcode>
+    <DlvCity>Luxemburg</DlvCity>
+    <DlvCounty>Luxemburg</DlvCounty>
+    <DlvState>Luxemburg</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <Recipient>Mila Goossens</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706131</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000131</RouteID>
+    <Qty>65.000000000000</Qty>
+    <ItemID>JG420566</ItemID>
+    <InventoryOrderID>000207211</InventoryOrderID>
+    <DeliveryDate>2026-08-22T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395311</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030131</InventTransRefID>
+    <DeliveryAdress>Molenweg 129 Afdeling 3 23035 Luxemburg Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Industrieel Filter Set</Note>
+    <MultiComponentItemID>JG420566</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 129 Afdeling 3 23035 Luxemburg Luxembourg</DlvAddress>
+    <DlvStreet>Molenweg 129 Afdeling 3</DlvStreet>
+    <DlvZipCode>23035</DlvZipCode>
+    <DlvCity>Luxemburg</DlvCity>
+    <DlvCountry>Luxemburg</DlvCountry>
+    <DlvState>Luxemburg</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1395310</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000131</RouteID>
+    <Qty>31.000000000000</Qty>
+    <ItemID>TA179917</ItemID>
+    <InventoryOrderID>000207212</InventoryOrderID>
+    <DeliveryDate>2026-08-22T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395312</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030131</InventTransRefID>
+    <DeliveryAdress>Molenweg 129 Afdeling 3 23035 Luxemburg Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Duurzaam Afdichting Mini</Note>
+    <MultiComponentItemID>TA179917</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 129 Afdeling 3 23035 Luxemburg Luxembourg</DlvAddress>
+    <DlvStreet>Molenweg 129 Afdeling 3</DlvStreet>
+    <DlvZipCode>23035</DlvZipCode>
+    <DlvCity>Luxemburg</DlvCity>
+    <DlvCountry>Luxemburg</DlvCountry>
+    <DlvState>Luxemburg</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1395310</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000131</RouteID>
+    <Qty>13.000000000000</Qty>
+    <ItemID>FT484450</ItemID>
+    <InventoryOrderID>000207213</InventoryOrderID>
+    <DeliveryDate>2026-08-22T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395313</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030131</InventTransRefID>
+    <DeliveryAdress>Molenweg 129 Afdeling 3 23035 Luxemburg Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Precisie Afdichting Kit</Note>
+    <MultiComponentItemID>FT484450</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 129 Afdeling 3 23035 Luxemburg Luxembourg</DlvAddress>
+    <DlvStreet>Molenweg 129 Afdeling 3</DlvStreet>
+    <DlvZipCode>23035</DlvZipCode>
+    <DlvCity>Luxemburg</DlvCity>
+    <DlvCountry>Luxemburg</DlvCountry>
+    <DlvState>Luxemburg</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1395310</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000131</RouteID>
+    <Qty>95.000000000000</Qty>
+    <ItemID>SD941083</ItemID>
+    <InventoryOrderID>000207214</InventoryOrderID>
+    <DeliveryDate>2026-08-22T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395314</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030131</InventTransRefID>
+    <DeliveryAdress>Molenweg 129 Afdeling 3 23035 Luxemburg Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Duurzaam Motor Kit</Note>
+    <MultiComponentItemID>SD941083</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 129 Afdeling 3 23035 Luxemburg Luxembourg</DlvAddress>
+    <DlvStreet>Molenweg 129 Afdeling 3</DlvStreet>
+    <DlvZipCode>23035</DlvZipCode>
+    <DlvCity>Luxemburg</DlvCity>
+    <DlvCountry>Luxemburg</DlvCountry>
+    <DlvState>Luxemburg</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1395310</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

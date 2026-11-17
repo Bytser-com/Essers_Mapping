@@ -1,0 +1,13 @@
+---
+galaxy_info:
+  role_name: k8s_worker
+  author: Essers Infrastructure Team
+  description: Joins Kubernetes worker nodes to the Control Plane and applies node role/environment labels
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Debian
+      versions:
+        - trixie
+        - bookworm
+dependencies: []

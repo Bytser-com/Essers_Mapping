@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120068</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22068</CustomerNumber>
+    <DeliveryAddress>Kerkstraat 122 22361 Brussel Belgium</DeliveryAddress>
+    <ShipmentName />
+    <Name>Visser Industries</Name>
+    <WarehouseID>BE10</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-09T20:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kerkstraat 122</DlvStreet>
+    <DlvZipcode>22361</DlvZipcode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCounty>Brussel</DlvCounty>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <Recipient>Sara Visser</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706068</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000068</RouteID>
+    <Qty>13.000000000000</Qty>
+    <ItemID>ST712664</ItemID>
+    <InventoryOrderID>000206581</InventoryOrderID>
+    <DeliveryDate>2026-08-15T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394681</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030068</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 122 22361 Brussel Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Robuust Paneel Max</Note>
+    <MultiComponentItemID>ST712664</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 122 22361 Brussel Belgium</DlvAddress>
+    <DlvStreet>Kerkstraat 122</DlvStreet>
+    <DlvZipCode>22361</DlvZipCode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCountry>Brussel</DlvCountry>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394680</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000068</RouteID>
+    <Qty>32.000000000000</Qty>
+    <ItemID>XQ052919</ItemID>
+    <InventoryOrderID>000206582</InventoryOrderID>
+    <DeliveryDate>2026-08-15T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394682</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030068</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 122 22361 Brussel Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Industrieel Pomp Set</Note>
+    <MultiComponentItemID>XQ052919</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 122 22361 Brussel Belgium</DlvAddress>
+    <DlvStreet>Kerkstraat 122</DlvStreet>
+    <DlvZipCode>22361</DlvZipCode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCountry>Brussel</DlvCountry>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394680</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000068</RouteID>
+    <Qty>28.000000000000</Qty>
+    <ItemID>FS056014</ItemID>
+    <InventoryOrderID>000206583</InventoryOrderID>
+    <DeliveryDate>2026-08-15T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394683</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030068</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 122 22361 Brussel Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Mobiel Controller Set</Note>
+    <MultiComponentItemID>FS056014</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 122 22361 Brussel Belgium</DlvAddress>
+    <DlvStreet>Kerkstraat 122</DlvStreet>
+    <DlvZipCode>22361</DlvZipCode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCountry>Brussel</DlvCountry>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394680</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000068</RouteID>
+    <Qty>70.000000000000</Qty>
+    <ItemID>SO106299</ItemID>
+    <InventoryOrderID>000206584</InventoryOrderID>
+    <DeliveryDate>2026-08-15T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394684</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030068</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 122 22361 Brussel Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Slim Beugel Set</Note>
+    <MultiComponentItemID>SO106299</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 122 22361 Brussel Belgium</DlvAddress>
+    <DlvStreet>Kerkstraat 122</DlvStreet>
+    <DlvZipCode>22361</DlvZipCode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCountry>Brussel</DlvCountry>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394680</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000068</RouteID>
+    <Qty>76.000000000000</Qty>
+    <ItemID>CK382707</ItemID>
+    <InventoryOrderID>000206585</InventoryOrderID>
+    <DeliveryDate>2026-08-15T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394685</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030068</InventTransRefID>
+    <DeliveryAdress>Kerkstraat 122 22361 Brussel Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Ergonomisch Kabel Set</Note>
+    <MultiComponentItemID>CK382707</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kerkstraat 122 22361 Brussel Belgium</DlvAddress>
+    <DlvStreet>Kerkstraat 122</DlvStreet>
+    <DlvZipCode>22361</DlvZipCode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCountry>Brussel</DlvCountry>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394680</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

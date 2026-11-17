@@ -1,0 +1,25 @@
+---
+# ==============================================================================
+# ROLE TASKS ENTRYPOINT: containerd
+# ==============================================================================
+
+- name: Disable swap memory for Kubernetes kubelet compatibility
+  ansible.builtin.import_tasks: swap.yml
+  tags:
+    - containerd
+    - k8s
+    - swap
+
+- name: Configure kernel modules and sysctl networking prerequisites
+  ansible.builtin.import_tasks: kernel.yml
+  tags:
+    - containerd
+    - k8s
+    - kernel
+
+- name: Install and configure containerd CRI runtime
+  ansible.builtin.import_tasks: install.yml
+  tags:
+    - containerd
+    - k8s
+    - runtime

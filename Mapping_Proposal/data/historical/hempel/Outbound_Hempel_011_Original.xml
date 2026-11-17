@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120011</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22011</CustomerNumber>
+    <DeliveryAddress>Nieuwstraat 102 Gebouw U 48809 Brussel Belgium</DeliveryAddress>
+    <ShipmentName />
+    <Name>Mertens Consulting</Name>
+    <WarehouseID>BE10</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-02T17:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Nieuwstraat 102 Gebouw U</DlvStreet>
+    <DlvZipcode>48809</DlvZipcode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCounty>Brussel</DlvCounty>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <Recipient>Arthur Mertens</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706011</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000011</RouteID>
+    <Qty>91.000000000000</Qty>
+    <ItemID>QM718469</ItemID>
+    <InventoryOrderID>000206011</InventoryOrderID>
+    <DeliveryDate>2026-08-07T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394111</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030011</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 102 Gebouw U 48809 Brussel Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Flexibel Connector X1</Note>
+    <MultiComponentItemID>QM718469</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 102 Gebouw U 48809 Brussel Belgium</DlvAddress>
+    <DlvStreet>Nieuwstraat 102 Gebouw U</DlvStreet>
+    <DlvZipCode>48809</DlvZipCode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCountry>Brussel</DlvCountry>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394110</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000011</RouteID>
+    <Qty>13.000000000000</Qty>
+    <ItemID>PJ543141</ItemID>
+    <InventoryOrderID>000206012</InventoryOrderID>
+    <DeliveryDate>2026-08-07T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394112</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030011</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 102 Gebouw U 48809 Brussel Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Automatisch Adapter X2</Note>
+    <MultiComponentItemID>PJ543141</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 102 Gebouw U 48809 Brussel Belgium</DlvAddress>
+    <DlvStreet>Nieuwstraat 102 Gebouw U</DlvStreet>
+    <DlvZipCode>48809</DlvZipCode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCountry>Brussel</DlvCountry>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394110</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000011</RouteID>
+    <Qty>47.000000000000</Qty>
+    <ItemID>FK969425</ItemID>
+    <InventoryOrderID>000206013</InventoryOrderID>
+    <DeliveryDate>2026-08-07T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394113</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030011</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 102 Gebouw U 48809 Brussel Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Sterk Kabel Max</Note>
+    <MultiComponentItemID>FK969425</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 102 Gebouw U 48809 Brussel Belgium</DlvAddress>
+    <DlvStreet>Nieuwstraat 102 Gebouw U</DlvStreet>
+    <DlvZipCode>48809</DlvZipCode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCountry>Brussel</DlvCountry>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394110</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000011</RouteID>
+    <Qty>59.000000000000</Qty>
+    <ItemID>PB305971</ItemID>
+    <InventoryOrderID>000206014</InventoryOrderID>
+    <DeliveryDate>2026-08-07T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394114</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030011</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 102 Gebouw U 48809 Brussel Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Snel Afdichting X2</Note>
+    <MultiComponentItemID>PB305971</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 102 Gebouw U 48809 Brussel Belgium</DlvAddress>
+    <DlvStreet>Nieuwstraat 102 Gebouw U</DlvStreet>
+    <DlvZipCode>48809</DlvZipCode>
+    <DlvCity>Brussel</DlvCity>
+    <DlvCountry>Brussel</DlvCountry>
+    <DlvState>Brussel</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1394110</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

@@ -1,0 +1,54 @@
+# ==============================================================================
+# LONGHORN HELM VALUES — TUNED FOR 1-WORKER NODE (8 vCPU / 8GB RAM / 128GB DISK)
+# ==============================================================================
+# Install via Helm from your Bastion / Runner VM:
+#   helm repo add longhorn https://charts.longhorn.io
+#   helm repo update
+#   helm upgrade --install longhorn longhorn/longhorn \
+#     --namespace longhorn-system --create-namespace \
+#     -f Kubernetes/cluster-addons/longhorn/values-single-worker.yaml
+# ==============================================================================
+
+defaultSettings:
+  # CRITICAL FOR 1-WORKER CLUSTER:
+  # Default is 3 replicas across 3 nodes. On a single worker node, setting this to 1
+  # prevents volumes from staying in 'Degraded' state and saves 66% disk & I/O overhead!
+  defaultReplicaCount: 1
+
+  # Reserve 15% of the 128GB disk (~19GB) for Debian OS, containerd images & kubelet
+  storageMinimalAvailablePercentage: 15
+
+  # Allow scheduling even when PVCs request large virtual sizes (thin provisioning)
+  storageOverProvisioningPercentage: 200
+
+  # Keep CPU/RAM footprint low on the 8GB RAM worker node
+  guaranteedInstanceManagerCPU: 5
+
+persistence:
+  defaultClass: true
+  defaultFsType: ext4
+  # Single replica for single-worker cluster (increase to 2 or 3 if you add more Worker VMs later)
+  defaultClassReplicaCount: 1
+  reclaimPolicy: Retain
+
+# Reduce Longhorn UI replica count from 2 to 1 to save RAM on a single-worker cluster
+longhornUI:
+  replicas: 1
+
+longhornManager:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+longhornDriver:
+  resources:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi

@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120149</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22149</CustomerNumber>
+    <DeliveryAddress>Parklaan 114 Bus 22 14296 Esch-sur-Alzette Luxembourg</DeliveryAddress>
+    <ShipmentName />
+    <Name>Schmidt Technics</Name>
+    <WarehouseID>LU10</WarehouseID>
+    <CompanyID>E223</CompanyID>
+    <PublishedByAX>2026-08-19T23:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Parklaan 114 Bus 22</DlvStreet>
+    <DlvZipcode>14296</DlvZipcode>
+    <DlvCity>Esch-sur-Alzette</DlvCity>
+    <DlvCounty>Esch-sur-Alzette</DlvCounty>
+    <DlvState>Esch-sur-Alzette</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <Recipient>Yara Schmidt</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706149</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000149</RouteID>
+    <Qty>24.000000000000</Qty>
+    <ItemID>GW111649</ItemID>
+    <InventoryOrderID>000207391</InventoryOrderID>
+    <DeliveryDate>2026-08-26T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395491</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030149</InventTransRefID>
+    <DeliveryAdress>Parklaan 114 Bus 22 14296 Esch-sur-Alzette Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Eco Controller Plus</Note>
+    <MultiComponentItemID>GW111649</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Parklaan 114 Bus 22 14296 Esch-sur-Alzette Luxembourg</DlvAddress>
+    <DlvStreet>Parklaan 114 Bus 22</DlvStreet>
+    <DlvZipCode>14296</DlvZipCode>
+    <DlvCity>Esch-sur-Alzette</DlvCity>
+    <DlvCountry>Esch-sur-Alzette</DlvCountry>
+    <DlvState>Esch-sur-Alzette</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1395490</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000149</RouteID>
+    <Qty>21.000000000000</Qty>
+    <ItemID>FG301382</ItemID>
+    <InventoryOrderID>000207392</InventoryOrderID>
+    <DeliveryDate>2026-08-26T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395492</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030149</InventTransRefID>
+    <DeliveryAdress>Parklaan 114 Bus 22 14296 Esch-sur-Alzette Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Universeel Paneel Set</Note>
+    <MultiComponentItemID>FG301382</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Parklaan 114 Bus 22 14296 Esch-sur-Alzette Luxembourg</DlvAddress>
+    <DlvStreet>Parklaan 114 Bus 22</DlvStreet>
+    <DlvZipCode>14296</DlvZipCode>
+    <DlvCity>Esch-sur-Alzette</DlvCity>
+    <DlvCountry>Esch-sur-Alzette</DlvCountry>
+    <DlvState>Esch-sur-Alzette</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1395490</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

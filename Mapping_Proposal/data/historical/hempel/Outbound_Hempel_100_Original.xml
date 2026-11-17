@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120100</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22100</CustomerNumber>
+    <DeliveryAddress>Schoolstraat 195 73867 Lissabon Portugal</DeliveryAddress>
+    <ShipmentName />
+    <Name>Peeters Consulting</Name>
+    <WarehouseID>PT10</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-13T20:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Schoolstraat 195</DlvStreet>
+    <DlvZipcode>73867</DlvZipcode>
+    <DlvCity>Lissabon</DlvCity>
+    <DlvCounty>Lissabon</DlvCounty>
+    <DlvState>Lissabon</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <Recipient>Sara Peeters</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706100</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000100</RouteID>
+    <Qty>44.000000000000</Qty>
+    <ItemID>HB528294</ItemID>
+    <InventoryOrderID>000206901</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395001</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030100</InventTransRefID>
+    <DeliveryAdress>Schoolstraat 195 73867 Lissabon Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Modulair Filter Basic</Note>
+    <MultiComponentItemID>HB528294</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Schoolstraat 195 73867 Lissabon Portugal</DlvAddress>
+    <DlvStreet>Schoolstraat 195</DlvStreet>
+    <DlvZipCode>73867</DlvZipCode>
+    <DlvCity>Lissabon</DlvCity>
+    <DlvCountry>Lissabon</DlvCountry>
+    <DlvState>Lissabon</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395000</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000100</RouteID>
+    <Qty>52.000000000000</Qty>
+    <ItemID>MM230317</ItemID>
+    <InventoryOrderID>000206902</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395002</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030100</InventTransRefID>
+    <DeliveryAdress>Schoolstraat 195 73867 Lissabon Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Modulair Meetset Plus</Note>
+    <MultiComponentItemID>MM230317</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Schoolstraat 195 73867 Lissabon Portugal</DlvAddress>
+    <DlvStreet>Schoolstraat 195</DlvStreet>
+    <DlvZipCode>73867</DlvZipCode>
+    <DlvCity>Lissabon</DlvCity>
+    <DlvCountry>Lissabon</DlvCountry>
+    <DlvState>Lissabon</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395000</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000100</RouteID>
+    <Qty>76.000000000000</Qty>
+    <ItemID>MF934147</ItemID>
+    <InventoryOrderID>000206903</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395003</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030100</InventTransRefID>
+    <DeliveryAdress>Schoolstraat 195 73867 Lissabon Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Modulair Paneel Plus</Note>
+    <MultiComponentItemID>MF934147</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Schoolstraat 195 73867 Lissabon Portugal</DlvAddress>
+    <DlvStreet>Schoolstraat 195</DlvStreet>
+    <DlvZipCode>73867</DlvZipCode>
+    <DlvCity>Lissabon</DlvCity>
+    <DlvCountry>Lissabon</DlvCountry>
+    <DlvState>Lissabon</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395000</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000100</RouteID>
+    <Qty>26.000000000000</Qty>
+    <ItemID>ZY129981</ItemID>
+    <InventoryOrderID>000206904</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395004</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030100</InventTransRefID>
+    <DeliveryAdress>Schoolstraat 195 73867 Lissabon Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Veilig Omvormer Mini</Note>
+    <MultiComponentItemID>ZY129981</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Schoolstraat 195 73867 Lissabon Portugal</DlvAddress>
+    <DlvStreet>Schoolstraat 195</DlvStreet>
+    <DlvZipCode>73867</DlvZipCode>
+    <DlvCity>Lissabon</DlvCity>
+    <DlvCountry>Lissabon</DlvCountry>
+    <DlvState>Lissabon</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395000</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000100</RouteID>
+    <Qty>25.000000000000</Qty>
+    <ItemID>FS056014</ItemID>
+    <InventoryOrderID>000206905</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395005</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030100</InventTransRefID>
+    <DeliveryAdress>Schoolstraat 195 73867 Lissabon Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Mobiel Controller Set</Note>
+    <MultiComponentItemID>FS056014</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Schoolstraat 195 73867 Lissabon Portugal</DlvAddress>
+    <DlvStreet>Schoolstraat 195</DlvStreet>
+    <DlvZipCode>73867</DlvZipCode>
+    <DlvCity>Lissabon</DlvCity>
+    <DlvCountry>Lissabon</DlvCountry>
+    <DlvState>Lissabon</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395000</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

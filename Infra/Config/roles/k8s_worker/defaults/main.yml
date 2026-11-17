@@ -1,0 +1,4 @@
+---
+# Role default variables for 'k8s_worker'
+k8s_worker_node_labels:
+  node-role.kubernetes.io/worker: "worker"

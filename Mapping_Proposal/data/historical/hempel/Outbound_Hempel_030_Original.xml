@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120030</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22030</CustomerNumber>
+    <DeliveryAddress>Bosweg 36 Unit 28 64686 Lissabon Portugal</DeliveryAddress>
+    <ShipmentName />
+    <Name>Leroy Supply</Name>
+    <WarehouseID>PT10</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-05T02:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Bosweg 36 Unit 28</DlvStreet>
+    <DlvZipcode>64686</DlvZipcode>
+    <DlvCity>Lissabon</DlvCity>
+    <DlvCounty>Lissabon</DlvCounty>
+    <DlvState>Lissabon</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <Recipient>Sara Leroy</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706030</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000030</RouteID>
+    <Qty>76.000000000000</Qty>
+    <ItemID>ZM090224</ItemID>
+    <InventoryOrderID>000206201</InventoryOrderID>
+    <DeliveryDate>2026-08-13T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394301</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030030</InventTransRefID>
+    <DeliveryAdress>Bosweg 36 Unit 28 64686 Lissabon Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Modulair Sensor Plus</Note>
+    <MultiComponentItemID>ZM090224</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 36 Unit 28 64686 Lissabon Portugal</DlvAddress>
+    <DlvStreet>Bosweg 36 Unit 28</DlvStreet>
+    <DlvZipCode>64686</DlvZipCode>
+    <DlvCity>Lissabon</DlvCity>
+    <DlvCountry>Lissabon</DlvCountry>
+    <DlvState>Lissabon</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1394300</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000030</RouteID>
+    <Qty>60.000000000000</Qty>
+    <ItemID>VP258289</ItemID>
+    <InventoryOrderID>000206202</InventoryOrderID>
+    <DeliveryDate>2026-08-13T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394302</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030030</InventTransRefID>
+    <DeliveryAdress>Bosweg 36 Unit 28 64686 Lissabon Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Premium Omvormer Pro</Note>
+    <MultiComponentItemID>VP258289</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 36 Unit 28 64686 Lissabon Portugal</DlvAddress>
+    <DlvStreet>Bosweg 36 Unit 28</DlvStreet>
+    <DlvZipCode>64686</DlvZipCode>
+    <DlvCity>Lissabon</DlvCity>
+    <DlvCountry>Lissabon</DlvCountry>
+    <DlvState>Lissabon</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1394300</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000030</RouteID>
+    <Qty>70.000000000000</Qty>
+    <ItemID>UJ687021</ItemID>
+    <InventoryOrderID>000206203</InventoryOrderID>
+    <DeliveryDate>2026-08-13T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394303</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030030</InventTransRefID>
+    <DeliveryAdress>Bosweg 36 Unit 28 64686 Lissabon Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Veilig Filter Kit</Note>
+    <MultiComponentItemID>UJ687021</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 36 Unit 28 64686 Lissabon Portugal</DlvAddress>
+    <DlvStreet>Bosweg 36 Unit 28</DlvStreet>
+    <DlvZipCode>64686</DlvZipCode>
+    <DlvCity>Lissabon</DlvCity>
+    <DlvCountry>Lissabon</DlvCountry>
+    <DlvState>Lissabon</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1394300</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

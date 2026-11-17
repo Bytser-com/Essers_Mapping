@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120022</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22022</CustomerNumber>
+    <DeliveryAddress>Bosweg 72 Afdeling 6 52064 Essen Germany</DeliveryAddress>
+    <ShipmentName />
+    <Name>Simon Solutions</Name>
+    <WarehouseID>DE20</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-04T02:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Bosweg 72 Afdeling 6</DlvStreet>
+    <DlvZipcode>52064</DlvZipcode>
+    <DlvCity>Essen</DlvCity>
+    <DlvCounty>Essen</DlvCounty>
+    <DlvState>Essen</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <Recipient>Amelie Simon</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706022</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000022</RouteID>
+    <Qty>43.000000000000</Qty>
+    <ItemID>FG853367</ItemID>
+    <InventoryOrderID>000206121</InventoryOrderID>
+    <DeliveryDate>2026-08-12T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394221</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030022</InventTransRefID>
+    <DeliveryAdress>Bosweg 72 Afdeling 6 52064 Essen Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Snel Paneel Basic</Note>
+    <MultiComponentItemID>FG853367</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 72 Afdeling 6 52064 Essen Germany</DlvAddress>
+    <DlvStreet>Bosweg 72 Afdeling 6</DlvStreet>
+    <DlvZipCode>52064</DlvZipCode>
+    <DlvCity>Essen</DlvCity>
+    <DlvCountry>Essen</DlvCountry>
+    <DlvState>Essen</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394220</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000022</RouteID>
+    <Qty>76.000000000000</Qty>
+    <ItemID>JM382882</ItemID>
+    <InventoryOrderID>000206122</InventoryOrderID>
+    <DeliveryDate>2026-08-12T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394222</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030022</InventTransRefID>
+    <DeliveryAdress>Bosweg 72 Afdeling 6 52064 Essen Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Flexibel Schakelaar Kit</Note>
+    <MultiComponentItemID>JM382882</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 72 Afdeling 6 52064 Essen Germany</DlvAddress>
+    <DlvStreet>Bosweg 72 Afdeling 6</DlvStreet>
+    <DlvZipCode>52064</DlvZipCode>
+    <DlvCity>Essen</DlvCity>
+    <DlvCountry>Essen</DlvCountry>
+    <DlvState>Essen</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394220</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000022</RouteID>
+    <Qty>1.000000000000</Qty>
+    <ItemID>ZA225708</ItemID>
+    <InventoryOrderID>000206123</InventoryOrderID>
+    <DeliveryDate>2026-08-12T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394223</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030022</InventTransRefID>
+    <DeliveryAdress>Bosweg 72 Afdeling 6 52064 Essen Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Modulair Pomp Plus</Note>
+    <MultiComponentItemID>ZA225708</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 72 Afdeling 6 52064 Essen Germany</DlvAddress>
+    <DlvStreet>Bosweg 72 Afdeling 6</DlvStreet>
+    <DlvZipCode>52064</DlvZipCode>
+    <DlvCity>Essen</DlvCity>
+    <DlvCountry>Essen</DlvCountry>
+    <DlvState>Essen</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1394220</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

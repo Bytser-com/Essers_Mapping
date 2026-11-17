@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120053</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22053</CustomerNumber>
+    <DeliveryAddress>Ringlaan 192 Unit 5 91823 Dudelange Luxembourg</DeliveryAddress>
+    <ShipmentName />
+    <Name>Martin Logistics</Name>
+    <WarehouseID>LU10</WarehouseID>
+    <CompanyID>E223</CompanyID>
+    <PublishedByAX>2026-08-07T23:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Ringlaan 192 Unit 5</DlvStreet>
+    <DlvZipcode>91823</DlvZipcode>
+    <DlvCity>Dudelange</DlvCity>
+    <DlvCounty>Dudelange</DlvCounty>
+    <DlvState>Dudelange</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <Recipient>Emma Martin</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706053</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000053</RouteID>
+    <Qty>77.000000000000</Qty>
+    <ItemID>CB112982</ItemID>
+    <InventoryOrderID>000206431</InventoryOrderID>
+    <DeliveryDate>2026-08-14T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394531</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030053</InventTransRefID>
+    <DeliveryAdress>Ringlaan 192 Unit 5 91823 Dudelange Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Mobiel Schakelaar X1</Note>
+    <MultiComponentItemID>CB112982</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 192 Unit 5 91823 Dudelange Luxembourg</DlvAddress>
+    <DlvStreet>Ringlaan 192 Unit 5</DlvStreet>
+    <DlvZipCode>91823</DlvZipCode>
+    <DlvCity>Dudelange</DlvCity>
+    <DlvCountry>Dudelange</DlvCountry>
+    <DlvState>Dudelange</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1394530</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000053</RouteID>
+    <Qty>27.000000000000</Qty>
+    <ItemID>KL754984</ItemID>
+    <InventoryOrderID>000206432</InventoryOrderID>
+    <DeliveryDate>2026-08-14T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394532</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030053</InventTransRefID>
+    <DeliveryAdress>Ringlaan 192 Unit 5 91823 Dudelange Luxembourg</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>LU10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Eco Ventiel X2</Note>
+    <MultiComponentItemID>KL754984</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 192 Unit 5 91823 Dudelange Luxembourg</DlvAddress>
+    <DlvStreet>Ringlaan 192 Unit 5</DlvStreet>
+    <DlvZipCode>91823</DlvZipCode>
+    <DlvCity>Dudelange</DlvCity>
+    <DlvCountry>Dudelange</DlvCountry>
+    <DlvState>Dudelange</DlvState>
+    <DlvCountryRegion>LUX</DlvCountryRegion>
+    <MultiComponentInventTransID>1394530</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

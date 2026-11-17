@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120105</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22105</CustomerNumber>
+    <DeliveryAddress>Ringlaan 162 Unit 20 14751 Essen Germany</DeliveryAddress>
+    <ShipmentName />
+    <Name>Maes Systems</Name>
+    <WarehouseID>DE20</WarehouseID>
+    <CompanyID>E223</CompanyID>
+    <PublishedByAX>2026-08-14T11:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Ringlaan 162 Unit 20</DlvStreet>
+    <DlvZipcode>14751</DlvZipcode>
+    <DlvCity>Essen</DlvCity>
+    <DlvCounty>Essen</DlvCounty>
+    <DlvState>Essen</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <Recipient>Nora Maes</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706105</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000105</RouteID>
+    <Qty>28.000000000000</Qty>
+    <ItemID>JO119261</ItemID>
+    <InventoryOrderID>000206951</InventoryOrderID>
+    <DeliveryDate>2026-08-17T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395051</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030105</InventTransRefID>
+    <DeliveryAdress>Ringlaan 162 Unit 20 14751 Essen Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Compact Adapter Mini</Note>
+    <MultiComponentItemID>JO119261</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 162 Unit 20 14751 Essen Germany</DlvAddress>
+    <DlvStreet>Ringlaan 162 Unit 20</DlvStreet>
+    <DlvZipCode>14751</DlvZipCode>
+    <DlvCity>Essen</DlvCity>
+    <DlvCountry>Essen</DlvCountry>
+    <DlvState>Essen</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1395050</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000105</RouteID>
+    <Qty>90.000000000000</Qty>
+    <ItemID>CJ191323</ItemID>
+    <InventoryOrderID>000206952</InventoryOrderID>
+    <DeliveryDate>2026-08-17T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395052</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030105</InventTransRefID>
+    <DeliveryAdress>Ringlaan 162 Unit 20 14751 Essen Germany</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>DE20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Automatisch Meetset Basic</Note>
+    <MultiComponentItemID>CJ191323</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 162 Unit 20 14751 Essen Germany</DlvAddress>
+    <DlvStreet>Ringlaan 162 Unit 20</DlvStreet>
+    <DlvZipCode>14751</DlvZipCode>
+    <DlvCity>Essen</DlvCity>
+    <DlvCountry>Essen</DlvCountry>
+    <DlvState>Essen</DlvState>
+    <DlvCountryRegion>DEU</DlvCountryRegion>
+    <MultiComponentInventTransID>1395050</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120130</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22130</CustomerNumber>
+    <DeliveryAddress>Marktplein 184 87810 Amsterdam Netherlands</DeliveryAddress>
+    <ShipmentName />
+    <Name>Muller Technics</Name>
+    <WarehouseID>NL20</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-17T14:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Marktplein 184</DlvStreet>
+    <DlvZipcode>87810</DlvZipcode>
+    <DlvCity>Amsterdam</DlvCity>
+    <DlvCounty>Amsterdam</DlvCounty>
+    <DlvState>Amsterdam</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <Recipient>Lina Muller</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706130</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000130</RouteID>
+    <Qty>49.000000000000</Qty>
+    <ItemID>KF381039</ItemID>
+    <InventoryOrderID>000207201</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395301</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030130</InventTransRefID>
+    <DeliveryAdress>Marktplein 184 87810 Amsterdam Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Sterk Meetset Kit</Note>
+    <MultiComponentItemID>KF381039</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 184 87810 Amsterdam Netherlands</DlvAddress>
+    <DlvStreet>Marktplein 184</DlvStreet>
+    <DlvZipCode>87810</DlvZipCode>
+    <DlvCity>Amsterdam</DlvCity>
+    <DlvCountry>Amsterdam</DlvCountry>
+    <DlvState>Amsterdam</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395300</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000130</RouteID>
+    <Qty>36.000000000000</Qty>
+    <ItemID>MF934147</ItemID>
+    <InventoryOrderID>000207202</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395302</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030130</InventTransRefID>
+    <DeliveryAdress>Marktplein 184 87810 Amsterdam Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Modulair Paneel Plus</Note>
+    <MultiComponentItemID>MF934147</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 184 87810 Amsterdam Netherlands</DlvAddress>
+    <DlvStreet>Marktplein 184</DlvStreet>
+    <DlvZipCode>87810</DlvZipCode>
+    <DlvCity>Amsterdam</DlvCity>
+    <DlvCountry>Amsterdam</DlvCountry>
+    <DlvState>Amsterdam</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395300</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>EXW</DeliveryTerms>
+    <DeliveryMode>EXP</DeliveryMode>
+    <RouteID>P000130</RouteID>
+    <Qty>77.000000000000</Qty>
+    <ItemID>KF153246</ItemID>
+    <InventoryOrderID>000207203</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395303</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030130</InventTransRefID>
+    <DeliveryAdress>Marktplein 184 87810 Amsterdam Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Eco Ventiel X1</Note>
+    <MultiComponentItemID>KF153246</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 184 87810 Amsterdam Netherlands</DlvAddress>
+    <DlvStreet>Marktplein 184</DlvStreet>
+    <DlvZipCode>87810</DlvZipCode>
+    <DlvCity>Amsterdam</DlvCity>
+    <DlvCountry>Amsterdam</DlvCountry>
+    <DlvState>Amsterdam</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395300</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

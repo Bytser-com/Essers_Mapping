@@ -1,0 +1,50 @@
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from 'vite'
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  // Local development: send /api/proposal/* and /api/proposals/* to the Mapping_Proposal backend
+  // (uvicorn on port 8000), like the frontend proxy does in Kubernetes.
+  server: {
+    host: true,
+    proxy: {
+      '/api/proposal': {
+        target: 'http://localhost:8000',
+        rewrite: (path) => path.replace(/^\/api\/proposal/, ''),
+      },
+      '/api/proposals': {
+        target: 'http://localhost:8000',
+        rewrite: (path) => (path === '/api/proposals' ? '/proposals' : path.replace(/^\/api\/proposals/, '')),
+      },
+      '/api/version-control': {
+        target: 'http://localhost:8085',
+        rewrite: (path) => path.replace(/^\/api\/version-control/, ''),
+      },
+    },
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.js'],
+    include: ['src/**/*.{test,spec}.{js,jsx,ts,tsx}'],
+    exclude: ['node_modules', 'dist', 'e2e/**'],
+    reporters: ['default', 'junit'],
+    outputFile: {
+      junit: './test-results/vitest-junit.xml',
+    },
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'lcov', 'clover', 'json-summary'],
+      reportsDirectory: './coverage',
+      include: ['src/**/*.{js,jsx,ts,tsx}'],
+      exclude: [
+        'src/main.{jsx,tsx}',
+        'src/test/**',
+        'src/__tests__/**',
+        'src/**/*.{test,spec}.{js,jsx,ts,tsx}',
+      ],
+    },
+  },
+})

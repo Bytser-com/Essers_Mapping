@@ -1,0 +1,31 @@
+# ==============================================================================
+# TESTING ENVIRONMENT: DEDICATED PUBLIC LOADBALANCER IPs & INGRESS PATCH
+#   - 192.168.100.101 -> ingress-nginx-controller (Ports 80, 443 -> frontend:8080)
+#   - 192.168.100.102 -> sftp-shared (Port 22, 8080)
+#   - 192.168.100.103 -> sftp-runtime (Port 22, 8080)
+# ==============================================================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: essers-frontend-ingress
+  annotations:
+    # Uses Let's Encrypt Staging via Cloudflare DNS-01 (avoids production rate limits during CI/CD test runs)
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sftp-shared
+  annotations:
+    metallb.io/loadBalancerIPs: "192.168.100.102"
+spec:
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sftp-runtime
+  annotations:
+    metallb.io/loadBalancerIPs: "192.168.100.103"
+spec:
+  type: LoadBalancer

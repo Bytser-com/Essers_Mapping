@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120034</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22034</CustomerNumber>
+    <DeliveryAddress>Nieuwstraat 105 30928 Porto Portugal</DeliveryAddress>
+    <ShipmentName />
+    <Name>Claes Technics</Name>
+    <WarehouseID>PT10</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-05T14:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Nieuwstraat 105</DlvStreet>
+    <DlvZipcode>30928</DlvZipcode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCounty>Porto</DlvCounty>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <Recipient>Adam Claes</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706034</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000034</RouteID>
+    <Qty>7.000000000000</Qty>
+    <ItemID>JM382882</ItemID>
+    <InventoryOrderID>000206241</InventoryOrderID>
+    <DeliveryDate>2026-08-09T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394341</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030034</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 105 30928 Porto Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Flexibel Schakelaar Kit</Note>
+    <MultiComponentItemID>JM382882</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 105 30928 Porto Portugal</DlvAddress>
+    <DlvStreet>Nieuwstraat 105</DlvStreet>
+    <DlvZipCode>30928</DlvZipCode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCountry>Porto</DlvCountry>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1394340</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000034</RouteID>
+    <Qty>2.000000000000</Qty>
+    <ItemID>BQ787317</ItemID>
+    <InventoryOrderID>000206242</InventoryOrderID>
+    <DeliveryDate>2026-08-09T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394342</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030034</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 105 30928 Porto Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Duurzaam Paneel X2</Note>
+    <MultiComponentItemID>BQ787317</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 105 30928 Porto Portugal</DlvAddress>
+    <DlvStreet>Nieuwstraat 105</DlvStreet>
+    <DlvZipCode>30928</DlvZipCode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCountry>Porto</DlvCountry>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1394340</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000034</RouteID>
+    <Qty>73.000000000000</Qty>
+    <ItemID>UF808158</ItemID>
+    <InventoryOrderID>000206243</InventoryOrderID>
+    <DeliveryDate>2026-08-09T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394343</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030034</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 105 30928 Porto Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Universeel Filter Kit</Note>
+    <MultiComponentItemID>UF808158</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 105 30928 Porto Portugal</DlvAddress>
+    <DlvStreet>Nieuwstraat 105</DlvStreet>
+    <DlvZipCode>30928</DlvZipCode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCountry>Porto</DlvCountry>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1394340</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

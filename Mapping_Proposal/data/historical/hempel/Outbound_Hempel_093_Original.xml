@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120093</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22093</CustomerNumber>
+    <DeliveryAddress>Bosweg 273 Bus 18 71487 Porto Portugal</DeliveryAddress>
+    <ShipmentName />
+    <Name>Leclercq Systems</Name>
+    <WarehouseID>PT10</WarehouseID>
+    <CompanyID>E223</CompanyID>
+    <PublishedByAX>2026-08-12T23:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Bosweg 273 Bus 18</DlvStreet>
+    <DlvZipcode>71487</DlvZipcode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCounty>Porto</DlvCounty>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <Recipient>Mila Leclercq</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706093</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000093</RouteID>
+    <Qty>20.000000000000</Qty>
+    <ItemID>SQ643496</ItemID>
+    <InventoryOrderID>000206831</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394931</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030093</InventTransRefID>
+    <DeliveryAdress>Bosweg 273 Bus 18 71487 Porto Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Compact Meetset Mini</Note>
+    <MultiComponentItemID>SQ643496</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 273 Bus 18 71487 Porto Portugal</DlvAddress>
+    <DlvStreet>Bosweg 273 Bus 18</DlvStreet>
+    <DlvZipCode>71487</DlvZipCode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCountry>Porto</DlvCountry>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1394930</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000093</RouteID>
+    <Qty>88.000000000000</Qty>
+    <ItemID>KA613008</ItemID>
+    <InventoryOrderID>000206832</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394932</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030093</InventTransRefID>
+    <DeliveryAdress>Bosweg 273 Bus 18 71487 Porto Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Mobiel Connector V2</Note>
+    <MultiComponentItemID>KA613008</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Bosweg 273 Bus 18 71487 Porto Portugal</DlvAddress>
+    <DlvStreet>Bosweg 273 Bus 18</DlvStreet>
+    <DlvZipCode>71487</DlvZipCode>
+    <DlvCity>Porto</DlvCity>
+    <DlvCountry>Porto</DlvCountry>
+    <DlvState>Porto</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1394930</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120113</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22113</CustomerNumber>
+    <DeliveryAddress>Marktplein 160 64288 Coimbra Portugal</DeliveryAddress>
+    <ShipmentName />
+    <Name>Vermeulen Services</Name>
+    <WarehouseID>PT10</WarehouseID>
+    <CompanyID>E223</CompanyID>
+    <PublishedByAX>2026-08-15T11:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Marktplein 160</DlvStreet>
+    <DlvZipcode>64288</DlvZipcode>
+    <DlvCity>Coimbra</DlvCity>
+    <DlvCounty>Coimbra</DlvCounty>
+    <DlvState>Coimbra</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <Recipient>Noah Vermeulen</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706113</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000113</RouteID>
+    <Qty>86.000000000000</Qty>
+    <ItemID>KF153246</ItemID>
+    <InventoryOrderID>000207031</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395131</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030113</InventTransRefID>
+    <DeliveryAdress>Marktplein 160 64288 Coimbra Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Eco Ventiel X1</Note>
+    <MultiComponentItemID>KF153246</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 160 64288 Coimbra Portugal</DlvAddress>
+    <DlvStreet>Marktplein 160</DlvStreet>
+    <DlvZipCode>64288</DlvZipCode>
+    <DlvCity>Coimbra</DlvCity>
+    <DlvCountry>Coimbra</DlvCountry>
+    <DlvState>Coimbra</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395130</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000113</RouteID>
+    <Qty>68.000000000000</Qty>
+    <ItemID>FG853367</ItemID>
+    <InventoryOrderID>000207032</InventoryOrderID>
+    <DeliveryDate>2026-08-18T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395132</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030113</InventTransRefID>
+    <DeliveryAdress>Marktplein 160 64288 Coimbra Portugal</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>PT10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e223</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Snel Paneel Basic</Note>
+    <MultiComponentItemID>FG853367</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Marktplein 160 64288 Coimbra Portugal</DlvAddress>
+    <DlvStreet>Marktplein 160</DlvStreet>
+    <DlvZipCode>64288</DlvZipCode>
+    <DlvCity>Coimbra</DlvCity>
+    <DlvCountry>Coimbra</DlvCountry>
+    <DlvState>Coimbra</DlvState>
+    <DlvCountryRegion>PRT</DlvCountryRegion>
+    <MultiComponentInventTransID>1395130</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

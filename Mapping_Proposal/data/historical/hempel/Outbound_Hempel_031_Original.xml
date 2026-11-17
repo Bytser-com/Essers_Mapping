@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120031</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22031</CustomerNumber>
+    <DeliveryAddress>Veldweg 140 25711 Lille France</DeliveryAddress>
+    <ShipmentName />
+    <Name>Vermeulen Consulting</Name>
+    <WarehouseID>FR30</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-05T05:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Veldweg 140</DlvStreet>
+    <DlvZipcode>25711</DlvZipcode>
+    <DlvCity>Lille</DlvCity>
+    <DlvCounty>Lille</DlvCounty>
+    <DlvState>Lille</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <Recipient>Lucas Vermeulen</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706031</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000031</RouteID>
+    <Qty>88.000000000000</Qty>
+    <ItemID>ZC780644</ItemID>
+    <InventoryOrderID>000206211</InventoryOrderID>
+    <DeliveryDate>2026-08-14T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394311</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030031</InventTransRefID>
+    <DeliveryAdress>Veldweg 140 25711 Lille France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Precisie Ventiel Kit</Note>
+    <MultiComponentItemID>ZC780644</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 140 25711 Lille France</DlvAddress>
+    <DlvStreet>Veldweg 140</DlvStreet>
+    <DlvZipCode>25711</DlvZipCode>
+    <DlvCity>Lille</DlvCity>
+    <DlvCountry>Lille</DlvCountry>
+    <DlvState>Lille</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394310</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000031</RouteID>
+    <Qty>8.000000000000</Qty>
+    <ItemID>IP566875</ItemID>
+    <InventoryOrderID>000206212</InventoryOrderID>
+    <DeliveryDate>2026-08-14T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394312</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030031</InventTransRefID>
+    <DeliveryAdress>Veldweg 140 25711 Lille France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Automatisch Lader Mini</Note>
+    <MultiComponentItemID>IP566875</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 140 25711 Lille France</DlvAddress>
+    <DlvStreet>Veldweg 140</DlvStreet>
+    <DlvZipCode>25711</DlvZipCode>
+    <DlvCity>Lille</DlvCity>
+    <DlvCountry>Lille</DlvCountry>
+    <DlvState>Lille</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394310</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000031</RouteID>
+    <Qty>37.000000000000</Qty>
+    <ItemID>ZD987507</ItemID>
+    <InventoryOrderID>000206213</InventoryOrderID>
+    <DeliveryDate>2026-08-14T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394313</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030031</InventTransRefID>
+    <DeliveryAdress>Veldweg 140 25711 Lille France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Robuust Lader Plus</Note>
+    <MultiComponentItemID>ZD987507</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 140 25711 Lille France</DlvAddress>
+    <DlvStreet>Veldweg 140</DlvStreet>
+    <DlvZipCode>25711</DlvZipCode>
+    <DlvCity>Lille</DlvCity>
+    <DlvCountry>Lille</DlvCountry>
+    <DlvState>Lille</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394310</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>CIF</DeliveryTerms>
+    <DeliveryMode>TSB24</DeliveryMode>
+    <RouteID>P000031</RouteID>
+    <Qty>13.000000000000</Qty>
+    <ItemID>BD064650</ItemID>
+    <InventoryOrderID>000206214</InventoryOrderID>
+    <DeliveryDate>2026-08-14T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394314</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030031</InventTransRefID>
+    <DeliveryAdress>Veldweg 140 25711 Lille France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Flexibel Filter Set</Note>
+    <MultiComponentItemID>BD064650</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Veldweg 140 25711 Lille France</DlvAddress>
+    <DlvStreet>Veldweg 140</DlvStreet>
+    <DlvZipCode>25711</DlvZipCode>
+    <DlvCity>Lille</DlvCity>
+    <DlvCountry>Lille</DlvCountry>
+    <DlvState>Lille</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394310</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

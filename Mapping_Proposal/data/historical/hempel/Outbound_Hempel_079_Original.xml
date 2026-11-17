@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120079</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22079</CustomerNumber>
+    <DeliveryAddress>Kanaalweg 271 Afdeling 1 75126 Verona Italy</DeliveryAddress>
+    <ShipmentName />
+    <Name>Muller Industries</Name>
+    <WarehouseID>IT20</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-11T05:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kanaalweg 271 Afdeling 1</DlvStreet>
+    <DlvZipcode>75126</DlvZipcode>
+    <DlvCity>Verona</DlvCity>
+    <DlvCounty>Verona</DlvCounty>
+    <DlvState>Verona</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <Recipient>Yara Muller</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706079</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000079</RouteID>
+    <Qty>40.000000000000</Qty>
+    <ItemID>FS056014</ItemID>
+    <InventoryOrderID>000206691</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394791</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030079</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 271 Afdeling 1 75126 Verona Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Mobiel Controller Set</Note>
+    <MultiComponentItemID>FS056014</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 271 Afdeling 1 75126 Verona Italy</DlvAddress>
+    <DlvStreet>Kanaalweg 271 Afdeling 1</DlvStreet>
+    <DlvZipCode>75126</DlvZipCode>
+    <DlvCity>Verona</DlvCity>
+    <DlvCountry>Verona</DlvCountry>
+    <DlvState>Verona</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394790</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000079</RouteID>
+    <Qty>90.000000000000</Qty>
+    <ItemID>ZC780644</ItemID>
+    <InventoryOrderID>000206692</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394792</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030079</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 271 Afdeling 1 75126 Verona Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Precisie Ventiel Kit</Note>
+    <MultiComponentItemID>ZC780644</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 271 Afdeling 1 75126 Verona Italy</DlvAddress>
+    <DlvStreet>Kanaalweg 271 Afdeling 1</DlvStreet>
+    <DlvZipCode>75126</DlvZipCode>
+    <DlvCity>Verona</DlvCity>
+    <DlvCountry>Verona</DlvCountry>
+    <DlvState>Verona</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394790</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000079</RouteID>
+    <Qty>13.000000000000</Qty>
+    <ItemID>FS673376</ItemID>
+    <InventoryOrderID>000206693</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394793</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030079</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 271 Afdeling 1 75126 Verona Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Modulair Paneel Basic</Note>
+    <MultiComponentItemID>FS673376</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 271 Afdeling 1 75126 Verona Italy</DlvAddress>
+    <DlvStreet>Kanaalweg 271 Afdeling 1</DlvStreet>
+    <DlvZipCode>75126</DlvZipCode>
+    <DlvCity>Verona</DlvCity>
+    <DlvCountry>Verona</DlvCountry>
+    <DlvState>Verona</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394790</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000079</RouteID>
+    <Qty>22.000000000000</Qty>
+    <ItemID>BU942225</ItemID>
+    <InventoryOrderID>000206694</InventoryOrderID>
+    <DeliveryDate>2026-08-20T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394794</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030079</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 271 Afdeling 1 75126 Verona Italy</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>IT20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Modulair Lader X2</Note>
+    <MultiComponentItemID>BU942225</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 271 Afdeling 1 75126 Verona Italy</DlvAddress>
+    <DlvStreet>Kanaalweg 271 Afdeling 1</DlvStreet>
+    <DlvZipCode>75126</DlvZipCode>
+    <DlvCity>Verona</DlvCity>
+    <DlvCountry>Verona</DlvCountry>
+    <DlvState>Verona</DlvState>
+    <DlvCountryRegion>ITA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394790</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

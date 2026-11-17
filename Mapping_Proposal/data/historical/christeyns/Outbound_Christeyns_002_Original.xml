@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Root>
+  <MessageType>Outbound Delivery</MessageType>
+  <DocHeader>
+    <OutboundNumber>SO270000001</OutboundNumber>
+    <DocumentNumber>SO270000001</DocumentNumber>
+    <Reference>600001 /70001</Reference>
+    <DeliveryDate>07/08/2026</DeliveryDate>
+    <ShipByDate>03/08/2026</ShipByDate>
+    <RushIndicator>N</RushIndicator>
+    <Carrier>DAC</Carrier>
+    <ShipToCode>200001</ShipToCode>
+    <Name1>Sofia Bakker</Name1>
+    <Name2>Bakker Services</Name2>
+    <Address1>Kanaalweg 172</Address1>
+    <Address2 />
+    <PostalCode>34622</PostalCode>
+    <City>Gent</City>
+    <County />
+    <Country>BE</Country>
+    <LanguageCode>FR</LanguageCode>
+    <CommentCustomer />
+    <CommentOrder>
+      <Comment>Customer Reference: 800001</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>INCO:DDP</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>T4T : +32 11 21 31 41</Comment>
+    </CommentOrder>
+    <CommentOrder>
+      <Comment>Open: Ma-Di-Wo-Do-Vr 08:00-16:00</Comment>
+    </CommentOrder>
+    <TransportInstruction>
+      <Comment>T4T : +32 11 21 31 41</Comment>
+    </TransportInstruction>
+    <TransportInstruction>
+      <Comment>F92 : 1 08001600 2 08001600 3 08001600 4 08001600 5 08001600</Comment>
+    </TransportInstruction>
+    <WarehouseInstruction />
+  </DocHeader>
+  <DocLine>
+    <OrderLine>1</OrderLine>
+    <Product>FV079975</Product>
+    <Quantity>2</Quantity>
+    <UOM>BOX</UOM>
+    <Status>0</Status>
+    <PalletID />
+    <CrossReference />
+    <VOCContent>3.4</VOCContent>
+    <BiocideCode />
+    <CommentItem />
+  </DocLine>
+</Root>

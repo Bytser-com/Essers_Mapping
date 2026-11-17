@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120012</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22012</CustomerNumber>
+    <DeliveryAddress>Molenweg 141 Afdeling 8 79904 Metz France</DeliveryAddress>
+    <ShipmentName />
+    <Name>Peeters Transport</Name>
+    <WarehouseID>FR30</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-02T20:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Molenweg 141 Afdeling 8</DlvStreet>
+    <DlvZipcode>79904</DlvZipcode>
+    <DlvCity>Metz</DlvCity>
+    <DlvCounty>Metz</DlvCounty>
+    <DlvState>Metz</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <Recipient>Jules Peeters</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706012</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000012</RouteID>
+    <Qty>60.000000000000</Qty>
+    <ItemID>OE221132</ItemID>
+    <InventoryOrderID>000206021</InventoryOrderID>
+    <DeliveryDate>2026-08-08T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394121</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030012</InventTransRefID>
+    <DeliveryAdress>Molenweg 141 Afdeling 8 79904 Metz France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Professioneel Kabel Mini</Note>
+    <MultiComponentItemID>OE221132</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 141 Afdeling 8 79904 Metz France</DlvAddress>
+    <DlvStreet>Molenweg 141 Afdeling 8</DlvStreet>
+    <DlvZipCode>79904</DlvZipCode>
+    <DlvCity>Metz</DlvCity>
+    <DlvCountry>Metz</DlvCountry>
+    <DlvState>Metz</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394120</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000012</RouteID>
+    <Qty>66.000000000000</Qty>
+    <ItemID>RS465117</ItemID>
+    <InventoryOrderID>000206022</InventoryOrderID>
+    <DeliveryDate>2026-08-08T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394122</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030012</InventTransRefID>
+    <DeliveryAdress>Molenweg 141 Afdeling 8 79904 Metz France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Eco Beugel X1</Note>
+    <MultiComponentItemID>RS465117</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 141 Afdeling 8 79904 Metz France</DlvAddress>
+    <DlvStreet>Molenweg 141 Afdeling 8</DlvStreet>
+    <DlvZipCode>79904</DlvZipCode>
+    <DlvCity>Metz</DlvCity>
+    <DlvCountry>Metz</DlvCountry>
+    <DlvState>Metz</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394120</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000012</RouteID>
+    <Qty>57.000000000000</Qty>
+    <ItemID>CS380192</ItemID>
+    <InventoryOrderID>000206023</InventoryOrderID>
+    <DeliveryDate>2026-08-08T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394123</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030012</InventTransRefID>
+    <DeliveryAdress>Molenweg 141 Afdeling 8 79904 Metz France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Professioneel Terminal Max</Note>
+    <MultiComponentItemID>CS380192</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 141 Afdeling 8 79904 Metz France</DlvAddress>
+    <DlvStreet>Molenweg 141 Afdeling 8</DlvStreet>
+    <DlvZipCode>79904</DlvZipCode>
+    <DlvCity>Metz</DlvCity>
+    <DlvCountry>Metz</DlvCountry>
+    <DlvState>Metz</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394120</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000012</RouteID>
+    <Qty>43.000000000000</Qty>
+    <ItemID>PW042589</ItemID>
+    <InventoryOrderID>000206024</InventoryOrderID>
+    <DeliveryDate>2026-08-08T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394124</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030012</InventTransRefID>
+    <DeliveryAdress>Molenweg 141 Afdeling 8 79904 Metz France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Flexibel Controller V2</Note>
+    <MultiComponentItemID>PW042589</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 141 Afdeling 8 79904 Metz France</DlvAddress>
+    <DlvStreet>Molenweg 141 Afdeling 8</DlvStreet>
+    <DlvZipCode>79904</DlvZipCode>
+    <DlvCity>Metz</DlvCity>
+    <DlvCountry>Metz</DlvCountry>
+    <DlvState>Metz</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394120</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000012</RouteID>
+    <Qty>76.000000000000</Qty>
+    <ItemID>II790218</ItemID>
+    <InventoryOrderID>000206025</InventoryOrderID>
+    <DeliveryDate>2026-08-08T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394125</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030012</InventTransRefID>
+    <DeliveryAdress>Molenweg 141 Afdeling 8 79904 Metz France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Universeel Omvormer Plus</Note>
+    <MultiComponentItemID>II790218</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Molenweg 141 Afdeling 8 79904 Metz France</DlvAddress>
+    <DlvStreet>Molenweg 141 Afdeling 8</DlvStreet>
+    <DlvZipCode>79904</DlvZipCode>
+    <DlvCity>Metz</DlvCity>
+    <DlvCountry>Metz</DlvCountry>
+    <DlvState>Metz</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394120</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

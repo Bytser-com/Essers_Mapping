@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120114</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22114</CustomerNumber>
+    <DeliveryAddress>Kanaalweg 256 Afdeling 9 10790 Eindhoven Netherlands</DeliveryAddress>
+    <ShipmentName />
+    <Name>Martin Industries</Name>
+    <WarehouseID>NL20</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-15T14:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kanaalweg 256 Afdeling 9</DlvStreet>
+    <DlvZipcode>10790</DlvZipcode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCounty>Eindhoven</DlvCounty>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <Recipient>Amelie Martin</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706114</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000114</RouteID>
+    <Qty>56.000000000000</Qty>
+    <ItemID>QD446580</ItemID>
+    <InventoryOrderID>000207041</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395141</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030114</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 256 Afdeling 9 10790 Eindhoven Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Veilig Meetset Pro</Note>
+    <MultiComponentItemID>QD446580</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 256 Afdeling 9 10790 Eindhoven Netherlands</DlvAddress>
+    <DlvStreet>Kanaalweg 256 Afdeling 9</DlvStreet>
+    <DlvZipCode>10790</DlvZipCode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCountry>Eindhoven</DlvCountry>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395140</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000114</RouteID>
+    <Qty>63.000000000000</Qty>
+    <ItemID>MM230317</ItemID>
+    <InventoryOrderID>000207042</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395142</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030114</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 256 Afdeling 9 10790 Eindhoven Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Modulair Meetset Plus</Note>
+    <MultiComponentItemID>MM230317</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 256 Afdeling 9 10790 Eindhoven Netherlands</DlvAddress>
+    <DlvStreet>Kanaalweg 256 Afdeling 9</DlvStreet>
+    <DlvZipCode>10790</DlvZipCode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCountry>Eindhoven</DlvCountry>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395140</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DDP</DeliveryTerms>
+    <DeliveryMode>SEA</DeliveryMode>
+    <RouteID>P000114</RouteID>
+    <Qty>9.000000000000</Qty>
+    <ItemID>WJ326171</ItemID>
+    <InventoryOrderID>000207043</InventoryOrderID>
+    <DeliveryDate>2026-08-19T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395143</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030114</InventTransRefID>
+    <DeliveryAdress>Kanaalweg 256 Afdeling 9 10790 Eindhoven Netherlands</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>NL20</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Precisie Adapter X2</Note>
+    <MultiComponentItemID>WJ326171</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kanaalweg 256 Afdeling 9 10790 Eindhoven Netherlands</DlvAddress>
+    <DlvStreet>Kanaalweg 256 Afdeling 9</DlvStreet>
+    <DlvZipCode>10790</DlvZipCode>
+    <DlvCity>Eindhoven</DlvCity>
+    <DlvCountry>Eindhoven</DlvCountry>
+    <DlvState>Eindhoven</DlvState>
+    <DlvCountryRegion>NLD</DlvCountryRegion>
+    <MultiComponentInventTransID>1395140</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

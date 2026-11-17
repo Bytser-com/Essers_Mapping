@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120123</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22123</CustomerNumber>
+    <DeliveryAddress>Kasteelstraat 186 Afdeling 10 60640 Madrid Spain</DeliveryAddress>
+    <ShipmentName />
+    <Name>Peeters Systems</Name>
+    <WarehouseID>ES30</WarehouseID>
+    <CompanyID>E310</CompanyID>
+    <PublishedByAX>2026-08-16T17:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Kasteelstraat 186 Afdeling 10</DlvStreet>
+    <DlvZipcode>60640</DlvZipcode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCounty>Madrid</DlvCounty>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <Recipient>Nora Peeters</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706123</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000123</RouteID>
+    <Qty>93.000000000000</Qty>
+    <ItemID>MF934147</ItemID>
+    <InventoryOrderID>000207131</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395231</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030123</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 186 Afdeling 10 60640 Madrid Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Modulair Paneel Plus</Note>
+    <MultiComponentItemID>MF934147</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 186 Afdeling 10 60640 Madrid Spain</DlvAddress>
+    <DlvStreet>Kasteelstraat 186 Afdeling 10</DlvStreet>
+    <DlvZipCode>60640</DlvZipCode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCountry>Madrid</DlvCountry>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1395230</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000123</RouteID>
+    <Qty>62.000000000000</Qty>
+    <ItemID>YW241404</ItemID>
+    <InventoryOrderID>000207132</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395232</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030123</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 186 Afdeling 10 60640 Madrid Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Veilig Afdichting Mini</Note>
+    <MultiComponentItemID>YW241404</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 186 Afdeling 10 60640 Madrid Spain</DlvAddress>
+    <DlvStreet>Kasteelstraat 186 Afdeling 10</DlvStreet>
+    <DlvZipCode>60640</DlvZipCode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCountry>Madrid</DlvCountry>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1395230</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000123</RouteID>
+    <Qty>54.000000000000</Qty>
+    <ItemID>LI953172</ItemID>
+    <InventoryOrderID>000207133</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395233</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030123</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 186 Afdeling 10 60640 Madrid Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Digitaal Controller Max</Note>
+    <MultiComponentItemID>LI953172</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 186 Afdeling 10 60640 Madrid Spain</DlvAddress>
+    <DlvStreet>Kasteelstraat 186 Afdeling 10</DlvStreet>
+    <DlvZipCode>60640</DlvZipCode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCountry>Madrid</DlvCountry>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1395230</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000123</RouteID>
+    <Qty>33.000000000000</Qty>
+    <ItemID>ZN237870</ItemID>
+    <InventoryOrderID>000207134</InventoryOrderID>
+    <DeliveryDate>2026-08-21T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395234</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030123</InventTransRefID>
+    <DeliveryAdress>Kasteelstraat 186 Afdeling 10 60640 Madrid Spain</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>ES30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e310</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Duurzaam Schakelaar Max</Note>
+    <MultiComponentItemID>ZN237870</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Kasteelstraat 186 Afdeling 10 60640 Madrid Spain</DlvAddress>
+    <DlvStreet>Kasteelstraat 186 Afdeling 10</DlvStreet>
+    <DlvZipCode>60640</DlvZipCode>
+    <DlvCity>Madrid</DlvCity>
+    <DlvCountry>Madrid</DlvCountry>
+    <DlvState>Madrid</DlvState>
+    <DlvCountryRegion>ESP</DlvCountryRegion>
+    <MultiComponentInventTransID>1395230</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120102</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22102</CustomerNumber>
+    <DeliveryAddress>Ringlaan 153 Bus 6 64327 Luik Belgium</DeliveryAddress>
+    <ShipmentName />
+    <Name>Leclercq Systems</Name>
+    <WarehouseID>BE10</WarehouseID>
+    <CompanyID>E224</CompanyID>
+    <PublishedByAX>2026-08-14T02:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Ringlaan 153 Bus 6</DlvStreet>
+    <DlvZipcode>64327</DlvZipcode>
+    <DlvCity>Luik</DlvCity>
+    <DlvCounty>Luik</DlvCounty>
+    <DlvState>Luik</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <Recipient>Lina Leclercq</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706102</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000102</RouteID>
+    <Qty>84.000000000000</Qty>
+    <ItemID>VT147670</ItemID>
+    <InventoryOrderID>000206921</InventoryOrderID>
+    <DeliveryDate>2026-08-22T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395021</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030102</InventTransRefID>
+    <DeliveryAdress>Ringlaan 153 Bus 6 64327 Luik Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Premium Terminal X2</Note>
+    <MultiComponentItemID>VT147670</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 153 Bus 6 64327 Luik Belgium</DlvAddress>
+    <DlvStreet>Ringlaan 153 Bus 6</DlvStreet>
+    <DlvZipCode>64327</DlvZipCode>
+    <DlvCity>Luik</DlvCity>
+    <DlvCountry>Luik</DlvCountry>
+    <DlvState>Luik</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1395020</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000102</RouteID>
+    <Qty>82.000000000000</Qty>
+    <ItemID>HB357965</ItemID>
+    <InventoryOrderID>000206922</InventoryOrderID>
+    <DeliveryDate>2026-08-22T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395022</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030102</InventTransRefID>
+    <DeliveryAdress>Ringlaan 153 Bus 6 64327 Luik Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Modulair Controller Mini</Note>
+    <MultiComponentItemID>HB357965</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 153 Bus 6 64327 Luik Belgium</DlvAddress>
+    <DlvStreet>Ringlaan 153 Bus 6</DlvStreet>
+    <DlvZipCode>64327</DlvZipCode>
+    <DlvCity>Luik</DlvCity>
+    <DlvCountry>Luik</DlvCountry>
+    <DlvState>Luik</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1395020</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>DAP</DeliveryTerms>
+    <DeliveryMode>ROAD</DeliveryMode>
+    <RouteID>P000102</RouteID>
+    <Qty>25.000000000000</Qty>
+    <ItemID>OJ484800</ItemID>
+    <InventoryOrderID>000206923</InventoryOrderID>
+    <DeliveryDate>2026-08-22T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01395023</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030102</InventTransRefID>
+    <DeliveryAdress>Ringlaan 153 Bus 6 64327 Luik Belgium</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>BE10</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e224</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Slim Connector V2</Note>
+    <MultiComponentItemID>OJ484800</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Ringlaan 153 Bus 6 64327 Luik Belgium</DlvAddress>
+    <DlvStreet>Ringlaan 153 Bus 6</DlvStreet>
+    <DlvZipCode>64327</DlvZipCode>
+    <DlvCity>Luik</DlvCity>
+    <DlvCountry>Luik</DlvCountry>
+    <DlvState>Luik</DlvState>
+    <DlvCountryRegion>BEL</DlvCountryRegion>
+    <MultiComponentInventTransID>1395020</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

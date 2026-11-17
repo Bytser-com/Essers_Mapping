@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:OutboundExpected xmlns:ns0="http://hempel.com/schemas/v10">
+  <Head>
+    <ShipmentID>30120048</ShipmentID>
+    <TransType>0</TransType>
+    <CustomerNumber>22048</CustomerNumber>
+    <DeliveryAddress>Nieuwstraat 241 Gebouw O 94942 Lille France</DeliveryAddress>
+    <ShipmentName />
+    <Name>Simon Systems</Name>
+    <WarehouseID>FR30</WarehouseID>
+    <CompanyID>E411</CompanyID>
+    <PublishedByAX>2026-08-07T08:00:00</PublishedByAX>
+    <Note />
+    <DlvStreet>Nieuwstraat 241 Gebouw O</DlvStreet>
+    <DlvZipcode>94942</DlvZipcode>
+    <DlvCity>Lille</DlvCity>
+    <DlvCounty>Lille</DlvCounty>
+    <DlvState>Lille</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <Recipient>Adam Simon</Recipient>
+    <IsMT>0</IsMT>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <DeliveryComments />
+    <DeliveryAddressLocationID>000706048</DeliveryAddressLocationID>
+    <CarrierZone />
+    <PickInstructionCode />
+  </Head>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000048</RouteID>
+    <Qty>79.000000000000</Qty>
+    <ItemID>MA453497</ItemID>
+    <InventoryOrderID>000206381</InventoryOrderID>
+    <DeliveryDate>2026-08-09T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394481</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030048</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 241 Gebouw O 94942 Lille France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>1</LineNumber>
+    <Note>Licht Module Plus</Note>
+    <MultiComponentItemID>MA453497</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 241 Gebouw O 94942 Lille France</DlvAddress>
+    <DlvStreet>Nieuwstraat 241 Gebouw O</DlvStreet>
+    <DlvZipCode>94942</DlvZipCode>
+    <DlvCity>Lille</DlvCity>
+    <DlvCountry>Lille</DlvCountry>
+    <DlvState>Lille</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394480</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000048</RouteID>
+    <Qty>51.000000000000</Qty>
+    <ItemID>BU942225</ItemID>
+    <InventoryOrderID>000206382</InventoryOrderID>
+    <DeliveryDate>2026-08-09T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394482</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030048</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 241 Gebouw O 94942 Lille France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>2</LineNumber>
+    <Note>Modulair Lader X2</Note>
+    <MultiComponentItemID>BU942225</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 241 Gebouw O 94942 Lille France</DlvAddress>
+    <DlvStreet>Nieuwstraat 241 Gebouw O</DlvStreet>
+    <DlvZipCode>94942</DlvZipCode>
+    <DlvCity>Lille</DlvCity>
+    <DlvCountry>Lille</DlvCountry>
+    <DlvState>Lille</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394480</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000048</RouteID>
+    <Qty>56.000000000000</Qty>
+    <ItemID>YG044822</ItemID>
+    <InventoryOrderID>000206383</InventoryOrderID>
+    <DeliveryDate>2026-08-09T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394483</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030048</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 241 Gebouw O 94942 Lille France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>3</LineNumber>
+    <Note>Ergonomisch Adapter Kit</Note>
+    <MultiComponentItemID>YG044822</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 241 Gebouw O 94942 Lille France</DlvAddress>
+    <DlvStreet>Nieuwstraat 241 Gebouw O</DlvStreet>
+    <DlvZipCode>94942</DlvZipCode>
+    <DlvCity>Lille</DlvCity>
+    <DlvCountry>Lille</DlvCountry>
+    <DlvState>Lille</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394480</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000048</RouteID>
+    <Qty>65.000000000000</Qty>
+    <ItemID>JO119261</ItemID>
+    <InventoryOrderID>000206384</InventoryOrderID>
+    <DeliveryDate>2026-08-09T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394484</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030048</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 241 Gebouw O 94942 Lille France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>4</LineNumber>
+    <Note>Compact Adapter Mini</Note>
+    <MultiComponentItemID>JO119261</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 241 Gebouw O 94942 Lille France</DlvAddress>
+    <DlvStreet>Nieuwstraat 241 Gebouw O</DlvStreet>
+    <DlvZipCode>94942</DlvZipCode>
+    <DlvCity>Lille</DlvCity>
+    <DlvCountry>Lille</DlvCountry>
+    <DlvState>Lille</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394480</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+  <Line>
+    <OrderStatus>1</OrderStatus>
+    <DeliveryTerms>FCA</DeliveryTerms>
+    <DeliveryMode>AIR</DeliveryMode>
+    <RouteID>P000048</RouteID>
+    <Qty>34.000000000000</Qty>
+    <ItemID>LJ519434</ItemID>
+    <InventoryOrderID>000206385</InventoryOrderID>
+    <DeliveryDate>2026-08-09T00:00:00</DeliveryDate>
+    <PickMethod>3</PickMethod>
+    <InventTransID>01394485</InventTransID>
+    <InventTransType>0</InventTransType>
+    <InventTransRefID>20030048</InventTransRefID>
+    <DeliveryAdress>Nieuwstraat 241 Gebouw O 94942 Lille France</DeliveryAdress>
+    <HandlingStatus>3</HandlingStatus>
+    <SiteID />
+    <WarehouseID>FR30</WarehouseID>
+    <LocationID />
+    <BatchID />
+    <PalletID />
+    <SerialID />
+    <ColorID />
+    <InventUnitID>EA</InventUnitID>
+    <CompanyID>e411</CompanyID>
+    <LineNumber>5</LineNumber>
+    <Note>Slim Filter X2</Note>
+    <MultiComponentItemID>LJ519434</MultiComponentItemID>
+    <BatchOrderID />
+    <ColorDescription />
+    <SalesOrderID />
+    <SalesColorID />
+    <SalesColorDescription />
+    <DlvAddress>Nieuwstraat 241 Gebouw O 94942 Lille France</DlvAddress>
+    <DlvStreet>Nieuwstraat 241 Gebouw O</DlvStreet>
+    <DlvZipCode>94942</DlvZipCode>
+    <DlvCity>Lille</DlvCity>
+    <DlvCountry>Lille</DlvCountry>
+    <DlvState>Lille</DlvState>
+    <DlvCountryRegion>FRA</DlvCountryRegion>
+    <MultiComponentInventTransID>1394480</MultiComponentInventTransID>
+    <DeliveryTimeFrom>0</DeliveryTimeFrom>
+    <DeliveryTimeTo>0</DeliveryTimeTo>
+    <MultiComponentLineID>1</MultiComponentLineID>
+    <MTTRelationRef />
+    <ACQPArequired>0</ACQPArequired>
+  </Line>
+</ns0:OutboundExpected>

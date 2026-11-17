@@ -1,0 +1,100 @@
+name: Python service CI (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      service-path:
+        description: Repository-relative Python service directory
+        required: true
+        type: string
+      artifact-prefix:
+        description: Unique prefix for service report artifacts
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Python - lint, tests and coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: ${{ inputs.service-path }}
+    env:
+      PIP_DISABLE_PIP_VERSION_CHECK: '1'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup service and dependencies
+        id: setup
+        uses: ./.github/actions/setup-python-service
+        with:
+          service-path: ${{ inputs.service-path }}
+
+      - name: Lint Python
+        if: steps.setup.outputs.enabled == 'true'
+        run: python -m ruff check .
+
+      # All test categories under tests/ run together; pytest fails if none exist.
+      - name: Unit, integration and functional tests with coverage
+        if: steps.setup.outputs.enabled == 'true'
+        run: >-
+          python -m pytest tests -ra
+          --junitxml=test-results/pytest-junit.xml
+          --cov=. --cov-branch
+          --cov-report=term-missing
+          --cov-report=xml:coverage.xml
+          --cov-report=html:coverage
+
+      - name: Export installed application and test dependencies
+        if: steps.setup.outputs.enabled == 'true'
+        run: >-
+          python "$GITHUB_WORKSPACE/Scripts/dependency-inventory.py"
+          --python --output test-results/dependencies.json
+
+      - name: Audit installed dependencies
+        if: steps.setup.outputs.enabled == 'true'
+        uses: ./.github/actions/dependency-audit
+        with:
+          lockfile: osv-scanner:${{ inputs.service-path }}/test-results/dependencies.json
+          report-path: ${{ inputs.service-path }}/test-results/dependency-audit.json
+
+      - name: Setup Docker Buildx
+        if: steps.setup.outputs.enabled == 'true' && hashFiles(format('{0}/Dockerfile', inputs.service-path)) != ''
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build container for validation
+        if: steps.setup.outputs.enabled == 'true' && hashFiles(format('{0}/Dockerfile', inputs.service-path)) != ''
+        uses: docker/build-push-action@v7
+        with:
+          context: ${{ inputs.service-path }}
+          load: true
+          push: false
+          tags: service-ci:local
+
+      - name: Validate container startup and health
+        if: steps.setup.outputs.enabled == 'true' && hashFiles(format('{0}/Dockerfile', inputs.service-path)) != ''
+        working-directory: ${{ github.workspace }}
+        env:
+          IMAGE: service-ci:local
+          SERVICE_PATH: ${{ inputs.service-path }}
+        run: bash Scripts/smoke-service-image.sh
+
+      - name: Upload test results and coverage
+        if: always() && steps.setup.outputs.enabled == 'true'
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ inputs.artifact-prefix }}-test-reports
+          path: |
+            ${{ inputs.service-path }}/test-results/
+            ${{ inputs.service-path }}/coverage.xml
+            ${{ inputs.service-path }}/coverage/
+          if-no-files-found: warn
+          retention-days: 14
