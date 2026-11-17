@@ -380,6 +380,9 @@ jobs:
               kubectl rollout status deployment/cloudflared -n cloudflare --timeout=180s
             else
               echo "::warning::CLOUDFLARE_TUNNEL_TOKEN secret is not set in GitHub repository secrets. Skipping cloudflared deployment."
+            fi
+          fi
+
           # 6. Prometheus Operator & Grafana Monitoring Stack (kube-prometheus-stack)
           MONITORING_VALUES="cluster-addons/monitoring/values-${OVERLAY}.yaml"
           if [ -f "$MONITORING_VALUES" ]; then
