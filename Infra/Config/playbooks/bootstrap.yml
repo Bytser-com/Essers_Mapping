@@ -132,6 +132,13 @@
         - bootstrap
         - common
         - security
+    - role: node_monitoring
+      tags:
+        - bootstrap
+        - monitoring
+        - node_monitoring
+        - node_exporter
+        - alloy
 
 - name: Wait for SSH connectivity and bootstrap CI/CD Runner Debian 13 virtual machine
   hosts: runners
@@ -207,3 +214,13 @@
         - runner
         - cicd
         - github_runner
+    - role: node_monitoring
+      tags:
+        - never
+        - runner
+        - cicd
+        - github_runner
+        - monitoring
+        - node_monitoring
+        - node_exporter
+        - alloy

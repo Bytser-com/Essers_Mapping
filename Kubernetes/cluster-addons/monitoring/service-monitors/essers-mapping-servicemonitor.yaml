@@ -1,0 +1,67 @@
+# ==============================================================================
+# SERVICEMONITOR: ESSERS MAPPING WORKLOADS
+# Automatically discovered by Prometheus Operator across namespaces.
+# Targets all Essers Mapping application services across zones:
+#   - Preparation Zone: frontend, mapping-converter, mapping-proposal, version-control-backend
+#   - Shared Storage Zone: sftp-shared
+#   - Runtime Zone: runtime-backend, sftp-runtime
+# ==============================================================================
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: essers-mapping-services
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+    app.kubernetes.io/part-of: essers-mapping
+spec:
+  namespaceSelector:
+    matchNames:
+      - essers-mapping-testing
+      - essers-mapping-production
+      - essers-mapping
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: essers-mapping
+  endpoints:
+    # 1. Standard HTTP metrics endpoint (e.g., Spring Boot Actuator or FastAPI /metrics)
+    - port: http
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s
+    # 2. Spring Boot Actuator Prometheus endpoint for Java services
+    - port: http
+      path: /actuator/prometheus
+      interval: 15s
+      scrapeTimeout: 10s
+---
+# ==============================================================================
+# SERVICEMONITOR: SFTPGO METRICS
+# Scrapes built-in SFTPGo Prometheus metrics on port 8080 (metrics endpoint)
+# ==============================================================================
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: essers-sftpgo-monitor
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+    app.kubernetes.io/part-of: essers-mapping
+spec:
+  namespaceSelector:
+    matchNames:
+      - essers-mapping-testing
+      - essers-mapping-production
+      - essers-mapping
+  selector:
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values:
+          - sftp-shared
+          - sftp-runtime
+  endpoints:
+    - port: webclient
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s

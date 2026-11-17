@@ -1,0 +1,18 @@
+---
+# ==============================================================================
+# TASKS ENTRYPOINT: node_monitoring
+# ==============================================================================
+
+- name: Install and configure Prometheus Node Exporter
+  ansible.builtin.import_tasks: node_exporter.yml
+  when: node_monitoring_node_exporter_enabled | bool
+  tags:
+    - node_monitoring
+    - node_exporter
+
+- name: Install and configure Grafana Alloy
+  ansible.builtin.import_tasks: alloy.yml
+  when: node_monitoring_alloy_enabled | bool
+  tags:
+    - node_monitoring
+    - alloy

@@ -90,6 +90,11 @@ jobs:
       ACME_EMAIL: ${{ vars.ACME_EMAIL || 'admin@example.com' }}
       DOMAIN_NAME: ${{ vars.DOMAIN_NAME || 'your-domain.example.com' }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_TUNNEL_TOKEN: ${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}
+
+      # --- Grafana Admin Secret & Alert Notifications ---
+      GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
       # --- Manual Options ---
       SKIP_ADDONS: ${{ inputs.skip_addons || false }}
@@ -148,7 +153,7 @@ jobs:
             yamllint -d "{extends: default, rules: {line-length: disable, document-start: disable, truthy: disable}}" .
           fi
 
-          # 2. Build both testing and production overlays offline to catch structural/patch errors early
+          # 2. Build overlays and addons offline to catch structural/patch errors early
           for env_dir in testing production; do
             if [ -f "overlays/${env_dir}/kustomization.yaml" ]; then
               echo "Validating Kustomize build for overlay: ${env_dir}..."
@@ -158,7 +163,14 @@ jobs:
               grep -q "kind: NetworkPolicy" "$RUNNER_TEMP/rendered-${env_dir}.yaml"
             fi
           done
-          echo "All Kustomize overlays built and validated cleanly."
+
+          if [ -d "cluster-addons/cloudflared" ]; then
+            echo "Validating Kustomize build for cluster addon: cloudflared..."
+            kubectl kustomize "cluster-addons/cloudflared" > "$RUNNER_TEMP/rendered-cloudflared.yaml"
+            grep -q "kind: Deployment" "$RUNNER_TEMP/rendered-cloudflared.yaml"
+            grep -q "kind: NetworkPolicy" "$RUNNER_TEMP/rendered-cloudflared.yaml"
+          fi
+          echo "All Kustomize overlays and addons built and validated cleanly."
 
       # Kubeconfig is isolated inside $RUNNER_TEMP and securely shredded on cleanup (only needed for live deploy/restart)
       - name: Prepare kubeconfig and verify cluster connectivity
@@ -263,7 +275,7 @@ jobs:
             perl -pi -e '$d = $ENV{DOMAIN_NAME}; s/your-domain\.example\.com/$d/g' "$INGRESS_FILE"
           fi
 
-      - name: Reconcile cluster addons (MetalLB, Longhorn, cert-manager, ingress-nginx)
+      - name: Reconcile cluster addons (MetalLB, Longhorn, cert-manager, ingress-nginx, monitoring, cloudflared)
         if: steps.manifests.outputs.exists == 'true' && env.MODE == 'apply' && env.SKIP_ADDONS != 'true'
         shell: bash
         run: |
@@ -352,6 +364,92 @@ jobs:
               -f "$INGRESS_VALUES" \
               --wait \
               --timeout 5m
+          fi
+
+          # 5. Cloudflare Tunnel (cloudflared) for Secure Public Access (No Port Forwarding)
+          if [ -d "cluster-addons/cloudflared" ]; then
+            echo "Reconciling Cloudflare Tunnel (cloudflared)..."
+            kubectl apply -f "cluster-addons/cloudflared/namespace.yaml"
+            if [ -n "${CLOUDFLARE_TUNNEL_TOKEN:-}" ]; then
+              echo "Deploying Cloudflare Tunnel secret and pods..."
+              kubectl create secret generic cloudflared-token \
+                --namespace cloudflare \
+                --from-literal=token="${CLOUDFLARE_TUNNEL_TOKEN}" \
+                --dry-run=client -o yaml | kubectl apply -f -
+              kubectl apply -k "cluster-addons/cloudflared"
+              kubectl rollout status deployment/cloudflared -n cloudflare --timeout=180s
+            else
+              echo "::warning::CLOUDFLARE_TUNNEL_TOKEN secret is not set in GitHub repository secrets. Skipping cloudflared deployment."
+            fi
+          fi
+
+          # 6. Prometheus Operator & Grafana Monitoring Stack (kube-prometheus-stack)
+          MONITORING_VALUES="cluster-addons/monitoring/values-${OVERLAY}.yaml"
+          if [ -f "$MONITORING_VALUES" ]; then
+            echo "Reconciling Prometheus & Grafana Monitoring Stack for ${OVERLAY}..."
+            kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
+
+            # In production, ensure the grafana-admin-credentials secret exists
+            if [ "$OVERLAY" = "production" ]; then
+              PROD_PASS="${GRAFANA_ADMIN_PASSWORD:-ProductionSecureGrafanaPass2026!}"
+              kubectl create secret generic grafana-admin-credentials \
+                --namespace monitoring \
+                --from-literal=admin-user=essers-admin \
+                --from-literal=admin-password="$PROD_PASS" \
+                --dry-run=client -o yaml | kubectl apply -f -
+            fi
+
+            # Inject Discord Webhook URL into Alertmanager values if configured
+            if [ -n "${DISCORD_WEBHOOK_URL:-}" ]; then
+              echo "Configuring Discord notification webhook for Alertmanager..."
+              perl -pi -e '$w = $ENV{DISCORD_WEBHOOK_URL}; s|https://discord.com/api/webhooks/PLACEHOLDER_DISCORD_WEBHOOK_URL|$w|g' "$MONITORING_VALUES"
+            fi
+
+            helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update
+            helm repo update
+            helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+              --namespace monitoring \
+              --create-namespace \
+              -f "$MONITORING_VALUES" \
+              --wait \
+              --timeout 10m
+
+            if [ -f "cluster-addons/monitoring/network-policies.yaml" ]; then
+              echo "Applying monitoring Calico Zero-Trust NetworkPolicies..."
+              kubectl apply -f "cluster-addons/monitoring/network-policies.yaml"
+            fi
+
+            if [ -d "cluster-addons/monitoring/service-monitors" ]; then
+              echo "Applying monitoring ServiceMonitors..."
+              kubectl apply -f "cluster-addons/monitoring/service-monitors/"
+            fi
+
+            if [ -d "cluster-addons/monitoring/alerts" ]; then
+              echo "Deploying Prometheus alerting rules..."
+              kubectl apply -k "cluster-addons/monitoring/alerts/"
+            fi
+
+            if [ -d "cluster-addons/monitoring/loki" ]; then
+              echo "Deploying Grafana Loki log aggregation engine..."
+              kubectl apply -k "cluster-addons/monitoring/loki/"
+              kubectl rollout status statefulset/loki -n monitoring --timeout=180s
+            fi
+
+            if [ -d "cluster-addons/monitoring/alloy" ]; then
+              echo "Deploying Grafana Alloy Kubernetes container log collector DaemonSet..."
+              kubectl apply -k "cluster-addons/monitoring/alloy/"
+              kubectl rollout status daemonset/alloy-k8s -n monitoring --timeout=180s
+            fi
+
+            if [ -d "cluster-addons/monitoring/datasources" ]; then
+              echo "Deploying Grafana Loki datasource..."
+              kubectl apply -k "cluster-addons/monitoring/datasources/"
+            fi
+
+            if [ -d "cluster-addons/monitoring/dashboards" ]; then
+              echo "Deploying GitOps Grafana Dashboards..."
+              kubectl apply -k "cluster-addons/monitoring/dashboards/"
+            fi
           fi
 
       - name: Render manifests while preserving service CD releases

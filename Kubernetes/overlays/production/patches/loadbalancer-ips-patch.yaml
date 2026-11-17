@@ -3,14 +3,40 @@
 #   - 192.168.100.201 -> ingress-nginx-controller (Ports 80, 443 -> frontend:8080)
 #   - 192.168.100.202 -> sftp-shared (Port 22, 8080)
 #   - 192.168.100.203 -> sftp-runtime (Port 22, 8080)
+# Hostname: production.essers.shystack.com
 # ==============================================================================
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: essers-frontend-ingress
   annotations:
-    # Uses Let's Encrypt production ACME HTTP-01 solver (or switch to "selfsigned-cluster-issuer" if private LAN only)
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+    - hosts:
+        - production.essers.shystack.com
+      secretName: essers-frontend-production-tls
+  rules:
+    - host: production.essers.shystack.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 8080
+    # Fallback rule for local IP access
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 8080
 ---
 apiVersion: v1
 kind: Service

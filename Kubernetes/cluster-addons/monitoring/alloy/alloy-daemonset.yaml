@@ -1,0 +1,70 @@
+# ==============================================================================
+# GRAFANA ALLOY KUBERNETES DAEMONSET
+# Deployed across all nodes to tail container logs from /var/log/pods.
+# ==============================================================================
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: alloy-k8s
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: alloy-k8s
+    app.kubernetes.io/part-of: essers-mapping
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: alloy-k8s
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: alloy-k8s
+        app.kubernetes.io/part-of: essers-mapping
+    spec:
+      serviceAccountName: alloy-k8s
+      terminationGracePeriodSeconds: 15
+      containers:
+        - name: alloy
+          image: grafana/alloy:v1.5.1
+          imagePullPolicy: IfNotPresent
+          args:
+            - run
+            - /etc/alloy/config.alloy
+            - --storage.path=/var/lib/alloy/data
+            - --server.http.listen-addr=0.0.0.0:12345
+          ports:
+            - name: http-metrics
+              containerPort: 12345
+              protocol: TCP
+          env:
+            - name: HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsUser: 0
+            runAsGroup: 0
+          volumeMounts:
+            - name: config
+              mountPath: /etc/alloy
+            - name: data
+              mountPath: /var/lib/alloy/data
+            - name: varlog
+              mountPath: /var/log
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: alloy-k8s-config
+        - name: data
+          emptyDir: {}
+        - name: varlog
+          hostPath:
+            path: /var/log
