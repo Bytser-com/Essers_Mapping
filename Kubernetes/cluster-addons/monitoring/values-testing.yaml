@@ -250,4 +250,4 @@ nodeExporter:
 defaultRules:
   create: true
   rules:
-    etcd: false # Running managed or external etcd without direct metric scrape
+    etcd: false  # Running managed or external etcd without direct metric scrape
