@@ -80,6 +80,7 @@ prometheus.scrape "local_node_exporter" {
   targets = [
     {
       "__address__" = "127.0.0.1:{{ node_monitoring_node_exporter_port }}",
+      "job"         = "node-exporter",
       "instance"    = "{{ inventory_hostname }}",
       "nodename"    = "{{ inventory_hostname }}",
       "role"        = "{{ 'k8s_master' if inventory_hostname in groups['k8s_masters'] else ('k8s_worker' if inventory_hostname in groups['k8s_workers'] else 'runner') }}",
