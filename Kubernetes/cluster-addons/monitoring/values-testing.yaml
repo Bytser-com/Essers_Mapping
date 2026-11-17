@@ -236,15 +236,12 @@ kubeStateMetrics:
       cpu: 100m
       memory: 128Mi
 
+# Node telemetry is collected natively on VM hosts by Ansible and Grafana Alloy
 nodeExporter:
-  enabled: true
-  resources:
-    requests:
-      cpu: 25m
-      memory: 32Mi
-    limits:
-      cpu: 100m
-      memory: 64Mi
+  enabled: false
+
+prometheus-node-exporter:
+  enabled: false
 
 # Pre-packaged Core Kubernetes Dashboards
 defaultRules:
