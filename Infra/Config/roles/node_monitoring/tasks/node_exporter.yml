@@ -1,0 +1,35 @@
+---
+# ==============================================================================
+# TASKS: node_exporter.yml
+# Installs and configures official Prometheus Node Exporter on Debian 13
+# ==============================================================================
+
+- name: Install Prometheus Node Exporter package
+  ansible.builtin.apt:
+    name: "{{ node_monitoring_node_exporter_package }}"
+    state: present
+    update_cache: false
+
+- name: Ensure textfile collector directory exists for Node Exporter
+  ansible.builtin.file:
+    path: "{{ node_monitoring_node_exporter_collector_textfile_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Deploy Prometheus Node Exporter default service flags
+  ansible.builtin.template:
+    src: prometheus-node-exporter.default.j2
+    dest: /etc/default/prometheus-node-exporter
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart node-exporter
+
+- name: Ensure Prometheus Node Exporter service is enabled and started
+  ansible.builtin.systemd:
+    name: prometheus-node-exporter
+    state: started
+    enabled: true
+  when: not ansible_check_mode

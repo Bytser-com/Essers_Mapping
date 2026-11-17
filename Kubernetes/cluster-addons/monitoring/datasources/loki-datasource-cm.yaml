@@ -1,0 +1,27 @@
+# ==============================================================================
+# GRAFANA LOKI DATASOURCE CONFIGMAP
+# Automatically discovered by the Grafana sidecar (label: grafana_datasource="1")
+# Enables querying container and host logs directly inside Grafana.
+# ==============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasource-loki
+  namespace: monitoring
+  labels:
+    grafana_datasource: "1"
+    app.kubernetes.io/part-of: essers-mapping
+data:
+  loki-datasource.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Loki
+        type: loki
+        uid: loki
+        access: proxy
+        url: http://loki.monitoring.svc.cluster.local:3100
+        isDefault: false
+        version: 1
+        editable: false
+        jsonData:
+          maxLines: 2000

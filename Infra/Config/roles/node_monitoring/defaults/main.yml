@@ -1,0 +1,34 @@
+---
+# ==============================================================================
+# DEFAULTS: node_monitoring
+# Configures Prometheus Node Exporter & Grafana Alloy on Debian 13 VMs
+# ==============================================================================
+
+# --- Prometheus Node Exporter Settings ---
+node_monitoring_node_exporter_enabled: true
+node_monitoring_node_exporter_package: "prometheus-node-exporter"
+node_monitoring_node_exporter_port: 9100
+node_monitoring_node_exporter_listen_address: "0.0.0.0"
+node_monitoring_node_exporter_collector_textfile_dir: "/var/lib/prometheus/node-exporter"
+
+# --- Grafana Alloy Settings ---
+node_monitoring_alloy_enabled: true
+node_monitoring_alloy_package: "alloy"
+node_monitoring_alloy_user: "alloy"
+node_monitoring_alloy_group: "alloy"
+node_monitoring_alloy_config_dir: "/etc/alloy"
+node_monitoring_alloy_config_file: "/etc/alloy/config.alloy"
+
+# APT Repository configuration for Grafana
+node_monitoring_alloy_gpg_key_url: "https://apt.grafana.com/gpg.key"
+node_monitoring_alloy_gpg_asc_path: "/etc/apt/keyrings/grafana-signing.asc"
+node_monitoring_alloy_gpg_keyring_path: "/etc/apt/keyrings/grafana.gpg"
+node_monitoring_alloy_repo_url: "https://apt.grafana.com"
+node_monitoring_alloy_repo_distribution: "stable"
+node_monitoring_alloy_repo_component: "main"
+
+# Log & Metrics forward destinations (overridable per environment or inventory group)
+node_monitoring_alloy_loki_url: >-
+  http://{{ (hostvars[groups['k8s_masters'][0]]['ansible_host'] | default('192.168.100.11')) }}:3100/loki/api/v1/push
+node_monitoring_alloy_prometheus_url: >-
+  http://{{ (hostvars[groups['k8s_masters'][0]]['ansible_host'] | default('192.168.100.11')) }}:9090/api/v1/write

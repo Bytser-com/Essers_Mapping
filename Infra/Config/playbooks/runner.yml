@@ -41,3 +41,13 @@
         - runner
         - cicd
         - github_runner
+    - role: node_monitoring
+      tags:
+        - never
+        - runner
+        - cicd
+        - github_runner
+        - monitoring
+        - node_monitoring
+        - node_exporter
+        - alloy

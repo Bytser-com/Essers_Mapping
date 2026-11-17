@@ -15,8 +15,15 @@ Kubernetes/
 │   ├── ingress-nginx/
 │   │   ├── values-testing.yaml                   # Binds ingress-nginx LoadBalancer to 192.168.100.101 (80 -> 443 + TLS)
 │   │   └── values-production.yaml                # Binds ingress-nginx LoadBalancer to 192.168.100.201 (80 -> 443 + TLS)
-│   └── longhorn/
-│       └── values-single-worker.yaml             # Longhorn Helm values tuned for 1 Worker (8 vCPU / 8GB RAM / 128GB)
+│   ├── longhorn/
+│   │   └── values-single-worker.yaml             # Longhorn Helm values tuned for 1 Worker (8 vCPU / 8GB RAM / 128GB)
+│   └── monitoring/                               # Prometheus Operator & Grafana Monitoring Stack
+│       ├── README.md                             # Step-by-step monitoring architecture & operations guide
+│       ├── values-testing.yaml                   # Helm values tuned for Testing cluster (7d retention, IP .101)
+│       ├── values-production.yaml                # Helm values tuned for Production cluster (30d retention, IP .201)
+│       ├── network-policies.yaml                 # Calico Zero-Trust NetworkPolicies for monitoring namespace
+│       ├── service-monitors/                     # Automated Prometheus metrics discovery
+│       └── dashboards/                           # GitOps Dashboards-as-Code (Cluster & Application health)
 ├── base/                                         # Shared base manifests across all environments
 │   ├── kustomization.yaml                        # Root base Kustomize definition & ConfigMap generator
 │   ├── common/
@@ -172,6 +179,39 @@ You will see:
 - `service/sftp-shared` $\rightarrow$ `EXTERNAL-IP: 192.168.100.102` (`22:.../TCP`)
 - `service/sftp-runtime` $\rightarrow$ `EXTERNAL-IP: 192.168.100.103` (`22:.../TCP`)
 - `service/frontend`, `service/mapping-converter`, `service/mapping-proposal`, `service/version-control-backend`, `service/runtime-backend` $\rightarrow$ `ClusterIP` (`EXTERNAL-IP: <none>`)
+
+### Step 5: Deploy Monitoring Stack (Prometheus Operator & Grafana Dashboards)
+Deploys Prometheus time-series metrics collection, Grafana visual dashboards, and Calico Zero-Trust policies:
+
+```bash
+# 1. Add Prometheus Community Helm Repository
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+# 2. Deploy kube-prometheus-stack for your target cluster:
+# On Testing cluster:
+helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+  --namespace monitoring --create-namespace \
+  -f Kubernetes/cluster-addons/monitoring/values-testing.yaml
+
+# On Production cluster:
+kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
+kubectl create secret generic grafana-admin-credentials \
+  --namespace monitoring \
+  --from-literal=admin-user=essers-admin \
+  --from-literal=admin-password="REPLACE_WITH_STRONG_PRODUCTION_SECRET" \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+  --namespace monitoring --create-namespace \
+  -f Kubernetes/cluster-addons/monitoring/values-production.yaml
+
+# 3. Apply Calico Zero-Trust NetworkPolicies, ServiceMonitors, and Dashboards-as-Code
+kubectl apply -f Kubernetes/cluster-addons/monitoring/network-policies.yaml
+kubectl apply -f Kubernetes/cluster-addons/monitoring/service-monitors/
+kubectl apply -k Kubernetes/cluster-addons/monitoring/dashboards/
+```
+Detailed instructions and dashboard documentation are in [`Kubernetes/cluster-addons/monitoring/README.md`](./cluster-addons/monitoring/README.md).
 
 ---
 
