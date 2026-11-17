@@ -3,7 +3,7 @@
 #   - 192.168.100.201 -> ingress-nginx-controller (Ports 80, 443 -> frontend:8080)
 #   - 192.168.100.202 -> sftp-shared (Port 22, 8080)
 #   - 192.168.100.203 -> sftp-runtime (Port 22, 8080)
-# Hostname: production.essers.shystack.com
+# Hostname: production-essers.shystack.com
 # ==============================================================================
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -14,10 +14,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - production.essers.shystack.com
+        - production-essers.shystack.com
       secretName: essers-frontend-production-tls
   rules:
-    - host: production.essers.shystack.com
+    - host: production-essers.shystack.com
       http:
         paths:
           - path: /

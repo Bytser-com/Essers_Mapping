@@ -59,16 +59,16 @@ grafana:
       nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       nginx.ingress.kubernetes.io/proxy-body-size: "10m"
     hosts:
+      - monitor-testing.shystack.com
       - grafana.testing.essers.local
-      - grafana-test.example.com
     paths:
       - /
     pathType: Prefix
     tls:
       - secretName: grafana-testing-tls
         hosts:
+          - monitor-testing.shystack.com
           - grafana.testing.essers.local
-          - grafana-test.example.com
 
   # Persistent storage via Longhorn (Testing: 5Gi RWO)
   persistence:
@@ -108,7 +108,7 @@ grafana:
 
   grafana.ini:
     server:
-      root_url: "https://grafana.testing.essers.local"
+      root_url: "https://monitor-testing.shystack.com"
       serve_from_sub_path: false
     analytics:
       reporting_enabled: false
