@@ -12,6 +12,12 @@ Kubernetes/
 ├── cluster-addons/
 │   ├── cert-manager/
 │   │   └── cluster-issuers.yaml                  # Let's Encrypt (prod/staging) & Self-Signed ClusterIssuers
+│   ├── cloudflared/
+│   │   ├── namespace.yaml                        # Namespace with Pod Security Standards (restricted)
+│   │   ├── deployment.yaml                       # Cloudflare Tunnel HA daemon (2 replicas)
+│   │   ├── network-policy.yaml                   # Calico zero-trust policy for Cloudflare & Ingress
+│   │   ├── kustomization.yaml                    # Kustomize manifest bundle
+│   │   └── README.md                             # Step-by-step setup guide & Zero Trust configuration
 │   ├── ingress-nginx/
 │   │   ├── values-testing.yaml                   # Binds ingress-nginx LoadBalancer to 192.168.100.101 (80 -> 443 + TLS)
 │   │   └── values-production.yaml                # Binds ingress-nginx LoadBalancer to 192.168.100.201 (80 -> 443 + TLS)
@@ -180,7 +186,23 @@ You will see:
 - `service/sftp-runtime` $\rightarrow$ `EXTERNAL-IP: 192.168.100.103` (`22:.../TCP`)
 - `service/frontend`, `service/mapping-converter`, `service/mapping-proposal`, `service/version-control-backend`, `service/runtime-backend` $\rightarrow$ `ClusterIP` (`EXTERNAL-IP: <none>`)
 
-### Step 5: Deploy Monitoring Stack (Prometheus Operator & Grafana Dashboards)
+### Step 5: Expose Publicly via Cloudflare Tunnel (No Port Forwarding Required)
+If you cannot open router ports (NAT/CGNAT), deploy `cloudflared` to establish an outbound-only reverse tunnel to Cloudflare Edge:
+```bash
+# 1. Create the secret with your Cloudflare Zero Trust Tunnel token:
+kubectl create namespace cloudflare --dry-run=client -o yaml | kubectl apply -f -
+kubectl create secret generic cloudflared-token \
+  --namespace cloudflare \
+  --from-literal=token="<YOUR_CLOUDFLARE_TUNNEL_TOKEN>"
+
+# 2. Deploy the HA cloudflared tunnel pods (2 replicas + Calico network policies):
+kubectl apply -k Kubernetes/cluster-addons/cloudflared/
+
+# 3. Verify tunnel connection:
+kubectl get pods -n cloudflare
+```
+See the full guide in [`cluster-addons/cloudflared/README.md`](./cluster-addons/cloudflared/README.md).
+### Step 6: Deploy Monitoring Stack (Prometheus Operator & Grafana Dashboards)
 Deploys Prometheus time-series metrics collection, Grafana visual dashboards, and Calico Zero-Trust policies:
 
 ```bash

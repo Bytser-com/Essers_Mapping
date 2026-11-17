@@ -90,6 +90,7 @@ jobs:
       ACME_EMAIL: ${{ vars.ACME_EMAIL || 'admin@example.com' }}
       DOMAIN_NAME: ${{ vars.DOMAIN_NAME || 'your-domain.example.com' }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_TUNNEL_TOKEN: ${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}
 
       # --- Grafana Admin Secret & Alert Notifications ---
       GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
@@ -152,7 +153,7 @@ jobs:
             yamllint -d "{extends: default, rules: {line-length: disable, document-start: disable, truthy: disable}}" .
           fi
 
-          # 2. Build both testing and production overlays offline to catch structural/patch errors early
+          # 2. Build overlays and addons offline to catch structural/patch errors early
           for env_dir in testing production; do
             if [ -f "overlays/${env_dir}/kustomization.yaml" ]; then
               echo "Validating Kustomize build for overlay: ${env_dir}..."
@@ -162,7 +163,14 @@ jobs:
               grep -q "kind: NetworkPolicy" "$RUNNER_TEMP/rendered-${env_dir}.yaml"
             fi
           done
-          echo "All Kustomize overlays built and validated cleanly."
+
+          if [ -d "cluster-addons/cloudflared" ]; then
+            echo "Validating Kustomize build for cluster addon: cloudflared..."
+            kubectl kustomize "cluster-addons/cloudflared" > "$RUNNER_TEMP/rendered-cloudflared.yaml"
+            grep -q "kind: Deployment" "$RUNNER_TEMP/rendered-cloudflared.yaml"
+            grep -q "kind: NetworkPolicy" "$RUNNER_TEMP/rendered-cloudflared.yaml"
+          fi
+          echo "All Kustomize overlays and addons built and validated cleanly."
 
       # Kubeconfig is isolated inside $RUNNER_TEMP and securely shredded on cleanup (only needed for live deploy/restart)
       - name: Prepare kubeconfig and verify cluster connectivity
@@ -267,7 +275,7 @@ jobs:
             perl -pi -e '$d = $ENV{DOMAIN_NAME}; s/your-domain\.example\.com/$d/g' "$INGRESS_FILE"
           fi
 
-      - name: Reconcile cluster addons (MetalLB, Longhorn, cert-manager, ingress-nginx, monitoring)
+      - name: Reconcile cluster addons (MetalLB, Longhorn, cert-manager, ingress-nginx, monitoring, cloudflared)
         if: steps.manifests.outputs.exists == 'true' && env.MODE == 'apply' && env.SKIP_ADDONS != 'true'
         shell: bash
         run: |
@@ -358,7 +366,24 @@ jobs:
               --timeout 5m
           fi
 
-          # 5. Prometheus Operator & Grafana Monitoring Stack (kube-prometheus-stack)
+          # 5. Cloudflare Tunnel (cloudflared) for Secure Public Access (No Port Forwarding)
+          if [ -d "cluster-addons/cloudflared" ]; then
+            echo "Reconciling Cloudflare Tunnel (cloudflared)..."
+            kubectl apply -f "cluster-addons/cloudflared/namespace.yaml"
+            if [ -n "${CLOUDFLARE_TUNNEL_TOKEN:-}" ]; then
+              echo "Deploying Cloudflare Tunnel secret and pods..."
+              kubectl create secret generic cloudflared-token \
+                --namespace cloudflare \
+                --from-literal=token="${CLOUDFLARE_TUNNEL_TOKEN}" \
+                --dry-run=client -o yaml | kubectl apply -f -
+              kubectl apply -k "cluster-addons/cloudflared"
+              kubectl rollout status deployment/cloudflared -n cloudflare --timeout=180s
+            else
+              echo "::warning::CLOUDFLARE_TUNNEL_TOKEN secret is not set in GitHub repository secrets. Skipping cloudflared deployment."
+            fi
+          fi
+
+          # 6. Prometheus Operator & Grafana Monitoring Stack (kube-prometheus-stack)
           MONITORING_VALUES="cluster-addons/monitoring/values-${OVERLAY}.yaml"
           if [ -f "$MONITORING_VALUES" ]; then
             echo "Reconciling Prometheus & Grafana Monitoring Stack for ${OVERLAY}..."
