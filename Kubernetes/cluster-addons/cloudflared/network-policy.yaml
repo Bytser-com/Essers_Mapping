@@ -24,27 +24,14 @@ spec:
           port: 53
         - protocol: TCP
           port: 53
-    # 2. Allow internal routing to NGINX Ingress Controller in ingress-nginx namespace
-    - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: ingress-nginx
-      ports:
+    # 2. Allow internal routing to NGINX Ingress Controller (ClusterIP VIP, MetalLB IP, and Pod IPs)
+    - ports:
         - protocol: TCP
           port: 80
         - protocol: TCP
           port: 443
-    # 3. Allow outbound connections to Cloudflare Edge (HTTPS 443 and Cloudflare Tunnel protocol 7844 UDP/TCP)
-    - to:
-        - ipBlock:
-            cidr: 0.0.0.0/0
-            except:
-              - 10.0.0.0/8
-              - 172.16.0.0/12
-              - 192.168.0.0/16
-      ports:
-        - protocol: TCP
-          port: 443
+    # 3. Allow outbound connections to Cloudflare Edge protocol (QUIC / HTTP/2 multiplexing)
+    - ports:
         - protocol: TCP
           port: 7844
         - protocol: UDP
