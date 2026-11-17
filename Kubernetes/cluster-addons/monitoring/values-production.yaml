@@ -148,7 +148,7 @@ prometheus:
   prometheusSpec:
     replicas: 1
     retention: 30d
-    retentionSize: 45Gi
+    retentionSize: 45GiB
 
     nodeSelector:
       node-role.kubernetes.io/worker: "worker"
