@@ -226,3 +226,25 @@ spec:
           port: 2022
         - protocol: TCP
           port: 8080
+---
+# 8. MONITORING TELEMETRY SCRAPE (Prometheus):
+#    Allows Prometheus in the `monitoring` namespace to scrape metrics from workloads
+#    in this namespace (HTTP metrics on ports 8000, 8080).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-monitoring-scrape
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - protocol: TCP
+          port: 8000
+        - protocol: TCP
+          port: 8080

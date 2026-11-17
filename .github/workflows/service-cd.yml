@@ -318,6 +318,11 @@ jobs:
               "spec": {"template": template},
           }))
           ')
+          # Strip any leftover dummy placeholder command/args on the live deployment
+          cleanup_patch=$(kubectl get deployment "$DEPLOYMENT" -n "$NAMESPACE" -o json | python3 Scripts/cleanup-deployment-overrides.py "$DEPLOYMENT")
+          if [[ "$cleanup_patch" != "[]" ]]; then
+            kubectl patch deployment "$DEPLOYMENT" -n "$NAMESPACE" --type=json -p "$cleanup_patch"
+          fi
           kubectl patch deployment "$DEPLOYMENT" -n "$NAMESPACE" --type=strategic --patch "$patch"
           if ! kubectl rollout status "deployment/$DEPLOYMENT" -n "$NAMESPACE" --timeout=300s; then
             echo "::error::Rollout failed or timed out for deployment/$DEPLOYMENT in $NAMESPACE. Capturing diagnostics..."

@@ -1,0 +1,96 @@
+---
+# ==============================================================================
+# TASKS: alloy.yml
+# Installs and configures official Grafana Alloy telemetry agent on Debian 13
+# ==============================================================================
+
+- name: Ensure /etc/apt/keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Download official Grafana APT ASCII GPG key
+  ansible.builtin.get_url:
+    url: "{{ node_monitoring_alloy_gpg_key_url }}"
+    dest: "{{ node_monitoring_alloy_gpg_asc_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  register: grafana_gpg_key_dl
+
+- name: Check if Grafana binary GPG keyring exists
+  ansible.builtin.stat:
+    path: "{{ node_monitoring_alloy_gpg_keyring_path }}"
+  register: grafana_keyring_stat
+
+- name: Dearmor Grafana GPG key into binary keyring
+  ansible.builtin.command:
+    cmd: "gpg --dearmor --yes -o {{ node_monitoring_alloy_gpg_keyring_path }} {{ node_monitoring_alloy_gpg_asc_path }}"
+  changed_when: true
+  when: grafana_gpg_key_dl.changed or not grafana_keyring_stat.stat.exists
+
+- name: Ensure Grafana GPG keyring permissions are world-readable by APT
+  ansible.builtin.file:
+    path: "{{ node_monitoring_alloy_gpg_keyring_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  when: not ansible_check_mode or grafana_keyring_stat.stat.exists
+
+- name: Add official Grafana APT repository (deb822)
+  ansible.builtin.deb822_repository:
+    name: grafana
+    types: deb
+    uris: "{{ node_monitoring_alloy_repo_url }}"
+    suites: "{{ node_monitoring_alloy_repo_distribution }}"
+    components: "{{ node_monitoring_alloy_repo_component }}"
+    architectures: amd64
+    signed_by: "{{ node_monitoring_alloy_gpg_keyring_path }}"
+    state: present
+    enabled: true
+
+- name: Install Grafana Alloy telemetry agent package
+  ansible.builtin.apt:
+    name: "{{ node_monitoring_alloy_package }}"
+    state: present
+    update_cache: true
+  register: alloy_install_apt
+  until: alloy_install_apt is success
+  retries: 3
+  delay: 5
+
+- name: Ensure alloy user is a member of adm and systemd-journal groups for log collection
+  ansible.builtin.user:
+    name: "{{ node_monitoring_alloy_user }}"
+    groups:
+      - adm
+      - systemd-journal
+    append: true
+  when: not ansible_check_mode
+
+- name: Ensure Alloy configuration directory exists
+  ansible.builtin.file:
+    path: "{{ node_monitoring_alloy_config_dir }}"
+    state: directory
+    owner: "{{ node_monitoring_alloy_user }}"
+    group: "{{ node_monitoring_alloy_group }}"
+    mode: "0755"
+
+- name: Deploy Grafana Alloy pipeline configuration
+  ansible.builtin.template:
+    src: config.alloy.j2
+    dest: "{{ node_monitoring_alloy_config_file }}"
+    owner: "{{ node_monitoring_alloy_user }}"
+    group: "{{ node_monitoring_alloy_group }}"
+    mode: "0644"
+  notify: Restart alloy
+
+- name: Ensure Grafana Alloy service is enabled and started
+  ansible.builtin.systemd:
+    name: "{{ node_monitoring_alloy_service_name | default('alloy') }}"
+    state: started
+    enabled: true
+  when: not ansible_check_mode
