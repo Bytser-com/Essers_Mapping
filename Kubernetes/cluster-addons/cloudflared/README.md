@@ -13,7 +13,7 @@ Visitor (Internet)
       │
       ├─────────────────────────────────────────────────┐
       ▼  HTTPS (443)                                    ▼  HTTPS (443)
-https://testing.essers.shystack.com          https://production.essers.shystack.com
+https://testing-essers.shystack.com          https://production-essers.shystack.com
       │                                                 │
       ▼                                                 ▼
 Cloudflare Edge Network                           Cloudflare Edge Network
@@ -32,8 +32,8 @@ Testing Frontend Pod                              Production Frontend Pod
 
 ### Why Separate Tunnels per Cluster?
 Because each cluster runs on its own virtual machines with its own internal network:
-1. **Testing Tunnel (`essers-k8s-testing`)**: Connects only to the Testing cluster and routes `testing.essers.shystack.com`.
-2. **Production Tunnel (`essers-k8s-production`)**: Connects only to the Production cluster and routes `production.essers.shystack.com`.
+1. **Testing Tunnel (`essers-k8s-testing`)**: Connects only to the Testing cluster and routes `testing-essers.shystack.com`.
+2. **Production Tunnel (`essers-k8s-production`)**: Connects only to the Production cluster and routes `production-essers.shystack.com`.
 3. **Environment Isolation**: If the testing cluster is rebuilt, modified, or destroyed, the production cluster and its tunnel remain 100% untouched and operational.
 
 ---
@@ -48,13 +48,13 @@ Log in to [Cloudflare Zero Trust Dashboard](https://one.dash.cloudflare.com/) an
 3. Select **Docker** environment and copy the tunnel token (string after `--token`).
 4. In the **Public Hostname** tab:
    - Click **Add a public hostname**.
-   - **Subdomain**: `testing.essers`
+   - **Subdomain**: `testing-essers`
    - **Domain**: `shystack.com`
    - **Service**:
      - **Type**: `HTTP`
      - **URL**: `ingress-nginx-controller.ingress-nginx.svc.cluster.local:80`
    - Under **Additional application settings** → **HTTP Settings**:
-     - **HTTP Host Header**: `testing.essers.shystack.com`
+     - **HTTP Host Header**: `testing-essers.shystack.com`
    - Click **Save hostname**.
 
 ### Tunnel 2: Production Cluster
@@ -63,13 +63,13 @@ Log in to [Cloudflare Zero Trust Dashboard](https://one.dash.cloudflare.com/) an
 3. Select **Docker** environment and copy the tunnel token (string after `--token`).
 4. In the **Public Hostname** tab:
    - Click **Add a public hostname**.
-   - **Subdomain**: `production.essers`
+   - **Subdomain**: `production-essers`
    - **Domain**: `shystack.com`
    - **Service**:
      - **Type**: `HTTP`
      - **URL**: `ingress-nginx-controller.ingress-nginx.svc.cluster.local:80`
    - Under **Additional application settings** → **HTTP Settings**:
-     - **HTTP Host Header**: `production.essers.shystack.com`
+     - **HTTP Host Header**: `production-essers.shystack.com`
    - Click **Save hostname**.
 
 ---

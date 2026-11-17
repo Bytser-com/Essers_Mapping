@@ -72,7 +72,7 @@ grafana:
       nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
       nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
     hosts:
-      - monitor.production.essers.shystack.com
+      - monitor-production.shystack.com
       - grafana.essers.example.com
     paths:
       - /
@@ -80,7 +80,7 @@ grafana:
     tls:
       - secretName: grafana-production-tls
         hosts:
-          - monitor.production.essers.shystack.com
+          - monitor-production.shystack.com
           - grafana.essers.example.com
 
   # Persistent storage via Longhorn (Production: 20Gi RWO)
@@ -121,7 +121,7 @@ grafana:
 
   grafana.ini:
     server:
-      root_url: "https://monitor.production.essers.shystack.com"
+      root_url: "https://monitor-production.shystack.com"
       serve_from_sub_path: false
     analytics:
       reporting_enabled: false
