@@ -247,7 +247,7 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
             </span>
           </div>
 
-          <p className="m-0 text-[13px] text-grey">{`Geüpload op ${formatUploadDate(proposal.geupload)}${proposal.uploadUser ? ` door ${proposal.uploadUser}` : ""}`}</p>
+          <p className="m-0 text-[13px] text-grey">{`Geüpload op ${formatUploadDate(proposal.geupload)}${proposal.createdBy ? ` door ${proposal.createdBy}` : ""}`}</p>
         </div>
 
         <div className="flex items-center gap-2.5">
@@ -303,8 +303,8 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
           <span className="text-xs font-medium text-anthracite mt-1 truncate" title={proposal.updatedDate || "Niet bijgewerkt"}>
             {proposal.updatedDate ? `${formatDateOnly(proposal.updatedDate)} ${proposal.updatedTime ? proposal.updatedTime.slice(0, 5) : ""}` : "—"}
           </span>
-          {proposal.uploadUser && (
-            <span className="text-[11px] text-grey truncate">Door: {proposal.uploadUser}</span>
+          {proposal.createdBy && (
+            <span className="text-[11px] text-grey truncate">Door: {proposal.createdBy}</span>
           )}
         </div>
       </div>

@@ -15,7 +15,7 @@ public record ProposalMetadata(
         @JsonAlias({"createdDate", "uploaded_at", "created_date", "uploadedAt"})
         String createdDate,
 
-        @JsonAlias({"createdBy", "created_by", "creator", "upload_user", "uploadUser"})
+        @JsonAlias({"createdBy", "created_by", "creator"})
         String createdBy,
 
         String description,

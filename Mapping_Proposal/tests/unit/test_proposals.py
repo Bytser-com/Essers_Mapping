@@ -306,3 +306,34 @@ def test_tc_57_08_empty_customer_name_is_refused(store):
 ])
 def test_tc_57_01_customer_folder_name_is_safe_and_readable(customer, folder):
     assert customer_folder_name(customer) == folder
+
+
+def test_proposal_version_is_v1_when_no_packages_exist(root, store):
+    ref = store.create_proposal('Nouryon')
+    assert ref.version == 1
+    assert ref.folder == 'nouryon/v1'
+
+
+def test_proposal_version_is_latest_package_version_plus_one(root, tmp_path):
+    # Customer exists in /packages/Nouryon with v1, v2, v3
+    pkg_dir = tmp_path / 'packages' / 'Nouryon'
+    (pkg_dir / 'v1').mkdir(parents=True)
+    (pkg_dir / 'v2').mkdir(parents=True)
+    (pkg_dir / 'v3').mkdir(parents=True)
+
+    store = ProposalStore(root)
+    ref = store.create_proposal('Nouryon')
+    assert ref.version == 4
+    assert ref.folder == 'nouryon/v4'
+
+
+def test_proposal_version_package_matching_is_case_insensitive(root, tmp_path):
+    # Customer folder in Packages is lowercase 'nouryon' with v2
+    pkg_dir = tmp_path / 'packages' / 'nouryon'
+    (pkg_dir / 'v2').mkdir(parents=True)
+
+    store = ProposalStore(root)
+    ref = store.create_proposal('Nouryon')
+    assert ref.version == 3
+    assert ref.folder == 'nouryon/v3'
+

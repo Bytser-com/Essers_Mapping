@@ -9,8 +9,6 @@ export type CompanyProposalOverviewDto = {
   fullPath?: string | null;
   createdDate?: string | null;
   createdBy?: string | null;
-  uploadUser?: string | null;
-  upload_user?: string | null;
   description?: string | null;
   status?: string | null;
   aiStatus?: string | null;
@@ -37,8 +35,6 @@ export type ProposalFileDataDto = {
   upload_time?: string | null;
   updated_time?: string | null;
   updated_date?: string | null;
-  upload_user?: string | null;
-  uploadUser?: string | null;
   createdBy?: string | null;
   status?: string | null;
   rows: Array<{
@@ -105,8 +101,7 @@ export async function getProposal(company: string, version?: string): Promise<Pr
       if (fileData.upload_time) proposal.uploadTime = fileData.upload_time;
       if (fileData.updated_date) proposal.updatedDate = fileData.updated_date;
       if (fileData.updated_time) proposal.updatedTime = fileData.updated_time;
-      const directUser = fileData.upload_user || fileData.uploadUser || fileData.createdBy;
-      if (directUser) proposal.uploadUser = directUser;
+      if (fileData.createdBy) proposal.createdBy = fileData.createdBy;
       return proposal;
     } catch (err) {
       // Fallback to overview lookup if filedata specifically fails with non-network error
@@ -151,8 +146,8 @@ export async function getProposal(company: string, version?: string): Promise<Pr
       geupload: item.createdDate || new Date().toISOString(),
       mappings: item.mappings,
     };
-    const overviewUser = item.createdBy || item.uploadUser || item.upload_user;
-    if (overviewUser) proposal.uploadUser = overviewUser;
+    const overviewUser = item.createdBy;
+    if (overviewUser) proposal.createdBy = overviewUser;
     return proposal;
   }
 
@@ -186,8 +181,8 @@ export async function getProposal(company: string, version?: string): Promise<Pr
     if (fileData.upload_time) proposal.uploadTime = fileData.upload_time;
     if (fileData.updated_date) proposal.updatedDate = fileData.updated_date;
     if (fileData.updated_time) proposal.updatedTime = fileData.updated_time;
-    const user = fileData.upload_user || fileData.uploadUser || item.createdBy || item.uploadUser || item.upload_user;
-    if (user) proposal.uploadUser = user;
+    const user = fileData.createdBy || item.createdBy;
+    if (user) proposal.createdBy = user;
     return proposal;
   } catch (err) {
     // If filedata call fails (e.g. backend error or test mock only mocking /proposals), fall back gracefully
@@ -202,8 +197,7 @@ export async function getProposal(company: string, version?: string): Promise<Pr
       geupload: item.createdDate || new Date().toISOString(),
       mappings: item.mappings || [],
     };
-    const fallbackUser = item.createdBy || item.uploadUser || item.upload_user;
-    if (fallbackUser) proposal.uploadUser = fallbackUser;
+    if (item.createdBy) proposal.createdBy = item.createdBy;
     return proposal;
   }
 }
