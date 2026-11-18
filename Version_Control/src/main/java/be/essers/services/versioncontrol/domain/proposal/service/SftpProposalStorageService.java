@@ -228,7 +228,7 @@ public class SftpProposalStorageService implements ProposalStorageService {
             String updatedDate = updateParts[0];
             String updatedTime = updateParts[1];
 
-            String uploadUser = (metadata != null) ? metadata.createdBy() : null;
+            String createdBy = (metadata != null) ? metadata.createdBy() : null;
             String status = (metadata != null) ? metadata.status() : null;
 
             return new ProposalFileDataDto(
@@ -238,7 +238,7 @@ public class SftpProposalStorageService implements ProposalStorageService {
                     uploadTime,
                     updatedTime,
                     updatedDate,
-                    uploadUser,
+                    createdBy,
                     status,
                     rows
             );

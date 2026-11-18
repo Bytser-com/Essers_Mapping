@@ -223,7 +223,7 @@ class ProposalControllerTest {
                 .andExpect(jsonPath("$.upload_time").value("14:30:00"))
                 .andExpect(jsonPath("$.updated_time").value("15:00:00"))
                 .andExpect(jsonPath("$.updated_date").value("2026-11-10"))
-                .andExpect(jsonPath("$.upload_user").value("Jane Doe"))
+                .andExpect(jsonPath("$.createdBy").value("Jane Doe"))
                 .andExpect(jsonPath("$.status").value("READY_FOR_REVIEW"))
                 .andExpect(jsonPath("$.rows.length()").value(2))
                 .andExpect(jsonPath("$.rows[0].source_field").value("OrderNo"))

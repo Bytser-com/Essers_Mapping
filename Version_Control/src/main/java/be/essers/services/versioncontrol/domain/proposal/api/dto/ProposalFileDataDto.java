@@ -12,7 +12,7 @@ import java.util.List;
         "upload_time",
         "updated_time",
         "updated_date",
-        "upload_user",
+        "createdBy",
         "status",
         "rows"
 })
@@ -35,8 +35,8 @@ public record ProposalFileDataDto(
         @JsonProperty("updated_date")
         String updatedDate,
 
-        @JsonProperty("upload_user")
-        String uploadUser,
+        @JsonProperty("createdBy")
+        String createdBy,
 
         @JsonProperty("status")
         String status,
@@ -51,9 +51,9 @@ public record ProposalFileDataDto(
             String uploadTime,
             String updatedTime,
             String updatedDate,
-            String uploadUser,
+            String createdBy,
             List<ProposalRowDto> rows
     ) {
-        this(version, companyName, uploadDate, uploadTime, updatedTime, updatedDate, uploadUser, null, rows);
+        this(version, companyName, uploadDate, uploadTime, updatedTime, updatedDate, createdBy, null, rows);
     }
 }

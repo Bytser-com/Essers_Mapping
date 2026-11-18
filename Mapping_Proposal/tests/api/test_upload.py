@@ -115,7 +115,7 @@ def test_uploaded_files_are_picked_up_by_the_watcher(client, incoming, store):
 
 
 def test_upload_fails_when_sftp_storage_fails(client, incoming, store, monkeypatch):
-    def failing_create(customer, upload_user='Analist A'):
+    def failing_create(customer, created_by='Analist A'):
         raise StorageError('Cannot connect to SFTP sftp-shared:22')
 
     monkeypatch.setattr(store, 'create_proposal', failing_create)

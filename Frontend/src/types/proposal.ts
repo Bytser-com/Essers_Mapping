@@ -15,6 +15,6 @@ export type Proposal = {
   uploadTime?: string | null;
   updatedDate?: string | null;
   updatedTime?: string | null;
-  uploadUser?: string | null;
+  createdBy?: string | null;
   mappings: Mapping[];
 };

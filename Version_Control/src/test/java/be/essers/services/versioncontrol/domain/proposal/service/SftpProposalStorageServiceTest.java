@@ -586,7 +586,7 @@ class SftpProposalStorageServiceTest {
                   "filename": "mappingproposal.xlsx",
                   "uploaded_at": "2026-10-20T16:45:00+02:00",
                   "updated_at": "2026-11-11T23:03:02+00:00",
-                  "upload_user": "Jane Doe",
+                  "createdBy": "Jane Doe",
                   "status": "READY_FOR_REVIEW"
                 }
                 """;
@@ -643,7 +643,7 @@ class SftpProposalStorageServiceTest {
         assertEquals("16:45:00", result.uploadTime());
         assertEquals("2026-11-11", result.updatedDate());
         assertEquals("23:03:02", result.updatedTime());
-        assertEquals("Jane Doe", result.uploadUser());
+        assertEquals("Jane Doe", result.createdBy());
         assertEquals("READY_FOR_REVIEW", result.status());
         assertNotNull(result.rows());
         assertEquals(2, result.rows().size());
@@ -818,7 +818,7 @@ class SftpProposalStorageServiceTest {
         assertEquals("2026-10-15", result.uploadDate());
         assertEquals("08:30:00", result.uploadTime());
         assertEquals("IN_REVIEW", result.status());
-        assertEquals("System", result.uploadUser());
+        assertEquals("System", result.createdBy());
         assertTrue(result.rows().isEmpty());
     }
 
