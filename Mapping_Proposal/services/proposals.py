@@ -118,13 +118,144 @@ class ProposalStore:
     tests, a folder: a Path is wrapped in a LocalStorage.
     """
 
-    def __init__(self, storage: Storage | Path | str):
+    def __init__(
+        self,
+        storage: Storage | Path | str,
+        packages_storage: Storage | Path | str | None = None,
+    ):
         self.storage = LocalStorage(Path(storage)) if isinstance(storage, (str, Path)) else storage
+        if packages_storage is not None:
+            self._packages_storage = (
+                LocalStorage(Path(packages_storage))
+                if isinstance(packages_storage, (str, Path))
+                else packages_storage
+            )
+        else:
+            self._packages_storage = None
 
     @property
     def root(self):
         """Root of the proposals (a Path for a local folder, a remote path for SFTP)."""
         return self.storage.root
+
+    def get_packages_storage(self) -> Storage | None:
+        """Resolve the packages storage (configured, local sibling, or from settings)."""
+        if self._packages_storage is not None:
+            return self._packages_storage
+
+        if isinstance(self.storage, LocalStorage):
+            parent = self.storage.root.parent
+            for candidate in ('packages', 'Packages'):
+                pkg_dir = parent / candidate
+                if pkg_dir.is_dir():
+                    return LocalStorage(pkg_dir)
+            return LocalStorage(parent / 'packages')
+
+        try:
+            from .storage import packages_storage
+            return packages_storage()
+        except Exception as e:
+            logger.warning('Failed to resolve packages storage: %s', e)
+            return None
+
+    def get_latest_package_version(
+        self,
+        customer: str,
+        session: StorageSession | None = None,
+    ) -> int | None:
+        """Find the latest package version number for this customer in /Packages, if any.
+
+        Returns None if the customer has no packages or packages storage is unavailable.
+        """
+        customer = customer.strip()
+        if not customer:
+            return None
+
+        # 1. If explicit packages_storage was configured, use it
+        if self._packages_storage is not None:
+            try:
+                with self._packages_storage.session() as s:
+                    return self._find_max_package_version_in_session(s, customer)
+            except Exception as e:
+                logger.warning('Failed to query configured packages storage for %r: %s', customer, e)
+                return None
+
+        # 2. If a live SFTP session was passed, reuse the SFTP client connection for /Packages
+        if session is not None and hasattr(session, 'client'):
+            import os
+            pkg_root = os.getenv('SFTP_SHARED_PACKAGES_DIR', '/Packages').strip() or '/Packages'
+            from .storage import _SftpSession
+            try:
+                pkg_session = _SftpSession(session.client, pkg_root)
+                return self._find_max_package_version_in_session(pkg_session, customer)
+            except Exception as e:
+                logger.warning('Failed to check packages on SFTP for %r: %s', customer, e)
+                return None
+
+        # 3. If session is LocalStorage or self.storage is LocalStorage
+        local_root = None
+        if isinstance(session, LocalStorage):
+            local_root = session.root
+        elif isinstance(self.storage, LocalStorage):
+            local_root = self.storage.root
+
+        if local_root is not None:
+            parent = local_root.parent
+            for candidate in ('packages', 'Packages'):
+                pkg_dir = parent / candidate
+                if pkg_dir.is_dir():
+                    try:
+                        with LocalStorage(pkg_dir).session() as s:
+                            return self._find_max_package_version_in_session(s, customer)
+                    except Exception as e:
+                        logger.warning('Failed to check local packages for %r: %s', customer, e)
+                        return None
+            return None
+
+        # 4. Fallback: query default packages_storage
+        pkg_store = self.get_packages_storage()
+        if pkg_store is not None:
+            try:
+                with pkg_store.session() as s:
+                    return self._find_max_package_version_in_session(s, customer)
+            except Exception as e:
+                logger.warning('Failed to query fallback packages storage for %r: %s', customer, e)
+                return None
+
+        return None
+
+    def _find_max_package_version_in_session(self, s: StorageSession, customer: str) -> int | None:
+        target_name = customer.strip().lower()
+        target_slug = customer_folder_name(customer).lower()
+        try:
+            dirs = s.list_dirs('')
+        except Exception:
+            return None
+
+        matched_dir = None
+        for d in dirs:
+            d_lower = d.lower()
+            if (
+                d_lower == target_name
+                or d_lower == target_slug
+                or customer_folder_name(d).lower() == target_slug
+            ):
+                matched_dir = d
+                break
+        if not matched_dir:
+            return None
+
+        try:
+            version_dirs = s.list_dirs(matched_dir)
+        except Exception:
+            return None
+
+        versions = [
+            int(m.group(1))
+            for name in version_dirs
+            if (m := re.match(r'^[vV](\d+)$', name))
+        ]
+        return max(versions) if versions else None
 
     # -- Writing (used by the AI run, see services/proposal_runner.py) -----------------
 
@@ -132,16 +263,22 @@ class ProposalStore:
         """Create the next version folder for this customer with status 'AI is generating'.
 
         The overview shows the new row immediately, while the AI is still working.
+        If the customer exists in /Packages, the proposal starts at latest package version + 1.
+        Otherwise it starts at v1.
         """
         customer = customer.strip()
         if not customer:
             raise ValueError('customer name is empty')
         customer_dir = customer_folder_name(customer)
         with self.storage.session() as s:
+            latest_pkg = self.get_latest_package_version(customer, session=s)
             s.make_dirs(customer_dir)
             existing = [int(m.group(1)) for name in s.list_dirs(customer_dir)
                         if (m := _VERSION_FOLDER.fullmatch(name))]
-            version = max(existing, default=0) + 1
+            if latest_pkg is not None:
+                version = max(existing + [latest_pkg], default=0) + 1
+            else:
+                version = max(existing, default=0) + 1
             # Creating a folder that exists fails: if another run took this number, try the next.
             while not s.make_dir(f'{customer_dir}/v{version}'):
                 version += 1

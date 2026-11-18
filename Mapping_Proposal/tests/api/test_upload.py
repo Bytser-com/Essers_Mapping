@@ -160,3 +160,19 @@ def test_watcher_reuses_existing_proposal_from_api_upload(client, incoming, stor
     assert len(proposals_after) == 1
     assert proposals_after[0].version == 1
 
+
+def test_upload_creates_version_based_on_existing_packages(client, tmp_path, store):
+    # Setup /Packages/Nouryon/v3
+    pkg_v3 = tmp_path / 'sftp-shared' / 'packages' / 'Nouryon' / 'v3'
+    pkg_v3.mkdir(parents=True)
+
+    response = client.post('/upload', data={'customer_name': 'Nouryon'}, files=[xml('order.xml')])
+    assert response.status_code == 201
+
+    proposals = store.list_proposals()
+    assert len(proposals) == 1
+    assert proposals[0].customer == 'Nouryon'
+    assert proposals[0].version == 4
+    assert proposals[0].id == 'nouryon/v4'
+
+

@@ -64,6 +64,20 @@ def proposal_storage() -> LocalStorage | SftpStorage:
     return LocalStorage(proposals_dir())
 
 
+def packages_storage() -> LocalStorage | SftpStorage:
+    """Where packages are stored: the SFTP server if SFTP_SHARED_HOST is set, else
+    the local folder data/sftp-shared/packages/."""
+    from scripts.config import (
+        packages_dir,
+        sftp_shared_packages_config,
+    )
+
+    config = sftp_shared_packages_config()
+    if config:
+        return SftpStorage(SftpSettings(**config))
+    return LocalStorage(packages_dir())
+
+
 def _clean(path: str) -> str:
     """Relative POSIX path without '..', so nothing can leave the storage root."""
     normalized = path.replace('\\', '/')
