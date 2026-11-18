@@ -72,7 +72,36 @@ spec:
             - sh
             - -c
             - |
-              mkdir -p /srv/sftpgo/data /srv/sftpgo/config /srv/sftpgo/backups
+              mkdir -p /srv/sftpgo/data /srv/sftpgo/config /srv/sftpgo/backups /srv/sftpgo/data/Packages /srv/sftpgo/data/Clients
+              cat << EOF > /srv/sftpgo/config/loaddata.json
+              {
+                "users": [
+                  {
+                    "username": "${SFTP_USER}",
+                    "password": "${SFTP_PASSWORD}",
+                    "status": 1,
+                    "permissions": {
+                      "/": ["*"]
+                    },
+                    "home_dir": "/srv/sftpgo/data"
+                  }
+                ],
+                "folders": [],
+                "groups": [],
+                "admins": []
+              }
+              EOF
+          env:
+            - name: SFTP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: sftp-runtime-credentials
+                  key: SFTP_USER
+            - name: SFTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sftp-runtime-credentials
+                  key: SFTP_PASSWORD
           volumeMounts:
             - name: runtime-data
               mountPath: /srv/sftpgo
@@ -94,6 +123,12 @@ spec:
               value: "8080"
             - name: SFTPGO_HTTPD__BINDINGS__0__ADDRESS
               value: "0.0.0.0"
+            - name: SFTPGO_DATA_PROVIDER__CREATE_DEFAULT_ADMIN
+              value: "true"
+            - name: SFTPGO_LOADDATA_FROM
+              value: "/srv/sftpgo/config/loaddata.json"
+            - name: SFTPGO_LOADDATA_MODE
+              value: "0"
             # Store SFTPGo SQLite DB & SSH host keys on the shared Longhorn RWX volume
             - name: SFTPGO_DATA_PROVIDER__DRIVER
               value: "sqlite"

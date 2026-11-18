@@ -21,6 +21,7 @@ from services.storage import (
     SftpSettings,
     SftpStorage,
     _SftpSession,
+    packages_storage,
     proposal_storage,
 )
 
@@ -133,6 +134,22 @@ def test_invalid_port_falls_back_to_22(monkeypatch):
     monkeypatch.setenv('SFTP_SHARED_HOST', 'sftp-shared')
     monkeypatch.setenv('SFTP_SHARED_PORT', 'abc')
     assert proposal_storage().settings.port == 22
+
+
+def test_packages_storage_configuration(monkeypatch):
+    monkeypatch.setenv('SFTP_SHARED_HOST', '')
+    assert isinstance(packages_storage(), LocalStorage)
+
+    monkeypatch.setenv('SFTP_SHARED_HOST', 'sftp-shared')
+    monkeypatch.setenv('SFTP_SHARED_PORT', '22')
+    monkeypatch.setenv('SFTP_SHARED_USER', 'shareduser')
+    monkeypatch.setenv('SFTP_SHARED_PASSWORD', 'secret')
+    monkeypatch.setenv('SFTP_SHARED_PACKAGES_DIR', '/upload/Packages')
+
+    storage = packages_storage()
+    assert isinstance(storage, SftpStorage)
+    assert storage.settings.base_dir == '/upload/Packages'
+    assert storage.root == '/upload/Packages'
 
 
 # ---------------------------------------------------------------------------
@@ -264,6 +281,17 @@ def test_next_upload_of_the_same_customer_gets_the_next_version(disk):
 
     assert ref.version == 2
     assert [row.version for row in store.list_proposals(all_versions=True)] == [2, 1]
+
+
+def test_proposal_version_increments_from_packages_on_sftp(disk):
+    (disk / 'Packages' / 'Nouryon' / 'v3').mkdir(parents=True)
+    store = ProposalStore(FakeSftpStorage(disk))
+
+    ref = store.create_proposal('Nouryon')
+
+    assert ref.version == 4
+    assert ref.folder == 'nouryon/v4'
+
 
 
 def test_excel_and_status_are_stored_on_sftp(disk, tmp_path):
