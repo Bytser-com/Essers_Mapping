@@ -121,6 +121,7 @@ jobs:
           : "${GHCR_USERNAME:?Set GHCR_USERNAME to the owner of the registry read token}"
           : "${GHCR_TOKEN:?Set GHCR_TOKEN to a durable read:packages token for Kubernetes image pulls}"
           : "${GEMINI_API_KEY:?Set GEMINI_API_KEY as a GitHub repository or environment secret}"
+          : "${GRAFANA_ADMIN_PASSWORD:?Set GRAFANA_ADMIN_PASSWORD as a GitHub repository or environment secret}"
 
       - name: Verify infrastructure is deployed
         if: steps.manifests.outputs.exists == 'true' && (env.MODE == 'apply' || env.MODE == 'restart')
@@ -389,15 +390,13 @@ jobs:
             echo "Reconciling Prometheus & Grafana Monitoring Stack for ${OVERLAY}..."
             kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
 
-            # In production, ensure the grafana-admin-credentials secret exists
-            if [ "$OVERLAY" = "production" ]; then
-              PROD_PASS="${GRAFANA_ADMIN_PASSWORD:-ProductionSecureGrafanaPass2026!}"
-              kubectl create secret generic grafana-admin-credentials \
-                --namespace monitoring \
-                --from-literal=admin-user=essers-admin \
-                --from-literal=admin-password="$PROD_PASS" \
-                --dry-run=client -o yaml | kubectl apply -f -
-            fi
+            # Ensure the grafana-admin-credentials secret exists (without fallback)
+            : "${GRAFANA_ADMIN_PASSWORD:?Set GRAFANA_ADMIN_PASSWORD as a GitHub repository or environment secret}"
+            kubectl create secret generic grafana-admin-credentials \
+              --namespace monitoring \
+              --from-literal=admin-user=admin \
+              --from-literal=admin-password="${GRAFANA_ADMIN_PASSWORD}" \
+              --dry-run=client -o yaml | kubectl apply -f -
 
             # Inject Discord Webhook URL into Alertmanager values if configured
             if [ -n "${DISCORD_WEBHOOK_URL:-}" ]; then

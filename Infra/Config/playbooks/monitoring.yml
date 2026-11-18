@@ -61,8 +61,8 @@
     monitoring_helm_release: "kube-prometheus-stack"
     monitoring_helm_chart: "prometheus-community/kube-prometheus-stack"
     monitoring_helm_repo_url: "https://prometheus-community.github.io/helm-charts"
-    grafana_admin_user: "essers-admin"
-    grafana_admin_password: "{{ lookup('env', 'GRAFANA_ADMIN_PASSWORD') | default('ProductionSecureGrafanaPass2026!', true) }}"
+    grafana_admin_user: "admin"
+    grafana_admin_password: "{{ lookup('env', 'GRAFANA_ADMIN_PASSWORD') }}"
 
   environment:
     KUBECONFIG: /etc/kubernetes/admin.conf
@@ -102,7 +102,7 @@
         stdin: "{{ mon_ns_yaml.stdout }}"
       changed_when: false
 
-    - name: Ensure production Grafana admin credentials secret exists
+    - name: Ensure Grafana admin credentials secret exists
       ansible.builtin.command: >-
         kubectl create secret generic grafana-admin-credentials
         --namespace {{ monitoring_namespace }}
@@ -111,15 +111,13 @@
         --dry-run=client -o yaml
       register: grafana_secret_yaml
       changed_when: false
-      when: monitoring_env == 'production'
 
-    - name: Apply production Grafana admin credentials secret
+    - name: Apply Grafana admin credentials secret
       ansible.builtin.command:
         cmd: "kubectl apply -f -"
       args:
         stdin: "{{ grafana_secret_yaml.stdout }}"
       changed_when: false
-      when: monitoring_env == 'production'
 
     - name: Configure Discord notification webhook in monitoring values if provided
       ansible.builtin.replace:

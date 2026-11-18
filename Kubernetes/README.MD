@@ -220,7 +220,7 @@ helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheu
 kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
 kubectl create secret generic grafana-admin-credentials \
   --namespace monitoring \
-  --from-literal=admin-user=essers-admin \
+  --from-literal=admin-user=admin \
   --from-literal=admin-password="REPLACE_WITH_STRONG_PRODUCTION_SECRET" \
   --dry-run=client -o yaml | kubectl apply -f -
 
