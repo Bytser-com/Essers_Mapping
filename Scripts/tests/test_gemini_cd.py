@@ -30,6 +30,7 @@ class GeminiCdTests(unittest.TestCase):
             "GEMINI_API_KEY": key,
             "GHCR_USERNAME": "dummy-user",
             "GHCR_TOKEN": "dummy-registry-token",
+            "GRAFANA_ADMIN_PASSWORD": "dummy-grafana-password",
             "SFTP_SHARED_ADMIN_PASSWORD": "", "SFTP_SHARED_PASSWORD": "",
             "SFTP_RUNTIME_ADMIN_PASSWORD": "", "SFTP_RUNTIME_PASSWORD": "",
             "ACME_EMAIL": "", "DOMAIN_NAME": "",
