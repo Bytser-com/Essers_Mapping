@@ -1,6 +1,7 @@
 """POST /upload (routers/upload.py): the uploaded files end up in the source folder in the
 layout the incoming watcher expects, so the AI starts automatically.
 
+Before returning success, the metadata document is created on the SFTP storage.
 Only the upload router is mounted, so the watcher thread of api.py does not start.
 """
 from __future__ import annotations
@@ -12,6 +13,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from routers import upload as upload_router
+from scripts.errors import StorageError
 from services.incoming_watcher import IncomingWatcher
 from services.proposals import ProposalStatus, ProposalStore
 
@@ -24,9 +26,15 @@ def incoming(tmp_path, monkeypatch):
 
 
 @pytest.fixture
-def client(incoming):
+def store(tmp_path):
+    return ProposalStore(tmp_path / 'sftp-shared' / 'proposals')
+
+
+@pytest.fixture
+def client(incoming, store):
     app = FastAPI()
     app.include_router(upload_router.router)
+    app.dependency_overrides[upload_router.get_proposal_store] = lambda: store
     return TestClient(app)
 
 
@@ -34,7 +42,7 @@ def xml(name: str, content: bytes = b'<root />'):
     return ('files', (name, content, 'text/xml'))
 
 
-def test_upload_stores_all_files_of_one_customer_together_in_the_source_folder(client, incoming):
+def test_upload_stores_all_files_of_one_customer_together_in_the_source_folder(client, incoming, store):
     response = client.post('/upload', data={'customer_name': ' Ostavel '},
                            files=[xml('order_1.xml', b'<a />'), xml('order_2.xml', b'<b />')])
 
@@ -45,9 +53,16 @@ def test_upload_stores_all_files_of_one_customer_together_in_the_source_folder(c
     [folder] = list(incoming.iterdir())
     assert folder.name == body['upload_id']
     assert '_ostavel_' in folder.name
-    assert sorted(p.name for p in folder.iterdir()) == ['order_1.xml', 'order_2.xml', 'upload.json']
+    assert sorted(p.name for p in folder.iterdir()) == ['order_1.xml', 'order_2.xml', 'proposal_ref.json', 'upload.json']
     assert (folder / 'order_2.xml').read_bytes() == b'<b />'
     assert json.loads((folder / 'upload.json').read_text(encoding='utf-8')) == {'customer': 'Ostavel'}
+    assert json.loads((folder / 'proposal_ref.json').read_text(encoding='utf-8'))['customer'] == 'Ostavel'
+
+    # The metadata document is created on SFTP right away
+    [prop] = store.list_proposals()
+    assert prop.customer == 'Ostavel'
+    assert prop.version == 1
+    assert prop.status is ProposalStatus.AI_GENERATING
 
 
 def test_every_upload_gets_its_own_folder(client, incoming):
@@ -82,9 +97,8 @@ def test_file_name_cannot_leave_the_upload_folder(client, incoming):
     assert (folder / 'evil.xml').is_file()
 
 
-def test_uploaded_files_are_picked_up_by_the_watcher(client, incoming, tmp_path):
+def test_uploaded_files_are_picked_up_by_the_watcher(client, incoming, store):
     client.post('/upload', data={'customer_name': 'Ostavel'}, files=[xml('order.xml')])
-    store = ProposalStore(tmp_path / 'sftp-shared' / 'proposals')
     received = []
 
     def fake_ai(settings):  # stands in for the AI run: remembers which files it got
@@ -96,4 +110,37 @@ def test_uploaded_files_are_picked_up_by_the_watcher(client, incoming, tmp_path)
     assert received == [['order.xml']]
     [row] = store.list_proposals()
     assert row.customer == 'Ostavel'
+    assert row.version == 1  # reused version 1; did not create version 2
     assert row.status is ProposalStatus.AI_GENERATING  # the AI run (fake) failed: "Mislukt"
+
+
+def test_upload_fails_when_sftp_storage_fails(client, incoming, store, monkeypatch):
+    def failing_create(customer, upload_user='Analist A'):
+        raise StorageError('Cannot connect to SFTP sftp-shared:22')
+
+    monkeypatch.setattr(store, 'create_proposal', failing_create)
+    response = client.post('/upload', data={'customer_name': 'Ostavel'}, files=[xml('order.xml')])
+
+    assert response.status_code == 500
+    assert 'Upload mislukt: kan metadata niet opslaan op SFTP server' in response.json()['detail']
+    assert not incoming.exists() or list(incoming.iterdir()) == []
+
+
+def test_watcher_reuses_existing_proposal_from_api_upload(client, incoming, store):
+    response = client.post('/upload', data={'customer_name': 'Ostavel'}, files=[xml('order.xml')])
+    assert response.status_code == 201
+
+    # Initially on SFTP: version 1 created
+    proposals = store.list_proposals()
+    assert len(proposals) == 1
+    assert proposals[0].version == 1
+
+    # Watcher processes the upload
+    watcher = IncomingWatcher(incoming, store, run=lambda s: None)
+    watcher.run_once()
+
+    # Still only 1 version exists on SFTP; watcher reused version 1
+    proposals_after = store.list_proposals()
+    assert len(proposals_after) == 1
+    assert proposals_after[0].version == 1
+

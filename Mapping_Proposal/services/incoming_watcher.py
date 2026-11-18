@@ -129,15 +129,38 @@ class IncomingWatcher:
                 logger.warning(f'Upload {folder.name} rejected: {error}')
                 self._finish(claimed_folder, FAILED_DIR, error=str(error))
                 continue
-            try:
-                ref = start_proposal(customer, self.store)
-            except Exception as error:
-                # Storage (SFTP) not reachable: give the upload back, it is retried next time.
-                logger.warning(f'Upload {folder.name} waits: proposal could not be created: {error}')
-                os.rename(claimed_folder, folder)
-                continue
-            (claimed_folder / PROPOSAL_REF).write_text(json.dumps(
-                {'customer': ref.customer, 'version': ref.version, 'folder': ref.folder}), encoding='utf-8')
+            ref = None
+            ref_file = claimed_folder / PROPOSAL_REF
+            if ref_file.is_file():
+                try:
+                    data = json.loads(ref_file.read_text(encoding='utf-8'))
+                    candidate_ref = ProposalRef(
+                        customer=data['customer'],
+                        version=int(data['version']),
+                        folder=str(data['folder']),
+                    )
+                    try:
+                        if self.store.exists(candidate_ref):
+                            ref = candidate_ref
+                    except Exception as error:
+                        # Storage (SFTP) not reachable: give the upload back, it is retried next time.
+                        logger.warning(f'Upload {folder.name} waits: SFTP check failed: {error}')
+                        os.rename(claimed_folder, folder)
+                        continue
+                except (ValueError, KeyError, TypeError, OSError) as error:
+                    logger.warning(f'Upload {folder.name} has invalid proposal_ref: {error}')
+                    ref = None
+
+            if ref is None:
+                try:
+                    ref = start_proposal(customer, self.store)
+                except Exception as error:
+                    # Storage (SFTP) not reachable: give the upload back, it is retried next time.
+                    logger.warning(f'Upload {folder.name} waits: proposal could not be created: {error}')
+                    os.rename(claimed_folder, folder)
+                    continue
+                (claimed_folder / PROPOSAL_REF).write_text(json.dumps(
+                    {'customer': ref.customer, 'version': ref.version, 'folder': ref.folder}), encoding='utf-8')
             claimed.append(ClaimedUpload(claimed_folder, ref))
         return claimed
 
