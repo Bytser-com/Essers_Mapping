@@ -68,6 +68,7 @@ jobs:
       ANSIBLE_BECOME_PASS: ${{ secrets.DEBIAN_VM_USER_PASSWORD }}
       DEBIAN_VM_USER_PASSWORD: ${{ secrets.DEBIAN_VM_USER_PASSWORD }}
       RUNNER_REGISTRATION_PAT: ${{ secrets.RUNNER_REGISTRATION_PAT }}
+      GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
 
       # --- Variables ---
       INVENTORY_FILE: "inventories/${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}/hosts.yml"

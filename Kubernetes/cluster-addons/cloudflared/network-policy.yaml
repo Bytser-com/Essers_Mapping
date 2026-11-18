@@ -16,10 +16,8 @@ spec:
         - protocol: TCP
           port: 2000
   egress:
-    # 1. Allow DNS lookups (CoreDNS in kube-system)
-    - to:
-        - namespaceSelector: {}
-      ports:
+    # 1. Allow DNS lookups (CoreDNS ClusterIP VIP & Pods)
+    - ports:
         - protocol: UDP
           port: 53
         - protocol: TCP
