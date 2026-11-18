@@ -46,31 +46,37 @@ Log in to [Cloudflare Zero Trust Dashboard](https://one.dash.cloudflare.com/) an
 1. Click **Create a tunnel**.
 2. Name: `essers-k8s-testing` → Click **Save tunnel**.
 3. Select **Docker** environment and copy the tunnel token (string after `--token`).
-4. In the **Public Hostname** tab:
-   - Click **Add a public hostname**.
-   - **Subdomain**: `testing-essers`
-   - **Domain**: `shystack.com`
-   - **Service**:
-     - **Type**: `HTTP`
-     - **URL**: `ingress-nginx-controller.ingress-nginx.svc.cluster.local:80`
-   - Under **Additional application settings** → **HTTP Settings**:
-     - **HTTP Host Header**: `testing-essers.shystack.com`
-   - Click **Save hostname**.
+4. In the **Public Hostname** tab, add two routes:
+   - **Route 1: Application Frontend**
+     - **Subdomain**: `testing-essers`
+     - **Domain**: `shystack.com`
+     - **Service URL**: `http://192.168.100.101:80`
+     - Under **Additional application settings** → **HTTP Settings**:
+       - **HTTP Host Header**: `testing-essers.shystack.com`
+   - **Route 2: Monitoring (Grafana)**
+     - **Subdomain**: `monitor-testing`
+     - **Domain**: `shystack.com`
+     - **Service URL**: `http://192.168.100.101:80`
+     - Under **Additional application settings** → **HTTP Settings**:
+       - **HTTP Host Header**: `monitor-testing.shystack.com`
 
 ### Tunnel 2: Production Cluster
 1. Click **Create a tunnel**.
 2. Name: `essers-k8s-production` → Click **Save tunnel**.
 3. Select **Docker** environment and copy the tunnel token (string after `--token`).
-4. In the **Public Hostname** tab:
-   - Click **Add a public hostname**.
-   - **Subdomain**: `production-essers`
-   - **Domain**: `shystack.com`
-   - **Service**:
-     - **Type**: `HTTP`
-     - **URL**: `ingress-nginx-controller.ingress-nginx.svc.cluster.local:80`
-   - Under **Additional application settings** → **HTTP Settings**:
-     - **HTTP Host Header**: `production-essers.shystack.com`
-   - Click **Save hostname**.
+4. In the **Public Hostname** tab, add two routes:
+   - **Route 1: Application Frontend**
+     - **Subdomain**: `production-essers`
+     - **Domain**: `shystack.com`
+     - **Service URL**: `http://192.168.100.201:80`
+     - Under **Additional application settings** → **HTTP Settings**:
+       - **HTTP Host Header**: `production-essers.shystack.com`
+   - **Route 2: Monitoring (Grafana)**
+     - **Subdomain**: `monitor-production`
+     - **Domain**: `shystack.com`
+     - **Service URL**: `http://192.168.100.201:80`
+     - Under **Additional application settings** → **HTTP Settings**:
+       - **HTTP Host Header**: `monitor-production.shystack.com`
 
 ---
 
