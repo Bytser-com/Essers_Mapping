@@ -1,0 +1,5 @@
+# osv-scanner configuration for Frontend dependencies
+
+[[IgnoredVulns]]
+id = "GHSA-fc5q-39xc-vjpf"
+reason = "Transitive dev dependency of Vite and Vitest build tools; no upstream patch available yet for picomatch <= 4.0.7 (CVE-2026-112366)."
