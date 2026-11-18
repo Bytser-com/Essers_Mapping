@@ -66,10 +66,26 @@ def test_upload_stores_all_files_of_one_customer_together_in_the_source_folder(c
 
 
 def test_every_upload_gets_its_own_folder(client, incoming):
-    client.post('/upload', data={'customer_name': 'Ostavel'}, files=[xml('order.xml')])
-    client.post('/upload', data={'customer_name': 'Ostavel'}, files=[xml('order.xml')])
+    resp1 = client.post('/upload', data={'customer_name': 'Ostavel'}, files=[xml('order.xml')])
+    assert resp1.status_code == 201
+    resp2 = client.post('/upload', data={'customer_name': 'Brunos'}, files=[xml('order.xml')])
+    assert resp2.status_code == 201
 
     assert len(list(incoming.iterdir())) == 2
+
+
+def test_upload_rejected_if_company_already_has_active_proposal(client, incoming):
+    resp1 = client.post('/upload', data={'customer_name': 'Ostavel'}, files=[xml('order.xml')])
+    assert resp1.status_code == 201
+
+    resp2 = client.post('/upload', data={'customer_name': 'Ostavel'}, files=[xml('order.xml')])
+    assert resp2.status_code == 400
+    assert 'al een voorstel actief' in resp2.json()['detail']
+
+    # Case-insensitive check also rejects
+    resp3 = client.post('/upload', data={'customer_name': 'ostavel'}, files=[xml('order.xml')])
+    assert resp3.status_code == 400
+    assert 'al een voorstel actief' in resp3.json()['detail']
 
 
 def test_upload_without_customer_is_refused(client, incoming):

@@ -65,6 +65,22 @@ async def upload_xml(
 
     file_contents = [(name, await file.read()) for name, file in zip(names, files)]
 
+    # Check on SFTP if a proposal folder already exists for this company (only 1 proposal per company allowed)
+    try:
+        if store.has_proposal(customer):
+            raise HTTPException(
+                status_code=400,
+                detail=f'Upload mislukt: er is momenteel al een voorstel actief voor {customer}. Dit voorstel moet eerst afgerond worden.',
+            )
+    except HTTPException:
+        raise
+    except Exception as error:
+        logger.error('Failed to check existing proposals on SFTP for %r: %s', customer, error)
+        raise HTTPException(
+            status_code=500,
+            detail=f'Upload mislukt: kan metadata niet opslaan op SFTP server: {error}',
+        )
+
     # First create the proposal metadata document on the SFTP storage.
     # If the SFTP server is unreachable or fails, return an error code instead of 200/201.
     try:

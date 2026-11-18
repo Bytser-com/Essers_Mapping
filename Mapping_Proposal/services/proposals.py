@@ -188,6 +188,18 @@ class ProposalStore:
             except Exception as e:
                 logger.warning('Failed to update filename in metadata: %s', e)
 
+    def has_proposal(self, customer: str) -> bool:
+        """Whether a proposal folder already exists on SFTP for this company."""
+        customer = customer.strip()
+        if not customer:
+            return False
+        customer_dir = customer_folder_name(customer)
+        with self.storage.session() as s:
+            if s.exists(customer_dir):
+                return True
+            existing_dirs = {d.lower() for d in s.list_dirs('')}
+            return customer_dir.lower() in existing_dirs
+
     def exists(self, ref: ProposalRef) -> bool:
         """Whether the proposal.json of ``ref`` exists on the storage."""
         with self.storage.session() as s:

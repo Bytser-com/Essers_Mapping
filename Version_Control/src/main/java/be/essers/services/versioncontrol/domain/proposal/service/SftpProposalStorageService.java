@@ -431,6 +431,26 @@ public class SftpProposalStorageService implements ProposalStorageService {
                     }
                 }
                 session.rmdir(versionPath);
+
+                // Clean up empty company directory if no other versions/files remain
+                SftpClient.DirEntry[] remaining = template.list(companyPath);
+                boolean isEmpty = true;
+                if (remaining != null) {
+                    for (SftpClient.DirEntry entry : remaining) {
+                        if (!isSpecialDirectory(entry.getFilename())) {
+                            isEmpty = false;
+                            break;
+                        }
+                    }
+                }
+                if (isEmpty) {
+                    try {
+                        session.rmdir(companyPath);
+                        log.info("Cleaned up empty company directory '{}'", companyPath);
+                    } catch (Exception ex) {
+                        log.warn("Could not remove empty company directory '{}': {}", companyPath, ex.getMessage());
+                    }
+                }
                 return null;
             });
 
