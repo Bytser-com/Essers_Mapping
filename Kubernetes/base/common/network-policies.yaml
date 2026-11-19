@@ -226,6 +226,10 @@ spec:
           port: 2022
         - protocol: TCP
           port: 8080
+    # Allow outbound HTTPS to external APIs (Google Gemini AI API for mapping-proposal)
+    - ports:
+        - protocol: TCP
+          port: 443
 ---
 # 8. MONITORING TELEMETRY SCRAPE (Prometheus):
 #    Allows Prometheus in the `monitoring` namespace to scrape metrics from workloads

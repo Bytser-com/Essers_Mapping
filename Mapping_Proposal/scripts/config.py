@@ -144,6 +144,18 @@ def packages_dir() -> Path:
     return shared_storage_dir() / 'packages'
 
 
+def auto_seed_enabled() -> bool:
+    """Whether example proposals should be seeded into storage on startup."""
+    _load_env()
+    val = os.getenv('SEED_PROPOSALS', '').strip().lower()
+    if val in ('1', 'true', 'yes'):
+        return True
+    if val in ('0', 'false', 'no'):
+        return False
+    env = os.getenv('ENVIRONMENT', '').strip().lower()
+    return env in ('testing', 'test', 'development', 'dev')
+
+
 def cors_origins() -> list[str]:
     """Browser origins allowed to call the API directly (comma-separated CORS_ORIGINS).
 
