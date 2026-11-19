@@ -18,6 +18,7 @@ public record ProposalMetadata(
         @JsonAlias({"createdBy", "created_by", "creator"})
         String createdBy,
 
+        @JsonAlias({"description", "error"})
         String description,
 
         @JsonAlias({"status", "proposal_status", "proposalStatus"})

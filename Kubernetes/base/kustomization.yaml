@@ -12,6 +12,7 @@ configMapGenerator:
     literals:
       - TZ=Europe/Brussels
       - LOG_LEVEL=INFO
+      - GEMINI_MODEL=gemini-2.5-flash
       # Shared SFTP Server (In-Between Zone)
       - SFTP_SHARED_HOST=sftp-shared
       - SFTP_SHARED_PORT=22
