@@ -27,13 +27,11 @@ grafana:
   nodeSelector:
     node-role.kubernetes.io/worker: "worker"
 
-  # Admin credentials (can also be overridden via an existing Secret)
+  # Admin credentials linked to dedicated Kubernetes Secret
   admin:
-    existingSecret: ""
+    existingSecret: "grafana-admin-credentials"
     userKey: admin-user
     passwordKey: admin-password
-  adminUser: "admin"
-  adminPassword: "TestingSecureAdminPassword2026!"
 
   # Hardened security context compliant with Pod Security Standards (Restricted)
   securityContext:

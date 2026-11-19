@@ -389,15 +389,16 @@ jobs:
             echo "Reconciling Prometheus & Grafana Monitoring Stack for ${OVERLAY}..."
             kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
 
-            # In production, ensure the grafana-admin-credentials secret exists
+            # Ensure the grafana-admin-credentials secret exists
+            GRAFANA_PASS="${GRAFANA_ADMIN_PASSWORD:-TestingSecureAdminPassword2026!}"
             if [ "$OVERLAY" = "production" ]; then
-              PROD_PASS="${GRAFANA_ADMIN_PASSWORD:-ProductionSecureGrafanaPass2026!}"
-              kubectl create secret generic grafana-admin-credentials \
-                --namespace monitoring \
-                --from-literal=admin-user=essers-admin \
-                --from-literal=admin-password="$PROD_PASS" \
-                --dry-run=client -o yaml | kubectl apply -f -
+              GRAFANA_PASS="${GRAFANA_ADMIN_PASSWORD:-ProductionSecureGrafanaPass2026!}"
             fi
+            kubectl create secret generic grafana-admin-credentials \
+              --namespace monitoring \
+              --from-literal=admin-user=admin \
+              --from-literal=admin-password="$GRAFANA_PASS" \
+              --dry-run=client -o yaml | kubectl apply -f -
 
             # Inject Discord Webhook URL into Alertmanager values if configured
             if [ -n "${DISCORD_WEBHOOK_URL:-}" ]; then
