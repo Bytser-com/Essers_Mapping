@@ -355,7 +355,7 @@ The frontend refreshes the list every 2 seconds while a proposal is "Bezig" and 
 
 ### Uploading (POST /upload)
 
-The Home page sends the customer name, proposal type and all chosen XML files in one request (`customer_name` + `proposal_type` + `files`, multipart). `routers/upload.py` stores them together in a new folder in the source folder (`data/source/<YYYYMMDD-HHMMSS>_<customer>_<random>/`) and writes `upload.json` last, so the watcher below starts the AI.
+The Home page sends the customer name, proposal type and all chosen XML files in one request (`customer_name` + `proposal_type` + `files`, multipart). `routers/upload.py` stores them together in a new folder in the source folder (`data/source/<YYYYMMDD-HHMMSS>_<customer>_<random>/`) and writes `upload.json` last, so the watcher below starts the AI. The `proposal_type` parameter is case-insensitive, normalized to lowercase, and stored on the SFTP server in lowercase (e.g. `/Proposals/<customer>/<version>/<proposal_type>/`).
 
 ### Automatic AI start for uploads
 

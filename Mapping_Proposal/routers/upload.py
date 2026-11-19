@@ -57,7 +57,7 @@ async def upload_xml(
     if not customer:
         raise HTTPException(status_code=400, detail='Upload mislukt: Vul eerst een klant in.')
 
-    prop_type = (proposal_type or '').strip()
+    prop_type = (proposal_type or '').strip().lower()
     if not prop_type:
         raise HTTPException(status_code=400, detail='Upload mislukt: proposal_type is verplicht (field is required).')
 

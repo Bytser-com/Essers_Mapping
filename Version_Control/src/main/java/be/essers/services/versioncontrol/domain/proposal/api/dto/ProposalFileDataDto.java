@@ -48,6 +48,10 @@ public record ProposalFileDataDto(
         @JsonProperty("rows")
         List<ProposalRowDto> rows
 ) {
+    public ProposalFileDataDto {
+        proposalType = (proposalType != null) ? proposalType.toLowerCase() : null;
+    }
+
     public ProposalFileDataDto(
             String version,
             String companyName,

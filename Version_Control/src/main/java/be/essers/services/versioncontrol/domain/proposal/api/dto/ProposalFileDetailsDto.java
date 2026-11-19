@@ -13,6 +13,10 @@ public record ProposalFileDetailsDto(
         String fileContentBase64,
         String proposalType
 ) {
+    public ProposalFileDetailsDto {
+        proposalType = (proposalType != null) ? proposalType.toLowerCase() : null;
+    }
+
     public ProposalFileDetailsDto(
             String company,
             String version,

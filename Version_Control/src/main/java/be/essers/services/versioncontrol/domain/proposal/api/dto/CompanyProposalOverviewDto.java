@@ -18,6 +18,10 @@ public record CompanyProposalOverviewDto(
         String customerName,
         String proposalType
 ) {
+    public CompanyProposalOverviewDto {
+        proposalType = (proposalType != null) ? proposalType.toLowerCase() : null;
+    }
+
     public CompanyProposalOverviewDto(String company, String latestVersion, String filename, String fullPath,
                                       String createdDate, String createdBy, String description,
                                       String status, String aiStatus, String customerName) {

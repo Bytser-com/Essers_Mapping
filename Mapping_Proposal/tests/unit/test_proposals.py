@@ -370,7 +370,20 @@ def test_proposal_type_folder_name_sanitization():
     assert proposal_type_folder_name('outbound') == 'outbound'
     assert proposal_type_folder_name('inboud-accept') == 'inboud-accept'
     assert proposal_type_folder_name('../../evil/inbound') == 'evil-inbound'
-    assert proposal_type_folder_name('Inbound') == 'Inbound'
+    assert proposal_type_folder_name('Inbound') == 'inbound'
+    assert proposal_type_folder_name('INBOUND') == 'inbound'
+    assert proposal_type_folder_name('InBounD-Accept') == 'inbound-accept'
     assert proposal_type_folder_name('inbound accept') == 'inbound-accept'
+
+
+def test_create_proposal_stores_proposal_type_in_lowercase(root, store):
+    ref = store.create_proposal('Ostavel', 'INBOUND')
+    assert ref.proposal_type == 'inbound'
+    assert ref.folder == 'ostavel/v1/inbound'
+    assert (root / 'ostavel/v1/inbound').is_dir()
+    data = json.loads((root / 'ostavel/v1/inbound/proposal.json').read_text(encoding='utf-8'))
+    assert data['proposal_type'] == 'inbound'
+    assert data['proposalType'] == 'inbound'
+
 
 
