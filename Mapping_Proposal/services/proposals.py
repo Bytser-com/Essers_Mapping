@@ -108,6 +108,10 @@ class ProposalRef:
     folder: str             # "<customer folder>/v<version>/<proposal_type>", relative to the proposals root
     proposal_type: str = ''
 
+    def __post_init__(self):
+        if self.proposal_type and not self.proposal_type.islower():
+            object.__setattr__(self, 'proposal_type', self.proposal_type.lower())
+
     @property
     def id(self) -> str:
         return self.folder
@@ -121,9 +125,9 @@ def customer_folder_name(customer: str) -> str:
 
 
 def proposal_type_folder_name(proposal_type: str) -> str:
-    """Folder name for a proposal type: 'inbound' -> 'inbound', 'inboud-accept' -> 'inboud-accept'."""
+    """Folder name for a proposal type: 'inbound' -> 'inbound', 'Inbound' -> 'inbound', 'inboud-accept' -> 'inboud-accept'."""
     ascii_name = unicodedata.normalize('NFKD', proposal_type).encode('ascii', 'ignore').decode('ascii')
-    slug = re.sub(r'[^a-zA-Z0-9_-]+', '-', ascii_name).strip('-')
+    slug = re.sub(r'[^a-zA-Z0-9_-]+', '-', ascii_name).strip('-').lower()
     return slug or 'proposal'
 
 
@@ -287,7 +291,7 @@ class ProposalStore:
             raise ValueError('customer name is empty')
         if proposal_type is None or not str(proposal_type).strip():
             raise ValueError('proposal type is empty')
-        prop_type = str(proposal_type).strip()
+        prop_type = str(proposal_type).strip().lower()
         type_dir = proposal_type_folder_name(prop_type)
         customer_dir = customer_folder_name(customer)
         with self.storage.session() as s:
@@ -437,7 +441,7 @@ def _read_metadata(customer_folder: str, version: int, text: str, proposal_type:
     except ValueError:
         raise ValueError(f'unknown ai_status {ai_value!r}') from None
 
-    prop_type = str(data.get('proposal_type') or data.get('proposalType') or proposal_type or '').strip()
+    prop_type = str(data.get('proposal_type') or data.get('proposalType') or proposal_type or '').strip().lower()
     folder_id = f'{customer_folder}/v{version}/{prop_type}' if prop_type else f'{customer_folder}/v{version}'
 
     return ProposalSummary(

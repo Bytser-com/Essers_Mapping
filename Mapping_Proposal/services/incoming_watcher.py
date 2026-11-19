@@ -291,7 +291,7 @@ def _read_proposal_type(folder: Path) -> str:
     data = json.loads((folder / UPLOAD_MARKER).read_text(encoding='utf-8-sig'))
     prop_type = ''
     if isinstance(data, dict):
-        prop_type = str(data.get('proposal_type') or data.get('proposalType') or '').strip()
+        prop_type = str(data.get('proposal_type') or data.get('proposalType') or '').strip().lower()
     return prop_type or 'inbound'
 
 

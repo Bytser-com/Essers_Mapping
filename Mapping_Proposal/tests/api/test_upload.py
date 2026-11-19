@@ -131,6 +131,17 @@ def test_upload_with_different_proposal_types(client, incoming, prop_type):
     assert data['proposal_type'] == prop_type
 
 
+def test_upload_converts_proposal_type_to_lowercase(client, incoming):
+    response = client.post('/upload', data={'customer_name': 'Ostavel', 'proposal_type': 'INBOUND'},
+                           files=[xml('order.xml')])
+
+    assert response.status_code == 201
+    assert response.json()['proposal_type'] == 'inbound'
+    [folder] = list(incoming.iterdir())
+    data = json.loads((folder / 'upload.json').read_text(encoding='utf-8'))
+    assert data['proposal_type'] == 'inbound'
+
+
 def test_upload_with_a_file_that_is_not_xml_stores_nothing(client, incoming):
     response = client.post('/upload', data={'customer_name': 'Ostavel', 'proposal_type': 'inbound'},
                            files=[xml('order.xml'), ('files', ('order.pdf', b'%PDF', 'application/pdf'))])

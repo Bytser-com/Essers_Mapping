@@ -709,4 +709,290 @@ class ProposalControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.title").value("Entity Not Found"));
     }
+
+    @Test
+    @DisplayName("GET /proposals returns 400 when company exceeds 20 characters")
+    void getProposals_companyExceeds20Chars_returns400() throws Exception {
+        mockMvc.perform(get("/proposals")
+                        .param("company", "123456789012345678901"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"))
+                .andExpect(jsonPath("$.detail").value("Company parameter must not exceed 20 characters"));
+    }
+
+    @Test
+    @DisplayName("GET /proposals returns 400 when proposalType exceeds 20 characters")
+    void getProposals_proposalTypeExceeds20Chars_returns400() throws Exception {
+        mockMvc.perform(get("/proposals")
+                        .param("proposalType", "123456789012345678901"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"))
+                .andExpect(jsonPath("$.detail").value("Proposal type parameter must not exceed 20 characters"));
+    }
+
+    @Test
+    @DisplayName("GET /proposals returns 400 when proposal_type exceeds 20 characters")
+    void getProposals_proposalTypeSnakeExceeds20Chars_returns400() throws Exception {
+        mockMvc.perform(get("/proposals")
+                        .param("proposal_type", "123456789012345678901"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"))
+                .andExpect(jsonPath("$.detail").value("Proposal type parameter must not exceed 20 characters"));
+    }
+
+    @Test
+    @DisplayName("GET /proposals/file returns 400 when company exceeds 20 characters")
+    void getProposalFile_companyExceeds20Chars_returns400() throws Exception {
+        mockMvc.perform(get("/proposals/file")
+                        .param("company", "123456789012345678901")
+                        .param("version", "v1")
+                        .param("proposalType", "inbound"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"))
+                .andExpect(jsonPath("$.detail").value("Company parameter must not exceed 20 characters"));
+    }
+
+    @Test
+    @DisplayName("GET /proposals/file returns 400 when proposalType exceeds 20 characters")
+    void getProposalFile_proposalTypeExceeds20Chars_returns400() throws Exception {
+        mockMvc.perform(get("/proposals/file")
+                        .param("company", "vanroey")
+                        .param("version", "v1")
+                        .param("proposalType", "123456789012345678901"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"))
+                .andExpect(jsonPath("$.detail").value("Proposal type parameter must not exceed 20 characters"));
+    }
+
+    @Test
+    @DisplayName("GET /proposals/file returns 400 when proposal_type (snake_case) exceeds 20 characters")
+    void getProposalFile_proposalTypeSnakeExceeds20Chars_returns400() throws Exception {
+        mockMvc.perform(get("/proposals/file")
+                        .param("company", "vanroey")
+                        .param("version", "v1")
+                        .param("proposal_type", "123456789012345678901"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"))
+                .andExpect(jsonPath("$.detail").value("Proposal type parameter must not exceed 20 characters"));
+    }
+
+    @Test
+    @DisplayName("GET /proposals/file accepts proposal_type (snake_case) when valid")
+    void getProposalFile_proposalTypeSnakeValid_returns200() throws Exception {
+        ProposalFileDetailsDto dto = new ProposalFileDetailsDto(
+                "vanroey", "v1", "file.xlsx", "/Proposals/vanroey/v1/inbound/file.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                100, "2026-11-10T12:00:00Z", "tester", null, "base64", "inbound"
+        );
+        when(proposalStorageService.getProposalFile("vanroey", "v1", "inbound")).thenReturn(dto);
+
+        mockMvc.perform(get("/proposals/file")
+                        .param("company", "vanroey")
+                        .param("version", "v1")
+                        .param("proposal_type", "inbound"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.company").value("vanroey"))
+                .andExpect(jsonPath("$.proposalType").value("inbound"));
+    }
+
+    @Test
+    @DisplayName("GET /proposals/filedata returns 400 when company exceeds 20 characters")
+    void getProposalFileData_companyExceeds20Chars_returns400() throws Exception {
+        mockMvc.perform(get("/proposals/filedata")
+                        .param("company", "123456789012345678901")
+                        .param("version", "v1")
+                        .param("proposalType", "inbound"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"))
+                .andExpect(jsonPath("$.detail").value("Company parameter must not exceed 20 characters"));
+    }
+
+    @Test
+    @DisplayName("GET /proposals/filedata returns 400 when proposalType exceeds 20 characters")
+    void getProposalFileData_proposalTypeExceeds20Chars_returns400() throws Exception {
+        mockMvc.perform(get("/proposals/filedata")
+                        .param("company", "vanroey")
+                        .param("version", "v1")
+                        .param("proposalType", "123456789012345678901"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"))
+                .andExpect(jsonPath("$.detail").value("Proposal type parameter must not exceed 20 characters"));
+    }
+
+    @Test
+    @DisplayName("PUT /proposals/file (multipart) returns 400 when company exceeds 20 characters")
+    void overwriteProposalFile_multipart_companyExceeds20Chars_returns400() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", "test.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new byte[]{1, 2, 3});
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/proposals/file")
+                        .file(file)
+                        .with(req -> { req.setMethod("PUT"); return req; })
+                        .param("company", "123456789012345678901")
+                        .param("version", "v1")
+                        .param("proposalType", "inbound"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"))
+                .andExpect(jsonPath("$.detail").value("Company parameter must not exceed 20 characters"));
+    }
+
+    @Test
+    @DisplayName("PUT /proposals/file (multipart) returns 400 when proposalType exceeds 20 characters")
+    void overwriteProposalFile_multipart_proposalTypeExceeds20Chars_returns400() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", "test.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new byte[]{1, 2, 3});
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/proposals/file")
+                        .file(file)
+                        .with(req -> { req.setMethod("PUT"); return req; })
+                        .param("company", "vanroey")
+                        .param("version", "v1")
+                        .param("proposalType", "123456789012345678901"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"))
+                .andExpect(jsonPath("$.detail").value("Proposal type parameter must not exceed 20 characters"));
+    }
+
+    @Test
+    @DisplayName("PUT /proposals/file (binary) returns 400 when company exceeds 20 characters")
+    void overwriteProposalFile_binary_companyExceeds20Chars_returns400() throws Exception {
+        mockMvc.perform(put("/proposals/file")
+                        .param("company", "123456789012345678901")
+                        .param("version", "v1")
+                        .param("proposalType", "inbound")
+                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                        .content(new byte[]{1, 2, 3}))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"))
+                .andExpect(jsonPath("$.detail").value("Company parameter must not exceed 20 characters"));
+    }
+
+    @Test
+    @DisplayName("PUT /proposals/file (binary) returns 400 when proposalType exceeds 20 characters")
+    void overwriteProposalFile_binary_proposalTypeExceeds20Chars_returns400() throws Exception {
+        mockMvc.perform(put("/proposals/file")
+                        .param("company", "vanroey")
+                        .param("version", "v1")
+                        .param("proposalType", "123456789012345678901")
+                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                        .content(new byte[]{1, 2, 3}))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"))
+                .andExpect(jsonPath("$.detail").value("Proposal type parameter must not exceed 20 characters"));
+    }
+
+    @Test
+    @DisplayName("POST /proposals returns 400 when company exceeds 20 characters")
+    void approveProposal_companyExceeds20Chars_returns400() throws Exception {
+        mockMvc.perform(post("/proposals")
+                        .param("company", "123456789012345678901")
+                        .param("version", "v1")
+                        .param("proposalType", "inbound"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"))
+                .andExpect(jsonPath("$.detail").value("Company parameter must not exceed 20 characters"));
+    }
+
+    @Test
+    @DisplayName("POST /proposals returns 400 when proposalType exceeds 20 characters")
+    void approveProposal_proposalTypeExceeds20Chars_returns400() throws Exception {
+        mockMvc.perform(post("/proposals")
+                        .param("company", "vanroey")
+                        .param("version", "v1")
+                        .param("proposalType", "123456789012345678901"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"))
+                .andExpect(jsonPath("$.detail").value("Proposal type parameter must not exceed 20 characters"));
+    }
+
+    @Test
+    @DisplayName("DELETE /proposals returns 400 when company exceeds 20 characters")
+    void deleteProposal_companyExceeds20Chars_returns400() throws Exception {
+        mockMvc.perform(delete("/proposals")
+                        .param("company", "123456789012345678901")
+                        .param("version", "v1")
+                        .param("proposalType", "inbound")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"deleteCheck\":\"123456789012345678901\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"))
+                .andExpect(jsonPath("$.detail").value("Company parameter must not exceed 20 characters"));
+    }
+
+    @Test
+    @DisplayName("DELETE /proposals returns 400 when proposalType exceeds 20 characters")
+    void deleteProposal_proposalTypeExceeds20Chars_returns400() throws Exception {
+        mockMvc.perform(delete("/proposals")
+                        .param("company", "vanroey")
+                        .param("version", "v1")
+                        .param("proposalType", "123456789012345678901")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"deleteCheck\":\"vanroey\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"))
+                .andExpect(jsonPath("$.detail").value("Proposal type parameter must not exceed 20 characters"));
+    }
+
+    @Test
+    @DisplayName("GET /proposals normalizes uppercase proposalType to lowercase")
+    void getProposals_normalizesProposalTypeToLowercase() throws Exception {
+        when(proposalStorageService.listProposals(eq("vanroey"), eq("inbound"))).thenReturn(List.of());
+
+        mockMvc.perform(get("/proposals")
+                        .param("company", "vanroey")
+                        .param("proposalType", "INBOUND"))
+                .andExpect(status().isOk());
+
+        verify(proposalStorageService).listProposals("vanroey", "inbound");
+    }
+
+    @Test
+    @DisplayName("GET /proposals/file normalizes uppercase proposalType to lowercase")
+    void getProposalFile_normalizesProposalTypeToLowercase() throws Exception {
+        ProposalFileDetailsDto dto = new ProposalFileDetailsDto(
+                "vanroey", "v1", "file.xlsx", "/Proposals/vanroey/v1/inbound/file.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                100, "2026-11-10T12:00:00Z", "tester", null, "base64", "inbound"
+        );
+        when(proposalStorageService.getProposalFile("vanroey", "v1", "inbound")).thenReturn(dto);
+
+        mockMvc.perform(get("/proposals/file")
+                        .param("company", "vanroey")
+                        .param("version", "v1")
+                        .param("proposalType", "InBound"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.proposalType").value("inbound"));
+
+        verify(proposalStorageService).getProposalFile("vanroey", "v1", "inbound");
+    }
+
+    @Test
+    @DisplayName("GET /proposals/file normalizes uppercase snake_case proposal_type to lowercase")
+    void getProposalFile_normalizesProposalTypeSnakeToLowercase() throws Exception {
+        ProposalFileDetailsDto dto = new ProposalFileDetailsDto(
+                "vanroey", "v1", "file.xlsx", "/Proposals/vanroey/v1/outbound/file.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                100, "2026-11-10T12:00:00Z", "tester", null, "base64", "outbound"
+        );
+        when(proposalStorageService.getProposalFile("vanroey", "v1", "outbound")).thenReturn(dto);
+
+        mockMvc.perform(get("/proposals/file")
+                        .param("company", "vanroey")
+                        .param("version", "v1")
+                        .param("proposal_type", "OUTBOUND"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.proposalType").value("outbound"));
+
+        verify(proposalStorageService).getProposalFile("vanroey", "v1", "outbound");
+    }
+
+    @Test
+    @DisplayName("DELETE /proposals normalizes uppercase proposalType to lowercase")
+    void deleteProposal_normalizesProposalTypeToLowercase() throws Exception {
+        mockMvc.perform(delete("/proposals")
+                        .param("company", "vanroey")
+                        .param("version", "v1")
+                        .param("proposalType", "INBOUND")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"deleteCheck\":\"vanroey\"}"))
+                .andExpect(status().isNoContent());
+
+        verify(proposalStorageService).deleteProposal("vanroey", "v1", "inbound");
+    }
 }

@@ -32,6 +32,10 @@ public record ProposalMetadata(
         @JsonAlias({"proposal_type", "proposalType"})
         String proposalType
 ) {
+    public ProposalMetadata {
+        proposalType = (proposalType != null) ? proposalType.toLowerCase() : null;
+    }
+
     public ProposalMetadata(
             String company,
             String version,

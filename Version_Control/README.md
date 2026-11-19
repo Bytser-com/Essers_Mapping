@@ -28,10 +28,10 @@ The **Version Control Service** is a Java Spring Boot microservice within the Pr
 
 - **SFTP Integration**: Communicates with the remote SFTP share via Spring Integration SFTP without needing a local persistent mount.
 - **Natural Versioning**: Employs a semantic/numeric version comparator ensuring natural version ordering (e.g. `v10` is recognized as newer than `v3`).
-- **Proposal Type Categorization**: Supports proposal types (e.g., `inbound`, `outbound`, `inboud-accept`) under `/Proposals/<companyName>/<version>/<proposalType>/`.
+- **Proposal Type Categorization**: Supports proposal types (e.g., `inbound`, `outbound`, `inboud-accept`) under `/Proposals/<companyName>/<version>/<proposalType>/`. Proposal type inputs are case-insensitive and normalized to lowercase; all API responses, SFTP directory resolution, and persisted metadata use lowercase proposal types.
 - **Metadata Support**: Reads companion `proposal.json` (or `metadata.json`) for creation timestamp, author, description, workflow status, proposal type, and AI status, with automatic fallback to file attributes.
 - **Base64 File Streaming**: Delivers Excel spreadsheets (`.xlsx`, `.xls`) packaged inside JSON payloads for API clients and frontend UIs.
-- **Security & Validation**: Strict input sanitation preventing directory traversal attacks (`..`, `/`, `\`). Case-insensitive folder resolution for cross-platform compatibility.
+- **Security & Validation**: Strict input sanitation preventing directory traversal attacks (`..`, `/`, `\`). Case-insensitive folder resolution for cross-platform compatibility. Parameter length validation enforcing a maximum of 20 characters on `company` and `proposalType` / `proposal_type`.
 
 ---
 
@@ -109,7 +109,7 @@ Each proposal type directory contains a companion metadata JSON file (`proposal.
 - **Proposal Type Subdirectory**: Proposals are organized inside `<proposalType>` subfolders within each version. For backward compatibility with legacy storage layouts, versions containing files directly inside the version folder are also supported.
 - **Metadata Fallbacks**: The service checks for `metadata.json` first, then falls back to `proposal.json` (both case-insensitive). If metadata is missing or invalid, the version is skipped in the `GET /proposals` overview to prevent broken entries, but can still be fetched directly via `GET /proposals/file` with fallback to file modification timestamps.
 - **Excel File Resolution**: The service first looks for the file named in `metadata.filename`. If not specified or absent, it automatically detects the first non-directory file ending with `.xlsx` or `.xls`.
-- **Case-Insensitive Resolution**: If an API consumer passes `company=nouryon&version=v2&proposalType=inbound`, the service resolves the directory names even if they are stored with different casing on disk (e.g., `Nouryon/V2/Inbound`).
+- **Case-Insensitive Resolution**: If an API consumer passes `company=nouryon&version=v2&proposalType=INBOUND` (or `proposal_type=Inbound`), the service resolves the directory names case-insensitively on disk (e.g. matching `Inbound` or `inbound`), normalizes `proposalType` to lowercase, and returns lowercase `proposalType` across all API responses and metadata files.
 
 ---
 
@@ -143,15 +143,15 @@ Retrieves an overview of all companies with their **latest version**, `proposalT
 * **URL**: `/proposals` (or `/Proposals`)
 * **Method**: `GET`
 * **Query Parameters**:
-  * `company` *(optional, string)*: Filter results to a specific company (e.g. `?company=nouryon`).
-  * `proposalType` *(optional, string)*: Filter results to a specific proposal type (e.g. `?proposalType=inbound`).
+  * `company` *(optional, string, max 20 chars)*: Filter results to a specific company (e.g. `?company=nouryon`).
+  * `proposalType` or `proposal_type` *(optional, string, max 20 chars, case-insensitive)*: Filter results to a specific proposal type (e.g. `?proposalType=inbound` or `?proposal_type=INBOUND`). Always normalized to lowercase.
 
 #### Response Codes
 
 | Status Code | Description |
 | :--- | :--- |
 | `200 OK` | Successfully retrieved proposal overview list. |
-| `400 Bad Request` | Company or proposalType parameter contains illegal path traversal characters (`..`, `/`, `\`). |
+| `400 Bad Request` | Parameter exceeds maximum length of 20 characters (`company` or `proposalType`/`proposal_type`), or contains illegal path traversal characters (`..`, `/`, `\`). |
 | `404 Not Found` | A specific company was requested but does not exist or has no versions. |
 | `502 Bad Gateway` / `500` | Failed to connect or read from SFTP storage (`StorageException`). |
 
@@ -197,16 +197,16 @@ Retrieves a specific proposal version for a company, returning the Excel file (e
 * **URL**: `/proposals/file` (or `/Proposals/file`)
 * **Method**: `GET`
 * **Query Parameters**:
-  * `company` *(required, string)*: Name of the company (e.g. `nouryon`).
+  * `company` *(required, string, max 20 chars)*: Name of the company (e.g. `nouryon`).
   * `version` *(required, string)*: Version identifier (e.g. `v2`).
-  * `proposalType` *(required, string)*: Proposal type (e.g. `inbound`).
+  * `proposalType` or `proposal_type` *(required, string, max 20 chars, case-insensitive)*: Proposal type (e.g. `inbound`). Both camelCase and snake_case parameter names are accepted; values are case-insensitive and normalized to lowercase.
 
 #### Response Codes
 
 | Status Code | Description |
 | :--- | :--- |
 | `200 OK` | Successfully retrieved file and metadata. |
-| `400 Bad Request` | Missing required query parameters, blank values, or illegal path traversal characters. |
+| `400 Bad Request` | Missing required query parameters, blank values, parameter exceeding 20 characters (`company` or `proposalType`/`proposal_type`), or illegal path traversal characters. |
 | `404 Not Found` | Company directory, version directory, proposal type directory, or Excel file does not exist. |
 | `502 Bad Gateway` / `500` | SFTP transfer failure or storage communication error. |
 
@@ -244,16 +244,16 @@ Retrieves parsed proposal file metadata, `proposalType`, and row mappings from t
 * **URL**: `/proposals/filedata` (or `/Proposals/filedata`)
 * **Method**: `GET`
 * **Query Parameters**:
-  * `company` *(required, string)*: Name of the company (e.g. `bedrijfsnaam`).
+  * `company` *(required, string, max 20 chars)*: Name of the company (e.g. `bedrijfsnaam`).
   * `version` *(required, string)*: Version identifier (e.g. `versie`).
-  * `proposalType` *(required, string)*: Proposal type (e.g. `inbound`).
+  * `proposalType` or `proposal_type` *(required, string, max 20 chars, case-insensitive)*: Proposal type (e.g. `inbound`). Both camelCase and snake_case parameter names are accepted; values are case-insensitive and normalized to lowercase.
 
 #### Response Codes
 
 | Status Code | Description |
 | :--- | :--- |
 | `200 OK` | Successfully retrieved and parsed file data and rows. |
-| `400 Bad Request` | Missing required query parameters, blank values, or illegal path traversal characters. |
+| `400 Bad Request` | Missing required query parameters, blank values, parameter exceeding 20 characters (`company` or `proposalType`/`proposal_type`), or illegal path traversal characters. |
 | `404 Not Found` | Company directory, version directory, proposal type directory, or Excel file does not exist. |
 | `502 Bad Gateway` / `500` | SFTP transfer failure or storage communication error. |
 
@@ -303,9 +303,9 @@ Overwrites the current proposal Excel spreadsheet file on SFTP for a given compa
 * **URL**: `/proposals/file` (or `/Proposals/file`)
 * **Method**: `PUT`
 * **Query Parameters**:
-  * `company` *(required, string)*: Company name (e.g. `vanroey`). Case-insensitive lookup.
+  * `company` *(required, string, max 20 chars)*: Company name (e.g. `vanroey`). Case-insensitive lookup.
   * `version` *(required, string)*: Version string (e.g. `v3`). Case-insensitive lookup.
-  * `proposalType` *(required, string)*: Proposal type (e.g. `inbound`). Case-insensitive lookup.
+  * `proposalType` or `proposal_type` *(required, string, max 20 chars, case-insensitive)*: Proposal type (e.g. `inbound`). Case-insensitive lookup; both camelCase and snake_case parameter names are accepted, and metadata values are persisted in lowercase.
 * **Request Body**:
   * Either `multipart/form-data` with part name `file` containing the `.xlsx` / `.xls` binary,
   * Or binary request body with `Content-Type: application/octet-stream` or `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`.
@@ -315,7 +315,7 @@ Overwrites the current proposal Excel spreadsheet file on SFTP for a given compa
 | Status Code | Description |
 | :--- | :--- |
 | `200 OK` | Proposal file successfully replaced and metadata updated. |
-| `400 Bad Request` | Missing query parameters, blank values, empty body, or corrupt non-Excel file. |
+| `400 Bad Request` | Missing query parameters, blank values, parameter exceeding 20 characters (`company` or `proposalType`/`proposal_type`), empty body, or corrupt non-Excel file. |
 | `404 Not Found` | Company directory, version directory, or proposal type directory does not exist. |
 | `502 Bad Gateway` / `500` | SFTP transfer failure or remote write error. |
 
@@ -363,16 +363,16 @@ Approves a proposal for a given company, version, and proposal type.
 * **URL**: `/proposals` (or `/Proposals`)
 * **Method**: `POST`
 * **Query Parameters**:
-  * `company` *(required, string)*: Company name (e.g. `vanroey`).
+  * `company` *(required, string, max 20 chars)*: Company name (e.g. `vanroey`).
   * `version` *(required, string)*: Proposal version (e.g. `v3`).
-  * `proposalType` *(required, string)*: Proposal type (e.g. `inbound`).
+  * `proposalType` or `proposal_type` *(required, string, max 20 chars, case-insensitive)*: Proposal type (e.g. `inbound`). Both camelCase and snake_case parameter names are accepted; values are case-insensitive and normalized to lowercase.
 
 #### Response Codes
 
 | Status Code | Description |
 | :--- | :--- |
 | `501 Not Implemented` | The feature is planned and not implemented yet. |
-| `400 Bad Request` | Missing required `company`, `version`, or `proposalType` parameter. |
+| `400 Bad Request` | Missing required `company`, `version`, or `proposalType`/`proposal_type` parameter, or parameter exceeding 20 characters. |
 
 #### Example Request
 
@@ -406,9 +406,9 @@ Deletes a proposal for a given company, version, and proposal type from the SFTP
 * **URL**: `/proposals` (or `/Proposals`)
 * **Method**: `DELETE`
 * **Query Parameters**:
-  * `company` *(required, string)*: Company name (e.g. `vanroey`).
+  * `company` *(required, string, max 20 chars)*: Company name (e.g. `vanroey`).
   * `version` *(required, string)*: Proposal version (e.g. `v2`).
-  * `proposalType` *(required, string)*: Proposal type (e.g. `inbound`).
+  * `proposalType` or `proposal_type` *(required, string, max 20 chars, case-insensitive)*: Proposal type (e.g. `inbound`). Both camelCase and snake_case parameter names are accepted; values are case-insensitive and normalized to lowercase.
 * **Request Body** (`application/json`):
   * `deleteCheck` *(required, string)*: Confirmation string that must match `company` exactly.
 
@@ -417,7 +417,7 @@ Deletes a proposal for a given company, version, and proposal type from the SFTP
 | Status Code | Description |
 | :--- | :--- |
 | `204 No Content` | Proposal successfully deleted. |
-| `400 Bad Request` | Missing query parameters, missing body, or `deleteCheck` does not match `company`. |
+| `400 Bad Request` | Missing query parameters, parameter exceeding 20 characters (`company` or `proposalType`/`proposal_type`), missing body, or `deleteCheck` does not match `company`. |
 | `404 Not Found` | Company, version, or proposal type directory does not exist. |
 | `502 Bad Gateway` / `500` | SFTP storage error. |
 

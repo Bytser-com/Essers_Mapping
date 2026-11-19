@@ -41,6 +41,8 @@ public class SftpProposalStorageService implements ProposalStorageService {
     private static final String FALLBACK_METADATA_FILENAME = "proposal.json";
     private static final String EXCEL_XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     private static final String EXCEL_XLS_MIME = "application/vnd.ms-excel";
+    private static final int MAX_COMPANY_LENGTH = 20;
+    private static final int MAX_PROPOSAL_TYPE_LENGTH = 20;
     // Statuses the overview can show (same values as Mapping_Proposal writes in proposal.json)
     private static final Set<String> PROPOSAL_STATUSES =
             Set.of("AI_GENERATING", "READY_FOR_REVIEW", "IN_REVIEW", "In review", "AI_CHECKING_REVIEW", "RETURNED");
@@ -75,11 +77,26 @@ public class SftpProposalStorageService implements ProposalStorageService {
     public List<CompanyProposalOverviewDto> listProposals(String company, String proposalType) {
         try {
             if (company != null && !company.isBlank()) {
+                if (company.length() > MAX_COMPANY_LENGTH) {
+                    throw new IllegalArgumentException("Company parameter must not exceed " + MAX_COMPANY_LENGTH + " characters");
+                }
                 String sanitized = sanitizePathSegment(company);
-                String sanitizedType = (proposalType != null && !proposalType.isBlank()) ? sanitizePathSegment(proposalType) : null;
+                String sanitizedType = null;
+                if (proposalType != null && !proposalType.isBlank()) {
+                    if (proposalType.length() > MAX_PROPOSAL_TYPE_LENGTH) {
+                        throw new IllegalArgumentException("Proposal type parameter must not exceed " + MAX_PROPOSAL_TYPE_LENGTH + " characters");
+                    }
+                    sanitizedType = sanitizePathSegment(proposalType).toLowerCase();
+                }
                 return getOverviewsForCompany(sanitized, sanitizedType);
             } else {
-                String sanitizedType = (proposalType != null && !proposalType.isBlank()) ? sanitizePathSegment(proposalType) : null;
+                String sanitizedType = null;
+                if (proposalType != null && !proposalType.isBlank()) {
+                    if (proposalType.length() > MAX_PROPOSAL_TYPE_LENGTH) {
+                        throw new IllegalArgumentException("Proposal type parameter must not exceed " + MAX_PROPOSAL_TYPE_LENGTH + " characters");
+                    }
+                    sanitizedType = sanitizePathSegment(proposalType).toLowerCase();
+                }
                 return listAllProposals(sanitizedType);
             }
         } catch (EntityNotFoundException | IllegalArgumentException e) {
@@ -97,17 +114,14 @@ public class SftpProposalStorageService implements ProposalStorageService {
 
     @Override
     public ProposalFileDetailsDto getProposalFile(String company, String version, String proposalType) {
-        if (company == null || company.isBlank()) {
-            throw new IllegalArgumentException("Company parameter must not be empty");
-        }
-        if (version == null || version.isBlank()) {
-            throw new IllegalArgumentException("Version parameter must not be empty");
-        }
+        validateCompany(company);
+        validateVersion(version);
+        validateProposalTypeIfPresent(proposalType);
 
         String sanitizedCompany = sanitizePathSegment(company);
         String sanitizedVersion = sanitizePathSegment(version);
         String sanitizedProposalType = (proposalType != null && !proposalType.isBlank())
-                ? sanitizePathSegment(proposalType)
+                ? sanitizePathSegment(proposalType).toLowerCase()
                 : null;
 
         try {
@@ -182,8 +196,8 @@ public class SftpProposalStorageService implements ProposalStorageService {
             String createdBy = (metadata != null) ? metadata.createdBy() : null;
             String description = (metadata != null) ? metadata.description() : null;
             String finalProposalType = (resolvedProposalType != null)
-                    ? resolvedProposalType
-                    : (metadata != null && metadata.proposalType() != null ? metadata.proposalType() : proposalType);
+                    ? resolvedProposalType.toLowerCase()
+                    : (metadata != null && metadata.proposalType() != null ? metadata.proposalType().toLowerCase() : (proposalType != null ? proposalType.toLowerCase() : null));
 
             return new ProposalFileDetailsDto(
                     resolvedCompany,
@@ -213,17 +227,14 @@ public class SftpProposalStorageService implements ProposalStorageService {
 
     @Override
     public ProposalFileDataDto getProposalFileData(String company, String version, String proposalType) {
-        if (company == null || company.isBlank()) {
-            throw new IllegalArgumentException("Company parameter must not be empty");
-        }
-        if (version == null || version.isBlank()) {
-            throw new IllegalArgumentException("Version parameter must not be empty");
-        }
+        validateCompany(company);
+        validateVersion(version);
+        validateProposalTypeIfPresent(proposalType);
 
         String sanitizedCompany = sanitizePathSegment(company);
         String sanitizedVersion = sanitizePathSegment(version);
         String sanitizedProposalType = (proposalType != null && !proposalType.isBlank())
-                ? sanitizePathSegment(proposalType)
+                ? sanitizePathSegment(proposalType).toLowerCase()
                 : null;
 
         try {
@@ -313,8 +324,8 @@ public class SftpProposalStorageService implements ProposalStorageService {
             String createdBy = (metadata != null) ? metadata.createdBy() : null;
             String status = (metadata != null) ? metadata.status() : null;
             String finalProposalType = (resolvedProposalType != null)
-                    ? resolvedProposalType
-                    : (metadata != null && metadata.proposalType() != null ? metadata.proposalType() : proposalType);
+                    ? resolvedProposalType.toLowerCase()
+                    : (metadata != null && metadata.proposalType() != null ? metadata.proposalType().toLowerCase() : (proposalType != null ? proposalType.toLowerCase() : null));
 
             return new ProposalFileDataDto(
                     resolvedVersion,
@@ -343,12 +354,9 @@ public class SftpProposalStorageService implements ProposalStorageService {
 
     @Override
     public ProposalFileDetailsDto overwriteProposalFile(String company, String version, String proposalType, byte[] fileBytes, String originalFilename) {
-        if (company == null || company.isBlank()) {
-            throw new IllegalArgumentException("Company parameter must not be empty");
-        }
-        if (version == null || version.isBlank()) {
-            throw new IllegalArgumentException("Version parameter must not be empty");
-        }
+        validateCompany(company);
+        validateVersion(version);
+        validateProposalTypeIfPresent(proposalType);
         if (fileBytes == null || fileBytes.length == 0) {
             throw new IllegalArgumentException("File content must not be empty");
         }
@@ -358,7 +366,7 @@ public class SftpProposalStorageService implements ProposalStorageService {
         String sanitizedCompany = sanitizePathSegment(company);
         String sanitizedVersion = sanitizePathSegment(version);
         String sanitizedProposalType = (proposalType != null && !proposalType.isBlank())
-                ? sanitizePathSegment(proposalType)
+                ? sanitizePathSegment(proposalType).toLowerCase()
                 : null;
 
         try {
@@ -463,11 +471,11 @@ public class SftpProposalStorageService implements ProposalStorageService {
             rootNode.put("updated_time", nowTime);
             rootNode.put("filename", targetFilename);
             String effectiveType = (resolvedProposalType != null)
-                    ? resolvedProposalType
-                    : (proposalType != null ? proposalType : (metadata != null ? metadata.proposalType() : null));
+                    ? resolvedProposalType.toLowerCase()
+                    : (proposalType != null ? proposalType.toLowerCase() : (metadata != null && metadata.proposalType() != null ? metadata.proposalType().toLowerCase() : null));
             if (effectiveType != null) {
-                rootNode.put("proposal_type", effectiveType);
-                rootNode.put("proposalType", effectiveType);
+                rootNode.put("proposal_type", effectiveType.toLowerCase());
+                rootNode.put("proposalType", effectiveType.toLowerCase());
             }
             if (!rootNode.has("customer") && !rootNode.has("company")) {
                 rootNode.put("company", resolvedCompany);
@@ -524,17 +532,14 @@ public class SftpProposalStorageService implements ProposalStorageService {
 
     @Override
     public void deleteProposal(String company, String version, String proposalType) {
-        if (company == null || company.isBlank()) {
-            throw new IllegalArgumentException("Company parameter must not be empty");
-        }
-        if (version == null || version.isBlank()) {
-            throw new IllegalArgumentException("Version parameter must not be empty");
-        }
+        validateCompany(company);
+        validateVersion(version);
+        validateProposalTypeIfPresent(proposalType);
 
         String sanitizedCompany = sanitizePathSegment(company);
         String sanitizedVersion = sanitizePathSegment(version);
         String sanitizedProposalType = (proposalType != null && !proposalType.isBlank())
-                ? sanitizePathSegment(proposalType)
+                ? sanitizePathSegment(proposalType).toLowerCase()
                 : null;
 
         try {
@@ -767,7 +772,7 @@ public class SftpProposalStorageService implements ProposalStorageService {
                         log.warn("Skipping proposal {}: {}", typePath, problem);
                         continue;
                     }
-                    CompanyProposalOverviewDto dto = toOverview(companyName, version, typePath, typeName, typeEntries, metadata);
+                    CompanyProposalOverviewDto dto = toOverview(companyName, version, typePath, typeName.toLowerCase(), typeEntries, metadata);
                     latestByType.put(typeKey, dto);
                 }
             } else {
@@ -777,13 +782,13 @@ public class SftpProposalStorageService implements ProposalStorageService {
                     log.warn("Skipping proposal {}: {}", versionPath, problem);
                     continue;
                 }
-                String typeName = metadata.proposalType() != null ? metadata.proposalType() : "";
+                String typeName = metadata.proposalType() != null ? metadata.proposalType().toLowerCase() : "";
                 if (proposalTypeFilter != null && !proposalTypeFilter.equalsIgnoreCase(typeName)) {
                     continue;
                 }
                 String typeKey = typeName.toLowerCase();
                 if (!latestByType.containsKey(typeKey)) {
-                    CompanyProposalOverviewDto dto = toOverview(companyName, version, versionPath, typeName, versionEntries, metadata);
+                    CompanyProposalOverviewDto dto = toOverview(companyName, version, versionPath, typeName.toLowerCase(), versionEntries, metadata);
                     latestByType.put(typeKey, dto);
                 }
             }
@@ -800,18 +805,18 @@ public class SftpProposalStorageService implements ProposalStorageService {
             String companyName, String version, String versionPath, SftpClient.DirEntry[] versionEntries, String proposalTypeFilter) {
         for (SftpClient.DirEntry entry : versionEntries) {
             if (!isSpecialDirectory(entry.getFilename()) && isDirectory(entry)) {
-                String typeName = entry.getFilename();
+                String typeName = entry.getFilename().toLowerCase();
                 if (proposalTypeFilter != null && !typeName.equalsIgnoreCase(proposalTypeFilter)) {
                     continue;
                 }
-                String typePath = versionPath + "/" + typeName;
+                String typePath = versionPath + "/" + entry.getFilename();
                 SftpClient.DirEntry[] typeEntries = listVersionEntries(typePath);
                 ProposalMetadata metadata = readMetadata(typePath, typeEntries);
                 return toOverview(companyName, version, typePath, typeName, typeEntries, metadata);
             }
         }
         ProposalMetadata metadata = readMetadata(versionPath, versionEntries);
-        String typeName = metadata != null ? metadata.proposalType() : null;
+        String typeName = metadata != null && metadata.proposalType() != null ? metadata.proposalType().toLowerCase() : null;
         if (proposalTypeFilter != null && (typeName == null || !typeName.equalsIgnoreCase(proposalTypeFilter))) {
             return null;
         }
@@ -938,8 +943,8 @@ public class SftpProposalStorageService implements ProposalStorageService {
         String aiStatus = (metadata != null) ? metadata.aiStatus() : null;
         String customerName = (metadata != null) ? metadata.company() : null;
         String finalProposalType = (proposalType != null && !proposalType.isBlank())
-                ? proposalType
-                : (metadata != null ? metadata.proposalType() : null);
+                ? proposalType.toLowerCase()
+                : (metadata != null && metadata.proposalType() != null ? metadata.proposalType().toLowerCase() : null);
 
         return new CompanyProposalOverviewDto(
                 companyName,
@@ -1083,6 +1088,32 @@ public class SftpProposalStorageService implements ProposalStorageService {
         }
         return entry.getAttributes().isDirectory()
                 || entry.getAttributes().getType() == SftpConstants.SSH_FILEXFER_TYPE_DIRECTORY;
+    }
+
+    private void validateCompany(String company) {
+        if (company == null || company.isBlank()) {
+            throw new IllegalArgumentException("Company parameter must not be empty");
+        }
+        if (company.length() > MAX_COMPANY_LENGTH) {
+            throw new IllegalArgumentException("Company parameter must not exceed " + MAX_COMPANY_LENGTH + " characters");
+        }
+    }
+
+    private void validateVersion(String version) {
+        if (version == null || version.isBlank()) {
+            throw new IllegalArgumentException("Version parameter must not be empty");
+        }
+    }
+
+    private void validateProposalTypeIfPresent(String proposalType) {
+        if (proposalType != null) {
+            if (proposalType.isBlank()) {
+                throw new IllegalArgumentException("Proposal type parameter must not be empty");
+            }
+            if (proposalType.length() > MAX_PROPOSAL_TYPE_LENGTH) {
+                throw new IllegalArgumentException("Proposal type parameter must not exceed " + MAX_PROPOSAL_TYPE_LENGTH + " characters");
+            }
+        }
     }
 
     private String sanitizePathSegment(String segment) {
