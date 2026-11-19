@@ -57,7 +57,9 @@ SonarQube draait één gezamenlijke analyse op `Development` en verzamelt daarvo
 opnieuw coverage van alle geïmplementeerde services.
 
 De losse Sonar-scanner kent de Maven-classpath niet automatisch. Daarom kopiëren
-we de Runtime-dependencies (inclusief testdependencies) naar `target/sonar-libraries`.
+we voor Runtime en Version_Control de dependencies (inclusief testdependencies)
+naar hun eigen `target/sonar-libraries`. Beide Java-services worden gebouwd en
+getest; hun JaCoCo-rapporten worden samen met frontend- en Python-coverage ingelezen.
 `sonar-project.properties` verwijst naar die JARs en de gecompileerde productie-
 en testklassen. Python wordt als versie 3.12 geanalyseerd, net als in CI.
 Het patroon `Mapping_*/coverage.xml` leest bestaande Python-rapporten en verwacht
@@ -65,16 +67,26 @@ geen rapport van een service die alleen een README bevat.
 
 Onze teamafspraak is **minstens 70% totale coverage**. Dat is een andere maatstaf
 dan de standaard Sonar-gate: die vereist **80% coverage op nieuwe code**.
-De workflow neemt de gate over van SonarCloud; het percentage staat niet in YAML.
-Een eigen gate met 70% totale coverage vereist in SonarCloud een Team- of
-Enterprise-abonnement. De bestaande Sonar-gate blijft actief in SonarCloud.
+De workflow neemt de gate over van onze eigen SonarQube Community Build;
+het percentage staat niet in YAML. Community Build ondersteunt eigen quality
+gates, dus 70% totale coverage kan op de server worden ingesteld. Deze migratie
+verandert het bestaande gatebeleid niet.
 In GitHub Actions behandelen we alleen een tekort aan coverage op nieuwe code
-als waarschuwing. De cloud-gate kan daardoor rood zijn terwijl deze workflow groen
+als waarschuwing. De server-gate kan daardoor rood zijn terwijl deze workflow groen
 is. Security-, betrouwbaarheids-, onderhoudbaarheids-, duplicatie- en andere
 gatefouten blijven de workflow blokkeren. De 70% totale coverage is een teamdoel;
 deze wijziging voegt daarvoor geen automatische grens toe.
 Let op: Sonars `Coverage` combineert regels en vertakkingen en kan dus lager zijn
 dan alleen `Line coverage`. Bekijk voor onze afspraak de totale `Coverage`.
+
+De server staat op `https://sonar-essers.shystack.com`. Stel in GitHub de variable
+`SONAR_HOST_URL` in op die URL en `SONAR_PROJECT_KEY` op de projectkey van deze
+server. Vervang secret `SONAR_TOKEN` door een nieuw project-analysetoken van deze
+instantie. `SONAR_ORGANIZATION` wordt niet meer gebruikt. De volledige
+[instelhandleiding](../../docs/SONARQUBE_SETUP.md) beschrijft ook de eerste scan.
+Community Build analyseert alleen de hoofdbranch van het Sonar-project; bij ons
+is dat `Development`. PR-analyse wordt niet ondersteund. De gewone service-CI
+blijft de controles voor pull requests uitvoeren.
 
 De scan uploadt eerst de analyse zonder zelf op de gate te wachten. Daarna leest
 `Scripts/check-sonar-quality-gate.py` het taaknummer uit `.scannerwork/report-task.txt`.
