@@ -47,7 +47,8 @@ export const useProposalStore = create<ProposalState>()((set, get) => ({
   downloadProposal: async (company, version) => {
     set({ actionError: null });
     try {
-      return await getProposalFile(company, version);
+      const proposalType = get().proposal?.proposalType ?? "";
+      return await getProposalFile(company, version, proposalType);
     } catch (err) {
       console.error("Failed to download proposal Excel file:", err);
       set({ actionError: err instanceof Error ? err.message : "Onbekende fout" });
@@ -58,7 +59,8 @@ export const useProposalStore = create<ProposalState>()((set, get) => ({
   uploadProposal: async (company, version, file) => {
     set({ actionError: null });
     try {
-      await uploadProposalFile(company, version, file);
+      const proposalType = get().proposal?.proposalType ?? "";
+      await uploadProposalFile(company, version, proposalType, file);
       await get().fetchProposal(company);
       return true;
     } catch (err) {
@@ -70,7 +72,8 @@ export const useProposalStore = create<ProposalState>()((set, get) => ({
   approveProposal: async (company, version) => {
     set({ actionError: null });
     try {
-      await approveProposal(company, version);
+      const proposalType = get().proposal?.proposalType ?? "";
+      await approveProposal(company, version, proposalType);
       await get().fetchProposal(company);
       return true;
     } catch (err) {
@@ -82,7 +85,8 @@ export const useProposalStore = create<ProposalState>()((set, get) => ({
   deleteProposal: async (company, version, deleteCheck) => {
     set({ actionError: null });
     try {
-      await deleteProposal(company, version, deleteCheck);
+      const proposalType = get().proposal?.proposalType ?? "";
+      await deleteProposal(company, version, proposalType, deleteCheck);
       set({
         proposal: null,
         deleteSuccessMessage: `Voorstel voor ${company} (${version}) is succesvol verwijderd.`,

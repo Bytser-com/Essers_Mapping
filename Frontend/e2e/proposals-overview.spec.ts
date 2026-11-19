@@ -102,14 +102,14 @@ test.describe('E2E - Proposals overview on Home', () => {
     await page.goto('/')
 
     const headers = proposalsSection(page).getByRole('columnheader')
-    await expect(headers).toHaveText(['KLANT', 'VERSIE', 'GEÜPLOAD OP', 'STATUS', 'AI-STATUS', 'ACTIE'])
+    await expect(headers).toHaveText(['KLANT', 'VERSIE', 'TYPE', 'GEÜPLOAD OP', 'STATUS', 'AI-STATUS', 'ACTIE'])
     const cells = rowOf(page, 'Klant A').getByRole('cell')
     await expect(cells.nth(0)).toHaveText('Klant A')
     await expect(cells.nth(1)).toHaveText('v1')
-    await expect(cells.nth(2)).toHaveText('22/10/2026 14:05')
-    await expect(cells.nth(3)).toHaveText('Klaar om na te kijken')
-    await expect(rowOf(page, 'Klant B').getByRole('cell').nth(2)).toHaveText('05/01/2026 08:07')
-    await expect(rowOf(page, 'Klant C').getByRole('cell').nth(2)).toHaveText('25/10/2026 10:00')
+    await expect(cells.nth(3)).toHaveText('22/10/2026 14:05')
+    await expect(cells.nth(4)).toHaveText('Klaar om na te kijken')
+    await expect(rowOf(page, 'Klant B').getByRole('cell').nth(3)).toHaveText('05/01/2026 08:07')
+    await expect(rowOf(page, 'Klant C').getByRole('cell').nth(3)).toHaveText('25/10/2026 10:00')
   })
 
   test('TC-57-05 statuses and AI statuses are shown in Dutch', xrayTest('IT2627T06-131'), async ({ page }) => {
@@ -135,16 +135,16 @@ test.describe('E2E - Proposals overview on Home', () => {
     ]
     for (const [customer, status, aiStatus] of expected) {
       const cells = rowOf(page, customer).getByRole('cell')
-      await expect(cells.nth(3)).toHaveText(status)
-      await expect(cells.nth(4)).toHaveText(aiStatus)
+      await expect(cells.nth(4)).toHaveText(status)
+      await expect(cells.nth(5)).toHaveText(aiStatus)
     }
   })
 
-  test('TC-57-06 "Openen" goes to the package of the customer and is disabled while the AI is busy', xrayTest('IT2627T06-132'), async ({ page }) => {
+  test('TC-57-06 "Openen" goes to the package of the customer and is always enabled', xrayTest('IT2627T06-132'), async ({ page }) => {
     await mockProposals(
       page,
       list(
-        proposal('Klant A', { status: 'AI_GENERATING', ai_status: 'RUNNING', can_open: false }),
+        proposal('Klant A', { status: 'AI_GENERATING', ai_status: 'RUNNING' }),
         proposal('Voorbeeldbedrijf B', { version: 2 }),
       ),
     )
@@ -153,7 +153,7 @@ test.describe('E2E - Proposals overview on Home', () => {
 
     await page.goto('/')
 
-    await expect(rowOf(page, 'Klant A').getByRole('button', { name: 'Openen' })).toBeDisabled()
+    await expect(rowOf(page, 'Klant A').getByRole('button', { name: 'Openen' })).toBeEnabled()
     await rowOf(page, 'Voorbeeldbedrijf B').getByRole('button', { name: 'Openen' }).click()
 
     // Only the address is checked: what that page shows belongs to another user story.
@@ -212,6 +212,7 @@ test.describe('E2E - Proposals overview on Home', () => {
     await expect(rowOf(page, 'Klant B')).toBeVisible()
 
     await page.getByLabel('Klantnaam').fill('Klant A')
+    await page.getByLabel('Type').fill('inbound')
     await page.getByTestId('file-input').setInputFiles({ name: 'order.xml', mimeType: 'text/xml', buffer: Buffer.from('<root />') })
     await page.getByRole('button', { name: 'Uploaden' }).click()
 
@@ -219,9 +220,9 @@ test.describe('E2E - Proposals overview on Home', () => {
     const row = rowOf(page, 'Klant A')
     await expect(row).toBeVisible({ timeout: 10_000 })
     await expect(row.getByRole('cell').nth(1)).toHaveText('v1')
-    await expect(row.getByRole('cell').nth(3)).toHaveText('AI maakt voorstel')
-    await expect(row.getByRole('cell').nth(4)).toHaveText('Bezig')
-    await expect(row.getByRole('button', { name: 'Openen' })).toBeDisabled()
+    await expect(row.getByRole('cell').nth(4)).toHaveText('AI maakt voorstel')
+    await expect(row.getByRole('cell').nth(5)).toHaveText('Bezig')
+    await expect(row.getByRole('button', { name: 'Openen' })).toBeEnabled()
     await expect(page.getByTestId('proposal-count')).toHaveText('2')
     expect(pageLoads).toBe(1)
   })

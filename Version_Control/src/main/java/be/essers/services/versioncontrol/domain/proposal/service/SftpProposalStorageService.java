@@ -41,6 +41,8 @@ public class SftpProposalStorageService implements ProposalStorageService {
     private static final String FALLBACK_METADATA_FILENAME = "proposal.json";
     private static final String EXCEL_XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     private static final String EXCEL_XLS_MIME = "application/vnd.ms-excel";
+    private static final int MAX_COMPANY_LENGTH = 20;
+    private static final int MAX_PROPOSAL_TYPE_LENGTH = 20;
     // Statuses the overview can show (same values as Mapping_Proposal writes in proposal.json)
     private static final Set<String> PROPOSAL_STATUSES =
             Set.of("AI_GENERATING", "READY_FOR_REVIEW", "IN_REVIEW", "In review", "AI_CHECKING_REVIEW", "RETURNED");
@@ -68,13 +70,34 @@ public class SftpProposalStorageService implements ProposalStorageService {
 
     @Override
     public List<CompanyProposalOverviewDto> listProposals(String company) {
+        return listProposals(company, null);
+    }
+
+    @Override
+    public List<CompanyProposalOverviewDto> listProposals(String company, String proposalType) {
         try {
             if (company != null && !company.isBlank()) {
+                if (company.length() > MAX_COMPANY_LENGTH) {
+                    throw new IllegalArgumentException("Company parameter must not exceed " + MAX_COMPANY_LENGTH + " characters");
+                }
                 String sanitized = sanitizePathSegment(company);
-                CompanyProposalOverviewDto overview = getOverviewForCompany(sanitized);
-                return List.of(overview);
+                String sanitizedType = null;
+                if (proposalType != null && !proposalType.isBlank()) {
+                    if (proposalType.length() > MAX_PROPOSAL_TYPE_LENGTH) {
+                        throw new IllegalArgumentException("Proposal type parameter must not exceed " + MAX_PROPOSAL_TYPE_LENGTH + " characters");
+                    }
+                    sanitizedType = sanitizePathSegment(proposalType).toLowerCase();
+                }
+                return getOverviewsForCompany(sanitized, sanitizedType);
             } else {
-                return listAllProposals();
+                String sanitizedType = null;
+                if (proposalType != null && !proposalType.isBlank()) {
+                    if (proposalType.length() > MAX_PROPOSAL_TYPE_LENGTH) {
+                        throw new IllegalArgumentException("Proposal type parameter must not exceed " + MAX_PROPOSAL_TYPE_LENGTH + " characters");
+                    }
+                    sanitizedType = sanitizePathSegment(proposalType).toLowerCase();
+                }
+                return listAllProposals(sanitizedType);
             }
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             throw e;
@@ -86,15 +109,20 @@ public class SftpProposalStorageService implements ProposalStorageService {
 
     @Override
     public ProposalFileDetailsDto getProposalFile(String company, String version) {
-        if (company == null || company.isBlank()) {
-            throw new IllegalArgumentException("Company parameter must not be empty");
-        }
-        if (version == null || version.isBlank()) {
-            throw new IllegalArgumentException("Version parameter must not be empty");
-        }
+        return getProposalFile(company, version, null);
+    }
+
+    @Override
+    public ProposalFileDetailsDto getProposalFile(String company, String version, String proposalType) {
+        validateCompany(company);
+        validateVersion(version);
+        validateProposalTypeIfPresent(proposalType);
 
         String sanitizedCompany = sanitizePathSegment(company);
         String sanitizedVersion = sanitizePathSegment(version);
+        String sanitizedProposalType = (proposalType != null && !proposalType.isBlank())
+                ? sanitizePathSegment(proposalType).toLowerCase()
+                : null;
 
         try {
             String rootPath = normalizePath(properties.basePath());
@@ -110,19 +138,47 @@ public class SftpProposalStorageService implements ProposalStorageService {
             }
 
             String versionPath = companyPath + "/" + resolvedVersion;
-            SftpClient.DirEntry[] versionEntries = template.list(versionPath);
-            if (versionEntries == null || versionEntries.length == 0) {
-                throw new EntityNotFoundException("No files found in directory '" + versionPath + "'");
+            String targetPath = null;
+            String resolvedProposalType = null;
+
+            if (sanitizedProposalType != null) {
+                resolvedProposalType = resolveDirectoryName(versionPath, sanitizedProposalType);
+                if (resolvedProposalType != null) {
+                    targetPath = versionPath + "/" + resolvedProposalType;
+                } else if (template.exists(versionPath + "/" + METADATA_FILENAME) || template.exists(versionPath + "/" + FALLBACK_METADATA_FILENAME)) {
+                    targetPath = versionPath;
+                } else {
+                    throw new EntityNotFoundException("Proposal type directory '" + proposalType + "' does not exist for company '" + resolvedCompany + "' and version '" + resolvedVersion + "'");
+                }
+            } else {
+                SftpClient.DirEntry[] vEntries = template.list(versionPath);
+                if (vEntries != null) {
+                    for (SftpClient.DirEntry entry : vEntries) {
+                        if (!isSpecialDirectory(entry.getFilename()) && isDirectory(entry)) {
+                            targetPath = versionPath + "/" + entry.getFilename();
+                            resolvedProposalType = entry.getFilename();
+                            break;
+                        }
+                    }
+                }
+                if (targetPath == null) {
+                    targetPath = versionPath;
+                }
             }
 
-            ProposalMetadata metadata = readMetadata(versionPath, versionEntries);
-            SftpClient.DirEntry excelEntry = findExcelEntry(versionEntries, metadata != null ? metadata.filename() : null);
+            SftpClient.DirEntry[] folderEntries = template.list(targetPath);
+            if (folderEntries == null || folderEntries.length == 0) {
+                throw new EntityNotFoundException("No files found in directory '" + targetPath + "'");
+            }
+
+            ProposalMetadata metadata = readMetadata(targetPath, folderEntries);
+            SftpClient.DirEntry excelEntry = findExcelEntry(folderEntries, metadata != null ? metadata.filename() : null);
             if (excelEntry == null) {
                 throw new EntityNotFoundException("No Excel proposal file found for company '" + resolvedCompany + "' and version '" + resolvedVersion + "'");
             }
 
             String excelFilename = excelEntry.getFilename();
-            String excelFullPath = versionPath + "/" + excelFilename;
+            String excelFullPath = targetPath + "/" + excelFilename;
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             boolean readSuccess = template.get(excelFullPath, in -> in.transferTo(baos));
@@ -139,6 +195,9 @@ public class SftpProposalStorageService implements ProposalStorageService {
                     : extractFileTimestamp(excelEntry);
             String createdBy = (metadata != null) ? metadata.createdBy() : null;
             String description = (metadata != null) ? metadata.description() : null;
+            String finalProposalType = (resolvedProposalType != null)
+                    ? resolvedProposalType.toLowerCase()
+                    : (metadata != null && metadata.proposalType() != null ? metadata.proposalType().toLowerCase() : (proposalType != null ? proposalType.toLowerCase() : null));
 
             return new ProposalFileDetailsDto(
                     resolvedCompany,
@@ -150,7 +209,8 @@ public class SftpProposalStorageService implements ProposalStorageService {
                     createdDate,
                     createdBy,
                     description,
-                    base64Content
+                    base64Content,
+                    finalProposalType
             );
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             throw e;
@@ -162,15 +222,20 @@ public class SftpProposalStorageService implements ProposalStorageService {
 
     @Override
     public ProposalFileDataDto getProposalFileData(String company, String version) {
-        if (company == null || company.isBlank()) {
-            throw new IllegalArgumentException("Company parameter must not be empty");
-        }
-        if (version == null || version.isBlank()) {
-            throw new IllegalArgumentException("Version parameter must not be empty");
-        }
+        return getProposalFileData(company, version, null);
+    }
+
+    @Override
+    public ProposalFileDataDto getProposalFileData(String company, String version, String proposalType) {
+        validateCompany(company);
+        validateVersion(version);
+        validateProposalTypeIfPresent(proposalType);
 
         String sanitizedCompany = sanitizePathSegment(company);
         String sanitizedVersion = sanitizePathSegment(version);
+        String sanitizedProposalType = (proposalType != null && !proposalType.isBlank())
+                ? sanitizePathSegment(proposalType).toLowerCase()
+                : null;
 
         try {
             String rootPath = normalizePath(properties.basePath());
@@ -186,19 +251,47 @@ public class SftpProposalStorageService implements ProposalStorageService {
             }
 
             String versionPath = companyPath + "/" + resolvedVersion;
-            SftpClient.DirEntry[] versionEntries = template.list(versionPath);
-            if (versionEntries == null || versionEntries.length == 0) {
-                throw new EntityNotFoundException("No files found in directory '" + versionPath + "'");
+            String targetPath = null;
+            String resolvedProposalType = null;
+
+            if (sanitizedProposalType != null) {
+                resolvedProposalType = resolveDirectoryName(versionPath, sanitizedProposalType);
+                if (resolvedProposalType != null) {
+                    targetPath = versionPath + "/" + resolvedProposalType;
+                } else if (template.exists(versionPath + "/" + METADATA_FILENAME) || template.exists(versionPath + "/" + FALLBACK_METADATA_FILENAME)) {
+                    targetPath = versionPath;
+                } else {
+                    throw new EntityNotFoundException("Proposal type directory '" + proposalType + "' does not exist for company '" + resolvedCompany + "' and version '" + resolvedVersion + "'");
+                }
+            } else {
+                SftpClient.DirEntry[] vEntries = template.list(versionPath);
+                if (vEntries != null) {
+                    for (SftpClient.DirEntry entry : vEntries) {
+                        if (!isSpecialDirectory(entry.getFilename()) && isDirectory(entry)) {
+                            targetPath = versionPath + "/" + entry.getFilename();
+                            resolvedProposalType = entry.getFilename();
+                            break;
+                        }
+                    }
+                }
+                if (targetPath == null) {
+                    targetPath = versionPath;
+                }
             }
 
-            ProposalMetadata metadata = readMetadata(versionPath, versionEntries);
-            SftpClient.DirEntry excelEntry = findExcelEntry(versionEntries, metadata != null ? metadata.filename() : null);
+            SftpClient.DirEntry[] folderEntries = template.list(targetPath);
+            if (folderEntries == null || folderEntries.length == 0) {
+                throw new EntityNotFoundException("No files found in directory '" + targetPath + "'");
+            }
+
+            ProposalMetadata metadata = readMetadata(targetPath, folderEntries);
+            SftpClient.DirEntry excelEntry = findExcelEntry(folderEntries, metadata != null ? metadata.filename() : null);
             if (excelEntry == null) {
                 throw new EntityNotFoundException("No Excel proposal file found for company '" + resolvedCompany + "' and version '" + resolvedVersion + "'");
             }
 
             String excelFilename = excelEntry.getFilename();
-            String excelFullPath = versionPath + "/" + excelFilename;
+            String excelFullPath = targetPath + "/" + excelFilename;
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             boolean readSuccess = template.get(excelFullPath, in -> in.transferTo(baos));
@@ -230,10 +323,14 @@ public class SftpProposalStorageService implements ProposalStorageService {
 
             String createdBy = (metadata != null) ? metadata.createdBy() : null;
             String status = (metadata != null) ? metadata.status() : null;
+            String finalProposalType = (resolvedProposalType != null)
+                    ? resolvedProposalType.toLowerCase()
+                    : (metadata != null && metadata.proposalType() != null ? metadata.proposalType().toLowerCase() : (proposalType != null ? proposalType.toLowerCase() : null));
 
             return new ProposalFileDataDto(
                     resolvedVersion,
                     companyName,
+                    finalProposalType,
                     uploadDate,
                     uploadTime,
                     updatedTime,
@@ -252,12 +349,14 @@ public class SftpProposalStorageService implements ProposalStorageService {
 
     @Override
     public ProposalFileDetailsDto overwriteProposalFile(String company, String version, byte[] fileBytes, String originalFilename) {
-        if (company == null || company.isBlank()) {
-            throw new IllegalArgumentException("Company parameter must not be empty");
-        }
-        if (version == null || version.isBlank()) {
-            throw new IllegalArgumentException("Version parameter must not be empty");
-        }
+        return overwriteProposalFile(company, version, null, fileBytes, originalFilename);
+    }
+
+    @Override
+    public ProposalFileDetailsDto overwriteProposalFile(String company, String version, String proposalType, byte[] fileBytes, String originalFilename) {
+        validateCompany(company);
+        validateVersion(version);
+        validateProposalTypeIfPresent(proposalType);
         if (fileBytes == null || fileBytes.length == 0) {
             throw new IllegalArgumentException("File content must not be empty");
         }
@@ -266,6 +365,9 @@ public class SftpProposalStorageService implements ProposalStorageService {
 
         String sanitizedCompany = sanitizePathSegment(company);
         String sanitizedVersion = sanitizePathSegment(version);
+        String sanitizedProposalType = (proposalType != null && !proposalType.isBlank())
+                ? sanitizePathSegment(proposalType).toLowerCase()
+                : null;
 
         try {
             String rootPath = normalizePath(properties.basePath());
@@ -281,13 +383,41 @@ public class SftpProposalStorageService implements ProposalStorageService {
             }
 
             String versionPath = companyPath + "/" + resolvedVersion;
-            SftpClient.DirEntry[] versionEntries = template.list(versionPath);
-            if (versionEntries == null || versionEntries.length == 0) {
-                throw new EntityNotFoundException("No files found in directory '" + versionPath + "'");
+            String targetFolderPath = null;
+            String resolvedProposalType = null;
+
+            if (sanitizedProposalType != null) {
+                resolvedProposalType = resolveDirectoryName(versionPath, sanitizedProposalType);
+                if (resolvedProposalType != null) {
+                    targetFolderPath = versionPath + "/" + resolvedProposalType;
+                } else if (template.exists(versionPath + "/" + METADATA_FILENAME) || template.exists(versionPath + "/" + FALLBACK_METADATA_FILENAME)) {
+                    targetFolderPath = versionPath;
+                } else {
+                    throw new EntityNotFoundException("Proposal type directory '" + proposalType + "' does not exist for company '" + resolvedCompany + "' and version '" + resolvedVersion + "'");
+                }
+            } else {
+                SftpClient.DirEntry[] vEntries = template.list(versionPath);
+                if (vEntries != null) {
+                    for (SftpClient.DirEntry entry : vEntries) {
+                        if (!isSpecialDirectory(entry.getFilename()) && isDirectory(entry)) {
+                            targetFolderPath = versionPath + "/" + entry.getFilename();
+                            resolvedProposalType = entry.getFilename();
+                            break;
+                        }
+                    }
+                }
+                if (targetFolderPath == null) {
+                    targetFolderPath = versionPath;
+                }
             }
 
-            ProposalMetadata metadata = readMetadata(versionPath, versionEntries);
-            SftpClient.DirEntry existingExcelEntry = findExcelEntry(versionEntries, metadata != null ? metadata.filename() : null);
+            SftpClient.DirEntry[] folderEntries = template.list(targetFolderPath);
+            if (folderEntries == null || folderEntries.length == 0) {
+                throw new EntityNotFoundException("No files found in directory '" + targetFolderPath + "'");
+            }
+
+            ProposalMetadata metadata = readMetadata(targetFolderPath, folderEntries);
+            SftpClient.DirEntry existingExcelEntry = findExcelEntry(folderEntries, metadata != null ? metadata.filename() : null);
 
             String targetFilename;
             if (existingExcelEntry != null) {
@@ -298,7 +428,7 @@ public class SftpProposalStorageService implements ProposalStorageService {
                 targetFilename = "mappingproposal.xlsx";
             }
 
-            String targetFullPath = versionPath + "/" + targetFilename;
+            String targetFullPath = targetFolderPath + "/" + targetFilename;
 
             // 1. Write the new Excel file to SFTP (overwriting existing file)
             template.execute(session -> {
@@ -312,11 +442,11 @@ public class SftpProposalStorageService implements ProposalStorageService {
             String nowDate = now.toLocalDate().toString();
             String nowTime = now.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
 
-            String metadataFileName = resolveMetadataFilename(versionPath, versionEntries);
+            String metadataFileName = resolveMetadataFilename(targetFolderPath, folderEntries);
             if (metadataFileName == null) {
                 metadataFileName = METADATA_FILENAME;
             }
-            String metadataFullPath = versionPath + "/" + metadataFileName;
+            String metadataFullPath = targetFolderPath + "/" + metadataFileName;
 
             // Read existing metadata raw JSON if possible, else create new
             ByteArrayOutputStream metaBaos = new ByteArrayOutputStream();
@@ -340,6 +470,13 @@ public class SftpProposalStorageService implements ProposalStorageService {
             rootNode.put("updated_date", nowDate);
             rootNode.put("updated_time", nowTime);
             rootNode.put("filename", targetFilename);
+            String effectiveType = (resolvedProposalType != null)
+                    ? resolvedProposalType.toLowerCase()
+                    : (proposalType != null ? proposalType.toLowerCase() : (metadata != null && metadata.proposalType() != null ? metadata.proposalType().toLowerCase() : null));
+            if (effectiveType != null) {
+                rootNode.put("proposal_type", effectiveType.toLowerCase());
+                rootNode.put("proposalType", effectiveType.toLowerCase());
+            }
             if (!rootNode.has("customer") && !rootNode.has("company")) {
                 rootNode.put("company", resolvedCompany);
                 rootNode.put("customer", resolvedCompany);
@@ -377,7 +514,8 @@ public class SftpProposalStorageService implements ProposalStorageService {
                     createdDate,
                     createdBy,
                     description,
-                    base64Content
+                    base64Content,
+                    effectiveType
             );
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             throw e;
@@ -389,15 +527,20 @@ public class SftpProposalStorageService implements ProposalStorageService {
 
     @Override
     public void deleteProposal(String company, String version) {
-        if (company == null || company.isBlank()) {
-            throw new IllegalArgumentException("Company parameter must not be empty");
-        }
-        if (version == null || version.isBlank()) {
-            throw new IllegalArgumentException("Version parameter must not be empty");
-        }
+        deleteProposal(company, version, null);
+    }
+
+    @Override
+    public void deleteProposal(String company, String version, String proposalType) {
+        validateCompany(company);
+        validateVersion(version);
+        validateProposalTypeIfPresent(proposalType);
 
         String sanitizedCompany = sanitizePathSegment(company);
         String sanitizedVersion = sanitizePathSegment(version);
+        String sanitizedProposalType = (proposalType != null && !proposalType.isBlank())
+                ? sanitizePathSegment(proposalType).toLowerCase()
+                : null;
 
         try {
             String rootPath = normalizePath(properties.basePath());
@@ -413,16 +556,34 @@ public class SftpProposalStorageService implements ProposalStorageService {
             }
 
             String versionPath = companyPath + "/" + resolvedVersion;
-            SftpClient.DirEntry[] versionEntries = template.list(versionPath);
+            String targetDeletePath;
+            boolean isTypeSubdir = false;
+
+            if (sanitizedProposalType != null) {
+                String resolvedProposalType = resolveDirectoryName(versionPath, sanitizedProposalType);
+                if (resolvedProposalType != null) {
+                    targetDeletePath = versionPath + "/" + resolvedProposalType;
+                    isTypeSubdir = true;
+                } else if (template.exists(versionPath + "/" + METADATA_FILENAME) || template.exists(versionPath + "/" + FALLBACK_METADATA_FILENAME)) {
+                    targetDeletePath = versionPath;
+                } else {
+                    throw new EntityNotFoundException("Proposal type directory '" + proposalType + "' does not exist for company '" + resolvedCompany + "' and version '" + resolvedVersion + "'");
+                }
+            } else {
+                targetDeletePath = versionPath;
+            }
+
+            SftpClient.DirEntry[] targetEntries = template.list(targetDeletePath);
+            boolean finalIsTypeSubdir = isTypeSubdir;
 
             template.execute(session -> {
-                if (versionEntries != null) {
-                    for (SftpClient.DirEntry entry : versionEntries) {
+                if (targetEntries != null) {
+                    for (SftpClient.DirEntry entry : targetEntries) {
                         String name = entry.getFilename();
                         if (isSpecialDirectory(name)) {
                             continue;
                         }
-                        String childPath = versionPath + "/" + name;
+                        String childPath = targetDeletePath + "/" + name;
                         if (isDirectory(entry)) {
                             deleteRecursively(session, childPath);
                         } else {
@@ -430,7 +591,29 @@ public class SftpProposalStorageService implements ProposalStorageService {
                         }
                     }
                 }
-                session.rmdir(versionPath);
+                session.rmdir(targetDeletePath);
+
+                // If deleted a type subdirectory, clean up empty version directory if no other entries remain
+                if (finalIsTypeSubdir) {
+                    SftpClient.DirEntry[] remainingInVersion = template.list(versionPath);
+                    boolean versionEmpty = true;
+                    if (remainingInVersion != null) {
+                        for (SftpClient.DirEntry entry : remainingInVersion) {
+                            if (!isSpecialDirectory(entry.getFilename())) {
+                                versionEmpty = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (versionEmpty) {
+                        try {
+                            session.rmdir(versionPath);
+                            log.info("Cleaned up empty version directory '{}'", versionPath);
+                        } catch (Exception ex) {
+                            log.warn("Could not remove empty version directory '{}': {}", versionPath, ex.getMessage());
+                        }
+                    }
+                }
 
                 // Clean up empty company directory if no other versions/files remain
                 SftpClient.DirEntry[] remaining = template.list(companyPath);
@@ -454,7 +637,7 @@ public class SftpProposalStorageService implements ProposalStorageService {
                 return null;
             });
 
-            log.info("Successfully deleted proposal version directory '{}' from SFTP", versionPath);
+            log.info("Successfully deleted proposal directory '{}' from SFTP", targetDeletePath);
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             throw e;
         } catch (Exception e) {
@@ -494,21 +677,34 @@ public class SftpProposalStorageService implements ProposalStorageService {
         }
     }
 
-    private CompanyProposalOverviewDto getOverviewForCompany(String company) {
+    private List<CompanyProposalOverviewDto> getOverviewsForCompany(String company, String proposalTypeFilter) {
         String rootPath = normalizePath(properties.basePath());
         String resolvedCompany = resolveDirectoryName(rootPath, company);
         if (resolvedCompany == null) {
             throw new EntityNotFoundException("Company directory '" + company + "' does not exist at " + rootPath);
         }
 
-        CompanyProposalOverviewDto overview = buildCompanyOverview(rootPath, resolvedCompany);
-        if (overview == null) {
+        String companyPath = rootPath + "/" + resolvedCompany;
+        List<String> versions = listVersions(companyPath);
+        if (versions.isEmpty()) {
             throw new EntityNotFoundException("No proposal versions found for company '" + resolvedCompany + "'");
         }
-        return overview;
+
+        List<CompanyProposalOverviewDto> overviews = findLatestProposalsForCompany(rootPath, resolvedCompany, versions, proposalTypeFilter);
+        if (overviews.isEmpty()) {
+            String latestVersion = versions.get(versions.size() - 1);
+            String versionPath = companyPath + "/" + latestVersion;
+            SftpClient.DirEntry[] versionEntries = listVersionEntries(versionPath);
+            CompanyProposalOverviewDto fallback = buildCompanyOverviewFallback(resolvedCompany, latestVersion, versionPath, versionEntries, proposalTypeFilter);
+            if (fallback != null) {
+                return List.of(fallback);
+            }
+            throw new EntityNotFoundException("No proposal versions found for company '" + resolvedCompany + "'");
+        }
+        return overviews;
     }
 
-    private List<CompanyProposalOverviewDto> listAllProposals() {
+    private List<CompanyProposalOverviewDto> listAllProposals(String proposalTypeFilter) {
         String rootPath = normalizePath(properties.basePath());
         if (!template.exists(rootPath)) {
             log.warn("Root proposals directory '{}' does not exist on SFTP server", rootPath);
@@ -527,10 +723,10 @@ public class SftpProposalStorageService implements ProposalStorageService {
                 continue;
             }
 
-            CompanyProposalOverviewDto overview = buildValidCompanyOverview(rootPath, entryName);
-            if (overview != null) {
-                results.add(overview);
-            }
+            String companyPath = rootPath + "/" + entryName;
+            List<String> versions = listVersions(companyPath);
+            List<CompanyProposalOverviewDto> companyOverviews = findLatestProposalsForCompany(rootPath, entryName, versions, proposalTypeFilter);
+            results.addAll(companyOverviews);
         }
 
         // Newest upload first; the company name keeps the order stable
@@ -541,41 +737,90 @@ public class SftpProposalStorageService implements ProposalStorageService {
         return results;
     }
 
-    private CompanyProposalOverviewDto buildCompanyOverview(String rootPath, String companyName) {
+    private List<CompanyProposalOverviewDto> findLatestProposalsForCompany(
+            String rootPath, String companyName, List<String> versions, String proposalTypeFilter) {
         String companyPath = rootPath + "/" + companyName;
-        List<String> versions = listVersions(companyPath);
-        if (versions.isEmpty()) {
-            return null;
-        }
-
-        String latestVersion = versions.get(versions.size() - 1);
-        String versionPath = companyPath + "/" + latestVersion;
-        SftpClient.DirEntry[] versionEntries = listVersionEntries(versionPath);
-        return toOverview(companyName, latestVersion, versionPath, versionEntries, readMetadata(versionPath, versionEntries));
-    }
-
-    /**
-     * Overview on Home: the newest version of the company with valid proposal data.
-     * A version with missing or invalid data is skipped, so one broken upload never breaks the list.
-     */
-    private CompanyProposalOverviewDto buildValidCompanyOverview(String rootPath, String companyName) {
-        String companyPath = rootPath + "/" + companyName;
-        List<String> versions = listVersions(companyPath);
+        Map<String, CompanyProposalOverviewDto> latestByType = new LinkedHashMap<>();
 
         for (int i = versions.size() - 1; i >= 0; i--) {
             String version = versions.get(i);
             String versionPath = companyPath + "/" + version;
             SftpClient.DirEntry[] versionEntries = listVersionEntries(versionPath);
-            ProposalMetadata metadata = readMetadata(versionPath, versionEntries);
 
-            String problem = findMetadataProblem(metadata);
-            if (problem != null) {
-                log.warn("Skipping proposal {}: {}", versionPath, problem);
-                continue;
+            List<SftpClient.DirEntry> subdirs = new ArrayList<>();
+            for (SftpClient.DirEntry entry : versionEntries) {
+                if (!isSpecialDirectory(entry.getFilename()) && isDirectory(entry)) {
+                    subdirs.add(entry);
+                }
             }
-            return toOverview(companyName, version, versionPath, versionEntries, metadata);
+
+            if (!subdirs.isEmpty()) {
+                for (SftpClient.DirEntry subdir : subdirs) {
+                    String typeName = subdir.getFilename();
+                    if (proposalTypeFilter != null && !typeName.equalsIgnoreCase(proposalTypeFilter)) {
+                        continue;
+                    }
+                    String typeKey = typeName.toLowerCase();
+                    if (latestByType.containsKey(typeKey)) {
+                        continue;
+                    }
+                    String typePath = versionPath + "/" + typeName;
+                    SftpClient.DirEntry[] typeEntries = listVersionEntries(typePath);
+                    ProposalMetadata metadata = readMetadata(typePath, typeEntries);
+                    String problem = findMetadataProblem(metadata);
+                    if (problem != null) {
+                        log.warn("Skipping proposal {}: {}", typePath, problem);
+                        continue;
+                    }
+                    CompanyProposalOverviewDto dto = toOverview(companyName, version, typePath, typeName.toLowerCase(), typeEntries, metadata);
+                    latestByType.put(typeKey, dto);
+                }
+            } else {
+                ProposalMetadata metadata = readMetadata(versionPath, versionEntries);
+                String problem = findMetadataProblem(metadata);
+                if (problem != null) {
+                    log.warn("Skipping proposal {}: {}", versionPath, problem);
+                    continue;
+                }
+                String typeName = metadata.proposalType() != null ? metadata.proposalType().toLowerCase() : "";
+                if (proposalTypeFilter != null && !proposalTypeFilter.equalsIgnoreCase(typeName)) {
+                    continue;
+                }
+                String typeKey = typeName.toLowerCase();
+                if (!latestByType.containsKey(typeKey)) {
+                    CompanyProposalOverviewDto dto = toOverview(companyName, version, versionPath, typeName.toLowerCase(), versionEntries, metadata);
+                    latestByType.put(typeKey, dto);
+                }
+            }
+
+            if (!latestByType.isEmpty()) {
+                break;
+            }
         }
-        return null;
+
+        return new ArrayList<>(latestByType.values());
+    }
+
+    private CompanyProposalOverviewDto buildCompanyOverviewFallback(
+            String companyName, String version, String versionPath, SftpClient.DirEntry[] versionEntries, String proposalTypeFilter) {
+        for (SftpClient.DirEntry entry : versionEntries) {
+            if (!isSpecialDirectory(entry.getFilename()) && isDirectory(entry)) {
+                String typeName = entry.getFilename().toLowerCase();
+                if (proposalTypeFilter != null && !typeName.equalsIgnoreCase(proposalTypeFilter)) {
+                    continue;
+                }
+                String typePath = versionPath + "/" + entry.getFilename();
+                SftpClient.DirEntry[] typeEntries = listVersionEntries(typePath);
+                ProposalMetadata metadata = readMetadata(typePath, typeEntries);
+                return toOverview(companyName, version, typePath, typeName, typeEntries, metadata);
+            }
+        }
+        ProposalMetadata metadata = readMetadata(versionPath, versionEntries);
+        String typeName = metadata != null && metadata.proposalType() != null ? metadata.proposalType().toLowerCase() : null;
+        if (proposalTypeFilter != null && (typeName == null || !typeName.equalsIgnoreCase(proposalTypeFilter))) {
+            return null;
+        }
+        return toOverview(companyName, version, versionPath, typeName, versionEntries, metadata);
     }
 
     // Version folders of a company, sorted from oldest to newest (v2 before v10)
@@ -680,7 +925,8 @@ public class SftpProposalStorageService implements ProposalStorageService {
     }
 
     private CompanyProposalOverviewDto toOverview(String companyName, String version, String versionPath,
-                                                  SftpClient.DirEntry[] versionEntries, ProposalMetadata metadata) {
+                                                  String proposalType, SftpClient.DirEntry[] versionEntries,
+                                                  ProposalMetadata metadata) {
         SftpClient.DirEntry excelEntry = findExcelEntry(versionEntries, metadata != null ? metadata.filename() : null);
 
         String filename = (excelEntry != null)
@@ -695,8 +941,10 @@ public class SftpProposalStorageService implements ProposalStorageService {
         String description = (metadata != null) ? metadata.description() : null;
         String status = (metadata != null) ? metadata.status() : null;
         String aiStatus = (metadata != null) ? metadata.aiStatus() : null;
-        // Name as entered at the upload ("Klant B"); the folder name ("klant-b") stays in company
         String customerName = (metadata != null) ? metadata.company() : null;
+        String finalProposalType = (proposalType != null && !proposalType.isBlank())
+                ? proposalType.toLowerCase()
+                : (metadata != null && metadata.proposalType() != null ? metadata.proposalType().toLowerCase() : null);
 
         return new CompanyProposalOverviewDto(
                 companyName,
@@ -708,7 +956,8 @@ public class SftpProposalStorageService implements ProposalStorageService {
                 description,
                 status,
                 aiStatus,
-                customerName
+                customerName,
+                finalProposalType
         );
     }
 
@@ -839,6 +1088,32 @@ public class SftpProposalStorageService implements ProposalStorageService {
         }
         return entry.getAttributes().isDirectory()
                 || entry.getAttributes().getType() == SftpConstants.SSH_FILEXFER_TYPE_DIRECTORY;
+    }
+
+    private void validateCompany(String company) {
+        if (company == null || company.isBlank()) {
+            throw new IllegalArgumentException("Company parameter must not be empty");
+        }
+        if (company.length() > MAX_COMPANY_LENGTH) {
+            throw new IllegalArgumentException("Company parameter must not exceed " + MAX_COMPANY_LENGTH + " characters");
+        }
+    }
+
+    private void validateVersion(String version) {
+        if (version == null || version.isBlank()) {
+            throw new IllegalArgumentException("Version parameter must not be empty");
+        }
+    }
+
+    private void validateProposalTypeIfPresent(String proposalType) {
+        if (proposalType != null) {
+            if (proposalType.isBlank()) {
+                throw new IllegalArgumentException("Proposal type parameter must not be empty");
+            }
+            if (proposalType.length() > MAX_PROPOSAL_TYPE_LENGTH) {
+                throw new IllegalArgumentException("Proposal type parameter must not exceed " + MAX_PROPOSAL_TYPE_LENGTH + " characters");
+            }
+        }
     }
 
     private String sanitizePathSegment(String segment) {

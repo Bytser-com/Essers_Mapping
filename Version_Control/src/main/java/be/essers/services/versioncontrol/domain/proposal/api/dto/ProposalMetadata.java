@@ -28,8 +28,29 @@ public record ProposalMetadata(
         String aiStatus,
 
         @JsonAlias({"updated_at", "updatedAt", "updated_date", "updatedDate"})
-        String updatedAt
+        String updatedAt,
+
+        @JsonAlias({"proposal_type", "proposalType"})
+        String proposalType
 ) {
+    public ProposalMetadata {
+        proposalType = (proposalType != null) ? proposalType.toLowerCase() : null;
+    }
+
+    public ProposalMetadata(
+            String company,
+            String version,
+            String filename,
+            String createdDate,
+            String createdBy,
+            String description,
+            String status,
+            String aiStatus,
+            String updatedAt
+    ) {
+        this(company, version, filename, createdDate, createdBy, description, status, aiStatus, updatedAt, null);
+    }
+
     public ProposalMetadata(
             String company,
             String version,
@@ -40,6 +61,6 @@ public record ProposalMetadata(
             String status,
             String aiStatus
     ) {
-        this(company, version, filename, createdDate, createdBy, description, status, aiStatus, null);
+        this(company, version, filename, createdDate, createdBy, description, status, aiStatus, null, null);
     }
 }

@@ -1,14 +1,16 @@
 """Reading and writing mapping proposals on the shared storage (the SFTP server).
 
-Layout on the storage: one folder per customer, one subfolder per version.
+Layout on the storage: one folder per customer, one subfolder per version, one subfolder per proposal type.
 
     <SFTP_SHARED_PROPOSALS_DIR>/
         voorbeeldbedrijf-a/
             v1/
-                proposal.json        metadata shown in the overview (required)
-                MProposal-<Klant>_V<N>.xlsx  the AI result (the uploaded XML is not stored on SFTP)
+                inbound/
+                    proposal.json        metadata shown in the overview (required)
+                    MProposal-<Klant>_V<N>.xlsx  the AI result (the uploaded XML is not stored on SFTP)
             v2/
-                proposal.json
+                outbound/
+                    proposal.json
 
 The files live on the shared SFTPGo server of the infrastructure (sftp-shared, see
 Kubernetes/base/shared-storage/sftp-shared.yaml); this service connects to it directly
@@ -18,6 +20,7 @@ layout lives in data/sftp-shared/proposals/ (see scripts/dev_seed.py for example
 Example proposal.json:
     {
       "customer": "Voorbeeldbedrijf A",
+      "proposal_type": "inbound",
       "uploaded_at": "2026-10-22T14:05:00+02:00",
       "status": "AI_GENERATING",
       "ai_status": "RUNNING"
@@ -66,12 +69,13 @@ class AiStatus(StrEnum):
 class ProposalSummary:
     """One row of the proposals overview."""
 
-    id: str                 # "<customer folder>/v<version>", unique on the share
+    id: str                 # "<customer folder>/v<version>" or "<customer folder>/v<version>/<proposal_type>", unique on the share
     customer: str
     version: int
     uploaded_at: datetime   # always timezone-aware
     status: ProposalStatus
     ai_status: AiStatus | None
+    proposal_type: str = ''
 
     @property
     def can_open(self) -> bool:
@@ -80,7 +84,7 @@ class ProposalSummary:
 
     def to_dict(self) -> dict:
         """JSON-ready representation, used by the API response."""
-        return {
+        data = {
             'id': self.id,
             'customer': self.customer,
             'version': self.version,
@@ -89,6 +93,10 @@ class ProposalSummary:
             'ai_status': self.ai_status.value if self.ai_status else None,
             'can_open': self.can_open,
         }
+        if self.proposal_type:
+            data['proposal_type'] = self.proposal_type
+            data['proposalType'] = self.proposal_type
+        return data
 
 
 @dataclass(frozen=True)
@@ -97,7 +105,12 @@ class ProposalRef:
 
     customer: str
     version: int
-    folder: str             # "<customer folder>/v<version>", relative to the proposals root
+    folder: str             # "<customer folder>/v<version>/<proposal_type>", relative to the proposals root
+    proposal_type: str = ''
+
+    def __post_init__(self):
+        if self.proposal_type and not self.proposal_type.islower():
+            object.__setattr__(self, 'proposal_type', self.proposal_type.lower())
 
     @property
     def id(self) -> str:
@@ -109,6 +122,13 @@ def customer_folder_name(customer: str) -> str:
     ascii_name = unicodedata.normalize('NFKD', customer).encode('ascii', 'ignore').decode('ascii')
     slug = re.sub(r'[^a-z0-9]+', '-', ascii_name.lower()).strip('-')
     return slug or 'klant'
+
+
+def proposal_type_folder_name(proposal_type: str) -> str:
+    """Folder name for a proposal type: 'inbound' -> 'inbound', 'Inbound' -> 'inbound', 'inboud-accept' -> 'inboud-accept'."""
+    ascii_name = unicodedata.normalize('NFKD', proposal_type).encode('ascii', 'ignore').decode('ascii')
+    slug = re.sub(r'[^a-zA-Z0-9_-]+', '-', ascii_name).strip('-').lower()
+    return slug or 'proposal'
 
 
 class ProposalStore:
@@ -259,8 +279,8 @@ class ProposalStore:
 
     # -- Writing (used by the AI run, see services/proposal_runner.py) -----------------
 
-    def create_proposal(self, customer: str, created_by: str = 'Analist A') -> ProposalRef:
-        """Create the next version folder for this customer with status 'AI is generating'.
+    def create_proposal(self, customer: str, proposal_type: str = 'inbound', created_by: str = 'Analist A') -> ProposalRef:
+        """Create the next version and proposal type folder for this customer with status 'AI is generating'.
 
         The overview shows the new row immediately, while the AI is still working.
         If the customer exists in /Packages, the proposal starts at latest package version + 1.
@@ -269,6 +289,10 @@ class ProposalStore:
         customer = customer.strip()
         if not customer:
             raise ValueError('customer name is empty')
+        if proposal_type is None or not str(proposal_type).strip():
+            raise ValueError('proposal type is empty')
+        prop_type = str(proposal_type).strip().lower()
+        type_dir = proposal_type_folder_name(prop_type)
         customer_dir = customer_folder_name(customer)
         with self.storage.session() as s:
             latest_pkg = self.get_latest_package_version(customer, session=s)
@@ -282,19 +306,22 @@ class ProposalStore:
             # Creating a folder that exists fails: if another run took this number, try the next.
             while not s.make_dir(f'{customer_dir}/v{version}'):
                 version += 1
-            folder = f'{customer_dir}/v{version}'
+            folder = f'{customer_dir}/v{version}/{type_dir}'
+            s.make_dirs(folder)
             now = datetime.now(UTC).isoformat(timespec='seconds')
             _write_metadata(s, folder, {
                 'customer': customer,
                 'company': customer,
                 'version': f'v{version}',
+                'proposal_type': prop_type,
+                'proposalType': prop_type,
                 'uploaded_at': now,
                 'createdDate': now,
                 'status': ProposalStatus.AI_GENERATING.value,
                 'ai_status': AiStatus.RUNNING.value,
                 'createdBy': created_by,
             })
-        return ProposalRef(customer=customer, version=version, folder=folder)
+        return ProposalRef(customer=customer, version=version, folder=folder, proposal_type=prop_type)
 
     def set_status(self, ref: ProposalRef, status: ProposalStatus,
                    ai_status: AiStatus | None, *, error: str = '') -> None:
@@ -377,17 +404,28 @@ class ProposalStore:
             match = _VERSION_FOLDER.fullmatch(name)
             if not match:
                 continue  # other folders next to the versions are ignored
-            try:
-                path = f'{customer_dir}/{name}/{METADATA_FILE}'
-                if not s.exists(path):
-                    raise ValueError(f'{METADATA_FILE} is missing')
-                result.append(_read_metadata(customer_dir, int(match.group(1)), s.read_text(path)))
-            except (OSError, ValueError, TypeError) as error:
-                logger.warning('Skipping proposal %s/%s: %s', customer_dir, name, error)
+            version_num = int(match.group(1))
+            found_in_subdirs = False
+            for type_dir in s.list_dirs(f'{customer_dir}/{name}'):
+                type_meta_path = f'{customer_dir}/{name}/{type_dir}/{METADATA_FILE}'
+                if s.exists(type_meta_path):
+                    found_in_subdirs = True
+                    try:
+                        result.append(_read_metadata(customer_dir, version_num, s.read_text(type_meta_path), proposal_type=type_dir))
+                    except (OSError, ValueError, TypeError) as error:
+                        logger.warning('Skipping proposal %s/%s/%s: %s', customer_dir, name, type_dir, error)
+            if not found_in_subdirs:
+                try:
+                    legacy_path = f'{customer_dir}/{name}/{METADATA_FILE}'
+                    if not s.exists(legacy_path):
+                        raise ValueError(f'{METADATA_FILE} is missing')
+                    result.append(_read_metadata(customer_dir, version_num, s.read_text(legacy_path)))
+                except (OSError, ValueError, TypeError) as error:
+                    logger.warning('Skipping proposal %s/%s: %s', customer_dir, name, error)
         return result
 
 
-def _read_metadata(customer_folder: str, version: int, text: str) -> ProposalSummary:
+def _read_metadata(customer_folder: str, version: int, text: str, proposal_type: str = '') -> ProposalSummary:
     """Parse the proposal.json of one version folder. Raises ValueError when invalid."""
     data = json.loads(text)
     if not isinstance(data, dict):
@@ -403,8 +441,11 @@ def _read_metadata(customer_folder: str, version: int, text: str) -> ProposalSum
     except ValueError:
         raise ValueError(f'unknown ai_status {ai_value!r}') from None
 
+    prop_type = str(data.get('proposal_type') or data.get('proposalType') or proposal_type or '').strip().lower()
+    folder_id = f'{customer_folder}/v{version}/{prop_type}' if prop_type else f'{customer_folder}/v{version}'
+
     return ProposalSummary(
-        id=f'{customer_folder}/v{version}',
+        id=folder_id,
         # The display name falls back to the folder name when "customer" is missing.
         customer=str(data.get('customer') or customer_folder).strip(),
         # The folder name is the source of truth for the version number.
@@ -412,6 +453,7 @@ def _read_metadata(customer_folder: str, version: int, text: str) -> ProposalSum
         uploaded_at=_parse_timestamp(data.get('uploaded_at')),
         status=status,
         ai_status=ai_status,
+        proposal_type=prop_type,
     )
 
 

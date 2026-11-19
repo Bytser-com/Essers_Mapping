@@ -24,14 +24,14 @@ from .config import LOCAL_SHARED_DIR, TEMPLATE_PATH
 
 logger = logging.getLogger(__name__)
 
-# (folder, customer, version, uploaded_at, status, ai_status)
+# (folder, customer, version, uploaded_at, status, ai_status, proposal_type)
 EXAMPLES = [
-    ('voorbeeldbedrijf-a', 'Voorbeeldbedrijf A', 1, '2026-10-22T14:05:00+02:00', 'AI_GENERATING', 'RUNNING'),
-    ('voorbeeldbedrijf-b', 'Voorbeeldbedrijf B', 2, '2026-10-21T10:30:00+02:00', 'READY_FOR_REVIEW', None),
-    ('voorbeeldbedrijf-c', 'Voorbeeldbedrijf C', 1, '2026-10-20T16:45:00+02:00', 'AI_CHECKING_REVIEW', 'RUNNING'),
-    ('voorbeeldbedrijf-d', 'Voorbeeldbedrijf D', 3, '2026-10-19T09:15:00+02:00', 'RETURNED', 'FAILED'),
-    ('voorbeeldbedrijf-e', 'Voorbeeldbedrijf E', 1, '2026-10-18T11:00:00+02:00', 'READY_FOR_REVIEW', None),
-    ('voorbeeldbedrijf-f', 'Voorbeeldbedrijf F', 2, '2026-10-17T13:20:00+02:00', 'IN_REVIEW', None),
+    ('voorbeeldbedrijf-a', 'Voorbeeldbedrijf A', 1, '2026-10-22T14:05:00+02:00', 'AI_GENERATING', 'RUNNING', 'inbound'),
+    ('voorbeeldbedrijf-b', 'Voorbeeldbedrijf B', 2, '2026-10-21T10:30:00+02:00', 'READY_FOR_REVIEW', None, 'outbound'),
+    ('voorbeeldbedrijf-c', 'Voorbeeldbedrijf C', 1, '2026-10-20T16:45:00+02:00', 'AI_CHECKING_REVIEW', 'RUNNING', 'inboud-accept'),
+    ('voorbeeldbedrijf-d', 'Voorbeeldbedrijf D', 3, '2026-10-19T09:15:00+02:00', 'RETURNED', 'FAILED', 'inbound'),
+    ('voorbeeldbedrijf-e', 'Voorbeeldbedrijf E', 1, '2026-10-18T11:00:00+02:00', 'READY_FOR_REVIEW', None, 'outbound'),
+    ('voorbeeldbedrijf-f', 'Voorbeeldbedrijf F', 2, '2026-10-17T13:20:00+02:00', 'IN_REVIEW', None, 'inbound'),
 ]
 
 
@@ -42,8 +42,8 @@ def seed_proposals(storage=None, force: bool = False) -> None:
     print(f'Seeding proposals to: {storage.describe()}')
 
     with storage.session() as s:
-        for folder, customer, version, uploaded_at, status, ai_status in EXAMPLES:
-            version_dir = f'{folder}/v{version}'
+        for folder, customer, version, uploaded_at, status, ai_status, prop_type in EXAMPLES:
+            version_dir = f'{folder}/v{version}/{prop_type}'
             metadata_path = f'{version_dir}/proposal.json'
 
             if not force and s.exists(metadata_path):
@@ -58,6 +58,8 @@ def seed_proposals(storage=None, force: bool = False) -> None:
                 'customer': customer,
                 'company': customer,
                 'version': f'v{version}',
+                'proposal_type': prop_type,
+                'proposalType': prop_type,
                 'uploaded_at': uploaded_at,
                 'createdDate': uploaded_at,
                 'status': status,

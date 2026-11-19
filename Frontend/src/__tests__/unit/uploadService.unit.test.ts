@@ -17,7 +17,7 @@ describe('uploadService', () => {
     const files = [xmlFile('a.xml'), xmlFile('b.xml')]
 
     // Act
-    await uploadInterface('Brunos', files)
+    await uploadInterface('Brunos', 'outbound', files)
 
     // Assert
     expect(fetchMock).toHaveBeenCalledTimes(1)
@@ -34,7 +34,7 @@ describe('uploadService', () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')))
 
     // Act + Assert
-    await expect(uploadInterface('Brunos', [xmlFile('a.xml')])).rejects.toThrow(
+    await expect(uploadInterface('Brunos', 'outbound', [xmlFile('a.xml')])).rejects.toThrow(
       'Upload mislukt: de server is niet bereikbaar.',
     )
   })
@@ -48,7 +48,7 @@ describe('uploadService', () => {
     }))
 
     // Act + Assert
-    await expect(uploadInterface('Brunos', [xmlFile('a.xml')])).rejects.toThrow(
+    await expect(uploadInterface('Brunos', 'outbound', [xmlFile('a.xml')])).rejects.toThrow(
       'Upload mislukt: dit is geen XML-bestand.',
     )
   })
@@ -58,7 +58,7 @@ describe('uploadService', () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 500, json: async () => ({}) }))
 
     // Act + Assert
-    await expect(uploadInterface('Brunos', [xmlFile('a.xml')])).rejects.toThrow('Upload mislukt (status 500).')
+    await expect(uploadInterface('Brunos', 'outbound', [xmlFile('a.xml')])).rejects.toThrow('Upload mislukt (status 500).')
   })
 
   it('throws a message with the status when the error body is not JSON', async () => {
@@ -72,6 +72,6 @@ describe('uploadService', () => {
     }))
 
     // Act + Assert
-    await expect(uploadInterface('Brunos', [xmlFile('a.xml')])).rejects.toThrow('Upload mislukt (status 502).')
+    await expect(uploadInterface('Brunos', 'outbound', [xmlFile('a.xml')])).rejects.toThrow('Upload mislukt (status 502).')
   })
 })
