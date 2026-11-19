@@ -264,22 +264,23 @@ def test_storage_rejects_a_symlink_to_another_directory(tmp_path):
 def test_new_proposal_is_written_in_the_customer_folder_on_sftp(disk):
     store = ProposalStore(FakeSftpStorage(disk))
 
-    ref = store.create_proposal('Ostavel')
+    ref = store.create_proposal('Ostavel', 'inbound')
 
-    assert ref.folder == 'ostavel/v1'
-    assert (disk / 'upload' / 'Proposals' / 'ostavel' / 'v1' / 'proposal.json').is_file()
+    assert ref.folder == 'ostavel/v1/inbound'
+    assert (disk / 'upload' / 'Proposals' / 'ostavel' / 'v1' / 'inbound' / 'proposal.json').is_file()
     [row] = store.list_proposals()
-    assert (row.customer, row.version, row.status, row.ai_status) == (
-        'Ostavel', 1, ProposalStatus.AI_GENERATING, AiStatus.RUNNING)
+    assert (row.customer, row.version, row.status, row.ai_status, row.proposal_type) == (
+        'Ostavel', 1, ProposalStatus.AI_GENERATING, AiStatus.RUNNING, 'inbound')
 
 
 def test_next_upload_of_the_same_customer_gets_the_next_version(disk):
     store = ProposalStore(FakeSftpStorage(disk))
-    store.create_proposal('Ostavel')
+    store.create_proposal('Ostavel', 'inbound')
 
-    ref = store.create_proposal('Ostavel')
+    ref = store.create_proposal('Ostavel', 'outbound')
 
     assert ref.version == 2
+    assert ref.folder == 'ostavel/v2/outbound'
     assert [row.version for row in store.list_proposals(all_versions=True)] == [2, 1]
 
 
@@ -287,23 +288,23 @@ def test_proposal_version_increments_from_packages_on_sftp(disk):
     (disk / 'Packages' / 'Nouryon' / 'v3').mkdir(parents=True)
     store = ProposalStore(FakeSftpStorage(disk))
 
-    ref = store.create_proposal('Nouryon')
+    ref = store.create_proposal('Nouryon', 'inbound')
 
     assert ref.version == 4
-    assert ref.folder == 'nouryon/v4'
+    assert ref.folder == 'nouryon/v4/inbound'
 
 
 
 def test_excel_and_status_are_stored_on_sftp(disk, tmp_path):
     store = ProposalStore(FakeSftpStorage(disk))
-    ref = store.create_proposal('Ostavel')
+    ref = store.create_proposal('Ostavel', 'inbound')
     excel = tmp_path / 'result.xlsx'
     excel.write_bytes(b'excel-bytes')
 
     store.save_file(ref, excel, 'MProposal-Ostavel_V1.xlsx')
     store.set_status(ref, ProposalStatus.READY_FOR_REVIEW, None)
 
-    folder = disk / 'upload' / 'Proposals' / 'ostavel' / 'v1'
+    folder = disk / 'upload' / 'Proposals' / 'ostavel' / 'v1' / 'inbound'
     assert (folder / 'MProposal-Ostavel_V1.xlsx').read_bytes() == b'excel-bytes'
     # No temporary files are left behind
     assert sorted(p.name for p in folder.iterdir()) == ['MProposal-Ostavel_V1.xlsx', 'proposal.json']
@@ -314,7 +315,7 @@ def test_excel_and_status_are_stored_on_sftp(disk, tmp_path):
 
 def test_overwriting_works_on_a_server_without_posix_rename(disk):
     store = ProposalStore(FakeSftpStorage(disk, posix_rename=False))
-    ref = store.create_proposal('Ostavel')
+    ref = store.create_proposal('Ostavel', 'inbound')
 
     store.set_status(ref, ProposalStatus.AI_GENERATING, AiStatus.FAILED, error='boom')
 
@@ -331,9 +332,9 @@ def test_missing_folders_are_created_on_the_server(tmp_path):
     disk.mkdir()
     store = ProposalStore(FakeSftpStorage(disk, base_dir='/upload'))  # /upload does not exist yet
 
-    store.create_proposal('Ostavel')
+    store.create_proposal('Ostavel', 'inbound')
 
-    assert (disk / 'upload' / 'Proposals' / 'ostavel' / 'v1').is_dir()
+    assert (disk / 'upload' / 'Proposals' / 'ostavel' / 'v1' / 'inbound').is_dir()
 
 
 def test_files_and_broken_versions_next_to_the_versions_are_ignored(disk):

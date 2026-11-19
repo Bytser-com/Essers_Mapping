@@ -19,7 +19,7 @@ flowchart TD
     end
 
     subgraph StorageZone ["Storage Zone (SFTPGo)"]
-        SharedSFTP["Shared SFTP (sftp-shared)<br/>Port 2222 (Web: 8081)<br/><code>/Proposals/&lt;Customer&gt;/v&lt;N&gt;/</code>"]
+        SharedSFTP["Shared SFTP (sftp-shared)<br/>Port 2222 (Web: 8081)<br/><code>/Proposals/&lt;Customer&gt;/v&lt;N&gt;/&lt;ProposalType&gt;/</code>"]
         RuntimeSFTP["Runtime SFTP (sftp-runtime)<br/>Port 2223 (Web: 8082)<br/><code>/Packages/&lt;Customer&gt;/v&lt;N&gt;/</code>"]
     end
 

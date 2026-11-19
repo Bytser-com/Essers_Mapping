@@ -305,10 +305,10 @@ The `proposal.json` of one version:
 **Where the data comes from.** Each version of a proposal is a folder with a `proposal.json` (layout and format: see `services/proposals.py`):
 
 ```text
-<shared storage>/proposals/<customer-folder>/v<version>/proposal.json
+<shared storage>/proposals/<customer-folder>/v<version>/<proposal-type>/proposal.json
 ```
 
-- The proposals are stored on an SFTP server, in `<SFTP_SHARED_PROPOSALS_DIR>/<customer>/v<N>/`. This service connects to it directly over SFTP (`services/storage.py`, with paramiko). `/Proposals` is also the folder the Version_Control service reads, so both services find the same files. The folder name can be configured with `SFTP_SHARED_PROPOSALS_DIR`.
+- The proposals are stored on an SFTP server, in `<SFTP_SHARED_PROPOSALS_DIR>/<customer>/v<N>/<proposal-type>/`. This service connects to it directly over SFTP (`services/storage.py`, with paramiko). `/Proposals` is also the folder the Version_Control service reads, so both services find the same files. The folder name can be configured with `SFTP_SHARED_PROPOSALS_DIR`.
 - In Kubernetes the settings come from the `common-config` ConfigMap and the `sftp-shared-credentials` Secret (`SFTP_SHARED_HOST=sftp-shared`). Later the SFTP server at Essers will be used: then only these settings change. Because those servers are not always reachable, **locally SFTPGo runs in Docker** (`Scripts/docker-compose.sftp.yml` from repo root):
 
   ```powershell
@@ -355,7 +355,7 @@ The frontend refreshes the list every 2 seconds while a proposal is "Bezig" and 
 
 ### Uploading (POST /upload)
 
-The Home page sends the customer name and all chosen XML files in one request (`customer_name` + `files`, multipart). `routers/upload.py` stores them together in a new folder in the source folder (`data/source/<YYYYMMDD-HHMMSS>_<customer>_<random>/`) and writes `upload.json` last, so the watcher below starts the AI.
+The Home page sends the customer name, proposal type and all chosen XML files in one request (`customer_name` + `proposal_type` + `files`, multipart). `routers/upload.py` stores them together in a new folder in the source folder (`data/source/<YYYYMMDD-HHMMSS>_<customer>_<random>/`) and writes `upload.json` last, so the watcher below starts the AI.
 
 ### Automatic AI start for uploads
 
