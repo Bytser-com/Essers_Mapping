@@ -159,7 +159,9 @@ publish partial results to that same key.
 
 The scan generates a complete coverage snapshot by rerunning the coverage tests
 for every implemented service at the same commit, including unchanged services.
-It imports Vitest LCOV, merged JaCoCo XML and pytest coverage XML using
+It includes Frontend, Runtime, Version_Control, Mapping_Proposal and
+Mapping_Converter. It imports Vitest LCOV, merged JaCoCo XML from both Java
+services and pytest coverage XML using
 [sonar-project.properties](../../sonar-project.properties). Python dependencies
 are isolated per service; placeholders defer coverage. Service linting and
 Playwright checks remain in the individual service workflows. Combined reports
@@ -175,9 +177,9 @@ failures, API errors and timeouts still fail CI. The JSON gate response is saved
 as `test-results/sonarqube-quality-gate.json` in the reports artifact.
 Local CLI scans retain `sonar.qualitygate.wait=true` and enforce the server gate.
 
-The standalone scanner receives Runtime's compiled production/test classes and
+The standalone scanner receives both Java services' compiled production/test classes and
 dependency JARs explicitly. A Maven `copy-dependencies` step copies the resolved
-dependencies, including test libraries, into `Runtime/target/sonar-libraries`.
+dependencies, including test libraries, into each service's `target/sonar-libraries`.
 Python analysis targets version 3.12 to match CI. The coverage pattern
 `Mapping_*/coverage.xml` imports reports from implemented Python services without
 requiring a report from README-only placeholders.

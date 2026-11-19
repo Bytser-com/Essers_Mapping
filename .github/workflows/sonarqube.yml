@@ -60,7 +60,9 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-          cache-dependency-path: Runtime/pom.xml
+          cache-dependency-path: |
+            Runtime/pom.xml
+            Version_Control/pom.xml
 
       # Generate coverage for every implemented service at the same revision.
       # Unchanged services are included so the combined project retains coverage.
@@ -74,13 +76,21 @@ jobs:
         working-directory: Runtime
         run: mvn --batch-mode --no-transfer-progress -Dstyle.color=never clean verify
 
+      - name: Version Control tests, bytecode and coverage
+        working-directory: Version_Control
+        run: mvn --batch-mode --no-transfer-progress -Dstyle.color=never clean verify
+
       # The standalone scanner needs the Maven dependency JARs, including test dependencies.
       - name: Prepare Java libraries for SonarQube
-        working-directory: Runtime
-        run: >-
-          mvn --batch-mode --no-transfer-progress -Dstyle.color=never
-          org.apache.maven.plugins:maven-dependency-plugin:3.8.1:copy-dependencies
-          -DincludeScope=test -DoutputDirectory=target/sonar-libraries
+        run: |
+          for service in Runtime Version_Control; do
+            (
+              cd "$service"
+              mvn --batch-mode --no-transfer-progress -Dstyle.color=never \
+                org.apache.maven.plugins:maven-dependency-plugin:3.8.1:copy-dependencies \
+                -DincludeScope=test -DoutputDirectory=target/sonar-libraries
+            )
+          done
 
       - name: Setup Mapping_Proposal
         id: proposal
@@ -164,6 +174,9 @@ jobs:
             Runtime/target/site/jacoco/
             Runtime/target/surefire-reports/
             Runtime/target/failsafe-reports/
+            Version_Control/target/site/jacoco/
+            Version_Control/target/surefire-reports/
+            Version_Control/target/failsafe-reports/
             Mapping_Proposal/coverage.xml
             Mapping_Proposal/test-results/
             Mapping_Converter/coverage.xml
