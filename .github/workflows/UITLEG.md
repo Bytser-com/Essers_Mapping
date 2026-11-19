@@ -57,7 +57,9 @@ SonarQube draait één gezamenlijke analyse op `Development` en verzamelt daarvo
 opnieuw coverage van alle geïmplementeerde services.
 
 De losse Sonar-scanner kent de Maven-classpath niet automatisch. Daarom kopiëren
-we de Runtime-dependencies (inclusief testdependencies) naar `target/sonar-libraries`.
+we voor Runtime en Version_Control de dependencies (inclusief testdependencies)
+naar hun eigen `target/sonar-libraries`. Beide Java-services worden gebouwd en
+getest; hun JaCoCo-rapporten worden samen met frontend- en Python-coverage ingelezen.
 `sonar-project.properties` verwijst naar die JARs en de gecompileerde productie-
 en testklassen. Python wordt als versie 3.12 geanalyseerd, net als in CI.
 Het patroon `Mapping_*/coverage.xml` leest bestaande Python-rapporten en verwacht

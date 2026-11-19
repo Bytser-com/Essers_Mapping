@@ -70,7 +70,9 @@ Zorg dat de workflowwijzigingen op `Development` staan. Kies daarna in GitHub
 **Actions > SonarQube > Run workflow > Development**, of push een nieuwe commit
 naar `Development`.
 
-De workflow maakt coverage met Vitest, Maven/JaCoCo en pytest, uploadt de analyse
+De workflow neemt Frontend, Runtime, Version_Control, Mapping_Proposal en
+Mapping_Converter mee. Hij maakt coverage met Vitest, Maven/JaCoCo voor beide
+Java-services en pytest, uploadt de analyse
 en controleert de quality gate van precies die analyse. Bekijk:
 
 - De job **SonarQube Quality Gate** voor het scanner- en gateresultaat.
