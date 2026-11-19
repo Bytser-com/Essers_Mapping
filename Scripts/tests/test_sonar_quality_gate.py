@@ -122,6 +122,7 @@ class SonarGateTests(unittest.TestCase):
         request = opener.open.call_args.args[0]
         self.assertEqual(request.get_method(), 'GET')
         self.assertEqual(request.get_header('Authorization'), 'Bearer token')
+        self.assertTrue(request.get_header('User-agent').startswith('Essers-Mapping-Sonar-Quality-Gate/'))
         self.assertEqual(request.full_url, 'https://sonarcloud.io/api/ce/task?id=a%26other%3Db')
         self.assertEqual(opener.open.call_args.kwargs['timeout'], 12)
 
@@ -191,6 +192,27 @@ class SonarGateTests(unittest.TestCase):
                     patch.object(sonar, 'wait_for_gate', return_value=gate({**COVERAGE, 'actualValue': value})), \
                     redirect_stdout(io.StringIO()):
                 self.assertEqual(sonar.main(), 1)
+
+    def test_cloudflare_block_is_identified_without_exposing_response_details(self):
+        payload = {'cloudflare_error': True, 'error_code': 1010,
+                   'detail': 'Untrusted response containing ' + CONFIG['SONAR_TOKEN']}
+        error = HTTPError('https://sonar-essers.shystack.com/api/ce/task', 403, 'Forbidden',
+                          {}, io.BytesIO(json.dumps(payload).encode()))
+        output = io.StringIO()
+        with workspace(), patch.object(sonar, 'wait_for_gate', side_effect=error), redirect_stdout(output):
+            self.assertEqual(sonar.main(), 1)
+        self.assertIn('Cloudflare rejected the API client (error 1010)', output.getvalue())
+        self.assertNotIn('Check token permissions', output.getvalue())
+        self.assertNotIn(CONFIG['SONAR_TOKEN'], output.getvalue())
+
+    def test_non_json_forbidden_response_remains_a_blocking_http_error(self):
+        error = HTTPError('https://sonar-essers.shystack.com/api/ce/task', 403, 'Forbidden',
+                          {}, io.BytesIO(b'<html>Forbidden</html>'))
+        output = io.StringIO()
+        with workspace(), patch.object(sonar, 'wait_for_gate', side_effect=error), redirect_stdout(output):
+            self.assertEqual(sonar.main(), 1)
+        self.assertIn('HTTP 403', output.getvalue())
+        self.assertNotIn('<html>', output.getvalue())
 
     def test_workflow_keeps_scan_failures_blocking_and_checks_gate_separately(self):
         workflow = (SCRIPT.parent.parent / '.github/workflows/sonarqube.yml').read_text(encoding='utf-8')

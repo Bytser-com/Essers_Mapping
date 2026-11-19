@@ -95,6 +95,24 @@ Maak **SonarQube Quality Gate** niet verplicht voor PR's: die job draait pas na
 een push of merge naar `Development`. De bestaande frontend-, Runtime- en
 Python-servicechecks blijven de PR-controles.
 
+## Problemen oplossen: HTTP 403 na een geslaagde scan
+
+De scanner en het quality-gatescript gebruiken verschillende HTTP-clients. Een
+geslaagde upload gevolgd door HTTP 403 betekent daarom niet automatisch dat
+`SONAR_TOKEN` onjuist is.
+
+Bij de eerste scan blokkeerde Cloudflare de standaard `Python-urllib`-client met
+**error 1010 / browser_signature_banned**. Het quality-gatescript identificeert
+zich nu met `User-Agent: Essers-Mapping-Sonar-Quality-Gate/1.0`, zoals Cloudflare
+aanraadt voor API-clients. Het meldt gestructureerde Cloudflare-fouten apart van
+algemene authenticatie- of proxyfouten, zonder de responsebody of tokens te loggen.
+De Bearer-authenticatie, HTTPS-controle en blokkering van redirects blijven actief.
+
+Na het mergen van deze fix kan dezelfde workflow opnieuw worden gestart op
+`Development`. Als Cloudflare blijft blokkeren, controleer dan de beveiligingsregels
+voor dit hostname. Een echte SonarQube-rechtenfout moet apart worden opgelost;
+deze wijziging verleent geen extra rechten.
+
 ## Documentatie
 
 - [Sonar-project handmatig aanmaken](https://docs.sonarsource.com/sonarqube-community-build/project-administration/creating-project/creating-manually)
@@ -102,3 +120,4 @@ Python-servicechecks blijven de PR-controles.
 - [Server base URL](https://docs.sonarsource.com/sonarqube-community-build/instance-administration/server-base-url)
 - [Ondersteunde Community Build-functies](https://docs.sonarsource.com/sonarqube-community-build/feature-comparison-table)
 - [Cloudflare Access service tokens](https://developers.cloudflare.com/cloudflare-one/access-controls/service-credentials/service-tokens/)
+- [Cloudflare error 1010 en een herkenbare User-Agent](https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1010/)
