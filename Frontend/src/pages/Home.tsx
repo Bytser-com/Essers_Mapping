@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { useLocation, useInRouterContext } from 'react-router-dom'
 import InterfaceUpload from '../components/InterfaceUpload'
 import ProposalOverview from '../components/ProposalOverview'
-import { uploadInterface } from '../services/uploadService'
 import { useProposalStore } from '../stores/proposalStore'
 import iconSuccess from '../assets/home/icon-success.svg'
 
@@ -18,8 +17,6 @@ function RouterLocationListener({ onLocationMessage }: { onLocationMessage: (msg
 }
 
 function Home() {
-  // Raised after every successful upload, so the proposals list shows the new proposal
-  const [uploads, setUploads] = useState(0)
   const storeMessage = useProposalStore((state) => state.deleteSuccessMessage)
   const clearDeleteSuccessMessage = useProposalStore((state) => state.clearDeleteSuccessMessage)
 
@@ -27,11 +24,6 @@ function Home() {
   const inRouter = useInRouterContext()
 
   const message = storeMessage || routerMessage
-
-  async function upload(customerName: string, files: File[]) {
-    await uploadInterface(customerName, files)
-    setUploads((count) => count + 1)
-  }
 
   function handleDismiss() {
     clearDeleteSuccessMessage()
@@ -75,8 +67,8 @@ function Home() {
         </div>
       )}
 
-      <InterfaceUpload onUpload={upload} />
-      <ProposalOverview refreshKey={uploads} />
+      <InterfaceUpload />
+      <ProposalOverview />
     </div>
   )
 }

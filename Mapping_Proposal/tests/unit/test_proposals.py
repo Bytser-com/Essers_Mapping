@@ -249,25 +249,26 @@ def test_tc_57_01_windows_bom_in_proposal_json_is_accepted(root, store):
 def test_tc_57_08_new_proposal_appears_with_ai_maakt_voorstel_and_bezig(store):
     before = datetime.now(UTC).replace(microsecond=0)
 
-    ref = store.create_proposal('  Ostavel  ')
+    ref = store.create_proposal('  Ostavel  ', 'inbound')
 
     [row] = store.list_proposals()
-    assert (row.id, row.customer, row.version) == ('ostavel/v1', 'Ostavel', 1)
+    assert (row.id, row.customer, row.version, row.proposal_type) == ('ostavel/v1/inbound', 'Ostavel', 1, 'inbound')
     assert (row.status, row.ai_status, row.can_open) == (ProposalStatus.AI_GENERATING, AiStatus.RUNNING, False)
     assert before <= row.uploaded_at <= before + timedelta(minutes=1)
-    assert ref.id == 'ostavel/v1'
+    assert ref.id == 'ostavel/v1/inbound'
+    assert ref.folder == 'ostavel/v1/inbound'
 
 
 def test_tc_57_08_next_upload_of_the_same_customer_is_the_next_version(store):
-    store.create_proposal('Ostavel')
-    store.create_proposal('Ostavel')
+    store.create_proposal('Ostavel', 'inbound')
+    store.create_proposal('Ostavel', 'inbound')
 
     assert [row.version for row in store.list_proposals(all_versions=True)] == [2, 1]
     assert [row.version for row in store.list_proposals()] == [2]
 
 
 def test_tc_57_07_status_update_keeps_customer_and_upload_time(root, store):
-    ref = store.create_proposal('Ostavel')
+    ref = store.create_proposal('Ostavel', 'inbound')
     [before] = store.list_proposals()
 
     store.set_status(ref, ProposalStatus.READY_FOR_REVIEW, None)
@@ -278,23 +279,47 @@ def test_tc_57_07_status_update_keeps_customer_and_upload_time(root, store):
 
 
 def test_tc_57_07_failed_ai_run_shows_mislukt_and_keeps_the_error(root, store):
-    ref = store.create_proposal('Ostavel')
+    ref = store.create_proposal('Ostavel', 'inbound')
 
     store.set_status(ref, ProposalStatus.AI_GENERATING, AiStatus.FAILED, error='Gemini is overloaded (503).')
 
     [row] = store.list_proposals()
     assert row.ai_status is AiStatus.FAILED
-    data = json.loads((root / 'ostavel' / 'v1' / 'proposal.json').read_text(encoding='utf-8'))
+    data = json.loads((root / 'ostavel' / 'v1' / 'inbound' / 'proposal.json').read_text(encoding='utf-8'))
     assert data['error'] == 'Gemini is overloaded (503).'
 
     store.set_status(ref, ProposalStatus.READY_FOR_REVIEW, None)  # a later success removes the error
-    data = json.loads((root / 'ostavel' / 'v1' / 'proposal.json').read_text(encoding='utf-8'))
+    data = json.loads((root / 'ostavel' / 'v1' / 'inbound' / 'proposal.json').read_text(encoding='utf-8'))
     assert 'error' not in data
 
 
 def test_tc_57_08_empty_customer_name_is_refused(store):
     with pytest.raises(ValueError):
-        store.create_proposal('   ')
+        store.create_proposal('   ', 'inbound')
+
+
+def test_empty_or_null_proposal_type_is_refused(store):
+    with pytest.raises(ValueError, match='proposal type is empty'):
+        store.create_proposal('Ostavel', '')
+    with pytest.raises(ValueError, match='proposal type is empty'):
+        store.create_proposal('Ostavel', '   ')
+    with pytest.raises(ValueError, match='proposal type is empty'):
+        store.create_proposal('Ostavel', None)
+
+
+@pytest.mark.parametrize('prop_type', ['inbound', 'outbound', 'inboud-accept'])
+def test_proposals_saved_in_version_proposal_type_folder(root, store, prop_type):
+    ref = store.create_proposal('Acme Corp', prop_type)
+    assert ref.folder == f'acme-corp/v1/{prop_type}'
+    metadata_file = root / 'acme-corp' / 'v1' / prop_type / 'proposal.json'
+    assert metadata_file.is_file()
+    data = json.loads(metadata_file.read_text(encoding='utf-8'))
+    assert data['proposal_type'] == prop_type
+    assert data['proposalType'] == prop_type
+    [row] = store.list_proposals()
+    assert row.proposal_type == prop_type
+    assert row.to_dict()['proposal_type'] == prop_type
+    assert row.to_dict()['proposalType'] == prop_type
 
 
 @pytest.mark.parametrize('customer, folder', [
@@ -309,9 +334,9 @@ def test_tc_57_01_customer_folder_name_is_safe_and_readable(customer, folder):
 
 
 def test_proposal_version_is_v1_when_no_packages_exist(root, store):
-    ref = store.create_proposal('Nouryon')
+    ref = store.create_proposal('Nouryon', 'inbound')
     assert ref.version == 1
-    assert ref.folder == 'nouryon/v1'
+    assert ref.folder == 'nouryon/v1/inbound'
 
 
 def test_proposal_version_is_latest_package_version_plus_one(root, tmp_path):
@@ -322,9 +347,9 @@ def test_proposal_version_is_latest_package_version_plus_one(root, tmp_path):
     (pkg_dir / 'v3').mkdir(parents=True)
 
     store = ProposalStore(root)
-    ref = store.create_proposal('Nouryon')
+    ref = store.create_proposal('Nouryon', 'inbound')
     assert ref.version == 4
-    assert ref.folder == 'nouryon/v4'
+    assert ref.folder == 'nouryon/v4/inbound'
 
 
 def test_proposal_version_package_matching_is_case_insensitive(root, tmp_path):
@@ -333,7 +358,32 @@ def test_proposal_version_package_matching_is_case_insensitive(root, tmp_path):
     (pkg_dir / 'v2').mkdir(parents=True)
 
     store = ProposalStore(root)
-    ref = store.create_proposal('Nouryon')
+    ref = store.create_proposal('Nouryon', 'inbound')
     assert ref.version == 3
-    assert ref.folder == 'nouryon/v3'
+    assert ref.folder == 'nouryon/v3/inbound'
+
+
+def test_proposal_type_folder_name_sanitization():
+    from services.proposals import proposal_type_folder_name
+
+    assert proposal_type_folder_name('inbound') == 'inbound'
+    assert proposal_type_folder_name('outbound') == 'outbound'
+    assert proposal_type_folder_name('inboud-accept') == 'inboud-accept'
+    assert proposal_type_folder_name('../../evil/inbound') == 'evil-inbound'
+    assert proposal_type_folder_name('Inbound') == 'inbound'
+    assert proposal_type_folder_name('INBOUND') == 'inbound'
+    assert proposal_type_folder_name('InBounD-Accept') == 'inbound-accept'
+    assert proposal_type_folder_name('inbound accept') == 'inbound-accept'
+
+
+def test_create_proposal_stores_proposal_type_in_lowercase(root, store):
+    ref = store.create_proposal('Ostavel', 'INBOUND')
+    assert ref.proposal_type == 'inbound'
+    assert ref.folder == 'ostavel/v1/inbound'
+    assert (root / 'ostavel/v1/inbound').is_dir()
+    data = json.loads((root / 'ostavel/v1/inbound/proposal.json').read_text(encoding='utf-8'))
+    assert data['proposal_type'] == 'inbound'
+    assert data['proposalType'] == 'inbound'
+
+
 

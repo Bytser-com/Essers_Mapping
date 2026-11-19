@@ -17,12 +17,28 @@ ROOT = Path(__file__).resolve().parent.parent
 
 DATA_DIR = ROOT / 'data'
 SOURCE_DIR = DATA_DIR / 'source'
-HISTORICAL_DIR = (
-    Path(os.getenv('HISTORICAL_DIR')) if os.getenv('HISTORICAL_DIR')
-    else (DATA_DIR / 'historical' if (DATA_DIR / 'historical').is_dir() and any((DATA_DIR / 'historical').iterdir())
-          else (ROOT / 'tests' / 'fixtures' / 'historical' if (ROOT / 'tests' / 'fixtures' / 'historical').is_dir()
-                else DATA_DIR / 'historical'))
-)
+
+def _resolve_historical_dir() -> Path:
+    """Resolve the historical directory using the configured fallback order."""
+    configured = os.getenv('HISTORICAL_DIR')
+
+    if configured:
+        return Path(configured)
+
+    historical = DATA_DIR / 'historical'
+
+    if historical.is_dir() and any(historical.iterdir()):
+        return historical
+
+    fixtures = ROOT / 'tests' / 'fixtures' / 'historical'
+
+    if fixtures.is_dir():
+        return fixtures
+
+    return historical
+
+
+HISTORICAL_DIR = _resolve_historical_dir()
 OUTPUT_DIR = ROOT / 'output'
 RUNS_DIR = OUTPUT_DIR / 'runs'
 TEMPLATE_PATH = ROOT / 'templates' / 'mapping_template.xlsx'
@@ -142,6 +158,18 @@ def packages_dir() -> Path:
     if caps.is_dir():
         return caps
     return shared_storage_dir() / 'packages'
+
+
+def auto_seed_enabled() -> bool:
+    """Whether example proposals should be seeded into storage on startup."""
+    _load_env()
+    val = os.getenv('SEED_PROPOSALS', '').strip().lower()
+    if val in ('1', 'true', 'yes'):
+        return True
+    if val in ('0', 'false', 'no'):
+        return False
+    env = os.getenv('ENVIRONMENT', '').strip().lower()
+    return env in ('testing', 'test', 'development', 'dev')
 
 
 def cors_origins() -> list[str]:
