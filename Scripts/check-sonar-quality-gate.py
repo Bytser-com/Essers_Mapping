@@ -68,7 +68,7 @@ def check_gate(payload):
         raise ValueError('Sonar returned invalid quality-gate conditions.')
     failed = [item for item in conditions if item['status'] == 'ERROR']
     if gate['status'] == 'OK' and not failed:
-        print('SonarCloud quality gate passed.')
+        print('SonarQube quality gate passed.')
         return 0
     if gate['status'] != 'ERROR' or not failed:
         raise ValueError('Sonar returned an unknown or inconsistent quality-gate result.')
@@ -82,16 +82,16 @@ def check_gate(payload):
             annotation('warning',
                        f"Sonar new-code coverage: {condition['actualValue']}%; "
                        f"required: {condition['errorThreshold']}%. Coverage is advisory in GitHub Actions; "
-                       'the hosted SonarCloud gate remains failed.')
+                       'the SonarQube gate remains failed.')
         else:
             blocking = True
-            annotation('error', f'Sonar quality gate failed: {metric}. See the SonarCloud report.')
+            annotation('error', f'Sonar quality gate failed: {metric}. See the SonarQube report.')
     return 1 if blocking else 0
 
 
 def main():
     try:
-        server = os.environ.get('SONAR_HOST_URL', 'https://sonarcloud.io').rstrip('/')
+        server = os.environ.get('SONAR_HOST_URL', '').strip().rstrip('/')
         parsed = urlsplit(server)
         if parsed.scheme != 'https' or not parsed.netloc or parsed.username or parsed.query or parsed.fragment:
             raise ValueError('SONAR_HOST_URL must be an HTTPS URL without credentials.')

@@ -15,7 +15,7 @@ concurrency:
 jobs:
   analysis:
     name: SonarQube Quality Gate
-    # Preserve the existing SonarCloud baseline and avoid unsupported branch scans.
+    # Community Build supports one main branch; Development is our analysis branch.
     # Feature branches retain local IDE analysis and service tests/coverage.
     if: github.ref_name == 'Development'
     runs-on: ubuntu-latest
@@ -23,9 +23,8 @@ jobs:
     env:
       CI: 'true'
       # --- Variables ---
-      SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL || 'https://sonarcloud.io' }}
+      SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
       SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY || 'Bytser-com_Essers_Mapping' }}
-      SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION || 'bytser-com' }}
       SONAR_SCANNER_VERSION: '8.1.0.6389'
     steps:
       - name: Checkout repository with full history
@@ -34,13 +33,17 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Require SonarQube token
+      - name: Require SonarQube configuration
         env:
           # --- Secrets ---
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          if [[ -z "$SONAR_TOKEN" ]]; then
-            echo "::error::Configure the repository SONAR_TOKEN secret to run SonarQube analysis."
+          if [[ -z "$SONAR_HOST_URL" || -z "$SONAR_PROJECT_KEY" || -z "$SONAR_TOKEN" ]]; then
+            echo "::error::Configure SONAR_HOST_URL and SONAR_PROJECT_KEY repository variables and a SONAR_TOKEN secret from the self-hosted SonarQube instance."
+            exit 1
+          fi
+          if [[ "$SONAR_HOST_URL" != https://* ]]; then
+            echo "::error::SONAR_HOST_URL must use HTTPS, for example https://sonar-essers.shystack.com."
             exit 1
           fi
 
@@ -132,7 +135,6 @@ jobs:
           skipSignatureVerification: false
           args: >-
             -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
-            -Dsonar.organization=${{ env.SONAR_ORGANIZATION }}
             -Dsonar.qualitygate.wait=false
 
       # Inspect this scan separately so only new-code coverage is advisory.
