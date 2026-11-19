@@ -30,7 +30,6 @@ import java.util.List;
 @RequestMapping({"/proposals", "/Proposals"})
 public class ProposalController {
 
-    private static final String XLSX_EXTENSION = ".xlsx";
     private final ProposalStorageService proposalStorageService;
 
     public ProposalController(ProposalStorageService proposalStorageService) {
@@ -40,51 +39,75 @@ public class ProposalController {
     /**
      * GET /proposals
      * GET /proposals?company=VanRoey
+     * GET /proposals?company=VanRoey&proposalType=inbound
      * GET /Proposals
      *
-     * Retrieves all companies with their latest proposal version, creation date, and creator.
+     * Retrieves all companies with their latest proposal version, creation date, creator, and proposalType.
      */
     @GetMapping
     public ResponseEntity<List<CompanyProposalOverviewDto>> getProposals(
-            @RequestParam(required = false) String company
+            @RequestParam(required = false) String company,
+            @RequestParam(required = false) String proposalType
     ) {
-        List<CompanyProposalOverviewDto> proposals = proposalStorageService.listProposals(company);
+        List<CompanyProposalOverviewDto> proposals = (proposalType != null && !proposalType.isBlank())
+                ? proposalStorageService.listProposals(company, proposalType)
+                : proposalStorageService.listProposals(company);
         return ResponseEntity.ok(proposals);
     }
 
     /**
-     * GET /proposals/file?company=vanroey&version=v3
-     * GET /Proposals/file?company=vanroey&version=v3
+     * GET /proposals/file?company=vanroey&version=v3&proposalType=inbound
+     * GET /Proposals/file?company=vanroey&version=v3&proposalType=inbound
      *
      * Retrieves the Excel proposal file (Base64) and metadata as a JSON response.
      */
     @GetMapping("/file")
     public ResponseEntity<ProposalFileDetailsDto> getProposalFile(
             @RequestParam String company,
-            @RequestParam String version
+            @RequestParam String version,
+            @RequestParam String proposalType
     ) {
-        ProposalFileDetailsDto fileDetails = proposalStorageService.getProposalFile(company, version);
+        if (company == null || company.isBlank()) {
+            throw new IllegalArgumentException("Company parameter must not be empty");
+        }
+        if (version == null || version.isBlank()) {
+            throw new IllegalArgumentException("Version parameter must not be empty");
+        }
+        if (proposalType == null || proposalType.isBlank()) {
+            throw new IllegalArgumentException("Proposal type parameter must not be empty");
+        }
+        ProposalFileDetailsDto fileDetails = proposalStorageService.getProposalFile(company, version, proposalType);
         return ResponseEntity.ok(fileDetails);
     }
 
     /**
-     * GET /proposals/filedata?company=bedrijfsnaam&version=versie
-     * GET /Proposals/filedata?company=bedrijfsnaam&version=versie
+     * GET /proposals/filedata?company=bedrijfsnaam&version=versie&proposalType=type
+     * GET /Proposals/filedata?company=bedrijfsnaam&version=versie&proposalType=type
      *
      * Retrieves parsed proposal file metadata and rows as a JSON response.
      */
     @GetMapping("/filedata")
     public ResponseEntity<ProposalFileDataDto> getProposalFileData(
             @RequestParam String company,
-            @RequestParam String version
+            @RequestParam String version,
+            @RequestParam String proposalType
     ) {
-        ProposalFileDataDto fileData = proposalStorageService.getProposalFileData(company, version);
+        if (company == null || company.isBlank()) {
+            throw new IllegalArgumentException("Company parameter must not be empty");
+        }
+        if (version == null || version.isBlank()) {
+            throw new IllegalArgumentException("Version parameter must not be empty");
+        }
+        if (proposalType == null || proposalType.isBlank()) {
+            throw new IllegalArgumentException("Proposal type parameter must not be empty");
+        }
+        ProposalFileDataDto fileData = proposalStorageService.getProposalFileData(company, version, proposalType);
         return ResponseEntity.ok(fileData);
     }
 
     /**
-     * PUT /proposals/file?company=vanroey&version=v3
-     * PUT /Proposals/file?company=vanroey&version=v3
+     * PUT /proposals/file?company=vanroey&version=v3&proposalType=inbound
+     * PUT /Proposals/file?company=vanroey&version=v3&proposalType=inbound
      *
      * Overwrites the current Excel proposal on SFTP, updates updated_time / updated_date,
      * and sets status to "In review" in the metadata file. Supports multipart/form-data ("file").
@@ -93,19 +116,29 @@ public class ProposalController {
     public ResponseEntity<ProposalFileDetailsDto> overwriteProposalFileMultipart(
             @RequestParam String company,
             @RequestParam String version,
+            @RequestParam String proposalType,
             @RequestPart("file") MultipartFile file
     ) throws IOException {
+        if (company == null || company.isBlank()) {
+            throw new IllegalArgumentException("Company parameter must not be empty");
+        }
+        if (version == null || version.isBlank()) {
+            throw new IllegalArgumentException("Version parameter must not be empty");
+        }
+        if (proposalType == null || proposalType.isBlank()) {
+            throw new IllegalArgumentException("Proposal type parameter must not be empty");
+        }
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("Uploaded file cannot be empty");
         }
         ProposalFileDetailsDto details = proposalStorageService.overwriteProposalFile(
-                company, version, file.getBytes(), file.getOriginalFilename());
+                company, version, proposalType, file.getBytes(), file.getOriginalFilename());
         return ResponseEntity.ok(details);
     }
 
     /**
-     * PUT /proposals/file?company=vanroey&version=v3
-     * PUT /Proposals/file?company=vanroey&version=v3
+     * PUT /proposals/file?company=vanroey&version=v3&proposalType=inbound
+     * PUT /Proposals/file?company=vanroey&version=v3&proposalType=inbound
      *
      * Overwrites the current Excel proposal on SFTP, updates updated_time / updated_date,
      * and sets status to "In review" in the metadata file. Supports raw octet-stream / excel binary body.
@@ -118,26 +151,8 @@ public class ProposalController {
     public ResponseEntity<ProposalFileDetailsDto> overwriteProposalFileBinary(
             @RequestParam String company,
             @RequestParam String version,
+            @RequestParam String proposalType,
             @RequestBody byte[] fileBytes
-    ) {
-        if (fileBytes == null || fileBytes.length == 0) {
-            throw new IllegalArgumentException("Uploaded file content cannot be empty");
-        }
-        ProposalFileDetailsDto details = proposalStorageService.overwriteProposalFile(
-                company, version, fileBytes, null);
-        return ResponseEntity.ok(details);
-    }
-
-    /**
-     * POST /proposals?company=vanroey&version=v3
-     * POST /Proposals?company=vanroey&version=v3
-     *
-     * Approves a proposal. Currently returns HTTP 501 Not Implemented ("not implemented yet").
-     */
-    @PostMapping
-    public ResponseEntity<ProblemDetail> approveProposal(
-            @RequestParam String company,
-            @RequestParam String version
     ) {
         if (company == null || company.isBlank()) {
             throw new IllegalArgumentException("Company parameter must not be empty");
@@ -145,24 +160,57 @@ public class ProposalController {
         if (version == null || version.isBlank()) {
             throw new IllegalArgumentException("Version parameter must not be empty");
         }
+        if (proposalType == null || proposalType.isBlank()) {
+            throw new IllegalArgumentException("Proposal type parameter must not be empty");
+        }
+        if (fileBytes == null || fileBytes.length == 0) {
+            throw new IllegalArgumentException("Uploaded file content cannot be empty");
+        }
+        ProposalFileDetailsDto details = proposalStorageService.overwriteProposalFile(
+                company, version, proposalType, fileBytes, null);
+        return ResponseEntity.ok(details);
+    }
+
+    /**
+     * POST /proposals?company=vanroey&version=v3&proposalType=inbound
+     * POST /Proposals?company=vanroey&version=v3&proposalType=inbound
+     *
+     * Approves a proposal. Currently returns HTTP 501 Not Implemented ("not implemented yet").
+     */
+    @PostMapping
+    public ResponseEntity<ProblemDetail> approveProposal(
+            @RequestParam String company,
+            @RequestParam String version,
+            @RequestParam String proposalType
+    ) {
+        if (company == null || company.isBlank()) {
+            throw new IllegalArgumentException("Company parameter must not be empty");
+        }
+        if (version == null || version.isBlank()) {
+            throw new IllegalArgumentException("Version parameter must not be empty");
+        }
+        if (proposalType == null || proposalType.isBlank()) {
+            throw new IllegalArgumentException("Proposal type parameter must not be empty");
+        }
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.NOT_IMPLEMENTED,
-                "Approving proposal for company '" + company + "' and version '" + version + "' is not implemented yet"
+                "Approving proposal for company '" + company + "', version '" + version + "', and proposalType '" + proposalType + "' is not implemented yet"
         );
         problemDetail.setTitle("Not Implemented");
         problemDetail.setType(URI.create("about:blank"));
         problemDetail.setProperty("timestamp", Instant.now());
         problemDetail.setProperty("company", company);
         problemDetail.setProperty("version", version);
+        problemDetail.setProperty("proposalType", proposalType);
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(problemDetail);
     }
 
     /**
-     * DELETE /proposals?company=vanroey&version=v2
-     * DELETE /Proposals?company=vanroey&version=v2
+     * DELETE /proposals?company=vanroey&version=v2&proposalType=inbound
+     * DELETE /Proposals?company=vanroey&version=v2&proposalType=inbound
      *
      * Completely deletes this proposal from the SFTP server.
-     * Both query parameters (company, version) are required.
+     * Query parameters (company, version, proposalType) are required.
      * In the request body, expects a JSON object with a deleteCheck string
      * which must exactly match the company name to confirm deletion.
      */
@@ -170,6 +218,7 @@ public class ProposalController {
     public ResponseEntity<Void> deleteProposal(
             @RequestParam String company,
             @RequestParam String version,
+            @RequestParam String proposalType,
             @Valid @RequestBody DeleteProposalRequest request
     ) {
         if (company == null || company.isBlank()) {
@@ -177,6 +226,9 @@ public class ProposalController {
         }
         if (version == null || version.isBlank()) {
             throw new IllegalArgumentException("Version parameter must not be empty");
+        }
+        if (proposalType == null || proposalType.isBlank()) {
+            throw new IllegalArgumentException("Proposal type parameter must not be empty");
         }
         if (request == null || request.deleteCheck() == null || request.deleteCheck().isBlank()) {
             throw new IllegalArgumentException("Request body must contain deleteCheck");
@@ -187,7 +239,7 @@ public class ProposalController {
             );
         }
 
-        proposalStorageService.deleteProposal(company, version);
+        proposalStorageService.deleteProposal(company, version, proposalType);
         return ResponseEntity.noContent().build();
     }
 }

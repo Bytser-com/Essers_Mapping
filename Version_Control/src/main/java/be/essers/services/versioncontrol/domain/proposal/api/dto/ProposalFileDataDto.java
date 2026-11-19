@@ -8,6 +8,7 @@ import java.util.List;
 @JsonPropertyOrder({
         "version",
         "companyname",
+        "proposalType",
         "upload_date",
         "upload_time",
         "updated_time",
@@ -22,6 +23,9 @@ public record ProposalFileDataDto(
 
         @JsonProperty("companyname")
         String companyname,
+
+        @JsonProperty("proposalType")
+        String proposalType,
 
         @JsonProperty("upload_date")
         String uploadDate,
@@ -52,8 +56,22 @@ public record ProposalFileDataDto(
             String updatedTime,
             String updatedDate,
             String createdBy,
+            String status,
             List<ProposalRowDto> rows
     ) {
-        this(version, companyName, uploadDate, uploadTime, updatedTime, updatedDate, createdBy, null, rows);
+        this(version, companyName, null, uploadDate, uploadTime, updatedTime, updatedDate, createdBy, status, rows);
+    }
+
+    public ProposalFileDataDto(
+            String version,
+            String companyName,
+            String uploadDate,
+            String uploadTime,
+            String updatedTime,
+            String updatedDate,
+            String createdBy,
+            List<ProposalRowDto> rows
+    ) {
+        this(version, companyName, null, uploadDate, uploadTime, updatedTime, updatedDate, createdBy, null, rows);
     }
 }

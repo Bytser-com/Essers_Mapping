@@ -15,11 +15,18 @@ public record CompanyProposalOverviewDto(
         String description,
         String status,
         String aiStatus,
-        String customerName
+        String customerName,
+        String proposalType
 ) {
     public CompanyProposalOverviewDto(String company, String latestVersion, String filename, String fullPath,
                                       String createdDate, String createdBy, String description,
+                                      String status, String aiStatus, String customerName) {
+        this(company, latestVersion, filename, fullPath, createdDate, createdBy, description, status, aiStatus, customerName, null);
+    }
+
+    public CompanyProposalOverviewDto(String company, String latestVersion, String filename, String fullPath,
+                                      String createdDate, String createdBy, String description,
                                       String status, String aiStatus) {
-        this(company, latestVersion, filename, fullPath, createdDate, createdBy, description, status, aiStatus, null);
+        this(company, latestVersion, filename, fullPath, createdDate, createdBy, description, status, aiStatus, null, null);
     }
 }
