@@ -91,7 +91,6 @@ function OpenButton({ proposal }: { proposal: Proposal }) {
   return (
     <button
       type="button"
-      disabled={!proposal.can_open}
       onClick={() => window.location.assign(proposalPath(proposal))}
       className={OPEN_BUTTON}
     >
@@ -105,7 +104,6 @@ function RouterOpenButton({ proposal }: { proposal: Proposal }) {
   return (
     <button
       type="button"
-      disabled={!proposal.can_open}
       onClick={() => navigate(proposalPath(proposal))}
       className={OPEN_BUTTON}
     >

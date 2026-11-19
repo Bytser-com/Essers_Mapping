@@ -208,8 +208,8 @@ export async function getProposal(company: string, version?: string, proposalTyp
   }
 }
 
-export async function getProposalFile(company: string, version: string): Promise<ProposalFileDetailsDto> {
-  const params = new URLSearchParams({ company, version });
+export async function getProposalFile(company: string, version: string, proposalType: string): Promise<ProposalFileDetailsDto> {
+  const params = new URLSearchParams({ company, version, proposalType });
   const res = await fetch(`${VERSION_CONTROL_API}/proposals/file?${params.toString()}`);
   if (!res.ok) {
     throw new Error(`Bestand kon niet worden opgehaald (status ${res.status})`);
@@ -217,8 +217,8 @@ export async function getProposalFile(company: string, version: string): Promise
   return res.json();
 }
 
-export async function uploadProposalFile(company: string, version: string, file: File): Promise<void> {
-  const params = new URLSearchParams({ company, version });
+export async function uploadProposalFile(company: string, version: string, proposalType: string, file: File): Promise<void> {
+  const params = new URLSearchParams({ company, version, proposalType });
 
   const res = await fetch(`${VERSION_CONTROL_API}/proposals/file?${params.toString()}`, {
     method: "PUT",
@@ -234,8 +234,8 @@ export async function uploadProposalFile(company: string, version: string, file:
   }
 }
 
-export async function approveProposal(company: string, version: string): Promise<void> {
-  const params = new URLSearchParams({ company, version });
+export async function approveProposal(company: string, version: string, proposalType: string): Promise<void> {
+  const params = new URLSearchParams({ company, version, proposalType });
 
   const res = await fetch(`${VERSION_CONTROL_API}/proposals?${params.toString()}`, {
     method: "POST",
@@ -263,8 +263,8 @@ export async function approveProposal(company: string, version: string): Promise
   }
 }
 
-export async function deleteProposal(company: string, version: string, deleteCheck: string): Promise<void> {
-  const params = new URLSearchParams({ company, version });
+export async function deleteProposal(company: string, version: string,  proposalType: string, deleteCheck: string): Promise<void> {
+  const params = new URLSearchParams({ company, version, proposalType });
 
   const res = await fetch(`${VERSION_CONTROL_API}/proposals?${params.toString()}`, {
     method: "DELETE",

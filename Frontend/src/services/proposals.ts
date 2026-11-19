@@ -119,13 +119,14 @@ export function toProposal(item: CompanyProposalOverview | Proposal): Proposal {
     return {
       ...p,
       status: normalizeStatus(p.status),
+      can_open: p.can_open || p.ai_status === 'FAILED',
     }
   }
   const ov = item as CompanyProposalOverview
   const versionNum = parseInt(String(ov.latestVersion ?? '').replace(/^v/i, ''), 10) || 1
   const status: ProposalStatus = normalizeStatus(ov.status)
   const aiStatus: AiStatus | null = (ov.aiStatus as AiStatus) || null
-  const canOpen = status !== 'AI_GENERATING'
+  const canOpen = status !== 'AI_GENERATING' || aiStatus === 'FAILED'
 
   return {
     id: `${ov.company}/${ov.latestVersion}`,
