@@ -15,11 +15,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 
 from services.proposal_runner import workbook_name
-from services.storage import LocalStorage, proposal_storage
+from services.storage import LocalStorage, packages_storage, proposal_storage
 
 from .config import LOCAL_SHARED_DIR, TEMPLATE_PATH
+
+logger = logging.getLogger(__name__)
 
 # (folder, customer, version, uploaded_at, status, ai_status, proposal_type)
 EXAMPLES = [
@@ -74,6 +77,18 @@ def seed_proposals(storage=None, force: bool = False) -> None:
                 if force or not s.exists(excel_dest):
                     s.upload_file(TEMPLATE_PATH, excel_dest)
                     print(f'Uploaded: {excel_dest}')
+
+        # Seed sample package directory for Nouryon so package-based versioning can be tested
+        try:
+            pkg_store = packages_storage()
+            with pkg_store.session() as ps:
+                pkg_dir = 'Nouryon/v3'
+                if not ps.exists(pkg_dir):
+                    ps.make_dirs(pkg_dir)
+                    print(f'Created package: {pkg_dir}')
+                    logger.info('Created sample package directory: %s', pkg_dir)
+        except Exception as e:
+            logger.debug('Package seeding skipped: %s', e)
 
 
 def main() -> None:

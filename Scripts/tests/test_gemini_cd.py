@@ -47,7 +47,14 @@ class GeminiCdTests(unittest.TestCase):
         # kubectl is stubbed: capture arguments and consume the generated manifest.
         stub = """
 kubectl() {
-  printf '%s\\n' "$@" >> "$CAPTURE_CALLS"
+  if command -v flock >/dev/null 2>&1; then
+    (
+      flock 200
+      printf '%s\\n' "$@"
+    ) 200>>"$CAPTURE_CALLS.lock" >> "$CAPTURE_CALLS"
+  else
+    printf '%s\\n' "$@" >> "$CAPTURE_CALLS"
+  fi
   if [[ "$1" == create ]]; then
     printf '{"kind":"Secret"}'
   else
