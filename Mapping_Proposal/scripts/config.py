@@ -28,7 +28,7 @@ RUNS_DIR = OUTPUT_DIR / 'runs'
 TEMPLATE_PATH = ROOT / 'templates' / 'mapping_template.xlsx'
 PROMPT_PATH = ROOT / 'prompt.txt'
 
-DEFAULT_MODEL = 'gemini-2.5-flash'
+DEFAULT_MODEL = 'gemini-3.5-flash-lite'
 
 # Remembers whether .env was already read, so it is loaded only once per process.
 _env_loaded = False

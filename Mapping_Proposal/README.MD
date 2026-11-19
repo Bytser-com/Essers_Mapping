@@ -102,7 +102,7 @@ Mapping_Proposal/
 
    ```text
    GEMINI_API_KEY=replace_with_your_key
-   GEMINI_MODEL=gemini-2.5-flash
+   GEMINI_MODEL=gemini-3.5-flash-lite
    GEMINI_TIMEOUT_MS=120000
    ```
 
