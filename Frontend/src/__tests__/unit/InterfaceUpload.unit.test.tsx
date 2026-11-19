@@ -2,14 +2,18 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import InterfaceUpload from '../../components/InterfaceUpload'
+import { useHomeStore } from '../../stores/homeStore'
 
 function xmlFile(name = 'order.xml') {
   return new File(['<Order/>'], name, { type: 'text/xml' })
 }
 
-function renderUpload(onUpload?: (customer: string, files: File[]) => void | Promise<void>) {
+type UploadMock = (customerName: string, proposalType: string, files: File[]) => Promise<boolean>
+
+function renderUpload(uploadInterface: UploadMock = vi.fn().mockResolvedValue(true)) {
   // Only pass onUpload when the test gives one (exactOptionalPropertyTypes)
-  render(onUpload ? <InterfaceUpload onUpload={onUpload} /> : <InterfaceUpload />)
+  useHomeStore.setState({ uploadInterface, uploadError: null })
+  render(<InterfaceUpload />)
   return {
     customer: screen.getByLabelText('Klantnaam'),
     fileInput: screen.getByTestId('file-input') as HTMLInputElement,
@@ -24,8 +28,8 @@ function chooseFiles(input: HTMLInputElement, files: File[]) {
 describe('InterfaceUpload', () => {
   it('asks for a customer name when it is empty', async () => {
     // Arrange
-    const onUpload = vi.fn()
-    const { fileInput, uploadButton } = renderUpload(onUpload)
+    const upload = vi.fn()
+    const { fileInput, uploadButton } = renderUpload(upload)
     chooseFiles(fileInput, [xmlFile()])
 
     // Act
@@ -33,7 +37,7 @@ describe('InterfaceUpload', () => {
 
     // Assert
     expect(screen.getByRole('alert')).toHaveTextContent('Vul eerst een klant in.')
-    expect(onUpload).not.toHaveBeenCalled()
+    expect(upload).not.toHaveBeenCalled()
   })
 
   it('treats a name with only spaces as empty', async () => {
@@ -50,8 +54,8 @@ describe('InterfaceUpload', () => {
 
   it('asks for a file when none is chosen', async () => {
     // Arrange
-    const onUpload = vi.fn()
-    const { customer, uploadButton } = renderUpload(onUpload)
+    const upload = vi.fn()
+    const { customer, uploadButton } = renderUpload(upload)
     await userEvent.type(customer, 'Brunos')
 
     // Act
@@ -59,13 +63,13 @@ describe('InterfaceUpload', () => {
 
     // Assert
     expect(screen.getByRole('alert')).toHaveTextContent('kies eerst een XML-bestand')
-    expect(onUpload).not.toHaveBeenCalled()
+    expect(upload).not.toHaveBeenCalled()
   })
 
   it('refuses the upload when one of the files is not XML', async () => {
     // Arrange
-    const onUpload = vi.fn()
-    const { customer, fileInput, uploadButton } = renderUpload(onUpload)
+    const upload = vi.fn()
+    const { customer, fileInput, uploadButton } = renderUpload(upload)
     await userEvent.type(customer, 'Brunos')
     chooseFiles(fileInput, [xmlFile(), new File(['x'], 'notes.txt', { type: 'text/plain' })])
 
@@ -74,13 +78,13 @@ describe('InterfaceUpload', () => {
 
     // Assert
     expect(screen.getByRole('alert')).toHaveTextContent('dit is geen XML-bestand')
-    expect(onUpload).not.toHaveBeenCalled()
+    expect(upload).not.toHaveBeenCalled()
   })
 
   it('accepts files with an upper-case .XML extension', async () => {
     // Arrange
-    const onUpload = vi.fn()
-    const { customer, fileInput, uploadButton } = renderUpload(onUpload)
+    const upload = vi.fn().mockResolvedValue(true)
+    const { customer, fileInput, uploadButton } = renderUpload(upload)
     await userEvent.type(customer, 'Brunos')
     chooseFiles(fileInput, [xmlFile('ORDER.XML')])
 
@@ -88,45 +92,36 @@ describe('InterfaceUpload', () => {
     await userEvent.click(uploadButton)
 
     // Assert
-    expect(onUpload).toHaveBeenCalledTimes(1)
+    expect(upload).toHaveBeenCalledTimes(1)
   })
 
   it('sends the trimmed customer name and all files, then shows the success message', async () => {
     // Arrange
-    const onUpload = vi.fn().mockResolvedValue(undefined)
-    const { customer, fileInput, uploadButton } = renderUpload(onUpload)
+    const upload = vi.fn().mockResolvedValue(true)
+    const { customer, fileInput, uploadButton } = renderUpload(upload)
     const files = [xmlFile('a.xml'), xmlFile('b.xml')]
     await userEvent.type(customer, '  Brunos  ')
+    await userEvent.type(screen.getByLabelText('Type'), 'inbound')
     chooseFiles(fileInput, files)
 
     // Act
     await userEvent.click(uploadButton)
 
     // Assert
-    expect(onUpload).toHaveBeenCalledWith('Brunos', files)
+    expect(upload).toHaveBeenCalledWith('Brunos', 'inbound', files)
     expect(await screen.findByRole('status')).toHaveTextContent(
       'Upload gelukt. De AI is bezig met een mapping proposal voor Brunos.',
     )
     expect(screen.queryByText('a.xml')).not.toBeInTheDocument()
   })
 
-  it('also works without an onUpload handler', async () => {
-    // Arrange
-    const { customer, fileInput, uploadButton } = renderUpload()
-    await userEvent.type(customer, 'Brunos')
-    chooseFiles(fileInput, [xmlFile()])
-
-    // Act
-    await userEvent.click(uploadButton)
-
-    // Assert
-    expect(await screen.findByRole('status')).toBeInTheDocument()
-  })
-
   it('shows the server message when the upload fails', async () => {
     // Arrange
-    const onUpload = vi.fn().mockRejectedValue(new Error('Upload mislukt: de server is niet bereikbaar.'))
-    const { customer, fileInput, uploadButton } = renderUpload(onUpload)
+    const upload = vi.fn(async () => {
+      useHomeStore.setState({ uploadError: 'Upload mislukt: de server is niet bereikbaar.' })
+      return false
+    })
+    const { customer, fileInput, uploadButton } = renderUpload(upload)
     await userEvent.type(customer, 'Brunos')
     chooseFiles(fileInput, [xmlFile()])
 
@@ -137,20 +132,6 @@ describe('InterfaceUpload', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Upload mislukt: de server is niet bereikbaar.')
     expect(screen.queryByRole('status')).not.toBeInTheDocument()
     expect(screen.getByText('order.xml')).toBeInTheDocument()
-  })
-
-  it('shows a general message when the upload fails without an Error', async () => {
-    // Arrange
-    const onUpload = vi.fn().mockRejectedValue('kapot')
-    const { customer, fileInput, uploadButton } = renderUpload(onUpload)
-    await userEvent.type(customer, 'Brunos')
-    chooseFiles(fileInput, [xmlFile()])
-
-    // Act
-    await userEvent.click(uploadButton)
-
-    // Assert
-    expect(await screen.findByRole('alert')).toHaveTextContent('Upload mislukt.')
   })
 
   it('adds files chosen one after another to the list', () => {
@@ -230,7 +211,7 @@ describe('InterfaceUpload', () => {
 
   it('hides the success message when new files are chosen', async () => {
     // Arrange
-    const { customer, fileInput, uploadButton } = renderUpload(vi.fn())
+    const { customer, fileInput, uploadButton } = renderUpload(vi.fn().mockResolvedValue(true))
     await userEvent.type(customer, 'Brunos')
     chooseFiles(fileInput, [xmlFile()])
     await userEvent.click(uploadButton)
@@ -241,5 +222,21 @@ describe('InterfaceUpload', () => {
 
     // Assert
     expect(screen.queryByRole('status')).not.toBeInTheDocument()
+  })
+
+  it('sends the proposal type with the upload', async () => {
+    // Arrange
+    const upload = vi.fn().mockResolvedValue(true)
+    const { customer, fileInput, uploadButton } = renderUpload(upload)
+    const files = [xmlFile()]
+    await userEvent.type(customer, 'Brunos')
+    await userEvent.type(screen.getByLabelText('Type'), 'Inbound')
+    chooseFiles(fileInput, files)
+
+    // Act
+    await userEvent.click(uploadButton)
+
+    // Assert
+    expect(upload).toHaveBeenCalledWith('Brunos', 'Inbound', files)
   })
 })

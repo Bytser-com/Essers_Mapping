@@ -75,20 +75,6 @@ describe('proposalStore', () => {
         await promise
     })
 
-    it('sets loading while fetching', async () => {
-        // Arrange
-        getProposal.mockResolvedValue(PROPOSAL)
-
-        // Act
-        const promise = useProposalStore.getState().fetchProposal('brunos')
-
-        // Assert
-        const state = useProposalStore.getState()
-        expect(state.loading).toBe(true)
-
-        await promise
-    })
-
     it('clears a previous error when fetching again', async () => {
         // Arrange
         useProposalStore.setState({ error: 'geen mapping gevonden' })

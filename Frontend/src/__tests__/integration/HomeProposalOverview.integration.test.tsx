@@ -4,9 +4,10 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 import Home from '../../pages/Home'
 import type { Proposal } from '../../services/proposals'
+import { useHomeStore } from '../../stores/homeStore'
 
 const brunos: Proposal = {
   id: 'brunos/v1',
@@ -45,6 +46,11 @@ function fakeBackend(initial: Proposal[]) {
   vi.stubGlobal('fetch', fetchMock)
   return fetchMock
 }
+
+beforeEach(() => {
+  // Every test starts with an empty store: the list of the previous test must not stay behind
+  useHomeStore.setState({ proposalList: null, loading: false, error: null, uploadError: null, waitUntil: 0 })
+})
 
 afterEach(() => {
   vi.unstubAllGlobals()
