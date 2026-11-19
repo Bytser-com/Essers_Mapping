@@ -27,7 +27,7 @@ grafana:
   nodeSelector:
     node-role.kubernetes.io/worker: "worker"
 
-  # Admin credentials linked to dedicated Kubernetes Secret
+  # Admin credentials linked to dedicated Kubernetes Secret (from GRAFANA_ADMIN_PASSWORD)
   admin:
     existingSecret: "grafana-admin-credentials"
     userKey: admin-user
