@@ -44,6 +44,7 @@ describe('InterfaceUpload', () => {
     // Arrange
     const { customer, uploadButton } = renderUpload(vi.fn())
     await userEvent.type(customer, '   ')
+    await userEvent.type(screen.getByLabelText('Type'), 'Inbound')
 
     // Act
     await userEvent.click(uploadButton)
@@ -57,6 +58,7 @@ describe('InterfaceUpload', () => {
     const upload = vi.fn()
     const { customer, uploadButton } = renderUpload(upload)
     await userEvent.type(customer, 'Brunos')
+    await userEvent.type(screen.getByLabelText('Type'), 'Inbound')
 
     // Act
     await userEvent.click(uploadButton)
@@ -71,6 +73,7 @@ describe('InterfaceUpload', () => {
     const upload = vi.fn()
     const { customer, fileInput, uploadButton } = renderUpload(upload)
     await userEvent.type(customer, 'Brunos')
+    await userEvent.type(screen.getByLabelText('Type'), 'Inbound')
     chooseFiles(fileInput, [xmlFile(), new File(['x'], 'notes.txt', { type: 'text/plain' })])
 
     // Act
@@ -86,6 +89,7 @@ describe('InterfaceUpload', () => {
     const upload = vi.fn().mockResolvedValue(true)
     const { customer, fileInput, uploadButton } = renderUpload(upload)
     await userEvent.type(customer, 'Brunos')
+    await userEvent.type(screen.getByLabelText('Type'), 'Inbound')
     chooseFiles(fileInput, [xmlFile('ORDER.XML')])
 
     // Act
@@ -123,6 +127,7 @@ describe('InterfaceUpload', () => {
     })
     const { customer, fileInput, uploadButton } = renderUpload(upload)
     await userEvent.type(customer, 'Brunos')
+    await userEvent.type(screen.getByLabelText('Type'), 'Inbound')
     chooseFiles(fileInput, [xmlFile()])
 
     // Act
@@ -213,6 +218,7 @@ describe('InterfaceUpload', () => {
     // Arrange
     const { customer, fileInput, uploadButton } = renderUpload(vi.fn().mockResolvedValue(true))
     await userEvent.type(customer, 'Brunos')
+    await userEvent.type(screen.getByLabelText('Type'), 'Inbound')
     chooseFiles(fileInput, [xmlFile()])
     await userEvent.click(uploadButton)
     expect(await screen.findByRole('status')).toBeInTheDocument()
@@ -238,5 +244,20 @@ describe('InterfaceUpload', () => {
 
     // Assert
     expect(upload).toHaveBeenCalledWith('Brunos', 'Inbound', files)
+  })
+
+  it('shows an error and sends nothing when the type is empty', async () => {
+    // Arrange
+    const upload = vi.fn().mockResolvedValue(true)
+    const { customer, fileInput, uploadButton } = renderUpload(upload)
+    await userEvent.type(customer, 'Brunos')
+    chooseFiles(fileInput, [xmlFile()])
+
+    // Act
+    await userEvent.click(uploadButton)
+
+    // Assert
+    expect(await screen.findByRole('alert')).toHaveTextContent('Upload mislukt: vul eerst een type in.')
+    expect(upload).not.toHaveBeenCalled()
   })
 })

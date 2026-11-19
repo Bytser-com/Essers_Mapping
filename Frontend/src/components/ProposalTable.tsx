@@ -50,10 +50,11 @@ const AI_STATUS_LABEL_STYLE: Record<AiStatus, LabelStyle> = {
   FAILED: 'dark',
 }
 
-// Column widths 220 / 80 / 170 / 213 / 150 px with a 12 px gap; the row has 16 px
+// Column widths 220 / 80 / 150 / 170 / 213 / 150 px with a 12 px gap; the row has 16 px
 // side padding. Each cell's width includes its padding (border-box).
 const FIRST_CELL = 'w-[248px] pl-4 pr-3' // 16 + 220 + 12
 const VERSION_CELL = 'w-[92px] pr-3' // 80 + 12
+const TYPE_CELL = 'w-[162px] pr-3' // 150 + 12
 const DATE_CELL = 'w-[182px] pr-3' // 170 + 12
 const STATUS_CELL = 'w-[225px] pr-3' // 213 + 12
 const AI_CELL = 'w-[162px] pr-3' // 150 + 12
@@ -122,6 +123,7 @@ function ProposalTable({ proposals }: ProposalTableProps) {
           <tr>
             <th className={`${FIRST_CELL} ${HEADER_TEXT}`}>KLANT</th>
             <th className={`${VERSION_CELL} ${HEADER_TEXT}`}>VERSIE</th>
+            <th className={`${TYPE_CELL} ${HEADER_TEXT}`}>TYPE</th>
             <th className={`${DATE_CELL} ${HEADER_TEXT}`}>GEÜPLOAD OP</th>
             <th className={`${STATUS_CELL} ${HEADER_TEXT}`}>STATUS</th>
             <th className={`${AI_CELL} ${HEADER_TEXT}`}>AI-STATUS</th>
@@ -133,6 +135,9 @@ function ProposalTable({ proposals }: ProposalTableProps) {
             <tr key={proposal.id} className="border-b border-[#e3e3e8] last:border-b-0">
               <td className={`${FIRST_CELL} ${BODY_CELL} truncate font-semibold`}>{proposal.customer}</td>
               <td className={`${VERSION_CELL} ${BODY_CELL}`}>v{proposal.version}</td>
+              <td className={`${TYPE_CELL} ${BODY_CELL} truncate`} title={proposal.proposal_type ?? undefined}>
+                {proposal.proposal_type || '—'}
+              </td>
               <td className={`${DATE_CELL} ${BODY_CELL} whitespace-nowrap`}>
                 {formatUploadedAt(proposal.uploaded_at)}
               </td>

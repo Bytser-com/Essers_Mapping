@@ -12,6 +12,7 @@ export type CompanyProposalOverviewDto = {
   description?: string | null;
   status?: string | null;
   aiStatus?: string | null;
+  proposalType?: string | null;
   mappings?: Proposal["mappings"];
 };
 
@@ -45,8 +46,8 @@ export type ProposalFileDataDto = {
   }>;
 };
 
-export async function getProposalFileData(company: string, version: string): Promise<ProposalFileDataDto> {
-  const params = new URLSearchParams({ company, version });
+export async function getProposalFileData(company: string, version: string, proposalType: string): Promise<ProposalFileDataDto> {
+  const params = new URLSearchParams({ company, version, proposalType });
   const res = await fetch(`${VERSION_CONTROL_API}/proposals/filedata?${params.toString()}`);
   if (res.status === 502 || res.status === 503) {
     throw new Error(`De bestanden zijn tijdelijk niet bereikbaar (status ${res.status})`);
@@ -74,11 +75,11 @@ function mapStatusLabel(rawStatus?: string | null): string {
   return "Klaar om na te kijken";
 }
 
-export async function getProposal(company: string, version?: string): Promise<Proposal> {
+export async function getProposal(company: string, version?: string, proposalType?: string): Promise<Proposal> {
   // If version is provided, we can directly fetch filedata
-  if (version) {
+  if (version && proposalType) {
     try {
-      const fileData = await getProposalFileData(company, version);
+      const fileData = await getProposalFileData(company, version, proposalType);
       const versionNum = parseInt(String(fileData.version ?? version).replace(/^v/i, ""), 10) || 1;
       const isoUpload = fileData.upload_date
         ? `${fileData.upload_date}T${fileData.upload_time || "00:00:00"}`
@@ -87,6 +88,7 @@ export async function getProposal(company: string, version?: string): Promise<Pr
       const proposal: Proposal = {
         klant: fileData.companyname || company,
         versie: versionNum,
+        
         status: mapStatusLabel(fileData.status),
         geupload: isoUpload,
         mappings: (fileData.rows || []).map((row, index) => ({
@@ -102,6 +104,7 @@ export async function getProposal(company: string, version?: string): Promise<Pr
       if (fileData.updated_date) proposal.updatedDate = fileData.updated_date;
       if (fileData.updated_time) proposal.updatedTime = fileData.updated_time;
       if (fileData.createdBy) proposal.createdBy = fileData.createdBy;
+      proposal.proposalType = proposalType;
       return proposal;
     } catch (err) {
       // Fallback to overview lookup if filedata specifically fails with non-network error
@@ -148,6 +151,7 @@ export async function getProposal(company: string, version?: string): Promise<Pr
     };
     const overviewUser = item.createdBy;
     if (overviewUser) proposal.createdBy = overviewUser;
+    if (item.proposalType) proposal.proposalType = item.proposalType;
     return proposal;
   }
 
@@ -155,7 +159,7 @@ export async function getProposal(company: string, version?: string): Promise<Pr
 
   // Now attempt to load detailed rows and metadata via getProposalFileData
   try {
-    const fileData = await getProposalFileData(item.company || company, resolvedVersion);
+    const fileData = await getProposalFileData(item.company || company, resolvedVersion, item.proposalType ?? "");
     if (!fileData || !Array.isArray(fileData.rows)) {
       throw new Error("Invalid file data");
     }
@@ -183,6 +187,7 @@ export async function getProposal(company: string, version?: string): Promise<Pr
     if (fileData.updated_time) proposal.updatedTime = fileData.updated_time;
     const user = fileData.createdBy || item.createdBy;
     if (user) proposal.createdBy = user;
+    if (item.proposalType) proposal.proposalType = item.proposalType
     return proposal;
   } catch (err) {
     // If filedata call fails (e.g. backend error or test mock only mocking /proposals), fall back gracefully
@@ -198,6 +203,7 @@ export async function getProposal(company: string, version?: string): Promise<Pr
       mappings: item.mappings || [],
     };
     if (item.createdBy) proposal.createdBy = item.createdBy;
+    if (item.proposalType) proposal.proposalType = item.proposalType;
     return proposal;
   }
 }
