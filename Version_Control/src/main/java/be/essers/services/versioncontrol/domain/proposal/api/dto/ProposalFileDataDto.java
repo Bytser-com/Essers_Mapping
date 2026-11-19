@@ -8,11 +8,12 @@ import java.util.List;
 @JsonPropertyOrder({
         "version",
         "companyname",
+        "proposalType",
         "upload_date",
         "upload_time",
         "updated_time",
         "updated_date",
-        "upload_user",
+        "createdBy",
         "status",
         "rows"
 })
@@ -22,6 +23,9 @@ public record ProposalFileDataDto(
 
         @JsonProperty("companyname")
         String companyname,
+
+        @JsonProperty("proposalType")
+        String proposalType,
 
         @JsonProperty("upload_date")
         String uploadDate,
@@ -35,8 +39,8 @@ public record ProposalFileDataDto(
         @JsonProperty("updated_date")
         String updatedDate,
 
-        @JsonProperty("upload_user")
-        String uploadUser,
+        @JsonProperty("createdBy")
+        String createdBy,
 
         @JsonProperty("status")
         String status,
@@ -44,6 +48,10 @@ public record ProposalFileDataDto(
         @JsonProperty("rows")
         List<ProposalRowDto> rows
 ) {
+    public ProposalFileDataDto {
+        proposalType = (proposalType != null) ? proposalType.toLowerCase() : null;
+    }
+
     public ProposalFileDataDto(
             String version,
             String companyName,
@@ -51,9 +59,23 @@ public record ProposalFileDataDto(
             String uploadTime,
             String updatedTime,
             String updatedDate,
-            String uploadUser,
+            String createdBy,
+            String status,
             List<ProposalRowDto> rows
     ) {
-        this(version, companyName, uploadDate, uploadTime, updatedTime, updatedDate, uploadUser, null, rows);
+        this(version, companyName, null, uploadDate, uploadTime, updatedTime, updatedDate, createdBy, status, rows);
+    }
+
+    public ProposalFileDataDto(
+            String version,
+            String companyName,
+            String uploadDate,
+            String uploadTime,
+            String updatedTime,
+            String updatedDate,
+            String createdBy,
+            List<ProposalRowDto> rows
+    ) {
+        this(version, companyName, null, uploadDate, uploadTime, updatedTime, updatedDate, createdBy, null, rows);
     }
 }

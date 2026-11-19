@@ -1,0 +1,82 @@
+# ==============================================================================
+# GRAFANA ALLOY KUBERNETES CONTAINER LOGS COLLECTOR CONFIGURATION
+# Discovers and tails all container logs across all namespaces and pods,
+# parses metadata, and streams to Grafana Loki.
+# ==============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alloy-k8s-config
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: alloy-k8s
+    app.kubernetes.io/part-of: essers-mapping
+data:
+  config.alloy: |
+    logging {
+      level  = "info"
+      format = "logfmt"
+    }
+
+    // -----------------------------------------------------------------------------
+    // 1. FILE DISCOVERY: Tail all container logs from host /var/log/pods
+    // -----------------------------------------------------------------------------
+    local.file_match "pod_logs" {
+      path_targets = [
+        {
+          "__path__" = "/var/log/pods/*/*/*.log",
+        },
+      ]
+      sync_period = "5s"
+    }
+
+    // -----------------------------------------------------------------------------
+    // 2. PARSE CONTAINER METADATA (Namespace, Pod, Container)
+    // -----------------------------------------------------------------------------
+    loki.process "pod_logs" {
+      forward_to = [loki.write.loki_endpoint.receiver]
+
+      // Extract namespace, pod, and container from the file path
+      stage.regex {
+        expression = "^/var/log/pods/(?P<namespace>[^_]+)_(?P<pod>[^_]+)_[a-f0-9\\-]+/(?P<container>[^/]+)/.*\\.log$"
+        source     = "filename"
+      }
+
+      // Promote extracted fields to searchable Loki labels
+      stage.labels {
+        values = {
+          namespace = "",
+          pod       = "",
+          container = "",
+        }
+      }
+
+      // Parse JSON / CRI log envelope to extract clean message and log stream (stdout/stderr)
+      stage.cri {}
+    }
+
+    // -----------------------------------------------------------------------------
+    // 3. SOURCE: Read matched container log files
+    // -----------------------------------------------------------------------------
+    loki.source.file "pod_logs" {
+      targets    = local.file_match.pod_logs.targets
+      forward_to = [loki.process.pod_logs.receiver]
+      file_watch {
+        min_poll_frequency = "250ms"
+        max_poll_frequency = "2s"
+      }
+    }
+
+    // -----------------------------------------------------------------------------
+    // 4. DESTINATION: Forward to Loki in monitoring namespace
+    // -----------------------------------------------------------------------------
+    loki.write "loki_endpoint" {
+      endpoint {
+        url = "http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push"
+        batch_wait = "2s"
+        batch_size = "512KiB"
+        min_backoff_period = "500ms"
+        max_backoff_period = "5m"
+        max_backoff_retries = 10
+      }
+    }

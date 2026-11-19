@@ -12,6 +12,7 @@ function proposal(overrides: Partial<Proposal> = {}): Proposal {
     id: 'ostavel/v1',
     customer: 'Ostavel',
     version: 1,
+    proposal_type: 'inbound',
     uploaded_at: '2026-10-30T13:30:00+01:00',
     status: 'READY_FOR_REVIEW',
     ai_status: null,
@@ -26,11 +27,11 @@ function rows() {
 }
 
 describe('ProposalTable', () => {
-  it('TC-57-04 shows the columns KLANT, VERSIE, GEÜPLOAD OP, STATUS, AI-STATUS and ACTIE', () => {
+  it('TC-57-04 shows the columns KLANT, VERSIE, TYPE, GEÜPLOAD OP, STATUS, AI-STATUS and ACTIE', () => {
     render(<ProposalTable proposals={[proposal()]} />)
 
     const headers = screen.getAllByRole('columnheader').map((header) => header.textContent)
-    expect(headers).toEqual(['KLANT', 'VERSIE', 'GEÜPLOAD OP', 'STATUS', 'AI-STATUS', 'ACTIE'])
+    expect(headers).toEqual(['KLANT', 'VERSIE', 'TYPE', 'GEÜPLOAD OP', 'STATUS', 'AI-STATUS', 'ACTIE'])
   })
 
   it('TC-57-04 one row per proposal with customer, version, upload time and status', () => {
@@ -80,17 +81,17 @@ describe('ProposalTable', () => {
     expect(within(rows()[0]!).getByText(label)).toBeInTheDocument()
   })
 
-  it('TC-57-06 "Openen" is disabled while the AI is making the proposal', () => {
+  it('TC-57-06 "Openen" is always enabled, also while the AI is making the proposal', () => {
     render(
       <ProposalTable
         proposals={[
-          proposal({ id: 'busy/v1', customer: 'Busy', status: 'AI_GENERATING', ai_status: 'RUNNING', can_open: false }),
+          proposal({ id: 'busy/v1', customer: 'Busy', status: 'AI_GENERATING', ai_status: 'RUNNING' }),
           proposal({ id: 'ready/v1', customer: 'Ready' }),
         ]}
       />,
     )
 
-    expect(within(rows()[0]!).getByRole('button', { name: 'Openen' })).toBeDisabled()
+    expect(within(rows()[0]!).getByRole('button', { name: 'Openen' })).toBeEnabled()
     expect(within(rows()[1]!).getByRole('button', { name: 'Openen' })).toBeEnabled()
   })
 
@@ -113,28 +114,32 @@ describe('ProposalTable', () => {
     expect(screen.getByText('Pagina van voorbeeldbedrijf-a')).toBeInTheDocument()
   })
 
-  it('TC-57-06 a disabled "Openen" does not navigate', async () => {
+  it('TC-57-06 "Openen" navigates even when AI is making the proposal', async () => {
+    function CustomerPage() {
+      const { customer } = useParams()
+      return <p>Pagina van {customer}</p>
+    }
     render(
       <MemoryRouter initialEntries={['/']}>
         <Routes>
           <Route
             path="/"
-            element={<ProposalTable proposals={[proposal({ status: 'AI_GENERATING', can_open: false })]} />}
+            element={<ProposalTable proposals={[proposal({ id: 'busy/v1', customer: 'busy', status: 'AI_GENERATING' })]} />}
           />
-          <Route path="/proposals/:customer" element={<p>Pagina van de klant</p>} />
+          <Route path="/proposals/:customer" element={<CustomerPage />} />
         </Routes>
       </MemoryRouter>,
     )
 
     await userEvent.click(screen.getByRole('button', { name: 'Openen' }))
 
-    expect(screen.queryByText('Pagina van de klant')).not.toBeInTheDocument()
+    expect(screen.getByText('Pagina van busy')).toBeInTheDocument()
   })
 
-  it('TC-57-06 without a router "Openen" is still shown and follows can_open', () => {
-    render(<ProposalTable proposals={[proposal({ can_open: false })]} />)
+  it('TC-57-06 without a router "Openen" is still shown and enabled', () => {
+    render(<ProposalTable proposals={[proposal()]} />)
 
-    expect(screen.getByRole('button', { name: 'Openen' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Openen' })).toBeEnabled()
   })
 
   it('TC-57-09 an empty list shows only the header', () => {

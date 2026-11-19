@@ -1,0 +1,108 @@
+// ==============================================================================
+// GRAFANA ALLOY TELEMETRY PIPELINE CONFIGURATION
+// Managed by Ansible - role: node_monitoring
+// Host: {{ inventory_hostname }}
+// Role: {{ 'k8s_master' if inventory_hostname in groups['k8s_masters'] else ('k8s_worker' if inventory_hostname in groups['k8s_workers'] else 'runner') }}
+// Environment: {{ env_name | default('testing') }}
+// ==============================================================================
+
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+// -----------------------------------------------------------------------------
+// 1. SYSTEMD JOURNAL LOGS COLLECTION
+// -----------------------------------------------------------------------------
+loki.source.journal "systemd_journal" {
+  max_age       = "12h"
+  forward_to    = [loki.write.endpoint.receiver]
+  relabel_rules = loki.relabel.journal_labels.rules
+}
+
+loki.relabel "journal_labels" {
+  forward_to = []
+
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unit"
+  }
+  rule {
+    source_labels = ["__journal__hostname"]
+    target_label  = "hostname"
+  }
+  rule {
+    target_label = "nodename"
+    replacement  = "{{ inventory_hostname }}"
+  }
+  rule {
+    target_label = "role"
+    replacement  = "{{ 'k8s_master' if inventory_hostname in groups['k8s_masters'] else ('k8s_worker' if inventory_hostname in groups['k8s_workers'] else 'runner') }}"
+  }
+  rule {
+    target_label = "environment"
+    replacement  = "{{ env_name | default('testing') }}"
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 2. FILE LOGS (/var/log/*.log, syslog, auth.log)
+// -----------------------------------------------------------------------------
+local.file_match "system_log_files" {
+  path_targets = [
+    { "__path__" = "/var/log/*.log" },
+    { "__path__" = "/var/log/syslog" },
+    { "__path__" = "/var/log/auth.log" },
+  ]
+}
+
+loki.source.file "system_logs" {
+  targets    = local.file_match.system_log_files.targets
+  forward_to = [loki.write.endpoint.receiver]
+}
+
+// Loki push destination with internal buffering
+loki.write "endpoint" {
+  endpoint {
+    url = "{{ node_monitoring_alloy_loki_url }}"
+    batch_wait = "5s"
+    batch_size = "1MiB"
+    min_backoff_period = "500ms"
+    max_backoff_period = "5m"
+    max_backoff_retries = 10
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 3. PROMETHEUS HOST METRICS SCRAPING & FORWARDING
+// -----------------------------------------------------------------------------
+prometheus.scrape "local_node_exporter" {
+  targets = [
+    {
+      "__address__" = "127.0.0.1:{{ node_monitoring_node_exporter_port }}",
+      "job"         = "node-exporter",
+      "instance"    = "{{ inventory_hostname }}",
+      "nodename"    = "{{ inventory_hostname }}",
+      "role"        = "{{ 'k8s_master' if inventory_hostname in groups['k8s_masters'] else ('k8s_worker' if inventory_hostname in groups['k8s_workers'] else 'runner') }}",
+      "environment" = "{{ env_name | default('testing') }}",
+    },
+  ]
+  scrape_interval = "15s"
+  forward_to      = [prometheus.remote_write.endpoint.receiver]
+}
+
+prometheus.remote_write "endpoint" {
+  endpoint {
+    url = "{{ node_monitoring_alloy_prometheus_url }}"
+    queue_config {
+      capacity             = 2500
+      max_shards           = 10
+      min_shards           = 1
+      max_samples_per_send = 500
+      batch_send_deadline  = "5s"
+      min_backoff          = "30ms"
+      max_backoff          = "5s"
+      retry_on_http_429    = true
+    }
+  }
+}

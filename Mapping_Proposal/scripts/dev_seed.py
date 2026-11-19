@@ -15,20 +15,23 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 
 from services.proposal_runner import workbook_name
-from services.storage import LocalStorage, proposal_storage
+from services.storage import LocalStorage, packages_storage, proposal_storage
 
 from .config import LOCAL_SHARED_DIR, TEMPLATE_PATH
 
-# (folder, customer, version, uploaded_at, status, ai_status)
+logger = logging.getLogger(__name__)
+
+# (folder, customer, version, uploaded_at, status, ai_status, proposal_type)
 EXAMPLES = [
-    ('voorbeeldbedrijf-a', 'Voorbeeldbedrijf A', 1, '2026-10-22T14:05:00+02:00', 'AI_GENERATING', 'RUNNING'),
-    ('voorbeeldbedrijf-b', 'Voorbeeldbedrijf B', 2, '2026-10-21T10:30:00+02:00', 'READY_FOR_REVIEW', None),
-    ('voorbeeldbedrijf-c', 'Voorbeeldbedrijf C', 1, '2026-10-20T16:45:00+02:00', 'AI_CHECKING_REVIEW', 'RUNNING'),
-    ('voorbeeldbedrijf-d', 'Voorbeeldbedrijf D', 3, '2026-10-19T09:15:00+02:00', 'RETURNED', 'FAILED'),
-    ('voorbeeldbedrijf-e', 'Voorbeeldbedrijf E', 1, '2026-10-18T11:00:00+02:00', 'READY_FOR_REVIEW', None),
-    ('voorbeeldbedrijf-f', 'Voorbeeldbedrijf F', 2, '2026-10-17T13:20:00+02:00', 'IN_REVIEW', None),
+    ('voorbeeldbedrijf-a', 'Voorbeeldbedrijf A', 1, '2026-10-22T14:05:00+02:00', 'AI_GENERATING', 'RUNNING', 'inbound'),
+    ('voorbeeldbedrijf-b', 'Voorbeeldbedrijf B', 2, '2026-10-21T10:30:00+02:00', 'READY_FOR_REVIEW', None, 'outbound'),
+    ('voorbeeldbedrijf-c', 'Voorbeeldbedrijf C', 1, '2026-10-20T16:45:00+02:00', 'AI_CHECKING_REVIEW', 'RUNNING', 'inboud-accept'),
+    ('voorbeeldbedrijf-d', 'Voorbeeldbedrijf D', 3, '2026-10-19T09:15:00+02:00', 'RETURNED', 'FAILED', 'inbound'),
+    ('voorbeeldbedrijf-e', 'Voorbeeldbedrijf E', 1, '2026-10-18T11:00:00+02:00', 'READY_FOR_REVIEW', None, 'outbound'),
+    ('voorbeeldbedrijf-f', 'Voorbeeldbedrijf F', 2, '2026-10-17T13:20:00+02:00', 'IN_REVIEW', None, 'inbound'),
 ]
 
 
@@ -39,6 +42,7 @@ def _build_metadata(
     uploaded_at: str,
     status: str,
     ai_status: str,
+    prop_type: str,
     excel_name: str | None,
 ) -> dict:
     """Build metadata for an example proposal."""
@@ -46,6 +50,8 @@ def _build_metadata(
         'customer': customer,
         'company': customer,
         'version': f'v{version}',
+        'proposal_type': prop_type,
+        'proposalType': prop_type,
         'uploaded_at': uploaded_at,
         'createdDate': uploaded_at,
         'status': status,
@@ -87,8 +93,8 @@ def seed_proposals(storage=None, force: bool = False) -> None:
     print(f'Seeding proposals to: {storage.describe()}')
 
     with storage.session() as session:
-        for folder, customer, version, uploaded_at, status, ai_status in EXAMPLES:
-            version_dir = f'{folder}/v{version}'
+        for folder, customer, version, uploaded_at, status, ai_status, prop_type in EXAMPLES:
+            version_dir = f'{folder}/v{version}/{prop_type}'
             metadata_path = f'{version_dir}/proposal.json'
 
             if not force and session.exists(metadata_path):
@@ -109,6 +115,7 @@ def seed_proposals(storage=None, force: bool = False) -> None:
                 uploaded_at,
                 status,
                 ai_status,
+                prop_type,
                 excel_name,
             )
 
@@ -124,6 +131,18 @@ def seed_proposals(storage=None, force: bool = False) -> None:
                 excel_name,
                 force,
             )
+
+        # Seed sample package directory for Nouryon so package-based versioning can be tested
+        try:
+            pkg_store = packages_storage()
+            with pkg_store.session() as ps:
+                pkg_dir = 'Nouryon/v3'
+                if not ps.exists(pkg_dir):
+                    ps.make_dirs(pkg_dir)
+                    print(f'Created package: {pkg_dir}')
+                    logger.info('Created sample package directory: %s', pkg_dir)
+        except Exception as e:
+            logger.debug('Package seeding skipped: %s', e)
 
 
 def main() -> None:

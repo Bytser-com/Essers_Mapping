@@ -4,9 +4,10 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 import Home from '../../pages/Home'
 import type { Proposal } from '../../services/proposals'
+import { useHomeStore } from '../../stores/homeStore'
 
 const brunos: Proposal = {
   id: 'brunos/v1',
@@ -46,6 +47,11 @@ function fakeBackend(initial: Proposal[]) {
   return fetchMock
 }
 
+beforeEach(() => {
+  // Every test starts with an empty store: the list of the previous test must not stay behind
+  useHomeStore.setState({ proposalList: null, loading: false, error: null, uploadError: null, waitUntil: 0 })
+})
+
 afterEach(() => {
   vi.unstubAllGlobals()
 })
@@ -76,13 +82,14 @@ describe('Home – proposals overview', () => {
     await screen.findByText('Brunos')
 
     await userEvent.type(screen.getByLabelText('Klantnaam'), 'Ostavel')
+    await userEvent.type(screen.getByLabelText('Type'), 'outbound')
     await userEvent.upload(screen.getByTestId('file-input'), new File(['<root />'], 'order.xml', { type: 'text/xml' }))
     await userEvent.click(screen.getByRole('button', { name: 'Uploaden' }))
 
     const row = (await screen.findByText('Ostavel', { selector: 'td' })).closest('tr') as HTMLElement
     expect(within(row).getByText('AI maakt voorstel')).toBeInTheDocument()
     expect(within(row).getByText('Bezig')).toBeInTheDocument()
-    expect(within(row).getByRole('button', { name: 'Openen' })).toBeDisabled()
+    expect(within(row).getByRole('button', { name: 'Openen' })).toBeEnabled()
     expect(screen.getByTestId('proposal-count')).toHaveTextContent('2')
   })
 

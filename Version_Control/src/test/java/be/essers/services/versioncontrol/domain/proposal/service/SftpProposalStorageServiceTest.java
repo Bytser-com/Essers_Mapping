@@ -586,7 +586,7 @@ class SftpProposalStorageServiceTest {
                   "filename": "mappingproposal.xlsx",
                   "uploaded_at": "2026-10-20T16:45:00+02:00",
                   "updated_at": "2026-11-11T23:03:02+00:00",
-                  "upload_user": "Jane Doe",
+                  "createdBy": "Jane Doe",
                   "status": "READY_FOR_REVIEW"
                 }
                 """;
@@ -643,7 +643,7 @@ class SftpProposalStorageServiceTest {
         assertEquals("16:45:00", result.uploadTime());
         assertEquals("2026-11-11", result.updatedDate());
         assertEquals("23:03:02", result.updatedTime());
-        assertEquals("Jane Doe", result.uploadUser());
+        assertEquals("Jane Doe", result.createdBy());
         assertEquals("READY_FOR_REVIEW", result.status());
         assertNotNull(result.rows());
         assertEquals(2, result.rows().size());
@@ -818,7 +818,7 @@ class SftpProposalStorageServiceTest {
         assertEquals("2026-10-15", result.uploadDate());
         assertEquals("08:30:00", result.uploadTime());
         assertEquals("IN_REVIEW", result.status());
-        assertEquals("System", result.uploadUser());
+        assertEquals("System", result.createdBy());
         assertTrue(result.rows().isEmpty());
     }
 
@@ -1004,5 +1004,573 @@ class SftpProposalStorageServiceTest {
     void deleteProposal_blankParams_throwsIllegalArgument() {
         assertThrows(IllegalArgumentException.class, () -> service.deleteProposal("", "v1"));
         assertThrows(IllegalArgumentException.class, () -> service.deleteProposal("vanroey", ""));
+    }
+
+    @Test
+    @DisplayName("listProposals with proposalType subdirectory returns proposalType and updated fullPath")
+    void listProposals_withProposalTypeSubdirectory_returnsProposalTypeAndPath() {
+        String company = "VanRoey";
+        String companyPath = "/Proposals/VanRoey";
+
+        when(template.exists(companyPath)).thenReturn(true);
+        SftpClient.DirEntry v3 = createEntry("v3", true);
+        when(template.list(companyPath)).thenReturn(new SftpClient.DirEntry[]{v3});
+
+        String v3Path = "/Proposals/VanRoey/v3";
+        SftpClient.DirEntry inboundDir = createEntry("inbound", true);
+        when(template.list(v3Path)).thenReturn(new SftpClient.DirEntry[]{inboundDir});
+
+        String inboundPath = "/Proposals/VanRoey/v3/inbound";
+        SftpClient.DirEntry excelFile = createEntry("mappingproposal.xlsx", false);
+        SftpClient.DirEntry metaFile = createEntry("proposal.json", false);
+        when(template.list(inboundPath)).thenReturn(new SftpClient.DirEntry[]{excelFile, metaFile});
+
+        String metaJson = """
+                {
+                  "company": "VanRoey",
+                  "version": "v3",
+                  "proposal_type": "inbound",
+                  "filename": "mappingproposal.xlsx",
+                  "createdDate": "2026-11-10T14:30:00Z",
+                  "createdBy": "Jane Doe",
+                  "status": "READY_FOR_REVIEW"
+                }
+                """;
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(metaJson.getBytes(StandardCharsets.UTF_8))) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq(inboundPath + "/proposal.json"), any(InputStreamCallback.class));
+
+        List<CompanyProposalOverviewDto> results = service.listProposals(company);
+
+        assertEquals(1, results.size());
+        CompanyProposalOverviewDto dto = results.get(0);
+        assertEquals("VanRoey", dto.company());
+        assertEquals("v3", dto.latestVersion());
+        assertEquals("inbound", dto.proposalType());
+        assertEquals("mappingproposal.xlsx", dto.filename());
+        assertEquals("/Proposals/VanRoey/v3/inbound/mappingproposal.xlsx", dto.fullPath());
+        assertEquals("Jane Doe", dto.createdBy());
+        assertEquals("READY_FOR_REVIEW", dto.status());
+    }
+
+    @Test
+    @DisplayName("listProposals filtered by proposalType returns only matching proposal")
+    void listProposals_filteredByProposalType() {
+        String company = "VanRoey";
+        String companyPath = "/Proposals/VanRoey";
+
+        when(template.exists(companyPath)).thenReturn(true);
+        SftpClient.DirEntry v3 = createEntry("v3", true);
+        when(template.list(companyPath)).thenReturn(new SftpClient.DirEntry[]{v3});
+
+        String v3Path = "/Proposals/VanRoey/v3";
+        SftpClient.DirEntry inboundDir = createEntry("inbound", true);
+        SftpClient.DirEntry outboundDir = createEntry("outbound", true);
+        when(template.list(v3Path)).thenReturn(new SftpClient.DirEntry[]{inboundDir, outboundDir});
+
+        String outboundPath = "/Proposals/VanRoey/v3/outbound";
+        SftpClient.DirEntry excelFile = createEntry("outbound.xlsx", false);
+        SftpClient.DirEntry metaFile = createEntry("proposal.json", false);
+        when(template.list(outboundPath)).thenReturn(new SftpClient.DirEntry[]{excelFile, metaFile});
+
+        String metaJson = """
+                {
+                  "company": "VanRoey",
+                  "version": "v3",
+                  "proposal_type": "outbound",
+                  "filename": "outbound.xlsx",
+                  "createdDate": "2026-11-10T14:30:00Z",
+                  "createdBy": "Jane Doe",
+                  "status": "READY_FOR_REVIEW"
+                }
+                """;
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(metaJson.getBytes(StandardCharsets.UTF_8))) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq(outboundPath + "/proposal.json"), any(InputStreamCallback.class));
+
+        List<CompanyProposalOverviewDto> results = service.listProposals(company, "outbound");
+
+        assertEquals(1, results.size());
+        assertEquals("outbound", results.get(0).proposalType());
+        assertEquals("outbound.xlsx", results.get(0).filename());
+        assertEquals("/Proposals/VanRoey/v3/outbound/outbound.xlsx", results.get(0).fullPath());
+    }
+
+    @Test
+    @DisplayName("getProposalFile with proposalType resolves subdirectory and returns file details")
+    void getProposalFile_withProposalType_resolvesSubdirectory() {
+        when(template.exists("/Proposals/VanRoey")).thenReturn(true);
+        when(template.exists("/Proposals/VanRoey/v3")).thenReturn(true);
+        when(template.exists("/Proposals/VanRoey/v3/inbound")).thenReturn(true);
+
+        String inboundPath = "/Proposals/VanRoey/v3/inbound";
+        SftpClient.DirEntry excel = createEntry("mappingproposal.xlsx", false);
+        SftpClient.DirEntry meta = createEntry("proposal.json", false);
+        when(template.list(inboundPath)).thenReturn(new SftpClient.DirEntry[]{excel, meta});
+
+        String metaJson = """
+                {
+                  "company": "VanRoey",
+                  "version": "v3",
+                  "proposal_type": "inbound",
+                  "createdDate": "2026-11-10T14:30:00Z",
+                  "createdBy": "Jane Doe"
+                }
+                """;
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(metaJson.getBytes(StandardCharsets.UTF_8))) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq(inboundPath + "/proposal.json"), any(InputStreamCallback.class));
+
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream("EXCEL_BYTES".getBytes(StandardCharsets.UTF_8))) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq(inboundPath + "/mappingproposal.xlsx"), any(InputStreamCallback.class));
+
+        ProposalFileDetailsDto result = service.getProposalFile("VanRoey", "v3", "inbound");
+
+        assertNotNull(result);
+        assertEquals("VanRoey", result.company());
+        assertEquals("v3", result.version());
+        assertEquals("inbound", result.proposalType());
+        assertEquals("mappingproposal.xlsx", result.filename());
+        assertEquals("/Proposals/VanRoey/v3/inbound/mappingproposal.xlsx", result.fullPath());
+        assertEquals("Jane Doe", result.createdBy());
+    }
+
+    @Test
+    @DisplayName("getProposalFile throws EntityNotFoundException when proposalType directory does not exist")
+    void getProposalFile_proposalTypeNotFound_throwsEntityNotFound() {
+        when(template.exists("/Proposals/VanRoey")).thenReturn(true);
+        when(template.exists("/Proposals/VanRoey/v3")).thenReturn(true);
+        when(template.exists("/Proposals/VanRoey/v3/nonexisting")).thenReturn(false);
+        when(template.list("/Proposals/VanRoey/v3")).thenReturn(new SftpClient.DirEntry[0]);
+
+        assertThrows(EntityNotFoundException.class, () ->
+                service.getProposalFile("VanRoey", "v3", "nonexisting"));
+    }
+
+    @Test
+    @DisplayName("getProposalFileData with proposalType resolves subdirectory and returns rows and proposalType")
+    void getProposalFileData_withProposalType_returnsRowsAndProposalType() throws Exception {
+        when(template.exists("/Proposals/VanRoey")).thenReturn(true);
+        when(template.exists("/Proposals/VanRoey/v3")).thenReturn(true);
+        when(template.exists("/Proposals/VanRoey/v3/inbound")).thenReturn(true);
+
+        String inboundPath = "/Proposals/VanRoey/v3/inbound";
+        SftpClient.DirEntry excelEntry = createEntry("mappingproposal.xlsx", false);
+        SftpClient.DirEntry metaEntry = createEntry("proposal.json", false);
+        when(template.list(inboundPath)).thenReturn(new SftpClient.DirEntry[]{excelEntry, metaEntry});
+
+        String metaJson = """
+                {
+                  "company": "VanRoey Customer",
+                  "version": "v3",
+                  "proposal_type": "inbound",
+                  "createdDate": "2026-11-10T14:30:00Z",
+                  "createdBy": "Jane Doe",
+                  "status": "READY_FOR_REVIEW"
+                }
+                """;
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(metaJson.getBytes(StandardCharsets.UTF_8))) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq(inboundPath + "/proposal.json"), any(InputStreamCallback.class));
+
+        byte[] excelBytes;
+        try (org.apache.poi.xssf.usermodel.XSSFWorkbook wb = new org.apache.poi.xssf.usermodel.XSSFWorkbook();
+             java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream()) {
+            org.apache.poi.ss.usermodel.Sheet sheet = wb.createSheet("Mapping Proposal");
+            org.apache.poi.ss.usermodel.Row r0 = sheet.createRow(0);
+            r0.createCell(0).setCellValue("source_field");
+            r0.createCell(1).setCellValue("target_field");
+            r0.createCell(2).setCellValue("score");
+            r0.createCell(3).setCellValue("comment");
+            org.apache.poi.ss.usermodel.Row r1 = sheet.createRow(1);
+            r1.createCell(0).setCellValue("src_field");
+            r1.createCell(1).setCellValue("dst_field");
+            r1.createCell(2).setCellValue(99);
+            r1.createCell(3).setCellValue("Auto matched");
+            wb.write(baos);
+            excelBytes = baos.toByteArray();
+        }
+
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(excelBytes)) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq(inboundPath + "/mappingproposal.xlsx"), any(InputStreamCallback.class));
+
+        ProposalFileDataDto result = service.getProposalFileData("VanRoey", "v3", "inbound");
+
+        assertNotNull(result);
+        assertEquals("v3", result.version());
+        assertEquals("VanRoey Customer", result.companyname());
+        assertEquals("inbound", result.proposalType());
+        assertEquals("Jane Doe", result.createdBy());
+        assertEquals("READY_FOR_REVIEW", result.status());
+        assertEquals(1, result.rows().size());
+        assertEquals("src_field", result.rows().get(0).sourceField());
+        assertEquals("dst_field", result.rows().get(0).targetField());
+    }
+
+    @Test
+    @DisplayName("overwriteProposalFile with proposalType writes to subdirectory and updates proposal_type metadata")
+    void overwriteProposalFile_withProposalType_writesToSubdirAndUpdatesMetadata() throws Exception {
+        when(template.exists("/Proposals/vanroey")).thenReturn(true);
+        when(template.exists("/Proposals/vanroey/v3")).thenReturn(true);
+        when(template.exists("/Proposals/vanroey/v3/inbound")).thenReturn(true);
+
+        String inboundPath = "/Proposals/vanroey/v3/inbound";
+        SftpClient.DirEntry excelEntry = createEntry("mappingproposal.xlsx", false);
+        SftpClient.DirEntry metaEntry = createEntry("proposal.json", false);
+        when(template.list(inboundPath)).thenReturn(new SftpClient.DirEntry[]{excelEntry, metaEntry});
+
+        String initialJson = """
+                {
+                  "company": "vanroey",
+                  "version": "v3",
+                  "proposal_type": "inbound",
+                  "status": "AI_GENERATING",
+                  "createdDate": "2026-11-01T10:00:00Z"
+                }
+                """;
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(initialJson.getBytes(StandardCharsets.UTF_8))) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq(inboundPath + "/proposal.json"), any(InputStreamCallback.class));
+
+        Session<SftpClient.DirEntry> session = org.mockito.Mockito.mock(Session.class);
+        doAnswer(invocation -> {
+            SessionCallback<SftpClient.DirEntry, Object> action = invocation.getArgument(0);
+            return action.doInSession(session);
+        }).when(template).execute(any());
+
+        byte[] validExcel;
+        try (org.apache.poi.xssf.usermodel.XSSFWorkbook wb = new org.apache.poi.xssf.usermodel.XSSFWorkbook();
+             java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream()) {
+            wb.createSheet("Sheet1");
+            wb.write(baos);
+            validExcel = baos.toByteArray();
+        }
+
+        ProposalFileDetailsDto details = service.overwriteProposalFile("vanroey", "v3", "inbound", validExcel, "new_name.xlsx");
+
+        assertNotNull(details);
+        assertEquals("vanroey", details.company());
+        assertEquals("v3", details.version());
+        assertEquals("inbound", details.proposalType());
+        assertEquals("mappingproposal.xlsx", details.filename());
+        assertEquals("/Proposals/vanroey/v3/inbound/mappingproposal.xlsx", details.fullPath());
+
+        // Verify excel written to target path
+        org.mockito.Mockito.verify(session).write(any(InputStream.class), eq("/Proposals/vanroey/v3/inbound/mappingproposal.xlsx"));
+
+        // Verify metadata updated
+        ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
+        org.mockito.Mockito.verify(session).write(streamCaptor.capture(), eq("/Proposals/vanroey/v3/inbound/proposal.json"));
+
+        List<InputStream> capturedStreams = streamCaptor.getAllValues();
+        InputStream metaStream = capturedStreams.get(capturedStreams.size() - 1);
+        String savedMeta = new String(metaStream.readAllBytes(), StandardCharsets.UTF_8);
+        assertTrue(savedMeta.contains("\"status\" : \"In review\"") || savedMeta.contains("\"status\":\"In review\""));
+        assertTrue(savedMeta.contains("\"proposal_type\" : \"inbound\"") || savedMeta.contains("\"proposal_type\":\"inbound\""));
+        assertTrue(savedMeta.contains("\"proposalType\" : \"inbound\"") || savedMeta.contains("\"proposalType\":\"inbound\""));
+    }
+
+    @Test
+    @DisplayName("deleteProposal with proposalType deletes subdirectory and cleans up empty parent directories")
+    void deleteProposal_withProposalType_deletesSubdirAndCleansUp() throws Exception {
+        String company = "vanroey";
+        String version = "v2";
+        String proposalType = "inbound";
+
+        when(template.exists("/Proposals/vanroey")).thenReturn(true);
+        when(template.exists("/Proposals/vanroey/v2")).thenReturn(true);
+        when(template.exists("/Proposals/vanroey/v2/inbound")).thenReturn(true);
+
+        String inboundPath = "/Proposals/vanroey/v2/inbound";
+        SftpClient.DirEntry excelFile = createEntry("mappingproposal.xlsx", false);
+        SftpClient.DirEntry metaFile = createEntry("proposal.json", false);
+        when(template.list(inboundPath)).thenReturn(new SftpClient.DirEntry[]{excelFile, metaFile});
+
+        // Remaining in v2 is empty after inbound removal
+        when(template.list("/Proposals/vanroey/v2")).thenReturn(new SftpClient.DirEntry[0]);
+        // Remaining in company is empty after v2 removal
+        when(template.list("/Proposals/vanroey")).thenReturn(new SftpClient.DirEntry[0]);
+
+        Session<SftpClient.DirEntry> session = org.mockito.Mockito.mock(Session.class);
+        doAnswer(invocation -> {
+            SessionCallback<SftpClient.DirEntry, Object> action = invocation.getArgument(0);
+            return action.doInSession(session);
+        }).when(template).execute(any());
+
+        service.deleteProposal(company, version, proposalType);
+
+        org.mockito.Mockito.verify(session).remove("/Proposals/vanroey/v2/inbound/mappingproposal.xlsx");
+        org.mockito.Mockito.verify(session).remove("/Proposals/vanroey/v2/inbound/proposal.json");
+        org.mockito.Mockito.verify(session).rmdir("/Proposals/vanroey/v2/inbound");
+        org.mockito.Mockito.verify(session).rmdir("/Proposals/vanroey/v2");
+        org.mockito.Mockito.verify(session).rmdir("/Proposals/vanroey");
+    }
+
+    @Test
+    @DisplayName("deleteProposal throws EntityNotFoundException when proposalType directory does not exist")
+    void deleteProposal_proposalTypeNotFound_throwsEntityNotFound() {
+        when(template.exists("/Proposals/vanroey")).thenReturn(true);
+        when(template.exists("/Proposals/vanroey/v2")).thenReturn(true);
+        when(template.exists("/Proposals/vanroey/v2/nonexisting")).thenReturn(false);
+        when(template.list("/Proposals/vanroey/v2")).thenReturn(new SftpClient.DirEntry[0]);
+
+        assertThrows(EntityNotFoundException.class, () ->
+                service.deleteProposal("vanroey", "v2", "nonexisting"));
+    }
+
+    @Test
+    @DisplayName("listProposals throws IllegalArgumentException when company exceeds 20 characters")
+    void listProposals_companyExceeds20Chars_throwsIllegalArgumentException() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+                service.listProposals("123456789012345678901", "inbound"));
+        assertEquals("Company parameter must not exceed 20 characters", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("listProposals throws IllegalArgumentException when proposalType exceeds 20 characters")
+    void listProposals_proposalTypeExceeds20Chars_throwsIllegalArgumentException() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+                service.listProposals("vanroey", "123456789012345678901"));
+        assertEquals("Proposal type parameter must not exceed 20 characters", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("getProposalFile throws IllegalArgumentException when company exceeds 20 characters")
+    void getProposalFile_companyExceeds20Chars_throwsIllegalArgumentException() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+                service.getProposalFile("123456789012345678901", "v1", "inbound"));
+        assertEquals("Company parameter must not exceed 20 characters", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("getProposalFile throws IllegalArgumentException when proposalType exceeds 20 characters")
+    void getProposalFile_proposalTypeExceeds20Chars_throwsIllegalArgumentException() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+                service.getProposalFile("vanroey", "v1", "123456789012345678901"));
+        assertEquals("Proposal type parameter must not exceed 20 characters", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("getProposalFileData throws IllegalArgumentException when company exceeds 20 characters")
+    void getProposalFileData_companyExceeds20Chars_throwsIllegalArgumentException() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+                service.getProposalFileData("123456789012345678901", "v1", "inbound"));
+        assertEquals("Company parameter must not exceed 20 characters", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("getProposalFileData throws IllegalArgumentException when proposalType exceeds 20 characters")
+    void getProposalFileData_proposalTypeExceeds20Chars_throwsIllegalArgumentException() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+                service.getProposalFileData("vanroey", "v1", "123456789012345678901"));
+        assertEquals("Proposal type parameter must not exceed 20 characters", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("overwriteProposalFile throws IllegalArgumentException when company exceeds 20 characters")
+    void overwriteProposalFile_companyExceeds20Chars_throwsIllegalArgumentException() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+                service.overwriteProposalFile("123456789012345678901", "v1", "inbound", new byte[]{1, 2}, "test.xlsx"));
+        assertEquals("Company parameter must not exceed 20 characters", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("overwriteProposalFile throws IllegalArgumentException when proposalType exceeds 20 characters")
+    void overwriteProposalFile_proposalTypeExceeds20Chars_throwsIllegalArgumentException() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+                service.overwriteProposalFile("vanroey", "v1", "123456789012345678901", new byte[]{1, 2}, "test.xlsx"));
+        assertEquals("Proposal type parameter must not exceed 20 characters", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("deleteProposal throws IllegalArgumentException when company exceeds 20 characters")
+    void deleteProposal_companyExceeds20Chars_throwsIllegalArgumentException() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+                service.deleteProposal("123456789012345678901", "v1", "inbound"));
+        assertEquals("Company parameter must not exceed 20 characters", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("deleteProposal throws IllegalArgumentException when proposalType exceeds 20 characters")
+    void deleteProposal_proposalTypeExceeds20Chars_throwsIllegalArgumentException() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+                service.deleteProposal("vanroey", "v1", "123456789012345678901"));
+        assertEquals("Proposal type parameter must not exceed 20 characters", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("getProposalFile with uppercase proposalType matches case-insensitively and returns lowercase")
+    void getProposalFile_uppercaseProposalType_returnsLowercase() {
+        when(template.exists("/Proposals/VanRoey")).thenReturn(true);
+        when(template.exists("/Proposals/VanRoey/v3")).thenReturn(true);
+        when(template.exists("/Proposals/VanRoey/v3/inbound")).thenReturn(true);
+
+        String inboundPath = "/Proposals/VanRoey/v3/inbound";
+        SftpClient.DirEntry excelEntry = createEntry("mappingproposal.xlsx", false);
+        SftpClient.DirEntry metaEntry = createEntry("metadata.json", false);
+        when(template.list(inboundPath)).thenReturn(new SftpClient.DirEntry[]{excelEntry, metaEntry});
+
+        String metaJson = """
+                {
+                  "company": "VanRoey",
+                  "version": "v3",
+                  "proposal_type": "INBOUND",
+                  "filename": "mappingproposal.xlsx"
+                }
+                """;
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(metaJson.getBytes(StandardCharsets.UTF_8))) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq(inboundPath + "/metadata.json"), any(InputStreamCallback.class));
+
+        byte[] fakeExcelBytes = "FAKE_EXCEL".getBytes(StandardCharsets.UTF_8);
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(fakeExcelBytes)) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq(inboundPath + "/mappingproposal.xlsx"), any(InputStreamCallback.class));
+
+        ProposalFileDetailsDto result = service.getProposalFile("VanRoey", "v3", "INBOUND");
+
+        assertNotNull(result);
+        assertEquals("inbound", result.proposalType());
+    }
+
+    @Test
+    @DisplayName("getProposalFile resolves mixed-case SFTP directory case-insensitively and returns lowercase")
+    void getProposalFile_mixedCaseServerDirectory_returnsLowercase() {
+        when(template.exists("/Proposals/VanRoey")).thenReturn(true);
+        when(template.exists("/Proposals/VanRoey/v3")).thenReturn(true);
+        when(template.exists("/Proposals/VanRoey/v3/inbound")).thenReturn(false);
+
+        SftpClient.DirEntry mixedCaseDir = createEntry("Inbound", true);
+        when(template.list("/Proposals/VanRoey/v3")).thenReturn(new SftpClient.DirEntry[]{mixedCaseDir});
+
+        String inboundPath = "/Proposals/VanRoey/v3/Inbound";
+        SftpClient.DirEntry excelEntry = createEntry("mappingproposal.xlsx", false);
+        SftpClient.DirEntry metaEntry = createEntry("metadata.json", false);
+        when(template.list(inboundPath)).thenReturn(new SftpClient.DirEntry[]{excelEntry, metaEntry});
+
+        String metaJson = """
+                {
+                  "company": "VanRoey",
+                  "version": "v3",
+                  "proposal_type": "Inbound",
+                  "filename": "mappingproposal.xlsx"
+                }
+                """;
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(metaJson.getBytes(StandardCharsets.UTF_8))) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq(inboundPath + "/metadata.json"), any(InputStreamCallback.class));
+
+        byte[] fakeExcelBytes = "FAKE_EXCEL".getBytes(StandardCharsets.UTF_8);
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(fakeExcelBytes)) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq(inboundPath + "/mappingproposal.xlsx"), any(InputStreamCallback.class));
+
+        ProposalFileDetailsDto result = service.getProposalFile("VanRoey", "v3", "inbound");
+
+        assertNotNull(result);
+        assertEquals("inbound", result.proposalType());
+    }
+
+    @Test
+    @DisplayName("overwriteProposalFile with uppercase proposalType stores lowercase in metadata")
+    void overwriteProposalFile_uppercaseProposalType_storesLowercaseInMetadata() throws Exception {
+        when(template.exists("/Proposals/vanroey")).thenReturn(true);
+        when(template.exists("/Proposals/vanroey/v3")).thenReturn(true);
+        when(template.exists("/Proposals/vanroey/v3/inbound")).thenReturn(true);
+
+        String inboundPath = "/Proposals/vanroey/v3/inbound";
+        SftpClient.DirEntry excelEntry = createEntry("mappingproposal.xlsx", false);
+        SftpClient.DirEntry metaEntry = createEntry("proposal.json", false);
+        when(template.list(inboundPath)).thenReturn(new SftpClient.DirEntry[]{excelEntry, metaEntry});
+
+        String initialJson = """
+                {
+                  "company": "vanroey",
+                  "version": "v3",
+                  "proposal_type": "INBOUND",
+                  "status": "AI_GENERATING"
+                }
+                """;
+        doAnswer(invocation -> {
+            InputStreamCallback callback = invocation.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(initialJson.getBytes(StandardCharsets.UTF_8))) {
+                callback.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq(inboundPath + "/proposal.json"), any(InputStreamCallback.class));
+
+        Session<SftpClient.DirEntry> session = org.mockito.Mockito.mock(Session.class);
+        doAnswer(invocation -> {
+            SessionCallback<SftpClient.DirEntry, Object> action = invocation.getArgument(0);
+            return action.doInSession(session);
+        }).when(template).execute(any());
+
+        byte[] validExcel;
+        try (org.apache.poi.xssf.usermodel.XSSFWorkbook wb = new org.apache.poi.xssf.usermodel.XSSFWorkbook();
+             java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream()) {
+            wb.createSheet("Sheet1");
+            wb.write(baos);
+            validExcel = baos.toByteArray();
+        }
+
+        ProposalFileDetailsDto details = service.overwriteProposalFile("vanroey", "v3", "INBOUND", validExcel, "new_name.xlsx");
+
+        assertNotNull(details);
+        assertEquals("inbound", details.proposalType());
+
+        ArgumentCaptor<InputStream> streamCaptor = ArgumentCaptor.forClass(InputStream.class);
+        org.mockito.Mockito.verify(session).write(streamCaptor.capture(), eq(inboundPath + "/proposal.json"));
+
+        List<InputStream> capturedStreams = streamCaptor.getAllValues();
+        InputStream metaStream = capturedStreams.get(capturedStreams.size() - 1);
+        String savedMeta = new String(metaStream.readAllBytes(), StandardCharsets.UTF_8);
+        assertTrue(savedMeta.contains("\"proposal_type\" : \"inbound\"") || savedMeta.contains("\"proposal_type\":\"inbound\""));
+        assertTrue(savedMeta.contains("\"proposalType\" : \"inbound\"") || savedMeta.contains("\"proposalType\":\"inbound\""));
     }
 }

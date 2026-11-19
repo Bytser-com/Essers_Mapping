@@ -118,6 +118,30 @@ def sftp_shared_config() -> dict | None:
     }
 
 
+def sftp_shared_packages_config() -> dict | None:
+    """Connection settings for packages on the shared SFTP server, or None when SFTP_SHARED_HOST is empty."""
+    _load_env()
+    host = os.getenv('SFTP_SHARED_HOST', '').strip()
+    if not host:
+        return None
+    try:
+        port = int(os.getenv('SFTP_SHARED_PORT', '22'))
+    except ValueError:
+        port = 22
+    pkg = os.getenv('SFTP_SHARED_PACKAGES_DIR', '/Packages').strip() or '/Packages'
+    if not pkg.startswith('/'):
+        pkg = '/' + pkg
+
+    return {
+        'host': host,
+        'port': port,
+        'user': os.getenv('SFTP_SHARED_USER', '').strip(),
+        'password': os.getenv('SFTP_SHARED_PASSWORD', ''),
+        'base_dir': pkg,
+        'proposals_dir': '',
+    }
+
+
 def shared_storage_dir() -> Path:
     """Local stand-in for the SFTP server (used when SFTP_SHARED_HOST is not set)."""
     return LOCAL_SHARED_DIR
@@ -126,6 +150,26 @@ def shared_storage_dir() -> Path:
 def proposals_dir() -> Path:
     """Local folder with one subfolder per customer (layout: see services/proposals.py)."""
     return shared_storage_dir() / 'proposals'
+
+
+def packages_dir() -> Path:
+    """Local folder with one subfolder per customer for packages."""
+    caps = shared_storage_dir() / 'Packages'
+    if caps.is_dir():
+        return caps
+    return shared_storage_dir() / 'packages'
+
+
+def auto_seed_enabled() -> bool:
+    """Whether example proposals should be seeded into storage on startup."""
+    _load_env()
+    val = os.getenv('SEED_PROPOSALS', '').strip().lower()
+    if val in ('1', 'true', 'yes'):
+        return True
+    if val in ('0', 'false', 'no'):
+        return False
+    env = os.getenv('ENVIRONMENT', '').strip().lower()
+    return env in ('testing', 'test', 'development', 'dev')
 
 
 def cors_origins() -> list[str]:

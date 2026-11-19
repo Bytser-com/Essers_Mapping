@@ -1,0 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cloudflared-policy
+  namespace: cloudflare
+spec:
+  podSelector:
+    matchLabels:
+      app: cloudflared
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow Kubelet / Prometheus to scrape metrics & check /ready probe
+    - ports:
+        - protocol: TCP
+          port: 2000
+  egress:
+    # 1. Allow DNS lookups (CoreDNS ClusterIP VIP & Pods)
+    - ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # 2. Allow internal routing to NGINX Ingress Controller (ClusterIP VIP, MetalLB IP, and Pod IPs)
+    - ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443
+    # 3. Allow outbound connections to Cloudflare Edge protocol (QUIC / HTTP/2 multiplexing)
+    - ports:
+        - protocol: TCP
+          port: 7844
+        - protocol: UDP
+          port: 7844

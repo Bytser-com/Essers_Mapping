@@ -123,21 +123,47 @@ class IncomingWatcher:
                 continue  # taken by another watcher, or just removed
             try:
                 customer = _read_customer(claimed_folder)
+                prop_type = _read_proposal_type(claimed_folder)
                 if not any(claimed_folder.glob('*.xml')):
                     raise ValueError('the upload contains no XML files')
             except (OSError, ValueError) as error:
                 logger.warning(f'Upload {folder.name} rejected: {error}')
                 self._finish(claimed_folder, FAILED_DIR, error=str(error))
                 continue
-            try:
-                ref = start_proposal(customer, self.store)
-            except Exception as error:
-                # Storage (SFTP) not reachable: give the upload back, it is retried next time.
-                logger.warning(f'Upload {folder.name} waits: proposal could not be created: {error}')
-                os.rename(claimed_folder, folder)
-                continue
-            (claimed_folder / PROPOSAL_REF).write_text(json.dumps(
-                {'customer': ref.customer, 'version': ref.version, 'folder': ref.folder}), encoding='utf-8')
+            ref = None
+            ref_file = claimed_folder / PROPOSAL_REF
+            if ref_file.is_file():
+                try:
+                    data = json.loads(ref_file.read_text(encoding='utf-8'))
+                    candidate_ref = ProposalRef(
+                        customer=data['customer'],
+                        version=int(data['version']),
+                        folder=str(data['folder']),
+                        proposal_type=str(data.get('proposal_type') or ''),
+                    )
+                    try:
+                        if self.store.exists(candidate_ref):
+                            ref = candidate_ref
+                    except Exception as error:
+                        # Storage (SFTP) not reachable: give the upload back, it is retried next time.
+                        logger.warning(f'Upload {folder.name} waits: SFTP check failed: {error}')
+                        os.rename(claimed_folder, folder)
+                        continue
+                except (ValueError, KeyError, TypeError, OSError) as error:
+                    logger.warning(f'Upload {folder.name} has invalid proposal_ref: {error}')
+                    ref = None
+
+            if ref is None:
+                try:
+                    ref = start_proposal(customer, self.store, proposal_type=prop_type)
+                except Exception as error:
+                    # Storage (SFTP) not reachable: give the upload back, it is retried next time.
+                    logger.warning(f'Upload {folder.name} waits: proposal could not be created: {error}')
+                    os.rename(claimed_folder, folder)
+                    continue
+                (claimed_folder / PROPOSAL_REF).write_text(json.dumps(
+                    {'customer': ref.customer, 'version': ref.version, 'folder': ref.folder,
+                     'proposal_type': ref.proposal_type}), encoding='utf-8')
             claimed.append(ClaimedUpload(claimed_folder, ref))
         return claimed
 
@@ -204,7 +230,8 @@ class IncomingWatcher:
                     continue
                 data = json.loads(ref_file.read_text(encoding='utf-8'))
                 ref = ProposalRef(customer=data['customer'], version=data['version'],
-                                  folder=str(data['folder']))
+                                  folder=str(data['folder']),
+                                  proposal_type=str(data.get('proposal_type') or ''))
                 ready.append(ClaimedUpload(folder, ref))
             except (ValueError, TypeError, KeyError, OSError) as error:
                 logger.warning('Cannot resume upload %s: %s', folder.name, error)
@@ -258,6 +285,14 @@ def _read_customer(folder: Path) -> str:
     if not customer:
         raise ValueError(f'{UPLOAD_MARKER} has no customer name')
     return customer
+
+
+def _read_proposal_type(folder: Path) -> str:
+    data = json.loads((folder / UPLOAD_MARKER).read_text(encoding='utf-8-sig'))
+    prop_type = ''
+    if isinstance(data, dict):
+        prop_type = str(data.get('proposal_type') or data.get('proposalType') or '').strip().lower()
+    return prop_type or 'inbound'
 
 
 def default_watcher(run: RunMapping | None = None) -> IncomingWatcher:

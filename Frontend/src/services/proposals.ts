@@ -13,6 +13,7 @@ export type Proposal = {
   id: string
   customer: string
   version: number
+  proposal_type?: string | null
   uploaded_at: string // ISO 8601 with timezone
   status: ProposalStatus
   ai_status: AiStatus | null
@@ -31,6 +32,7 @@ export type CompanyProposalOverview = {
   aiStatus?: AiStatus | string | null
   // Name as entered at the upload ("Klant B"); company is the folder name ("klant-b")
   customerName?: string | null
+  proposalType?: string | null
 }
 
 export type ProposalFileDetails = {
@@ -117,22 +119,23 @@ export function toProposal(item: CompanyProposalOverview | Proposal): Proposal {
     return {
       ...p,
       status: normalizeStatus(p.status),
+      can_open: true,
     }
   }
   const ov = item as CompanyProposalOverview
   const versionNum = parseInt(String(ov.latestVersion ?? '').replace(/^v/i, ''), 10) || 1
   const status: ProposalStatus = normalizeStatus(ov.status)
   const aiStatus: AiStatus | null = (ov.aiStatus as AiStatus) || null
-  const canOpen = status !== 'AI_GENERATING'
 
   return {
     id: `${ov.company}/${ov.latestVersion}`,
     customer: ov.customerName || ov.company,
+    proposal_type: ov.proposalType ?? null,
     version: versionNum,
     uploaded_at: ov.createdDate || new Date().toISOString(),
     status,
     ai_status: aiStatus,
-    can_open: canOpen,
+    can_open: true,
   }
 }
 

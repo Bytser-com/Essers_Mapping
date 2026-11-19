@@ -88,14 +88,14 @@ def watcher(incoming, sftp, ai):
     return IncomingWatcher(incoming, sftp, SETTINGS)
 
 
-def upload(incoming: Path, upload_id: str, customer: str, *xml_files: Path, complete: bool = True) -> Path:
+def upload(incoming: Path, upload_id: str, customer: str, *xml_files: Path, proposal_type: str = 'inbound', complete: bool = True) -> Path:
     """Simulates TC-60-01: the upload story stores the files, then upload.json as the last step."""
     folder = incoming / upload_id
     folder.mkdir(parents=True)
     for file in xml_files:
         shutil.copy(file, folder / file.name)
     if complete:
-        (folder / 'upload.json').write_text(json.dumps({'customer': customer}), encoding='utf-8')
+        (folder / 'upload.json').write_text(json.dumps({'customer': customer, 'proposal_type': proposal_type}), encoding='utf-8')
     return folder
 
 
@@ -138,7 +138,7 @@ def test_fc2_excel_proposal_is_saved_in_the_proposals_folder_of_that_customer(in
 
     watcher.run_once()
 
-    excel = sftp.root / 'ostavel' / 'v1' / 'MProposal-Ostavel_V1.xlsx'  # naming convention
+    excel = sftp.root / 'ostavel' / 'v1' / 'inbound' / 'MProposal-Ostavel_V1.xlsx'  # naming convention
     assert excel.is_file()
     sheet = load_workbook(excel)['Mapping Proposal']
     headers = [cell.value for cell in sheet[2]]
@@ -147,7 +147,7 @@ def test_fc2_excel_proposal_is_saved_in_the_proposals_folder_of_that_customer(in
     assert first_row['Proposed rule type'] == 'DIRECT'
     # Only the Excel goes to SFTP, only in the folder of this customer; the XML stays off SFTP.
     on_sftp = [p.relative_to(sftp.root).as_posix() for p in sftp.root.rglob('*') if p.is_file()]
-    assert sorted(on_sftp) == ['ostavel/v1/MProposal-Ostavel_V1.xlsx', 'ostavel/v1/proposal.json']
+    assert sorted(on_sftp) == ['ostavel/v1/inbound/MProposal-Ostavel_V1.xlsx', 'ostavel/v1/inbound/proposal.json']
 
 
 def test_fc3_status_becomes_ready_for_review_when_the_ai_is_done(incoming, sftp, watcher):
@@ -218,10 +218,10 @@ def test_upload_waits_when_the_sftp_server_is_unreachable(incoming, sftp, watche
     real_create = sftp.create_proposal
     server = {'up': False}
 
-    def create_proposal(customer):
+    def create_proposal(customer, proposal_type='inbound', **kwargs):
         if not server['up']:
             raise StorageError('Cannot connect to SFTP sftp-shared:22')
-        return real_create(customer)
+        return real_create(customer, proposal_type=proposal_type, **kwargs)
     monkeypatch.setattr(sftp, 'create_proposal', create_proposal)
     upload(incoming, 'upload-1', 'Ostavel', OSTAVEL_XML)
 

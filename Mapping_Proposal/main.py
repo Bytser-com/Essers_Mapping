@@ -37,6 +37,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument('--model', default='', help='Optional override for GEMINI_MODEL from .env.')
     parser.add_argument('--customer', default='',
                         help='Customer name: register the run as a proposal, so the overview shows its status.')
+    parser.add_argument('--proposal-type', default='inbound',
+                        help='Proposal type (default inbound, e.g. inbound, outbound, inboud-accept).')
     parser.add_argument('--preview', action='store_true',
                         help='Show exactly what would be sent, without calling Gemini.')
     return parser
@@ -93,7 +95,7 @@ def main(argv: list[str] | None = None) -> int:
             print('Preview only: no Gemini request and no Excel output.')
         elif args.customer:
             # The proposals overview shows "AI maakt voorstel / Bezig" during this run.
-            run_for_customer(args.customer, settings)
+            run_for_customer(args.customer, settings, proposal_type=args.proposal_type)
         else:
             run_mapping(settings)
     except MappingError as error:

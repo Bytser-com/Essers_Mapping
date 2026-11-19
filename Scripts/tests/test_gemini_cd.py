@@ -30,6 +30,7 @@ class GeminiCdTests(unittest.TestCase):
             "GEMINI_API_KEY": key,
             "GHCR_USERNAME": "dummy-user",
             "GHCR_TOKEN": "dummy-registry-token",
+            "GRAFANA_ADMIN_PASSWORD": "dummy-grafana-password",
             "SFTP_SHARED_ADMIN_PASSWORD": "", "SFTP_SHARED_PASSWORD": "",
             "SFTP_RUNTIME_ADMIN_PASSWORD": "", "SFTP_RUNTIME_PASSWORD": "",
             "ACME_EMAIL": "", "DOMAIN_NAME": "",
@@ -46,7 +47,14 @@ class GeminiCdTests(unittest.TestCase):
         # kubectl is stubbed: capture arguments and consume the generated manifest.
         stub = """
 kubectl() {
-  printf '%s\\n' "$@" >> "$CAPTURE_CALLS"
+  if command -v flock >/dev/null 2>&1; then
+    (
+      flock 200
+      printf '%s\\n' "$@"
+    ) 200>>"$CAPTURE_CALLS.lock" >> "$CAPTURE_CALLS"
+  else
+    printf '%s\\n' "$@" >> "$CAPTURE_CALLS"
+  fi
   if [[ "$1" == create ]]; then
     printf '{"kind":"Secret"}'
   else

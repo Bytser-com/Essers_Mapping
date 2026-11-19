@@ -1,25 +1,44 @@
 import { useRef, useState } from 'react'
 import type { ChangeEvent, DragEvent } from 'react'
+import { useHomeStore } from '../stores/homeStore'
 import iconUpload from '../assets/home/icon-upload.svg'
 import iconError from '../assets/home/icon-error.svg'
 import iconSuccess from '../assets/home/icon-success.svg'
 
-type InterfaceUploadProps = {
-  // Sends all chosen files of one customer to the backend in one request (see services/uploadService.ts)
-  onUpload?: (customerName: string, files: File[]) => void | Promise<void>
+type UploadError = 'customer' | 'type' | 'noFile' | 'file' | 'server' | null
+
+type MaxLengthHintProps = {
+  id: string
+  value: string
+  max: number
 }
 
-type UploadError = 'customer' | 'noFile' | 'file' | 'server' | null
+// Shown under an input when the maximum number of characters is reached
+function MaxLengthHint({ id, value, max }: Readonly<MaxLengthHintProps>) {
+  if (value.length < max) return null
+  return (
+    <p id={id} aria-live="polite" className="text-[12px] text-red">
+      Maximaal {max} tekens bereikt.
+    </p>
+  )
+}
 
 // Upload card on the Home page (user story 60)
-function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
+function InterfaceUpload() {
+  // Sends all chosen files of one customer to the backend in one request (see stores/homeStore.ts)
+  const uploadInterface = useHomeStore((state) => state.uploadInterface)
+  const serverMessage = useHomeStore((state) => state.uploadError)
   const fileInput = useRef<HTMLInputElement>(null)
   const [customerName, setCustomerName] = useState('')
+  const [proposalType, setProposalType] = useState('')
   const [files, setFiles] = useState<File[]>([])
   const [uploadError, setUploadError] = useState<UploadError>(null)
-  const [serverMessage, setServerMessage] = useState('')
   // Customer name shown in the success message after a successful upload
   const [uploadedFor, setUploadedFor] = useState<string | null>(null)
+
+  // Longest customer name and proposal type that can be entered (also checked by the backend)
+  const MAX_CUSTOMER_LENGTH = 20
+  const MAX_TYPE_LENGTH = 20
 
   // New files are added to the list, so files can also be chosen one by one
   function chooseFiles(chosen: FileList | null) {
@@ -55,6 +74,11 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
       return
     }
 
+    if (!proposalType.trim()) {
+      setUploadError('type')
+      return
+    }
+
     // A file must be chosen before uploading
     if (files.length === 0) {
       setUploadError('noFile')
@@ -67,13 +91,12 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
     }
 
     // Send all files together: the AI makes one proposal for this upload
-    try {
-      await onUpload?.(customerName.trim(), files)
+    const succeeded = await uploadInterface(customerName.trim(), proposalType.trim(), files)
+    if (succeeded) {
       setUploadedFor(customerName.trim())
       // The files are sent: empty the list, so the same files are not uploaded twice by accident
       setFiles([])
-    } catch (error) {
-      setServerMessage(error instanceof Error ? error.message : 'Upload mislukt.')
+    } else {
       setUploadError('server')
     }
   }
@@ -89,6 +112,8 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
           <input
             id="customer-name"
             type="text"
+            maxLength={MAX_CUSTOMER_LENGTH}
+            aria-describedby="customer-name-max"
             value={customerName}
             onChange={(event) => {
               setCustomerName(event.target.value)
@@ -96,6 +121,23 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
             }}
             className="w-full rounded-lg border border-[#e3e3e8] bg-white px-3 py-[10px] text-[13px]"
           />
+          <MaxLengthHint id="customer-name-max" value={customerName} max={MAX_CUSTOMER_LENGTH} />
+          <label htmlFor="proposal-type" className="text-[12px] font-medium text-[#6b6b73]">
+            Type
+          </label>
+          <input
+            id="proposal-type"
+            type="text"
+            maxLength={MAX_TYPE_LENGTH}
+            aria-describedby="proposal-type-max"
+            value={proposalType}
+            onChange={(event) => {
+              setProposalType(event.target.value)
+              setUploadError(null)
+            }}
+            className="w-full rounded-lg border border-[#e3e3e8] bg-white px-3 py-[10px] text-[13px]"
+          />
+          <MaxLengthHint id="proposal-type-max" value={proposalType} max={MAX_TYPE_LENGTH} />
         </div>
 
         <div
@@ -156,25 +198,30 @@ function InterfaceUpload({ onUpload }: InterfaceUploadProps) {
       </section>
 
       {uploadError && (
-        <div role="alert" className="flex items-center gap-3 rounded-lg border border-[#1c1c1f] bg-[#fee2e2] px-4 py-3">
+        <div role="alert" className="flex items-center gap-3 rounded-lg border border-[#1c1c1f] bg-white px-4 py-3">
           <img src={iconError} alt="" width={18} height={18} />
           <div className="flex flex-col gap-[2px]">
             {uploadError === 'customer' ? (
               <>
-                <p className="text-[13px] font-semibold text-[#1c1c1f]">Upload mislukt: Vul eerst een klant in.</p>
-                <p className="text-[12px] text-[#1c1c1f]">Vul de klantnaam in en probeer opnieuw.</p>
+                <p className="text-[13px] font-semibold">Upload mislukt: Vul eerst een klant in.</p>
+                <p className="text-[12px] text-[#6b6b73]">Vul de klantnaam in en probeer opnieuw.</p>
+              </>
+            ) : uploadError === 'type' ? (
+              <>
+                <p className="text-[13px] font-semibold">Upload mislukt: vul eerst een type in.</p>
+                <p className="text-[12px] text-[#6b6b73]">Vul het type in en probeer opnieuw.</p>
               </>
             ) : uploadError === 'noFile' ? (
               <>
-                <p className="text-[13px] font-semibold text-[#1c1c1f]">Upload mislukt: kies eerst een XML-bestand.</p>
-                <p className="text-[12px] text-[#1c1c1f]">Kies een XML-bestand van de klant en probeer opnieuw.</p>
+                <p className="text-[13px] font-semibold">Upload mislukt: kies eerst een XML-bestand.</p>
+                <p className="text-[12px] text-[#6b6b73]">Kies een XML-bestand van de klant en probeer opnieuw.</p>
               </>
             ) : uploadError === 'server' ? (
-              <p className="text-[13px] font-semibold text-[#1c1c1f]">{serverMessage}</p>
+              <p className="text-[13px] font-semibold">{serverMessage}</p>
             ) : (
               <>
-                <p className="text-[13px] font-semibold text-[#1c1c1f]">Upload mislukt: dit is geen XML-bestand.</p>
-                <p className="text-[12px] text-[#1c1c1f]">Kies een XML-bestand van de klant en probeer opnieuw.</p>
+                <p className="text-[13px] font-semibold">Upload mislukt: dit is geen XML-bestand.</p>
+                <p className="text-[12px] text-[#6b6b73]">Kies een XML-bestand van de klant en probeer opnieuw.</p>
               </>
             )}
           </div>

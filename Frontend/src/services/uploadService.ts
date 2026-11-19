@@ -1,15 +1,17 @@
 // Calls the upload endpoint of the Mapping Proposal API (POST /upload).
 // The endpoint lives in Mapping_Proposal/routers/upload.py. All files of one upload are
-// sent together with the customer name, so the AI makes one proposal for them: the backend
-// stores them in one folder in Mapping_Proposal/data/source/ and the AI starts automatically.
+// sent together with the customer name and the proposal type, so the AI makes one proposal
+// for them: the backend stores them in one folder in Mapping_Proposal/data/source/ and the
+// AI starts automatically.
 //
 // Like services/proposals.ts the request goes through /api/proposal: in Kubernetes the
 // frontend proxies it to the backend, locally vite.config.js does the same.
 const API_URL = '/api/proposal'
 
-export async function uploadInterface(customerName: string, files: File[]): Promise<void> {
+export async function uploadInterface(customerName: string, proposalType: string, files: File[]): Promise<void> {
   const body = new FormData()
   body.append('customer_name', customerName)
+  body.append('proposal_type', proposalType)
   for (const file of files) {
     body.append('files', file)
   }
