@@ -2,6 +2,7 @@
 
 import io
 from pathlib import Path
+
 import openpyxl
 import pytest
 
