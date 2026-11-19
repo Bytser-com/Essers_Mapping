@@ -11,6 +11,9 @@ from urllib.parse import urlencode, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 
+USER_AGENT = 'Essers-Mapping-Sonar-Quality-Gate/1.0'
+
+
 class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, *args):
         # Never forward the Sonar token to a redirect destination.
@@ -25,7 +28,8 @@ def annotation(level, message):
 def get_json(server, token, endpoint, parameters, timeout):
     request = Request(
         f'{server}{endpoint}?{urlencode(parameters)}',
-        headers={'Authorization': f'Bearer {token}', 'Accept': 'application/json'},
+        headers={'Authorization': f'Bearer {token}', 'Accept': 'application/json',
+                 'User-Agent': USER_AGENT},
     )
     with build_opener(NoRedirect()).open(request, timeout=timeout) as response:
         payload = json.load(response)
@@ -115,8 +119,20 @@ def main():
         report.write_text(json.dumps(payload, indent=2), encoding='utf-8')
         return check_gate(payload)
     except HTTPError as error:
-        error.close()
-        annotation('error', f'Sonar quality-gate request failed: HTTP {error.code}. Check token permissions.')
+        try:
+            payload = json.loads(error.read(8192)) if error.fp is not None else {}
+        except (OSError, ValueError):
+            payload = {}
+        finally:
+            error.close()
+        if isinstance(payload, dict) and payload.get('cloudflare_error') is True:
+            code = payload.get('error_code')
+            detail = f' (error {code})' if isinstance(code, int) else ''
+            annotation('error', f'Sonar quality-gate request failed: HTTP {error.code}. '
+                       f'Cloudflare rejected the API client{detail}. Check the client User-Agent and Cloudflare rules.')
+        else:
+            annotation('error', f'Sonar quality-gate request failed: HTTP {error.code}. '
+                       'Check token permissions and upstream proxy rules.')
     except (OSError, URLError, ValueError, KeyError, TypeError) as error:
         annotation('error', f'Cannot verify Sonar quality gate: {error}')
     return 1
