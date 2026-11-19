@@ -122,3 +122,15 @@ async def upload_xml(
         raise HTTPException(status_code=500, detail=f'Upload mislukt: {error}')
 
     return {'upload_id': upload_id, 'customer': customer, 'files': names}
+
+
+@router.post('/seed')
+def seed(force: bool = False) -> dict:
+    """Seed sample proposals into the storage (used for testing and dev)."""
+    from scripts.dev_seed import seed_proposals
+    try:
+        seed_proposals(force=force)
+        return {'status': 'ok', 'message': 'Proposals seeded successfully'}
+    except Exception as e:
+        logger.error('Failed to seed proposals: %s', e)
+        raise HTTPException(status_code=500, detail=f'Seeding failed: {e}')

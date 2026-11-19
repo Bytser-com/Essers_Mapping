@@ -60,6 +60,7 @@ configMapGenerator:
     behavior: merge
     literals:
       - ENVIRONMENT=testing
+      - SEED_PROPOSALS=true
       - LOG_LEVEL=DEBUG
       - SPRING_PROFILES_ACTIVE=testing
       - PUBLIC_FRONTEND_IP=192.168.100.101

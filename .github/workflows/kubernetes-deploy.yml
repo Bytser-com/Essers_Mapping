@@ -502,6 +502,15 @@ jobs:
           # Display assigned LoadBalancer IPs and workload status
           kubectl get svc,pods,pvc,hpa,netpol -n "$NAMESPACE" -o wide
 
+          # Seed sample proposals on SFTP in testing environment
+          if [ "$OVERLAY" = "testing" ]; then
+            echo "Seeding sample proposals on SFTP for testing environment..."
+            PROPOSAL_POD=$(kubectl get pod -n "$NAMESPACE" -l app.kubernetes.io/name=mapping-proposal -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+            if [ -n "$PROPOSAL_POD" ]; then
+              kubectl exec -n "$NAMESPACE" "$PROPOSAL_POD" -- python -m scripts.dev_seed || true
+            fi
+          fi
+
       - name: Summary
         if: always() && steps.manifests.outputs.exists == 'true'
         shell: bash
