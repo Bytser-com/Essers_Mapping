@@ -117,31 +117,33 @@ pull request waiting for a status indefinitely.
 
 Coverage reports are generated and uploaded for implemented services. Service
 workflows need no Sonar secrets and do not impose a separate coverage percentage.
-The SonarQube workflow blocks on hosted quality-gate failures except new-code
+The SonarQube workflow blocks on server quality-gate failures except new-code
 coverage, which produces a GitHub Actions warning.
 
 The team's minimum is **70% overall coverage**. Sonar's built-in gate separately
 requires **80% coverage on new code**; these are different requirements.
 Sonar's `Coverage` combines line and condition coverage, so use overall `Coverage`,
 not only `Line coverage`, to assess the team target. No numerical threshold is
-configured in this repository. A hosted gate enforcing 70% overall coverage
-requires a [custom quality gate](https://docs.sonarsource.com/sonarqube-cloud/standards/managing-quality-gates/managing-custom-quality-gates),
-available on Team and Enterprise plans. The hosted gate is unchanged and can
+configured in this repository. Community Build supports custom quality gates;
+a gate enforcing 70% overall coverage can be configured on the server. This
+migration does not change the gate or the workflow's advisory coverage policy. The server gate can
 remain red when this workflow passes due to advisory new-code coverage.
 The 70% overall target is a team requirement, not an automated threshold here.
 
-### Hosted SonarQube and local feature work
+### Self-hosted SonarQube and local feature work
 
 [SonarQube](./sonarqube.yml) runs one combined analysis after each push to
 `Development`, including a merged feature PR. It can also be started manually
 with `Development` selected. It does not scan PRs or release branches.
 
-The shared project key defaults to `Bytser-com_Essers_Mapping`; organization
-defaults to `bytser-com`. Repository variables `SONAR_HOST_URL`,
-`SONAR_PROJECT_KEY`, and optional `SONAR_ORGANIZATION` override these settings.
-The repository secret `SONAR_TOKEN` is required. Configure `Development` as the
-project's main branch in SonarQube Cloud and disable automatic analysis when
-using this CI-based analysis.
+The server is available at `https://sonar-essers.shystack.com` through Cloudflare
+Tunnel. Set repository variable `SONAR_HOST_URL` to that URL; there is no implicit
+SonarCloud fallback. Set `SONAR_PROJECT_KEY` to the key created on this server
+(default: `Bytser-com_Essers_Mapping`). Replace repository secret `SONAR_TOKEN`
+with a project analysis token generated on this instance. A SonarCloud token
+cannot authenticate to this server, and `SONAR_ORGANIZATION` is no longer used.
+Configure `Development` as the project's main branch. See the
+[setup guide](../../docs/SONARQUBE_SETUP.md) for project creation and the first run.
 
 The workflow pins and caches the signature-verified SonarScanner CLI. The cache
 is saved even when analysis fails its quality gate, so repeated scans can reuse
@@ -150,10 +152,10 @@ command to 30 seconds plus a 5-second termination grace period. This lets the
 official action try its fallback keyserver instead of waiting for many minutes.
 Signature verification is required; installation fails if it cannot be verified.
 
-The [Free plan](https://docs.sonarsource.com/sonarqube-cloud/administering-sonarcloud/managing-subscription/subscription-plans)
-supports the main-branch setup within its private-code and user limits. This
-repository already uses one shared project, so independent service scans must
-not publish partial results to that same key.
+[Community Build](https://docs.sonarsource.com/sonarqube-community-build/feature-comparison-table)
+supports main-branch analysis, but does not provide native pull-request analysis.
+This repository uses one shared project, so independent service scans must not
+publish partial results to that same key.
 
 The scan generates a complete coverage snapshot by rerunning the coverage tests
 for every implemented service at the same commit, including unchanged services.
@@ -171,7 +173,7 @@ result, which could belong to another commit. Only a failed `new_coverage`
 condition is advisory. Other failures, missing/invalid results, processing
 failures, API errors and timeouts still fail CI. The JSON gate response is saved
 as `test-results/sonarqube-quality-gate.json` in the reports artifact.
-Local CLI scans retain `sonar.qualitygate.wait=true` and enforce the hosted gate.
+Local CLI scans retain `sonar.qualitygate.wait=true` and enforce the server gate.
 
 The standalone scanner receives Runtime's compiled production/test classes and
 dependency JARs explicitly. A Maven `copy-dependencies` step copies the resolved
@@ -182,9 +184,10 @@ requiring a report from README-only placeholders.
 
 Use the free [SonarQube for IDE](https://www.sonarsource.com/products/sonarqube/ide/)
 extension (formerly SonarLint) for local feature-branch analysis, alongside the
-local test and coverage commands below. It can align rules with SonarQube Cloud
+local test and coverage commands below. It can align rules with this server
 using Connected Mode. The extension does not replace test coverage collection.
-A local CLI scan that publishes to Cloud is still subject to Cloud branch limits.
+Publish CLI analyses to this project only from `Development`, so feature work
+does not overwrite the shared main-branch result.
 
 `SonarQube Quality Gate` is a post-merge check on `Development`; do not require
 it as a PR status check. The four service CI gates above still protect PRs.

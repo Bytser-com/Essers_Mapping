@@ -66,7 +66,7 @@ class SonarGateTests(unittest.TestCase):
         self.assertIn('::warning::', output)
         self.assertIn('69.0%', output)
         self.assertIn('80%', output)
-        self.assertIn('hosted SonarCloud gate remains failed', output)
+        self.assertIn('SonarQube gate remains failed', output)
 
     def test_other_conditions_still_block_even_alongside_low_coverage(self):
         for metric in ('new_security_rating', 'new_reliability_rating', 'new_maintainability_rating',
@@ -135,6 +135,16 @@ class SonarGateTests(unittest.TestCase):
             wait.assert_called_once_with('https://sonarcloud.io', 'fake-token', 'task-123', 'project')
             self.assertEqual(json.loads(Path('test-results/sonarqube-quality-gate.json').read_text()), gate(COVERAGE))
 
+    def test_self_hosted_scan_uses_the_configured_server(self):
+        server = 'https://sonar-essers.shystack.com'
+        with workspace(), patch.dict(os.environ, {'SONAR_HOST_URL': server}), \
+                patch.object(sonar, 'wait_for_gate', return_value=gate(status='OK')) as wait, \
+                redirect_stdout(io.StringIO()):
+            metadata = Path('.scannerwork/report-task.txt')
+            metadata.write_text(metadata.read_text().replace('https://sonarcloud.io', server), encoding='utf-8')
+            self.assertEqual(sonar.main(), 0)
+            wait.assert_called_once_with(server, 'fake-token', 'task-123', 'project')
+
     def test_missing_or_mismatched_metadata_cannot_pass(self):
         with workspace(metadata=False), patch.object(sonar, 'wait_for_gate') as wait, redirect_stdout(io.StringIO()):
             self.assertEqual(sonar.main(), 1)
@@ -150,6 +160,14 @@ class SonarGateTests(unittest.TestCase):
                     patch.object(sonar, 'wait_for_gate') as wait, redirect_stdout(io.StringIO()):
                 self.assertEqual(sonar.main(), 1)
                 wait.assert_not_called()
+
+    def test_missing_server_does_not_fall_back_to_sonarcloud(self):
+        output = io.StringIO()
+        with workspace(), patch.object(sonar, 'wait_for_gate') as wait, redirect_stdout(output):
+            del os.environ['SONAR_HOST_URL']
+            self.assertEqual(sonar.main(), 1)
+            self.assertIn('SONAR_HOST_URL', output.getvalue())
+            wait.assert_not_called()
 
     def test_api_authentication_network_timeout_and_invalid_json_errors_block(self):
         errors = (HTTPError('https://sonarcloud.io', 401, 'Unauthorized', {}, None),
