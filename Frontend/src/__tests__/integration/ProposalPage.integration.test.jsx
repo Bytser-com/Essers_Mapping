@@ -10,6 +10,7 @@ import { useProposalStore } from '../../stores/proposalStore'
 const PROPOSAL = {
   klant: 'brunos',
   versie: 1,
+  proposalType: 'inbound',
   status: 'Klaar om na te kijken',
   geupload: '2026-10-30T10:00:00',
   mappings: [{ id: 'MP-001', bronveld: 'Klant/Nummer', doelveld: 'Klantnummer', zekerheid: 92, opmerking: '' }],
@@ -43,7 +44,7 @@ describe('ProposalPage integration', () => {
     renderPage()
 
     // Assert
-    expect(await screen.findByText('brunos · v1')).toBeInTheDocument()
+    expect(await screen.findByText('brunos · v1 · inbound')).toBeInTheDocument()
     expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/proposals?company=brunos'))
   })
 
@@ -100,7 +101,7 @@ describe('ProposalPage integration', () => {
 
     // Act
     renderPage()
-    expect(await screen.findByText('brunos · v1')).toBeInTheDocument()
+    expect(await screen.findByText('brunos · v1 · inbound')).toBeInTheDocument()
 
     const button = screen.getByRole('button', { name: 'Goedkeuren' })
     await userEvent.click(button)
@@ -115,7 +116,7 @@ describe('ProposalPage integration', () => {
     })
 
     expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining('/proposals?company=brunos&version=v1'),
+      expect.stringContaining('/proposals?company=brunos&version=v1&proposalType=inbound'),
       { method: 'POST' }
     )
   })
@@ -139,7 +140,7 @@ describe('ProposalPage integration', () => {
 
     // Act
     renderPage()
-    expect(await screen.findByText('brunos · v1')).toBeInTheDocument()
+    expect(await screen.findByText('brunos · v1 · inbound')).toBeInTheDocument()
 
     // Click delete button to open modal
     await userEvent.click(screen.getByRole('button', { name: 'Verwijderen' }))
@@ -155,7 +156,7 @@ describe('ProposalPage integration', () => {
     // Assert
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining('/proposals?company=brunos&version=v1'),
+        expect.stringContaining('/proposals?company=brunos&version=v1&proposalType=inbound'),
         {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
@@ -198,7 +199,7 @@ describe('ProposalPage integration', () => {
 
     // Act
     renderPage()
-    expect(await screen.findByText('brunos · v1')).toBeInTheDocument()
+    expect(await screen.findByText('brunos · v1 · inbound')).toBeInTheDocument()
 
     // Click delete button to open modal
     await userEvent.click(screen.getByRole('button', { name: 'Verwijderen' }))

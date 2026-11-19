@@ -140,11 +140,11 @@ test.describe('E2E - Proposals overview on Home', () => {
     }
   })
 
-  test('TC-57-06 "Openen" goes to the package of the customer and is disabled while the AI is busy', xrayTest('IT2627T06-132'), async ({ page }) => {
+  test('TC-57-06 "Openen" goes to the package of the customer and is always enabled', xrayTest('IT2627T06-132'), async ({ page }) => {
     await mockProposals(
       page,
       list(
-        proposal('Klant A', { status: 'AI_GENERATING', ai_status: 'RUNNING', can_open: false }),
+        proposal('Klant A', { status: 'AI_GENERATING', ai_status: 'RUNNING' }),
         proposal('Voorbeeldbedrijf B', { version: 2 }),
       ),
     )
@@ -153,7 +153,7 @@ test.describe('E2E - Proposals overview on Home', () => {
 
     await page.goto('/')
 
-    await expect(rowOf(page, 'Klant A').getByRole('button', { name: 'Openen' })).toBeDisabled()
+    await expect(rowOf(page, 'Klant A').getByRole('button', { name: 'Openen' })).toBeEnabled()
     await rowOf(page, 'Voorbeeldbedrijf B').getByRole('button', { name: 'Openen' }).click()
 
     // Only the address is checked: what that page shows belongs to another user story.
@@ -221,7 +221,7 @@ test.describe('E2E - Proposals overview on Home', () => {
     await expect(row.getByRole('cell').nth(1)).toHaveText('v1')
     await expect(row.getByRole('cell').nth(3)).toHaveText('AI maakt voorstel')
     await expect(row.getByRole('cell').nth(4)).toHaveText('Bezig')
-    await expect(row.getByRole('button', { name: 'Openen' })).toBeDisabled()
+    await expect(row.getByRole('button', { name: 'Openen' })).toBeEnabled()
     await expect(page.getByTestId('proposal-count')).toHaveText('2')
     expect(pageLoads).toBe(1)
   })

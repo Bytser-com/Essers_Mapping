@@ -12,6 +12,7 @@ const REVIEW_MAPPING = { id: 'MP-003', bronveld: null, doelveld: 'Leverdatum', z
 const PROPOSAL = {
     klant: 'brunos',
     versie: 1,
+    proposalType: 'inbound',
     status: 'Klaar om na te kijken',
     geupload: '2026-10-30T10:00:00',
     mappings: [MAPPING],
@@ -40,7 +41,7 @@ describe('ProposalPage', () => {
         renderPage()
 
         // Assert
-        expect(screen.getByText('brunos · v1')).toBeInTheDocument()
+        expect(screen.getByText('brunos · v1 · inbound')).toBeInTheDocument()
         expect(screen.getByText('Geüpload op 30/10/2026 om 10:00')).toBeInTheDocument()
     })
 

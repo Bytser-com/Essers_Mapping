@@ -89,7 +89,7 @@ describe('Home – proposals overview', () => {
     const row = (await screen.findByText('Ostavel', { selector: 'td' })).closest('tr') as HTMLElement
     expect(within(row).getByText('AI maakt voorstel')).toBeInTheDocument()
     expect(within(row).getByText('Bezig')).toBeInTheDocument()
-    expect(within(row).getByRole('button', { name: 'Openen' })).toBeDisabled()
+    expect(within(row).getByRole('button', { name: 'Openen' })).toBeEnabled()
     expect(screen.getByTestId('proposal-count')).toHaveTextContent('2')
   })
 
