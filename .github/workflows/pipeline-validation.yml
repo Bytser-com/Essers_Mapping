@@ -23,47 +23,62 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout repository
+        id: checkout
         uses: actions/checkout@v6
         with:
           persist-credentials: false
 
       - name: Setup Node.js
+        id: node
         uses: actions/setup-node@v6
         with:
           node-version: '24'
 
       - name: Setup Python
+        id: python
+        if: ${{ !cancelled() && steps.checkout.outcome == 'success' }}
         uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
       - name: Download actionlint 1.7.12
+        id: download
+        if: ${{ !cancelled() && steps.checkout.outcome == 'success' }}
         run: >-
           curl --fail --silent --show-error --location
           https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz
           --output "$RUNNER_TEMP/actionlint.tar.gz"
 
       - name: Verify the actionlint download
+        id: checksum
+        if: ${{ !cancelled() && steps.download.outcome == 'success' }}
         run: |
           printf '%s  %s\n' '8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8' "$RUNNER_TEMP/actionlint.tar.gz" | sha256sum --check
 
       - name: Extract actionlint
+        id: extract
+        if: ${{ !cancelled() && steps.checksum.outcome == 'success' }}
         run: tar -xzf "$RUNNER_TEMP/actionlint.tar.gz" -C "$RUNNER_TEMP" actionlint
 
       # v1.7.12 predates GitHub's queue property. Ignore only that parser error.
       - name: Validate workflow syntax and expressions
+        if: ${{ !cancelled() && steps.extract.outcome == 'success' }}
         run: >-
           "$RUNNER_TEMP/actionlint" -color
           -ignore '^unexpected key "queue" for "concurrency" section'
 
       - name: Test pipeline helpers and Sonar gate policy
+        if: ${{ !cancelled() && steps.python.outcome == 'success' }}
         run: python -m unittest discover -s Scripts/tests -p 'test_*.py'
 
       - name: Test trusted CI revision selection
+        if: ${{ !cancelled() && steps.node.outcome == 'success' }}
         run: node Scripts/tests/test_service_workflows.cjs
 
       - name: Check container smoke script syntax
+        if: ${{ !cancelled() && steps.checkout.outcome == 'success' }}
         run: bash -n Scripts/smoke-service-image.sh
 
       - name: Check Sonar GPG wrapper syntax
+        if: ${{ !cancelled() && steps.checkout.outcome == 'success' }}
         run: bash -n Scripts/sonar-gpg.sh
