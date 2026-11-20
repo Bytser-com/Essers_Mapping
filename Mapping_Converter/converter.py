@@ -7,6 +7,7 @@ from typing import Any, BinaryIO
 import openpyxl
 
 from models import MappingEntry, MappingPackage
+from sftp_service import save_mapping_package_to_sftp
 
 
 def _normalize_header(value: Any) -> str:
@@ -157,3 +158,29 @@ def convert_excel_to_json_file(excel_path: str | Path, output_json_path: str | P
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(package.model_dump_json(indent=2), encoding="utf-8")
     return package
+
+
+def convert_excel_to_sftp(
+    excel_source: str | Path | bytes | BinaryIO,
+    company: str,
+    version: str | int,
+    message_type: str,
+    user_created: str = "analist_a",
+    package_version: str | None = None,
+) -> tuple[MappingPackage, str]:
+    """Convert an Excel proposal and upload the resulting JSON mapping package to SFTP.
+
+    Returns:
+        tuple[MappingPackage, str]: The parsed mapping package and the remote SFTP path.
+    """
+    package = parse_mapping_excel(excel_source)
+    sftp_path = save_mapping_package_to_sftp(
+        package=package,
+        company=company,
+        version=version,
+        message_type=message_type,
+        user_created=user_created,
+        package_version=package_version,
+    )
+    return package, sftp_path
+
