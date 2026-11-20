@@ -179,7 +179,7 @@ describe('ProposalPage', () => {
         expect(useProposalStore.getState().fetchProposal).toHaveBeenCalledWith('brunos')
     })
 
-    it('shows the persistent rejection dialog when proposal status is RETURNED', () => {
+    it('shows the rejection banner above the fields when proposal status is RETURNED', () => {
         useProposalStore.setState({
             proposal: {
                 klant: 'Klant A',
@@ -205,6 +205,5 @@ describe('ProposalPage', () => {
         expect(screen.getByText('Conflict found in target fields')).toBeInTheDocument()
         expect(screen.getByText('Target field /Order/Id has multiple conflicting source paths')).toBeInTheDocument()
         expect(screen.getByText('Rule DIRECT is missing source path on row 3')).toBeInTheDocument()
-        expect(screen.getByText('Terug naar overzicht')).toBeInTheDocument()
     })
 })

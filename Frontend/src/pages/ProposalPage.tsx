@@ -360,11 +360,52 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
 
       {/* Action banner if review is required */}
       {hasReviewFields && (
-        <div className="flex items-center gap-2.5 px-3.5 py-2.5 border border-mid-grey rounded-small bg-white text-[13px]">
-          <span className="inline-flex justify-center items-center size-4.5 shrink-0 rounded-full bg-anthracite text-white text-[11px] font-bold" aria-hidden="true">
-            i
+        <div className="flex items-center gap-2.5 px-3.5 py-2.5 border border-red/40 rounded-small bg-[#fee2e2] text-[13px] text-anthracite">
+          <span className="inline-flex justify-center items-center size-4.5 shrink-0 rounded-full bg-red text-white text-[11px] font-bold" aria-hidden="true">
+            !
           </span>
           <span>Velden met REVIEW_REQUIRED kon de AI niet invullen. Pas ze aan in de Excel en upload die opnieuw.</span>
+        </div>
+      )}
+
+      {/* Rejection notice and findings if proposal was returned / rejected by AI */}
+      {(proposal.statusCode === "RETURNED" || proposal.status === "Teruggestuurd") && (
+        <div
+          role="alert"
+          className="flex flex-col gap-3 p-4.5 rounded-small border border-red/40 bg-[#fee2e2] text-anthracite shadow-xs"
+        >
+          <div className="flex items-start gap-3">
+            <img src={iconError} alt="" width={22} height={22} className="mt-0.5 shrink-0" />
+            <div className="flex flex-col gap-1 flex-1">
+              <h3 className="m-0 text-sm font-bold text-red">
+                Voorstel afgekeurd door AI-controle
+              </h3>
+              <p className="m-0 text-[13px] text-anthracite leading-relaxed">
+                {proposal.aiReview?.summary || "Dit voorstel is afgekeurd door de AI-kwaliteitscontrole en teruggestuurd voor aanpassingen."}
+              </p>
+            </div>
+          </div>
+
+          {proposal.aiReview?.findings && proposal.aiReview.findings.length > 0 && (
+            <div className="flex flex-col gap-2 pt-1 pl-8.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-red">
+                Gevonden inconsistenties en redenen van afkeuring:
+              </span>
+              <ul className="flex flex-col gap-2 m-0 p-0 list-none">
+                {proposal.aiReview.findings.map((finding, idx) => (
+                  <li
+                    key={idx}
+                    className="flex items-start gap-2.5 p-2.5 rounded bg-white/80 border border-red/25 text-xs text-anthracite leading-relaxed"
+                  >
+                    <span className="inline-flex items-center justify-center size-4 rounded-full bg-red text-white text-[10px] font-bold shrink-0 mt-0.5">
+                      {idx + 1}
+                    </span>
+                    <span className="font-medium">{finding}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
 
@@ -561,72 +602,6 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
               >
                 {isDeleting ? "Verwijderen…" : "Proceed"}
               </button>
-            </div>
-          </dialog>
-        </div>
-      )}
-
-      {(proposal.statusCode === "RETURNED" || proposal.status === "Teruggestuurd") && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-anthracite/60 backdrop-blur-xs">
-          <dialog
-            open
-            aria-labelledby="rejection-dialog-title"
-            className="static flex flex-col gap-5 w-160 max-w-[calc(100vw-32px)] m-0 p-7 rounded-large bg-[#fef2f2] border-2 border-red/40 shadow-xl"
-            onKeyDown={(e) => {
-              if (e.key === "Escape") {
-                e.preventDefault();
-              }
-            }}
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red/15 shrink-0">
-                <img src={iconError} alt="" width={24} height={24} />
-              </div>
-              <div>
-                <h2 id="rejection-dialog-title" className="m-0 font-title text-xl font-bold text-red">
-                  Voorstel afgekeurd door AI-controle
-                </h2>
-                <p className="m-0 text-xs text-grey">
-                  Dit voorstel heeft de status &quot;Teruggestuurd&quot; en kan niet verder worden verwerkt zonder aanpassingen.
-                </p>
-              </div>
-            </div>
-
-            {proposal.aiReview?.summary && (
-              <div className="p-3.5 bg-white/80 border border-red/20 rounded-small text-sm text-anthracite font-medium">
-                {proposal.aiReview.summary}
-              </div>
-            )}
-
-            <div className="flex flex-col gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-red">
-                Gevonden inconsistenties en redenen van afkeuring:
-              </span>
-              {proposal.aiReview?.findings && proposal.aiReview.findings.length > 0 ? (
-                <ul className="flex flex-col gap-2 max-h-72 overflow-y-auto pr-1">
-                  {proposal.aiReview.findings.map((finding, idx) => (
-                    <li
-                      key={idx}
-                      className="flex items-start gap-3 p-3 rounded-small bg-white/90 border border-red/25 text-sm text-anthracite shadow-xs"
-                    >
-                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-red text-white text-xs font-bold shrink-0 mt-0.5">
-                        {idx + 1}
-                      </span>
-                      <span className="font-normal leading-relaxed">{finding}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-anthracite p-3 bg-white/80 border border-red/20 rounded-small">
-                  {proposal.aiReview?.summary || "Dit voorstel is afgekeurd door de kwaliteitscontrole."}
-                </p>
-              )}
-            </div>
-
-            <div className="flex justify-end pt-2">
-              <Link to="/" className="btn">
-                Terug naar overzicht
-              </Link>
             </div>
           </dialog>
         </div>
