@@ -15,6 +15,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from routers import approve
 from scripts.config import cors_origins
 
 logging.basicConfig(level=logging.INFO)
@@ -26,6 +27,7 @@ _origins = cors_origins()
 if _origins:
     app.add_middleware(CORSMiddleware, allow_origins=_origins, allow_methods=['GET', 'POST'], allow_headers=['*'])
 
+app.include_router(approve.router)
 
 @app.get('/health')
 def health() -> dict:
