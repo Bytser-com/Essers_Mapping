@@ -1,15 +1,50 @@
-"""Mapping Converter API placeholder service."""
+"""Mapping Converter API with an Excel-only Gemini consistency review endpoint."""
 
-from fastapi import FastAPI
+from __future__ import annotations
 
-app = FastAPI(title="Mapping Converter Placeholder", version="1.0.0")
+import logging
+
+from fastapi import FastAPI, File, HTTPException, UploadFile
+
+from excel_review import InvalidWorkbook, read_mapping_proposal
+from gemini_review import ReviewUnavailable, review_with_gemini
+
+logger = logging.getLogger(__name__)
+app = FastAPI(title='Mapping Converter', version='1.1.0')
 
 
-@app.get("/health")
+@app.get('/health')
 def health():
-    return {"status": "ok", "service": "mapping-converter"}
+    return {'status': 'ok', 'service': 'mapping-converter'}
 
 
-@app.get("/")
+@app.get('/')
 def root():
-    return {"message": "Mapping Converter Service (placeholder)"}
+    return {'message': 'Mapping Converter Service (placeholder)'}
+
+
+@app.post('/review-excel')
+async def review_excel(file: UploadFile = File(...)) -> dict:
+    """Review uploaded Excel; return ACCEPTED/REJECTED, or an HTTP error if unavailable.
+
+    A technical AI failure must NOT be interpreted as an accepted workbook.
+    This endpoint is intentionally independent from SFTP and frontend logic.
+    """
+    if not (file.filename or '').lower().endswith('.xlsx'):
+        raise HTTPException(status_code=400, detail='Please upload a .xlsx workbook.')
+
+    # Read with an upper bound, not an unlimited UploadFile.read().
+    contents = await file.read(5 * 1024 * 1024 + 1)
+    try:
+        records = read_mapping_proposal(contents)
+    except InvalidWorkbook as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+
+    try:
+        return review_with_gemini(records)
+    except ReviewUnavailable as error:
+        logger.warning('Excel review unavailable: %s', error)
+        raise HTTPException(status_code=503, detail=str(error)) from error
+    except Exception as error:
+        logger.exception('Unexpected Excel AI review failure')
+        raise HTTPException(status_code=503, detail='Excel AI review temporarily unavailable.') from error
