@@ -52,6 +52,11 @@ on:
 
   workflow_dispatch:
     inputs:
+      target_scope:
+        description: "Deployment Scope (all = full cluster & workloads, runner-only = bootstrap self-hosted runner VM only)"
+        type: choice
+        options: [all, runner-only]
+        default: all
       terraform_action:
         description: "Terraform action"
         type: choice
@@ -86,6 +91,7 @@ jobs:
     uses: ./.github/workflows/terraform-infra.yml
     with:
       action: ${{ (github.event_name == 'pull_request' && 'plan') || (inputs.terraform_action) || 'apply' }}
+      target: ${{ inputs.target_scope == 'runner-only' && 'proxmox_virtual_environment_vm.basic_vm["pipeline_runner"]' || '' }}
     secrets: inherit
 
   # ----------------------------------------------------------------------------
@@ -98,6 +104,8 @@ jobs:
     uses: ./.github/workflows/ansible-infra.yml
     with:
       mode: ${{ (github.event_name == 'pull_request' && 'validate') || (inputs.ansible_mode) || 'apply' }}
+      limit: ${{ inputs.target_scope == 'runner-only' && 'pipeline-runner' || '' }}
+      tags: ${{ inputs.target_scope == 'runner-only' && 'runner' || '' }}
     secrets: inherit
 
   # ----------------------------------------------------------------------------
@@ -106,6 +114,7 @@ jobs:
   kubernetes:
     name: 3. Deploy Cluster Workloads
     needs: ansible
+    if: inputs.target_scope != 'runner-only'
     uses: ./.github/workflows/kubernetes-deploy.yml
     with:
       mode: ${{ (github.event_name == 'pull_request' && 'validate') || (inputs.kubernetes_mode) || 'apply' }}

@@ -7,6 +7,10 @@ on:
         description: "Terraform action (plan, apply, destroy)"
         type: string
         default: apply
+      target:
+        description: "Optional Terraform target resource"
+        type: string
+        default: ""
     outputs:
       has_changes:
         description: "Whether Terraform plan detected changes"
@@ -97,10 +101,13 @@ jobs:
         id: plan
         run: |
           ACTION="${{ inputs.action || github.event.inputs.action || 'apply' }}"
+          TARGET="${{ inputs.target || '' }}"
           PLAN_ARGS=()
           if [ "$ACTION" = "destroy" ]; then
             # Target Kubernetes cluster VMs only; never destroy the pipeline runner VM that is executing this workflow
             PLAN_ARGS+=("-destroy" "-target=proxmox_virtual_environment_vm.basic_vm[\"k8s_master\"]" "-target=proxmox_virtual_environment_vm.basic_vm[\"k8s_worker\"]")
+          elif [ -n "$TARGET" ]; then
+            PLAN_ARGS+=("-target=$TARGET")
           fi
 
           set +e
