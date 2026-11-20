@@ -411,7 +411,9 @@ class ProposalStore:
                 if s.exists(type_meta_path):
                     found_in_subdirs = True
                     try:
-                        result.append(_read_metadata(customer_dir, version_num, s.read_text(type_meta_path), proposal_type=type_dir))
+                        summary = _read_metadata(customer_dir, version_num, s.read_text(type_meta_path), proposal_type=type_dir)
+                        if summary is not None:
+                            result.append(summary)
                     except (OSError, ValueError, TypeError) as error:
                         logger.warning('Skipping proposal %s/%s/%s: %s', customer_dir, name, type_dir, error)
             if not found_in_subdirs:
@@ -419,22 +421,28 @@ class ProposalStore:
                     legacy_path = f'{customer_dir}/{name}/{METADATA_FILE}'
                     if not s.exists(legacy_path):
                         raise ValueError(f'{METADATA_FILE} is missing')
-                    result.append(_read_metadata(customer_dir, version_num, s.read_text(legacy_path)))
+                    summary = _read_metadata(customer_dir, version_num, s.read_text(legacy_path))
+                    if summary is not None:
+                        result.append(summary)
                 except (OSError, ValueError, TypeError) as error:
                     logger.warning('Skipping proposal %s/%s: %s', customer_dir, name, error)
         return result
 
 
-def _read_metadata(customer_folder: str, version: int, text: str, proposal_type: str = '') -> ProposalSummary:
+def _read_metadata(customer_folder: str, version: int, text: str, proposal_type: str = '') -> ProposalSummary | None:
     """Parse the proposal.json of one version folder. Raises ValueError when invalid."""
     data = json.loads(text)
     if not isinstance(data, dict):
         raise ValueError(f'{METADATA_FILE} must contain a JSON object')
 
+    raw_status = data.get('status')
+    if raw_status is None:
+        return None
+
     try:
-        status = ProposalStatus(data.get('status'))
+        status = ProposalStatus(raw_status)
     except ValueError:
-        raise ValueError(f'unknown status {data.get("status")!r}') from None
+        raise ValueError(f'unknown status {raw_status!r}') from None
     ai_value = data.get('ai_status')
     try:
         ai_status = AiStatus(ai_value) if ai_value else None

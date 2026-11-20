@@ -6,14 +6,11 @@ import be.essers.services.versioncontrol.domain.dto.ProposalFileDataDto;
 import be.essers.services.versioncontrol.domain.dto.ProposalFileDetailsDto;
 import be.essers.services.versioncontrol.service.ProposalStorageService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,8 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.URI;
-import java.time.Instant;
 import java.util.List;
 
 @RestController
@@ -171,35 +166,6 @@ public class ProposalController {
         ProposalFileDetailsDto details = proposalStorageService.overwriteProposalFile(
                 company, version, effectiveProposalType, fileBytes, null);
         return ResponseEntity.ok(details);
-    }
-
-    /**
-     * POST /proposals?company=vanroey&version=v3&proposalType=inbound
-     * POST /Proposals?company=vanroey&version=v3&proposal_type=inbound
-     *
-     * Approves a proposal. Currently returns HTTP 501 Not Implemented ("not implemented yet").
-     */
-    @PostMapping
-    public ResponseEntity<ProblemDetail> approveProposal(
-            @RequestParam String company,
-            @RequestParam String version,
-            @RequestParam(name = "proposalType", required = false) String proposalType,
-            @RequestParam(name = "proposal_type", required = false) String proposalTypeSnake
-    ) throws MissingServletRequestParameterException {
-        validateCompany(company);
-        validateVersion(version);
-        String effectiveProposalType = resolveProposalType(proposalType, proposalTypeSnake);
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.NOT_IMPLEMENTED,
-                "Approving proposal for company '" + company + "', version '" + version + "', and proposalType '" + effectiveProposalType + "' is not implemented yet"
-        );
-        problemDetail.setTitle("Not Implemented");
-        problemDetail.setType(URI.create("about:blank"));
-        problemDetail.setProperty("timestamp", Instant.now());
-        problemDetail.setProperty("company", company);
-        problemDetail.setProperty("version", version);
-        problemDetail.setProperty("proposalType", effectiveProposalType);
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(problemDetail);
     }
 
     /**

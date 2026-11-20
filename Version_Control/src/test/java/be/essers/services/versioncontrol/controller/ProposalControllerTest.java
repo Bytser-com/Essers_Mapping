@@ -30,7 +30,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -545,55 +544,6 @@ class ProposalControllerTest {
     }
 
     @Test
-    @DisplayName("POST /Proposals returns 501 Not Implemented with proposalType")
-    void approveProposal_returns501NotImplemented() throws Exception {
-        mockMvc.perform(post("/Proposals")
-                        .param("company", "vanroey")
-                        .param("version", "v3")
-                        .param("proposalType", "inbound"))
-                .andExpect(status().isNotImplemented())
-                .andExpect(jsonPath("$.status").value(501))
-                .andExpect(jsonPath("$.title").value("Not Implemented"))
-                .andExpect(jsonPath("$.detail").value("Approving proposal for company 'vanroey', version 'v3', and proposalType 'inbound' is not implemented yet"))
-                .andExpect(jsonPath("$.company").value("vanroey"))
-                .andExpect(jsonPath("$.version").value("v3"))
-                .andExpect(jsonPath("$.proposalType").value("inbound"));
-    }
-
-    @Test
-    @DisplayName("POST /proposals (lowercase) returns 501 Not Implemented")
-    void approveProposal_lowercase_returns501NotImplemented() throws Exception {
-        mockMvc.perform(post("/proposals")
-                        .param("company", "Google")
-                        .param("version", "v1")
-                        .param("proposalType", "outbound"))
-                .andExpect(status().isNotImplemented())
-                .andExpect(jsonPath("$.status").value(501))
-                .andExpect(jsonPath("$.detail").value("Approving proposal for company 'Google', version 'v1', and proposalType 'outbound' is not implemented yet"))
-                .andExpect(jsonPath("$.proposalType").value("outbound"));
-    }
-
-    @Test
-    @DisplayName("POST /Proposals returns 400 when missing proposalType parameter")
-    void approveProposal_missingProposalType_returns400() throws Exception {
-        mockMvc.perform(post("/Proposals")
-                        .param("company", "vanroey")
-                        .param("version", "v3"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.title").value("Missing Required Parameter"));
-    }
-
-    @Test
-    @DisplayName("POST /Proposals returns 400 when missing query parameter")
-    void approveProposal_missingParams_returns400() throws Exception {
-        mockMvc.perform(post("/Proposals")
-                        .param("company", "vanroey")
-                        .param("proposalType", "inbound"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.title").value("Missing Required Parameter"));
-    }
-
-    @Test
     @DisplayName("DELETE /Proposals with matching deleteCheck and proposalType returns 204 No Content")
     void deleteProposal_validRequest_returns204NoContent() throws Exception {
         mockMvc.perform(delete("/Proposals")
@@ -872,30 +822,6 @@ class ProposalControllerTest {
                         .param("proposalType", "123456789012345678901")
                         .contentType(MediaType.APPLICATION_OCTET_STREAM)
                         .content(new byte[]{1, 2, 3}))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"))
-                .andExpect(jsonPath("$.detail").value("Proposal type parameter must not exceed 20 characters"));
-    }
-
-    @Test
-    @DisplayName("POST /proposals returns 400 when company exceeds 20 characters")
-    void approveProposal_companyExceeds20Chars_returns400() throws Exception {
-        mockMvc.perform(post("/proposals")
-                        .param("company", "123456789012345678901")
-                        .param("version", "v1")
-                        .param("proposalType", "inbound"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.title").value("Invalid Request Parameter"))
-                .andExpect(jsonPath("$.detail").value("Company parameter must not exceed 20 characters"));
-    }
-
-    @Test
-    @DisplayName("POST /proposals returns 400 when proposalType exceeds 20 characters")
-    void approveProposal_proposalTypeExceeds20Chars_returns400() throws Exception {
-        mockMvc.perform(post("/proposals")
-                        .param("company", "vanroey")
-                        .param("version", "v1")
-                        .param("proposalType", "123456789012345678901"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.title").value("Invalid Request Parameter"))
                 .andExpect(jsonPath("$.detail").value("Proposal type parameter must not exceed 20 characters"));

@@ -215,7 +215,7 @@ function InterfaceUpload() {
       </section>
 
       {uploadError && (
-        <div role="alert" className="flex items-center gap-3 rounded-lg border border-[#1c1c1f] bg-white px-4 py-3">
+        <div role="alert" className="flex items-center gap-3 rounded-lg border border-[#1c1c1f] bg-[#fee2e2] px-4 py-3">
           <img src={iconError} alt="" width={18} height={18} />
           <div className="flex flex-col gap-[2px]">
             {uploadError === 'customer' ? (

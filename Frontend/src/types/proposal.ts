@@ -6,10 +6,19 @@ export type Mapping = {
   opmerking: string | null;
 };
 
+export type AiReview = {
+  decision?: string;
+  summary?: string;
+  findings?: string[];
+  checked_mappings?: number;
+};
+
 export type Proposal = {
   klant: string;
   versie: number;
   status: string;
+  /** Raw backend status code (e.g. "AI_CHECKING_REVIEW"); use this for logic, `status` is the Dutch label. */
+  statusCode?: string | undefined;
   proposalType?: string | null;
   geupload: string;
   uploadDate?: string | null;
@@ -18,4 +27,5 @@ export type Proposal = {
   updatedTime?: string | null;
   createdBy?: string | null;
   mappings: Mapping[];
+  aiReview?: AiReview | null;
 };

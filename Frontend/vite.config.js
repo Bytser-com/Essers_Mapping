@@ -22,6 +22,10 @@ export default defineConfig({
         target: 'http://localhost:8085',
         rewrite: (path) => path.replace(/^\/api\/version-control/, ''),
       },
+            '/api/converter': {
+        target: 'http://localhost:8001',
+        rewrite: (path) => path.replace(/^\/api\/converter/, ''),
+      },
     },
   },
   test: {
