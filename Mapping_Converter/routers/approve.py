@@ -59,26 +59,25 @@ def trigger_ai_review(storage: Storage, company: str, version: str, proposal_typ
             filename = meta.get('filename')
             folder = location.folder
             if filename and s.exists(f'{folder}/{filename}'):
-                if hasattr(s, 'read_bytes'):
-                    contents = s.read_bytes(f'{folder}/{filename}')
-                elif hasattr(s, '_path'):
-                    contents = s._path(f'{folder}/{filename}').read_bytes()
-                elif hasattr(s, 'client'):
-                    with s.client.open(s._path(f'{folder}/{filename}'), 'rb') as h:
-                        contents = h.read()
+                contents = s.read_bytes(f'{folder}/{filename}')
 
         if contents is None:
             import sftp_service
             contents, _ = sftp_service.download_proposal_excel_from_sftp(company, version, proposal_type)
 
         review_result = run_review(contents)
-        logger.info('AI review completed for %s/%s/%s: %s', company, version, proposal_type, review_result.get('decision'))
+        decision = review_result.get('decision', 'ACCEPTED')
+        logger.info('AI review completed for %s/%s/%s: %s', company, version, proposal_type, decision)
 
         with storage.session() as s:
             location = find_proposal(s, company, version, proposal_type)
             meta = read_metadata(s, location)
             meta['ai_review'] = review_result
-            meta['ai_status'] = 'COMPLETED' if review_result.get('decision') == 'ACCEPTED' else 'FAILED'
+            if decision == 'REJECTED':
+                meta['status'] = 'RETURNED'
+                meta['ai_status'] = 'FAILED'
+            else:
+                meta['ai_status'] = 'COMPLETED'
             write_metadata(s, location, meta)
         return review_result
 

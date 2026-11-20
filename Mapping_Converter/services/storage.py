@@ -39,6 +39,7 @@ class StorageSession(Protocol):
     def make_dirs(self, path: str) -> None: ...               # like mkdir -p
     def make_dir(self, path: str) -> bool: ...                # False if it already exists
     def read_text(self, path: str) -> str: ...
+    def read_bytes(self, path: str) -> bytes: ...
     def write_text(self, path: str, text: str) -> None: ...   # atomic: never half-written
     def upload_file(self, local_path: Path, path: str) -> None: ...
 
@@ -131,6 +132,9 @@ class LocalStorage:
 
     def read_text(self, path: str) -> str:
         return self._path(path).read_text(encoding='utf-8-sig')  # -sig: tolerate a Windows BOM
+
+    def read_bytes(self, path: str) -> bytes:
+        return self._path(path).read_bytes()
 
     def write_text(self, path: str, text: str) -> None:
         target = self._path(path)
@@ -247,6 +251,10 @@ class _SftpSession:
     def read_text(self, path: str) -> str:
         with self.client.open(self._path(path), 'rb') as handle:
             return handle.read().decode('utf-8-sig')
+
+    def read_bytes(self, path: str) -> bytes:
+        with self.client.open(self._path(path), 'rb') as handle:
+            return handle.read()
 
     def write_text(self, path: str, text: str) -> None:
         self._write_atomic(self._path(path), lambda temp: self._put_bytes(temp, text.encode('utf-8')))

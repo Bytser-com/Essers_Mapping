@@ -223,3 +223,42 @@ def test_alias_endpoint_review(monkeypatch):
 
 def test_existing_endpoints():
     assert CLIENT.get("/health").json()["status"] == "ok"
+
+
+def test_review_with_gemini_retries_transient_503(monkeypatch):
+    import json
+
+    from google.genai import errors
+
+    from scripts.gemini_review import review_with_gemini
+
+    attempts = 0
+
+    class FakeResponse:
+        text = json.dumps({"decision": "ACCEPTED", "summary": "All good", "findings": []})
+
+    class FakeModels:
+        def generate_content(self, **kwargs):
+            nonlocal attempts
+            attempts += 1
+            if attempts == 1:
+                # First attempt fails with 503
+                raise errors.ServerError(503, {"error": {"code": 503, "message": "High demand"}}, None)
+            return FakeResponse()
+
+    class FakeClient:
+        models = FakeModels()
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr("time.sleep", lambda s: None)
+    monkeypatch.setenv("GEMINI_API_KEY", "fake-key")
+    monkeypatch.setenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
+    monkeypatch.setenv("GEMINI_MAX_ATTEMPTS", "3")
+    monkeypatch.setattr("google.genai.Client", lambda **kwargs: FakeClient())
+
+    result = review_with_gemini([{"Target field name": "A"}])
+    assert result["decision"] == "ACCEPTED"
+    assert attempts == 2
+
