@@ -23,6 +23,9 @@ function MaxLengthHint({ id, value, max }: Readonly<MaxLengthHintProps>) {
   )
 }
 
+// Available proposal types for upload
+const PROPOSAL_TYPE_OPTIONS = ['Inbound', 'Outbound'] as const
+
 // Upload card on the Home page (user story 60)
 function InterfaceUpload() {
   // Sends all chosen files of one customer to the backend in one request (see stores/homeStore.ts)
@@ -36,9 +39,8 @@ function InterfaceUpload() {
   // Customer name shown in the success message after a successful upload
   const [uploadedFor, setUploadedFor] = useState<string | null>(null)
 
-  // Longest customer name and proposal type that can be entered (also checked by the backend)
+  // Longest customer name that can be entered (also checked by the backend)
   const MAX_CUSTOMER_LENGTH = 20
-  const MAX_TYPE_LENGTH = 20
 
   // New files are added to the list, so files can also be chosen one by one
   function chooseFiles(chosen: FileList | null) {
@@ -125,19 +127,34 @@ function InterfaceUpload() {
           <label htmlFor="proposal-type" className="text-[12px] font-medium text-[#6b6b73]">
             Type
           </label>
-          <input
-            id="proposal-type"
-            type="text"
-            maxLength={MAX_TYPE_LENGTH}
-            aria-describedby="proposal-type-max"
-            value={proposalType}
-            onChange={(event) => {
-              setProposalType(event.target.value)
-              setUploadError(null)
-            }}
-            className="w-full rounded-lg border border-[#e3e3e8] bg-white px-3 py-[10px] text-[13px]"
-          />
-          <MaxLengthHint id="proposal-type-max" value={proposalType} max={MAX_TYPE_LENGTH} />
+          <div className="relative">
+            <select
+              id="proposal-type"
+              name="proposal-type"
+              value={proposalType}
+              onChange={(event) => {
+                setProposalType(event.target.value)
+                setUploadError(null)
+              }}
+              className="w-full cursor-pointer appearance-none rounded-lg border border-[#e3e3e8] bg-white px-3 py-[10px] pr-8 text-[13px] text-[#1c1c1f] focus:border-[#1c1c1f] focus:outline-none"
+            >
+              <option value="">Selecteer type</option>
+              {PROPOSAL_TYPE_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-[#6b6b73]">
+              <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20" aria-hidden="true">
+                <path
+                  fillRule="evenodd"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+          </div>
         </div>
 
         <div
