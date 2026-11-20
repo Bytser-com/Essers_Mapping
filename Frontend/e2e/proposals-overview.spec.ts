@@ -212,7 +212,7 @@ test.describe('E2E - Proposals overview on Home', () => {
     await expect(rowOf(page, 'Klant B')).toBeVisible()
 
     await page.getByLabel('Klantnaam').fill('Klant A')
-    await page.getByLabel('Type').fill('inbound')
+    await page.getByLabel('Type').selectOption('Inbound')
     await page.getByTestId('file-input').setInputFiles({ name: 'order.xml', mimeType: 'text/xml', buffer: Buffer.from('<root />') })
     await page.getByRole('button', { name: 'Uploaden' }).click()
 
