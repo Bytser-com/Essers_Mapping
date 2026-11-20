@@ -77,7 +77,8 @@ def trigger_ai_review(storage: Storage, company: str, version: str, proposal_typ
                 meta['status'] = 'RETURNED'
                 meta['ai_status'] = 'FAILED'
             else:
-                meta['ai_status'] = 'COMPLETED'
+                meta['status'] = None
+                meta['ai_status'] = None
             write_metadata(s, location, meta)
         return review_result
 

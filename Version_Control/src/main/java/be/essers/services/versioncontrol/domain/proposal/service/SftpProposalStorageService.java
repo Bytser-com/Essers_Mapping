@@ -767,6 +767,9 @@ public class SftpProposalStorageService implements ProposalStorageService {
                     String typePath = versionPath + "/" + typeName;
                     SftpClient.DirEntry[] typeEntries = listVersionEntries(typePath);
                     ProposalMetadata metadata = readMetadata(typePath, typeEntries);
+                    if (metadata == null || metadata.status() == null) {
+                        continue;
+                    }
                     String problem = findMetadataProblem(metadata);
                     if (problem != null) {
                         log.warn("Skipping proposal {}: {}", typePath, problem);
@@ -777,6 +780,9 @@ public class SftpProposalStorageService implements ProposalStorageService {
                 }
             } else {
                 ProposalMetadata metadata = readMetadata(versionPath, versionEntries);
+                if (metadata == null || metadata.status() == null) {
+                    continue;
+                }
                 String problem = findMetadataProblem(metadata);
                 if (problem != null) {
                     log.warn("Skipping proposal {}: {}", versionPath, problem);
