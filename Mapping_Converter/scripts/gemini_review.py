@@ -3,12 +3,9 @@
 from __future__ import annotations
 
 import json
-import os
-from pathlib import Path
 
-from excel_review import simple_stats
-
-PROMPT_PATH = Path(__file__).with_name('review_prompt.txt')
+from .config import PROMPT_PATH, load_review_settings
+from .excel_review import simple_stats
 
 RESPONSE_SCHEMA = {
     'type': 'object',
@@ -28,25 +25,22 @@ class ReviewUnavailable(RuntimeError):
 
 def review_with_gemini(records: list[dict]) -> dict:
     """Send ONLY Excel-derived mapping fields to Gemini and validate its response."""
-    from dotenv import load_dotenv
     from google import genai
     from google.genai import types
 
-    # Load the shared .env from the repository root.
-    ROOT = Path(__file__).resolve().parent.parent
-    load_dotenv(ROOT / '.env')
-
-    api_key = os.getenv('GEMINI_API_KEY', '').strip()
-    model = (os.getenv('GEMINI_REVIEW_MODEL') or os.getenv('GEMINI_MODEL') or '').strip()
-    if not api_key or not model:
+    settings = load_review_settings()
+    if not settings.api_key or not settings.model:
         raise ReviewUnavailable('Configure GEMINI_API_KEY and GEMINI_REVIEW_MODEL (or GEMINI_MODEL).')
 
     payload = json.dumps({'summary': simple_stats(records), 'mappings': records}, ensure_ascii=False)
     prompt = PROMPT_PATH.read_text(encoding='utf-8')
-    client = genai.Client(api_key=api_key, http_options=types.HttpOptions(timeout=60000))
+    client = genai.Client(
+        api_key=settings.api_key,
+        http_options=types.HttpOptions(timeout=settings.timeout_ms),
+    )
     try:
         response = client.models.generate_content(
-            model=model,
+            model=settings.model,
             contents=[prompt, payload],
             config=types.GenerateContentConfig(
                 temperature=0,

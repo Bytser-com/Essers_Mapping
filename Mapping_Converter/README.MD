@@ -1,61 +1,56 @@
-# Mapping Converter — Excel consistency check (prototype)
+# Mapping Converter — Excel consistency review (prototype)
 
-This update adds an **Excel-only Gemini consistency check**. It does not yet
-convert or execute mappings, write to SFTP, or modify the frontend.
+This service accepts a mapping workbook and uses Gemini to assess obvious
+internal inconsistencies. It does **not** execute mappings, access historical
+XML, write to SFTP, or intercept frontend uploads yet.
 
-## Setup
+## Architecture
 
-From `Mapping_Converter/`:
+- `api.py` — FastAPI routes, upload validation and HTTP responses.
+- `scripts/pipeline.py` — Coordinates Excel extraction followed by AI review.
+- `scripts/excel_review.py` — Extracts mapping fields from uploaded XLSX files.
+- `scripts/gemini_review.py` — Calls Gemini and validates its JSON response.
+- `scripts/config.py` — Reads settings from the shared **repository-root `.env`**
+  locally (environment variables override it).
+- `review_prompt.txt` — Instructions for Gemini's accept/reject decision.
+- `tests/` — Local endpoint and extraction tests; no live Gemini calls.
+
+The public API and response format are unchanged by this refactor.
+
+## Setup (from `Mapping_Converter/`)
 
 ```bash
 python -m pip install -r requirements.txt
 ```
 
-Copy `.env.example` to `.env` and configure `GEMINI_API_KEY` and
-`GEMINI_REVIEW_MODEL` (a valid model for your API access).
-
-Start:
+Store `GEMINI_API_KEY` and `GEMINI_REVIEW_MODEL` (or `GEMINI_MODEL`) in the
+**Essers_Mapping repository-root `.env`**, or provide them as environment
+variables. `.env.example` lists the variables; do not commit API keys.
 
 ```bash
 python -m uvicorn api:app --reload --port 8001
 ```
 
-Swagger UI: <http://localhost:8001/docs>
+Swagger: http://localhost:8001/docs
 
-## Review an uploaded Excel file
+## Review an Excel file
 
 ```bash
 curl -F "file=@mapping_package.xlsx" http://localhost:8001/review-excel
 ```
 
-The frontend/Java backend can send its uploaded `.xlsx` to this endpoint as a
-multipart request (`file` field) **before** accepting or publishing a package.
-Only publish/process the workbook if `decision == "ACCEPTED"`.
+A successful review request returns HTTP 200 and a JSON `decision` of
+`ACCEPTED` or `REJECTED`, along with `summary`, `findings`, and
+`checked_mappings`. HTTP 400/422 means an invalid upload/workbook; HTTP 503
+means the AI review is unavailable. **Neither is an acceptance.**
 
-Example response:
+The frontend/Java service must integrate this endpoint before publishing
+any reviewed package. Only a result with `decision == "ACCEPTED"` should
+proceed; the service does not currently implement that integration.
 
-```json
-{
-  "decision": "REJECTED",
-  "summary": "A direct mapping is missing a source.",
-  "findings": ["Row 3: DIRECT has no source path."],
-  "checked_mappings": 96
-}
-```
-
-- `200` + `ACCEPTED`: AI found no obvious inconsistencies.
-- `200` + `REJECTED`: AI found clear problems; show the reasons to the user.
-- `400/422`: upload or workbook structure invalid; do not accept.
-- `503`: missing configuration, AI unavailable, or invalid model response;
-  **do not accept** and optionally offer a retry.
-
-The model only receives selected columns from the **uploaded Excel file**;
-no historical XML pairs, Gemini proposal prompt, or SFTP files are read.
-It is still a **cloud AI call**: ensure uploaded workbooks may legally be sent
-to the selected provider (anonymize sensitive data where necessary).
-
-Review is a lightweight *consistency* check, not a proof of correct business
-mappings. The output should not be treated as a substitute for specialist signoff.
+Only Excel-derived mapping fields are sent to Gemini. A human specialist
+still needs to verify business correctness. Confirm that uploaded workbook
+content is permitted to leave your environment for the AI provider.
 
 ## Tests
 
@@ -63,5 +58,3 @@ mappings. The output should not be treated as a substitute for specialist signof
 python -m pytest -q
 python -m ruff check .
 ```
-
-No live Gemini request is made by the unit tests.

@@ -6,8 +6,9 @@ import logging
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 
-from excel_review import InvalidWorkbook, read_mapping_proposal
-from gemini_review import ReviewUnavailable, review_with_gemini
+from scripts.excel_review import InvalidWorkbook
+from scripts.gemini_review import ReviewUnavailable
+from scripts.pipeline import run_review
 
 logger = logging.getLogger(__name__)
 app = FastAPI(title='Mapping Converter', version='1.1.0')
@@ -36,12 +37,9 @@ async def review_excel(file: UploadFile = File(...)) -> dict:
     # Read with an upper bound, not an unlimited UploadFile.read().
     contents = await file.read(5 * 1024 * 1024 + 1)
     try:
-        records = read_mapping_proposal(contents)
+        return run_review(contents)
     except InvalidWorkbook as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
-
-    try:
-        return review_with_gemini(records)
     except ReviewUnavailable as error:
         logger.warning('Excel review unavailable: %s', error)
         raise HTTPException(status_code=503, detail=str(error)) from error

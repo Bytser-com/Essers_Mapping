@@ -6,7 +6,7 @@ import zipfile
 from fastapi.testclient import TestClient
 
 import api
-from excel_review import InvalidWorkbook, read_mapping_proposal
+from scripts.excel_review import InvalidWorkbook, read_mapping_proposal
 
 CLIENT = TestClient(api.app)
 MAIN_NS = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'
@@ -54,7 +54,7 @@ def test_corrupt_workbook_rejected():
 
 
 def test_api_accepts_review(monkeypatch):
-    monkeypatch.setattr(api, 'review_with_gemini', lambda rows: {
+    monkeypatch.setattr('scripts.pipeline.review_with_gemini', lambda rows: {
         'decision': 'ACCEPTED', 'summary': 'Looks consistent',
         'findings': [], 'checked_mappings': len(rows),
     })
@@ -67,7 +67,7 @@ def test_api_accepts_review(monkeypatch):
 
 
 def test_api_returns_rejection(monkeypatch):
-    monkeypatch.setattr(api, 'review_with_gemini', lambda rows: {
+    monkeypatch.setattr('scripts.pipeline.review_with_gemini', lambda rows: {
         'decision': 'REJECTED', 'summary': 'Contradictory rule',
         'findings': ['Row 3: DIRECT mapping has no source'], 'checked_mappings': len(rows),
     })
@@ -87,10 +87,10 @@ def test_api_corrupt_file():
 
 
 def test_api_fail_closed(monkeypatch):
-    from gemini_review import ReviewUnavailable
+    from scripts.gemini_review import ReviewUnavailable
     def unavailable(_):
         raise ReviewUnavailable('not configured')
-    monkeypatch.setattr(api, 'review_with_gemini', unavailable)
+    monkeypatch.setattr('scripts.pipeline.review_with_gemini', unavailable)
     response = CLIENT.post('/review-excel', files={'file': ('proposal.xlsx', example_xlsx(), 'application/octet-stream')})
     assert response.status_code == 503
 
