@@ -17,6 +17,7 @@ from pathlib import Path
 
 from .config import (
     HISTORICAL_DIR,
+    OUTPUT_DIR,
     PROMPT_PATH,
     ROOT,
     RUNS_DIR,
@@ -280,7 +281,7 @@ def run_mapping(settings: MappingSettings) -> MappingResult:
     run_dir = RUNS_DIR / name
     checkpoints = run_dir / 'checkpoints'
     tracker = ExperimentTracker(
-        root=ROOT, run_dir=run_dir, job_signature=signature,
+        root=ROOT, run_dir=run_dir, output_dir=OUTPUT_DIR, job_signature=signature,
         started_monotonic=started, started_utc=started_utc, settings={
             'model': model,
             'dataset_version': dataset_hash[:12],

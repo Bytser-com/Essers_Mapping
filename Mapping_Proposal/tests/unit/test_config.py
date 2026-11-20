@@ -21,3 +21,20 @@ def test_deployed_key_takes_precedence_over_personal_dotenv(tmp_path, monkeypatc
     monkeypatch.setenv('GEMINI_API_KEY', 'deployment-test-key')
 
     assert config.load_settings().gemini_api_key == 'deployment-test-key'
+
+
+def test_output_dir_uses_env_variable(tmp_path, monkeypatch):
+    custom_output = tmp_path / 'custom_output'
+    monkeypatch.setattr(config, 'ROOT', tmp_path)
+    monkeypatch.setattr(config, '_env_loaded', False)
+    monkeypatch.setenv('OUTPUT_DIR', str(custom_output))
+
+    assert config._resolve_output_dir() == custom_output
+
+
+def test_output_dir_falls_back_to_root_output_when_missing(tmp_path, monkeypatch):
+    monkeypatch.setattr(config, 'ROOT', tmp_path)
+    monkeypatch.setattr(config, '_env_loaded', False)
+    monkeypatch.delenv('OUTPUT_DIR', raising=False)
+
+    assert config._resolve_output_dir() == tmp_path / 'output'
