@@ -68,6 +68,11 @@ spec:
           env:
             - name: SERVICE_NAME
               value: "mapping-converter"
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: gemini-api
+                  key: GEMINI_API_KEY
             - name: SFTP_SHARED_PASSWORD
               valueFrom:
                 secretKeyRef:

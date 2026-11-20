@@ -34,7 +34,9 @@ def test_convert_valid_excel_upload():
     wb.save(buf)
     buf.seek(0)
 
-    files = {"file": ("proposal.xlsx", buf.getvalue(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")}
+    files = {
+        "file": ("proposal.xlsx", buf.getvalue(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    }
     response = client.post("/convert", files=files)
 
     assert response.status_code == 200
@@ -46,12 +48,20 @@ def test_convert_valid_excel_upload():
 
 
 def test_convert_sample_nouryon_proposal():
-    proposal_path = Path(__file__).resolve().parents[2] / "data/shared-sftp/Proposals/nouryon/v4/MProposal-Nouryon_V4.xlsx"
+    proposal_path = (
+        Path(__file__).resolve().parents[2] / "data/shared-sftp/Proposals/nouryon/v4/MProposal-Nouryon_V4.xlsx"
+    )
     if not proposal_path.exists():
         return
 
     with open(proposal_path, "rb") as f:
-        files = {"file": ("MProposal-Nouryon_V4.xlsx", f.read(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")}
+        files = {
+            "file": (
+                "MProposal-Nouryon_V4.xlsx",
+                f.read(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            )
+        }
         response = client.post("/convert", files=files)
 
     assert response.status_code == 200
@@ -74,7 +84,13 @@ def test_convert_rejects_empty_file():
 
 
 def test_convert_rejects_corrupted_excel():
-    files = {"file": ("corrupt.xlsx", b"not a zip or excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")}
+    files = {
+        "file": (
+            "corrupt.xlsx",
+            b"not a zip or excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+    }
     response = client.post("/convert", files=files)
     assert response.status_code == 400
     assert "Failed to parse Excel workbook" in response.json()["detail"]
@@ -91,7 +107,9 @@ def test_convert_and_upload_success():
     wb.save(buf)
     buf.seek(0)
 
-    files = {"file": ("proposal.xlsx", buf.getvalue(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")}
+    files = {
+        "file": ("proposal.xlsx", buf.getvalue(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    }
     data = {
         "company": "Nouryon",
         "version": "v4",
@@ -100,7 +118,9 @@ def test_convert_and_upload_success():
         "package_version": "1.0.0",
     }
 
-    with patch("api.save_mapping_package_to_sftp", return_value="/Packages/nouryon/v4/outbound/MPackage.json") as mock_save:
+    with patch(
+        "api.save_mapping_package_to_sftp", return_value="/Packages/nouryon/v4/outbound/MPackage.json"
+    ) as mock_save:
         response = client.post("/convert-and-upload", files=files, data=data)
 
     assert response.status_code == 201
@@ -120,7 +140,8 @@ def test_convert_and_upload_validation_errors():
     files = {"file": ("test.xlsx", b"some bytes", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")}
 
     # Missing company
-    res = client.post("/convert-and-upload", files=files, data={"company": "   ", "version": "v1", "message_type": "inbound"})
+    res = client.post(
+        "/convert-and-upload", files=files, data={"company": "   ", "version": "v1", "message_type": "inbound"}
+    )
     assert res.status_code == 400
     assert "company" in res.json()["detail"].lower()
-

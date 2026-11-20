@@ -12,7 +12,9 @@ from models import MappingEntry, MappingPackage
 
 
 def test_parse_mapping_excel_from_nouryon_proposal():
-    proposal_path = Path(__file__).resolve().parents[2] / "data/shared-sftp/Proposals/nouryon/v4/MProposal-Nouryon_V4.xlsx"
+    proposal_path = (
+        Path(__file__).resolve().parents[2] / "data/shared-sftp/Proposals/nouryon/v4/MProposal-Nouryon_V4.xlsx"
+    )
     if not proposal_path.exists():
         pytest.skip(f"Sample proposal not found at {proposal_path}")
 
@@ -30,7 +32,9 @@ def test_parse_mapping_excel_from_nouryon_proposal():
 
 
 def test_parse_mapping_excel_from_bytes():
-    proposal_path = Path(__file__).resolve().parents[2] / "data/shared-sftp/Proposals/nouryon/v4/MProposal-Nouryon_V4.xlsx"
+    proposal_path = (
+        Path(__file__).resolve().parents[2] / "data/shared-sftp/Proposals/nouryon/v4/MProposal-Nouryon_V4.xlsx"
+    )
     if not proposal_path.exists():
         pytest.skip(f"Sample proposal not found at {proposal_path}")
 
@@ -48,39 +52,47 @@ def test_parse_mapping_excel_with_in_memory_workbook():
     ws.append(["TARGET", "", "SOURCE", ""])
 
     # Column header row 2
-    ws.append([
-        "Target segment path",
-        "Target field name",
-        "Source full path",
-        "Extra Notes",
-    ])
+    ws.append(
+        [
+            "Target segment path",
+            "Target field name",
+            "Source full path",
+            "Extra Notes",
+        ]
+    )
 
     # Row 3: Standard mapping
-    ws.append([
-        "/TARGET/HDR",
-        "DOC_ID",
-        "/SOURCE/HEADER/ID",
-        "ok",
-    ])
+    ws.append(
+        [
+            "/TARGET/HDR",
+            "DOC_ID",
+            "/SOURCE/HEADER/ID",
+            "ok",
+        ]
+    )
 
     # Row 4: Source segment & field combination instead of full path
-    ws.append([
-        "/TARGET/ITEM",
-        "QTY",
-        "",
-        "no full path",
-    ])
+    ws.append(
+        [
+            "/TARGET/ITEM",
+            "QTY",
+            "",
+            "no full path",
+        ]
+    )
 
     # Row 5: Empty row with styling/spaces only
     ws.append([None, "  ", None, None])
 
     # Row 6: Another valid mapping
-    ws.append([
-        "/TARGET/FOOTER",
-        "CHECKSUM",
-        "/SOURCE/FOOTER/HASH",
-        "footer",
-    ])
+    ws.append(
+        [
+            "/TARGET/FOOTER",
+            "CHECKSUM",
+            "/SOURCE/FOOTER/HASH",
+            "footer",
+        ]
+    )
 
     buf = io.BytesIO()
     wb.save(buf)
@@ -155,7 +167,9 @@ def test_convert_excel_to_sftp():
     wb.save(buf)
     buf.seek(0)
 
-    with patch("converter.save_mapping_package_to_sftp", return_value="/Packages/nouryon/v4/outbound/MPackage.json") as mock_save:
+    with patch(
+        "converter.save_mapping_package_to_sftp", return_value="/Packages/nouryon/v4/outbound/MPackage.json"
+    ) as mock_save:
         package, sftp_path = convert_excel_to_sftp(
             excel_source=buf.getvalue(),
             company="Nouryon",
@@ -168,4 +182,3 @@ def test_convert_excel_to_sftp():
     assert len(package.mappings) == 1
     assert sftp_path == "/Packages/nouryon/v4/outbound/MPackage.json"
     assert mock_save.called
-

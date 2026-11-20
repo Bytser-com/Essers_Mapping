@@ -7,8 +7,10 @@ from unittest.mock import MagicMock, patch
 from models import MappingEntry, MappingPackage
 from sftp_service import (
     SftpConfig,
+    SftpFileNotFoundError,
     _sftp_makedirs,
     build_package_sftp_path,
+    download_proposal_excel_from_sftp,
     format_semver,
     normalize_slug,
     normalize_version,
@@ -105,10 +107,11 @@ def test_save_json_to_sftp_with_mocked_paramiko():
     mock_file = MagicMock()
     mock_sftp.open.return_value.__enter__.return_value = mock_file
 
-    with patch("paramiko.Transport", return_value=mock_transport), \
-         patch("paramiko.SFTPClient.from_transport", return_value=mock_sftp), \
-         patch("sftp_service._sftp_makedirs"):
-
+    with (
+        patch("paramiko.Transport", return_value=mock_transport),
+        patch("paramiko.SFTPClient.from_transport", return_value=mock_sftp),
+        patch("sftp_service._sftp_makedirs"),
+    ):
         path = "/Packages/nouryon/v4/outbound/MPackage.json"
         result = save_json_to_sftp('{"mappings": []}', path, config=config)
 
@@ -118,13 +121,11 @@ def test_save_json_to_sftp_with_mocked_paramiko():
 
 
 def test_save_mapping_package_to_sftp_attaches_metadata():
-    package = MappingPackage(
-        mappings=[
-            MappingEntry(source_path="/A/B", target_path="/C/D")
-        ]
-    )
+    package = MappingPackage(mappings=[MappingEntry(source_path="/A/B", target_path="/C/D")])
 
-    with patch("sftp_service.save_json_to_sftp", return_value="/Packages/nouryon/v1/inbound/MPackage.json") as mock_save:
+    with patch(
+        "sftp_service.save_json_to_sftp", return_value="/Packages/nouryon/v1/inbound/MPackage.json"
+    ) as mock_save:
         res = save_mapping_package_to_sftp(
             package=package,
             company="Nouryon",
@@ -142,3 +143,94 @@ def test_save_mapping_package_to_sftp_attaches_metadata():
         assert package.meta.package_type == "inbound"
         assert package.meta.user_created == "analist_a"
         assert "T" in package.meta.date_created
+
+
+def test_download_proposal_excel_from_sftp_local_fallback(tmp_path, monkeypatch):
+    monkeypatch.setenv("LOCAL_SFTP_SHARED_DIR", str(tmp_path))
+    config = SftpConfig(host="local", proposals_dir="/Proposals")
+
+    # Create dummy proposal directory structure in tmp_path
+    proposal_dir = tmp_path / "Proposals" / "nouryon" / "v2" / "inbound"
+    proposal_dir.mkdir(parents=True, exist_ok=True)
+    excel_file = proposal_dir / "MProposal-Nouryon_V2.xlsx"
+    excel_file.write_bytes(b"dummy excel bytes")
+
+    contents, path = download_proposal_excel_from_sftp(
+        company="Nouryon",
+        version="2",
+        proposal_type="inbound",
+        config=config,
+    )
+    assert contents == b"dummy excel bytes"
+    assert "MProposal-Nouryon_V2.xlsx" in path
+
+
+def test_download_proposal_excel_from_sftp_with_mocked_paramiko():
+    config = SftpConfig(
+        host="mock-sftp-host",
+        port=2222,
+        user="testuser",
+        password="secretpassword",
+        proposals_dir="/Proposals",
+    )
+
+    mock_transport = MagicMock()
+    mock_sftp = MagicMock()
+    mock_file = MagicMock()
+    mock_file.read.return_value = b"remote excel bytes"
+    mock_sftp.open.return_value.__enter__.return_value = mock_file
+
+    def fake_listdir(path):
+        if path in ("/Proposals", "/proposals"):
+            return ["nouryon"]
+        if path == "/Proposals/nouryon":
+            return ["v2"]
+        if path == "/Proposals/nouryon/v2":
+            return ["inbound"]
+        if path == "/Proposals/nouryon/v2/inbound":
+            return ["MProposal-Nouryon_V2.xlsx", "proposal.json"]
+        raise OSError("Directory not found")
+
+    mock_sftp.listdir.side_effect = fake_listdir
+
+    with (
+        patch("paramiko.Transport", return_value=mock_transport),
+        patch("paramiko.SFTPClient.from_transport", return_value=mock_sftp),
+    ):
+        contents, path = download_proposal_excel_from_sftp(
+            company="nouryon",
+            version="v2",
+            proposal_type="inbound",
+            config=config,
+        )
+        assert contents == b"remote excel bytes"
+        assert path == "/Proposals/nouryon/v2/inbound/MProposal-Nouryon_V2.xlsx"
+
+
+def test_download_proposal_excel_from_sftp_not_found():
+    config = SftpConfig(
+        host="mock-sftp-host",
+        port=2222,
+        user="testuser",
+        password="secretpassword",
+        proposals_dir="/Proposals",
+    )
+
+    mock_transport = MagicMock()
+    mock_sftp = MagicMock()
+    mock_sftp.listdir.return_value = []  # empty proposals dir
+
+    with (
+        patch("paramiko.Transport", return_value=mock_transport),
+        patch("paramiko.SFTPClient.from_transport", return_value=mock_sftp),
+    ):
+        try:
+            download_proposal_excel_from_sftp(
+                company="nonexistent",
+                version="v1",
+                proposal_type="inbound",
+                config=config,
+            )
+            assert False, "Expected SftpFileNotFoundError"
+        except SftpFileNotFoundError as exc:
+            assert "not found" in str(exc).lower()
