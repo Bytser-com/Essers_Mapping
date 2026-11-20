@@ -110,10 +110,10 @@ Both `k8s-masterServer` (VM 100) and `k8s-workerServer` (VM 200) are corrupted, 
 The infrastructure pipeline can rebuild the complete Kubernetes cluster and redeploy all applications in **under 15 minutes**.
 
 #### Step 1: Clean Up Stale VMs (if they still exist)
-* **Option 1 (via GitHub Actions)**:
-  Run **Terraform - Infra Setup** (`terraform-infra.yml`) with:
-  * **Action**: `destroy`
-  *(This destroys VM 100 and VM 200 while safely leaving `pipeline-runner` online).*
+* **Option 1 (via GitHub Actions Master Pipeline)**:
+  Run **Testing Infrastructure & Cluster Pipeline** (`infra-pipeline.yml`) with:
+  * **Terraform action**: `destroy`
+  *(This automatically tears down VM 100 and VM 200, skips Ansible and Kubernetes stages, and safely leaves `pipeline-runner` online).*
 * **Option 2 (via Proxmox UI)**:
   In Proxmox (`https://192.168.100.3:8006`):
   Right-click `100 (k8s-masterServer)` $\rightarrow$ Stop $\rightarrow$ Destroy.
