@@ -52,10 +52,15 @@ on:
 
   workflow_dispatch:
     inputs:
-      terraform_action:
-        description: "Terraform action"
+      target_scope:
+        description: "Deployment Scope (all = full cluster & workloads, runner-only = bootstrap self-hosted runner VM only)"
         type: choice
-        options: [apply, plan]
+        options: [all, runner-only]
+        default: all
+      terraform_action:
+        description: "Terraform action (apply = provision/reconcile, plan = preview, destroy = teardown k8s cluster VMs)"
+        type: choice
+        options: [apply, plan, destroy]
         default: apply
       ansible_mode:
         description: "Ansible mode (apply = configure VMs live, validate = syntax-check & lint)"
@@ -68,9 +73,9 @@ on:
         options: [apply, validate, restart]
         default: apply
 
-# Only one full deployment per environment at a time (prevents concurrent locks/collisions)
+# Shared cluster-write lock with Service CD and Kubernetes deploy (prevents concurrent collisions & race conditions)
 concurrency:
-  group: infra-cluster-pipeline-${{ github.base_ref || github.ref_name }}
+  group: cluster-write-${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}
   cancel-in-progress: false
 
 permissions:
@@ -86,6 +91,7 @@ jobs:
     uses: ./.github/workflows/terraform-infra.yml
     with:
       action: ${{ (github.event_name == 'pull_request' && 'plan') || (inputs.terraform_action) || 'apply' }}
+      target: ${{ inputs.target_scope == 'runner-only' && 'proxmox_virtual_environment_vm.basic_vm["pipeline_runner"]' || '' }}
     secrets: inherit
 
   # ----------------------------------------------------------------------------
@@ -94,10 +100,12 @@ jobs:
   ansible:
     name: 2. Configure Infrastructure
     needs: terraform
-    if: inputs.terraform_action != 'destroy'
+    if: github.event_name != 'workflow_dispatch' || inputs.terraform_action != 'destroy'
     uses: ./.github/workflows/ansible-infra.yml
     with:
       mode: ${{ (github.event_name == 'pull_request' && 'validate') || (inputs.ansible_mode) || 'apply' }}
+      limit: ${{ inputs.target_scope == 'runner-only' && 'pipeline-runner' || '' }}
+      tags: ${{ inputs.target_scope == 'runner-only' && 'runner' || '' }}
     secrets: inherit
 
   # ----------------------------------------------------------------------------
@@ -106,6 +114,7 @@ jobs:
   kubernetes:
     name: 3. Deploy Cluster Workloads
     needs: ansible
+    if: github.event_name != 'workflow_dispatch' || (inputs.terraform_action != 'destroy' && inputs.target_scope != 'runner-only')
     uses: ./.github/workflows/kubernetes-deploy.yml
     with:
       mode: ${{ (github.event_name == 'pull_request' && 'validate') || (inputs.kubernetes_mode) || 'apply' }}

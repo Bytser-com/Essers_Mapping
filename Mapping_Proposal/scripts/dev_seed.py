@@ -24,57 +24,113 @@ from .config import LOCAL_SHARED_DIR, TEMPLATE_PATH
 
 logger = logging.getLogger(__name__)
 
-# (folder, customer, version, uploaded_at, status, ai_status)
+# (folder, customer, version, uploaded_at, status, ai_status, proposal_type)
 EXAMPLES = [
-    ('voorbeeldbedrijf-a', 'Voorbeeldbedrijf A', 1, '2026-10-22T14:05:00+02:00', 'AI_GENERATING', 'RUNNING'),
-    ('voorbeeldbedrijf-b', 'Voorbeeldbedrijf B', 2, '2026-10-21T10:30:00+02:00', 'READY_FOR_REVIEW', None),
-    ('voorbeeldbedrijf-c', 'Voorbeeldbedrijf C', 1, '2026-10-20T16:45:00+02:00', 'AI_CHECKING_REVIEW', 'RUNNING'),
-    ('voorbeeldbedrijf-d', 'Voorbeeldbedrijf D', 3, '2026-10-19T09:15:00+02:00', 'RETURNED', 'FAILED'),
-    ('voorbeeldbedrijf-e', 'Voorbeeldbedrijf E', 1, '2026-10-18T11:00:00+02:00', 'READY_FOR_REVIEW', None),
-    ('voorbeeldbedrijf-f', 'Voorbeeldbedrijf F', 2, '2026-10-17T13:20:00+02:00', 'IN_REVIEW', None),
+    ('voorbeeldbedrijf-a', 'Voorbeeldbedrijf A', 1, '2026-10-22T14:05:00+02:00', 'AI_GENERATING', 'RUNNING', 'inbound'),
+    ('voorbeeldbedrijf-b', 'Voorbeeldbedrijf B', 2, '2026-10-21T10:30:00+02:00', 'READY_FOR_REVIEW', None, 'outbound'),
+    ('voorbeeldbedrijf-c', 'Voorbeeldbedrijf C', 1, '2026-10-20T16:45:00+02:00', 'AI_CHECKING_REVIEW', 'RUNNING', 'inboud-accept'),
+    ('voorbeeldbedrijf-d', 'Voorbeeldbedrijf D', 3, '2026-10-19T09:15:00+02:00', 'RETURNED', 'FAILED', 'inbound'),
+    ('voorbeeldbedrijf-e', 'Voorbeeldbedrijf E', 1, '2026-10-18T11:00:00+02:00', 'READY_FOR_REVIEW', None, 'outbound'),
+    ('voorbeeldbedrijf-f', 'Voorbeeldbedrijf F', 2, '2026-10-17T13:20:00+02:00', 'IN_REVIEW', None, 'inbound'),
 ]
 
 
+
+def _build_metadata(
+    customer: str,
+    version: int,
+    uploaded_at: str,
+    status: str,
+    ai_status: str,
+    prop_type: str,
+    excel_name: str | None,
+) -> dict:
+    """Build metadata for an example proposal."""
+    metadata = {
+        'customer': customer,
+        'company': customer,
+        'version': f'v{version}',
+        'proposal_type': prop_type,
+        'proposalType': prop_type,
+        'uploaded_at': uploaded_at,
+        'createdDate': uploaded_at,
+        'status': status,
+        'ai_status': ai_status,
+        'uploadUser': 'exampleUser',
+        'upload_user': 'exampleUser',
+        'createdBy': 'exampleUser',
+    }
+
+    if excel_name:
+        metadata['filename'] = excel_name
+
+    return metadata
+
+
+def _upload_example_workbook(
+    session,
+    version_dir: str,
+    excel_name: str | None,
+    force: bool,
+) -> None:
+    """Upload the example workbook when needed."""
+    if not excel_name or not TEMPLATE_PATH.is_file():
+        return
+
+    excel_dest = f'{version_dir}/{excel_name}'
+
+    if force or not session.exists(excel_dest):
+        session.upload_file(TEMPLATE_PATH, excel_dest)
+        print(f'Uploaded: {excel_dest}')
+
+
+
 def seed_proposals(storage=None, force: bool = False) -> None:
+    """Seed example proposals into the configured storage."""
     if storage is None:
         storage = proposal_storage()
 
     print(f'Seeding proposals to: {storage.describe()}')
 
-    with storage.session() as s:
-        for folder, customer, version, uploaded_at, status, ai_status in EXAMPLES:
-            version_dir = f'{folder}/v{version}'
+    with storage.session() as session:
+        for folder, customer, version, uploaded_at, status, ai_status, prop_type in EXAMPLES:
+            version_dir = f'{folder}/v{version}/{prop_type}'
             metadata_path = f'{version_dir}/proposal.json'
 
-            if not force and s.exists(metadata_path):
+            if not force and session.exists(metadata_path):
                 print(f'Exists, skipped: {metadata_path}')
                 continue
 
-            s.make_dirs(version_dir)
+            session.make_dirs(version_dir)
 
-            excel_name = workbook_name(customer, version) if status != 'AI_GENERATING' else None
+            excel_name = (
+                workbook_name(customer, version)
+                if status != 'AI_GENERATING'
+                else None
+            )
 
-            metadata = {
-                'customer': customer,
-                'company': customer,
-                'version': f'v{version}',
-                'uploaded_at': uploaded_at,
-                'createdDate': uploaded_at,
-                'status': status,
-                'ai_status': ai_status,
-                'createdBy': 'exampleUser',
-            }
-            if excel_name:
-                metadata['filename'] = excel_name
+            metadata = _build_metadata(
+                customer,
+                version,
+                uploaded_at,
+                status,
+                ai_status,
+                prop_type,
+                excel_name,
+            )
 
-            s.write_text(metadata_path, json.dumps(metadata, indent=2, ensure_ascii=False))
+            session.write_text(
+                metadata_path,
+                json.dumps(metadata, indent=2, ensure_ascii=False),
+            )
             print(f'Created: {metadata_path}')
 
-            if excel_name and TEMPLATE_PATH.is_file():
-                excel_dest = f'{version_dir}/{excel_name}'
-                if force or not s.exists(excel_dest):
-                    s.upload_file(TEMPLATE_PATH, excel_dest)
-                    print(f'Uploaded: {excel_dest}')
+            _upload_example_workbook(
+                session,
+                version_dir,
+                excel_name,
+                force,
+            )
 
         # Seed sample package directory for Nouryon so package-based versioning can be tested
         try:

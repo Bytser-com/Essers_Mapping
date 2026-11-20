@@ -233,7 +233,7 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
 
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="m-0 font-title text-2xl font-bold">
-              {proposal.klant} · v{proposal.versie}
+              {proposal.klant} · v{proposal.versie} · {proposal.proposalType}
             </h1>
             <span
               className={`status ${proposal.status === IN_REVIEW

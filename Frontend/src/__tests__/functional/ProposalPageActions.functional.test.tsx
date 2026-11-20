@@ -20,6 +20,7 @@ vi.mock('../../services/proposalService', () => ({
 const PROPOSAL: Proposal = {
   klant: 'brunos',
   versie: 2,
+  proposalType: 'inbound',
   status: 'Klaar om na te kijken',
   geupload: '2026-10-30T10:00:00',
   mappings: [{ id: 'MP-001', bronveld: 'Klant/Nummer', doelveld: 'Klantnummer', zekerheid: 92, opmerking: '' }],
@@ -93,7 +94,7 @@ describe('ProposalPage actions', () => {
 
     // Assert
     await waitFor(() => expect(anchorClick).toHaveBeenCalledTimes(1))
-    expect(getProposalFile).toHaveBeenCalledWith('brunos', 'v2')
+    expect(getProposalFile).toHaveBeenCalledWith('brunos', 'v2', 'inbound')
     const blob = createObjectURL.mock.calls[0]?.[0] as Blob
     expect(blob.type).toBe('application/test')
     expect(blob.size).toBe(5)
@@ -185,7 +186,7 @@ describe('ProposalPage actions', () => {
 
     // Assert
     await waitFor(() =>
-      expect(approveProposal).toHaveBeenCalledWith('brunos', 'v2'),
+      expect(approveProposal).toHaveBeenCalledWith('brunos', 'v2', 'inbound'),
     )
   })
 
@@ -246,7 +247,7 @@ describe('ProposalPage actions', () => {
 
     // Assert
     await waitFor(() => {
-      expect(deleteProposal).toHaveBeenCalledWith('brunos', 'v2', 'brunos')
+      expect(deleteProposal).toHaveBeenCalledWith('brunos', 'v2', 'inbound', 'brunos')
     })
     await waitFor(() => {
       expect(screen.getByTestId('delete-success-banner')).toBeInTheDocument()

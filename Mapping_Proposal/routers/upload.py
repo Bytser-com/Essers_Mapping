@@ -2,6 +2,7 @@
 
 POST /upload  (multipart form)
     customer_name   the customer entered on the Home page
+    proposal_type   type of proposal (e.g. inbound, outbound, inboud-accept)
     files           one or more XML files of that customer
 
 The metadata document is first created directly on the shared storage (SFTP server).
@@ -13,8 +14,8 @@ folder in the source folder (data/source/, or INCOMING_DIR):
 
     data/source/<YYYYMMDD-HHMMSS>_<customer>_<random>/
         order_1.xml, order_2.xml, ...
-        proposal_ref.json    {"customer": "Ostavel", "version": 1, "folder": "ostavel/v1"}
-        upload.json          written LAST: {"customer": "Ostavel"}
+        proposal_ref.json    {"customer": "Ostavel", "version": 1, "folder": "ostavel/v1/inbound", "proposal_type": "inbound"}
+        upload.json          written LAST: {"customer": "Ostavel", "proposal_type": "inbound"}
 
 As soon as upload.json is there, the watcher (services/incoming_watcher.py) picks up the
 existing proposal reference and runs the AI mapping.
@@ -49,11 +50,16 @@ def get_proposal_store() -> ProposalStore:
 async def upload_xml(
     files: list[UploadFile] = File(...),
     customer_name: str = Form(''),
+    proposal_type: str | None = Form(None),
     store: ProposalStore = Depends(get_proposal_store),
 ):
     customer = customer_name.strip()
     if not customer:
         raise HTTPException(status_code=400, detail='Upload mislukt: Vul eerst een klant in.')
+
+    prop_type = (proposal_type or '').strip().lower()
+    if not prop_type:
+        raise HTTPException(status_code=400, detail='Upload mislukt: proposal_type is verplicht (field is required).')
 
     # Only keep the file name, so a name like "../x.xml" cannot leave the folder
     names = [Path(file.filename or '').name for file in files]
@@ -84,7 +90,7 @@ async def upload_xml(
     # First create the proposal metadata document on the SFTP storage.
     # If the SFTP server is unreachable or fails, return an error code instead of 200/201.
     try:
-        ref = store.create_proposal(customer)
+        ref = store.create_proposal(customer, proposal_type=prop_type)
     except Exception as error:
         logger.error('Failed to create proposal metadata on SFTP for %r: %s', customer, error)
         raise HTTPException(
@@ -103,14 +109,14 @@ async def upload_xml(
         # proposal_ref.json links this upload to the proposal already created on SFTP
         temp_ref = folder / f'.{PROPOSAL_REF}.tmp'
         temp_ref.write_text(
-            json.dumps({'customer': ref.customer, 'version': ref.version, 'folder': ref.folder}),
+            json.dumps({'customer': ref.customer, 'version': ref.version, 'folder': ref.folder, 'proposal_type': ref.proposal_type}),
             encoding='utf-8',
         )
         os.replace(temp_ref, folder / PROPOSAL_REF)
 
         # upload.json LAST (written under another name first): only now the watcher picks it up
         temp = folder / f'.{UPLOAD_MARKER}.tmp'
-        temp.write_text(json.dumps({'customer': customer}, ensure_ascii=False), encoding='utf-8')
+        temp.write_text(json.dumps({'customer': customer, 'proposal_type': prop_type}, ensure_ascii=False), encoding='utf-8')
         os.replace(temp, folder / UPLOAD_MARKER)
     except Exception as error:
         shutil.rmtree(folder, ignore_errors=True)
@@ -121,7 +127,7 @@ async def upload_xml(
         logger.error('Failed to save uploaded files for upload %s: %s', upload_id, error)
         raise HTTPException(status_code=500, detail=f'Upload mislukt: {error}')
 
-    return {'upload_id': upload_id, 'customer': customer, 'files': names}
+    return {'upload_id': upload_id, 'customer': customer, 'proposal_type': prop_type, 'files': names}
 
 
 @router.post('/seed')
