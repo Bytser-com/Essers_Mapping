@@ -10,6 +10,14 @@ on:
         description: "validate = syntax-check & lint, apply = configure the VMs live"
         type: string
         default: apply
+      limit:
+        description: "Optional --limit host pattern (e.g. k8s_cluster, pipeline-runner)"
+        type: string
+        default: ""
+      tags:
+        description: "Optional --tags (comma separated)"
+        type: string
+        default: ""
 
   workflow_dispatch:
     inputs:
