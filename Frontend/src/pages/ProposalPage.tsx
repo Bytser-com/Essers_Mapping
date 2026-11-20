@@ -48,6 +48,45 @@ function formatDateOnly(dateStr?: string | null): string {
   return dateStr;
 }
 
+/** Why "Goedkeuren" is disabled, or undefined when the proposal can be approved. */
+function getApproveDisabledReason(hasReviewFields: boolean, isAiChecking: boolean): string | undefined {
+  if (hasReviewFields) {
+    return "Goedkeuren is pas mogelijk als alle velden zijn nagekeken";
+  }
+  if (isAiChecking) {
+    return "De AI-controle is bezig; het voorstel kan nu niet opnieuw goedgekeurd worden";
+  }
+  return undefined;
+}
+
+/**
+ * State of the "Proposal goedkeuren?" dialog (story IT2627T06-185), kept out of the page
+ * component so the page stays readable.
+ */
+function useApproveDialog(company: string | undefined, version: number | undefined, onApprove?: () => void) {
+  const approveProposal = useProposalStore((state) => state.approveProposal);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
+
+  function open() {
+    if (onApprove) {
+      onApprove();
+      return;
+    }
+    setIsOpen(true);
+  }
+
+  async function confirm(description: string) {
+    if (!company || version === undefined) return;
+    setIsApproving(true);
+    await approveProposal(company, `v${version}`, description);
+    setIsApproving(false);
+    setIsOpen(false);
+  }
+
+  return { isOpen, isApproving, open, close: () => setIsOpen(false), confirm };
+}
+
 function Confidence({ value }: Readonly<ConfidenceProps>) {
   if (value === null || value === undefined) {
     return <span className="text-grey text-xs">—</span>;
@@ -80,7 +119,6 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
   const fetchProposal = useProposalStore((state) => state.fetchProposal);
   const downloadProposal = useProposalStore((state) => state.downloadProposal);
   const uploadProposal = useProposalStore((state) => state.uploadProposal);
-  const approveProposal = useProposalStore((state) => state.approveProposal);
   const deleteProposal = useProposalStore((state) => state.deleteProposal);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
@@ -88,8 +126,7 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
-  const [showApproveDialog, setShowApproveDialog] = useState(false);
-  const [isApproving, setIsApproving] = useState(false);
+  const approveDialog = useApproveDialog(company, proposal?.versie, onApprove);
   const actionError = useProposalStore((state) => state.actionError);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -128,22 +165,6 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
-  }
-
-  function handleApprove() {
-    if (onApprove) {
-      onApprove();
-      return;
-    }
-    setShowApproveDialog(true);
-  }
-
-  async function handleConfirmApprove(description: string) {
-    if (!proposal || !company) return;
-    setIsApproving(true);
-    await approveProposal(company, `v${proposal.versie}`, description);
-    setIsApproving(false);
-    setShowApproveDialog(false);
   }
 
   function openDeleteDialog() {
@@ -215,11 +236,7 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
   const matchedCount = totalMappings - reviewCount;
   const hasReviewFields = reviewCount > 0;
   const isAiChecking = proposal.statusCode === AI_CHECKING_REVIEW;
-  const approveDisabledReason = hasReviewFields
-    ? "Goedkeuren is pas mogelijk als alle velden zijn nagekeken"
-    : isAiChecking
-      ? "De AI-controle is bezig; het voorstel kan nu niet opnieuw goedgekeurd worden"
-      : undefined;
+  const approveDisabledReason = getApproveDisabledReason(hasReviewFields, isAiChecking);
 
   const filteredMappings = proposal.mappings.filter((mapping) => {
     if (filterMissingOnly && mapping.bronveld) {
@@ -277,7 +294,7 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
           <button
             type="button"
             className="btn btn--primary"
-            onClick={handleApprove}
+            onClick={approveDialog.open}
             disabled={approveDisabledReason !== undefined}
             title={approveDisabledReason}
           >
@@ -434,13 +451,13 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
           </tbody>
         </table>
       </div>
-      {showApproveDialog && (
+      {approveDialog.isOpen && (
         <ApproveProposalDialog
           customer={proposal.klant}
           version={proposal.versie}
-          isSubmitting={isApproving}
-          onCancel={() => setShowApproveDialog(false)}
-          onConfirm={(description) => void handleConfirmApprove(description)}
+          isSubmitting={approveDialog.isApproving}
+          onCancel={approveDialog.close}
+          onConfirm={(description) => void approveDialog.confirm(description)}
         />
       )}
       {showUploadDialog && (

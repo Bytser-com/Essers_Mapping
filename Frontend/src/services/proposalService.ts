@@ -68,7 +68,7 @@ function parseScore(score: string | number | null | undefined): number | null {
 /** Raw status code as the backend writes it, normalised (e.g. "In review" -> "IN_REVIEW"). */
 function normalizeStatusCode(rawStatus?: string | null): string | undefined {
   if (!rawStatus) return undefined;
-  return rawStatus.trim().toUpperCase().replace(/\s+/g, "_");
+  return rawStatus.trim().toUpperCase().replaceAll(/\s+/g, "_");
 }
 
 function mapStatusLabel(rawStatus?: string | null): string {

@@ -15,6 +15,7 @@ translates them to HTTP:
 from __future__ import annotations
 
 import logging
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
@@ -36,13 +37,22 @@ def get_proposal_storage() -> Storage:
     return proposal_storage()
 
 
-@router.post('/approve')
+# Documented in the OpenAPI schema (/docs); the frontend shows ``detail`` to the analyst.
+ERROR_RESPONSES: dict[int | str, dict] = {
+    400: {'description': 'Invalid input: empty or too long description, invalid parameters'},
+    404: {'description': 'Customer, version, proposal type or metadata not found'},
+    409: {'description': 'Proposal cannot be approved in its current status (e.g. AI review running)'},
+    502: {'description': 'The shared SFTP storage is not reachable'},
+}
+
+
+@router.post('/approve', responses=ERROR_RESPONSES)
 def approve(
     request: ApproveRequest,
-    company: str = Query(''),
-    version: str = Query(''),
-    proposal_type: str = Query('', alias='proposalType'),
-    storage: Storage = Depends(get_proposal_storage),
+    storage: Annotated[Storage, Depends(get_proposal_storage)],
+    company: Annotated[str, Query()] = '',
+    version: Annotated[str, Query()] = '',
+    proposal_type: Annotated[str, Query(alias='proposalType')] = '',
 ) -> dict:
     try:
         result = approve_proposal(storage, company, version, proposal_type, request.description)
@@ -53,7 +63,8 @@ def approve(
     except ProposalConflictError as error:
         raise HTTPException(status_code=409, detail=str(error)) from error
     except StorageError as error:
-        logger.error('Approving %s/%s/%s failed: %s', company, version, proposal_type, error)
+        # Do not log the request parameters: they are user input (log injection).
+        logger.exception('Approving a proposal failed')
         raise HTTPException(status_code=502, detail='De bestanden zijn tijdelijk niet bereikbaar') from error
 
     logger.info('Proposal %s/%s/%s approved; AI review pending', result.company, result.version, result.proposal_type)
