@@ -6,7 +6,6 @@ from converter import parse_mapping_excel
 from models import MappingPackage, SaveToSftpResponse
 from sftp_service import (
     SftpError,
-    build_package_sftp_path,
     get_sftp_config,
     normalize_slug,
     normalize_version,

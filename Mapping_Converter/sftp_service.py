@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-import io
 import json
 import logging
 import os
@@ -140,10 +139,10 @@ def _sftp_makedirs(sftp_client: Any, remote_dir: str) -> None:
         current = posixpath.join(current, part)
         try:
             sftp_client.stat(current)
-        except (IOError, OSError):
+        except OSError:
             try:
                 sftp_client.mkdir(current)
-            except (IOError, OSError):
+            except OSError:
                 pass
 
 
