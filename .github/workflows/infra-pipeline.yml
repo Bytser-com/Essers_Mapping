@@ -73,9 +73,9 @@ on:
         options: [apply, validate, restart]
         default: apply
 
-# Only one full deployment per environment at a time (prevents concurrent locks/collisions)
+# Shared cluster-write lock with Service CD and Kubernetes deploy (prevents concurrent collisions & race conditions)
 concurrency:
-  group: infra-cluster-pipeline-${{ github.base_ref || github.ref_name }}
+  group: cluster-write-${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}
   cancel-in-progress: false
 
 permissions:
