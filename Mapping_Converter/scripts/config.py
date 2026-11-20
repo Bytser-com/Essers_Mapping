@@ -18,10 +18,16 @@ LOCAL_SHARED_DIR = DATA_DIR / 'sftp-shared'
 _env_loaded = False
 
 
+# Repo root (Essers_Mapping/): one shared .env for all services.
+REPO_ROOT = ROOT.parent
+
+
 def _load_env() -> None:
+    """Read the shared .env in the repo root once. Variables that are already set
+    (terminal, Kubernetes secrets) always win: load_dotenv never overrides them."""
     global _env_loaded
     if not _env_loaded:
-        load_dotenv(ROOT / '.env')
+        load_dotenv(REPO_ROOT / '.env')
         _env_loaded = True
 
 
