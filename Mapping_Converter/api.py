@@ -10,6 +10,9 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile, status
 
 from converter import parse_mapping_excel
 from models import MappingPackage, SaveToSftpResponse
+from scripts.excel_review import InvalidWorkbook
+from scripts.gemini_review import ReviewUnavailable
+from scripts.pipeline import run_review
 from sftp_service import (
     SftpError,
     get_sftp_config,
@@ -17,10 +20,6 @@ from sftp_service import (
     normalize_version,
     save_mapping_package_to_sftp,
 )
-
-from scripts.excel_review import InvalidWorkbook
-from scripts.gemini_review import ReviewUnavailable
-from scripts.pipeline import run_review
 
 logger = logging.getLogger(__name__)
 app = FastAPI(title='Mapping Converter Service', version='1.1.0')
