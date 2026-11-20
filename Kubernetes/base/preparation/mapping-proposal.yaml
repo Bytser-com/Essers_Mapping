@@ -82,6 +82,9 @@ spec:
             # Files wait in /tmp/source until the service handles them.
             - name: INCOMING_DIR
               value: "/tmp/source"
+            # Writable directory for intermediate AI run checkpoints, reports, and generated workbooks
+            - name: OUTPUT_DIR
+              value: "/tmp/output"
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -113,8 +116,12 @@ spec:
           volumeMounts:
             - name: tmp-dir
               mountPath: /tmp
+            - name: output-dir
+              mountPath: /app/output
       volumes:
         - name: tmp-dir
+          emptyDir: {}
+        - name: output-dir
           emptyDir: {}
 ---
 apiVersion: v1
