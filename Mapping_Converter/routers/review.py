@@ -47,6 +47,7 @@ def _get_downloader():
 @router.post(
     "/review-excel",
     responses=REVIEW_RESPONSES,
+    include_in_schema=False,
     summary="Review Excel mapping proposal consistency using Gemini AI",
 )
 @router.post(

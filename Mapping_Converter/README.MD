@@ -142,11 +142,8 @@ Variables that are already set in the terminal or in Kubernetes always win over 
 | Endpoint | Returns |
 |---|---|
 | `GET /health` | `{"status": "ok", "service": "mapping-converter"}` |
-| `GET /` | `{"message": "Mapping Converter Service"}` |
-| `POST /approve` | approves a reviewed proposal and sets status to `AI_CHECKING_REVIEW` |
-| `POST /review-excel` | reviews Excel mapping proposal consistency via Gemini (`/review` is a hidden alias) |
-| `POST /convert` | **preview:** converts an Excel proposal to the JSON package, nothing is stored |
-| `POST /convert-and-upload` | converts an Excel proposal and stores `MPackage.json` on SFTP (`/convert/save` is a hidden alias) |
+| `POST /approve` | approves a reviewed proposal, sets status to `AI_CHECKING_REVIEW`, and launches the AI review |
+| `POST /convert` | converts an Excel proposal and stores `MPackage.json` on SFTP (`/convert-and-upload` and `/convert/save` are hidden aliases) |
 
 ### POST /approve
 
@@ -162,7 +159,7 @@ Content-Type: application/json
 | `company` (query) | Required, max. 20 characters, case-insensitive |
 | `version` (query) | Required, format `v<number>` (e.g. `v1`) |
 | `proposalType` (query) | Required, max. 20 characters, case-insensitive (e.g. `inbound`) |
-| `description` (body) | Required, not only spaces, max. 200 characters (trimmed) |
+| `description` (body) | Optional, max. 200 characters (trimmed) |
 
 Response `200 OK`:
 
@@ -177,44 +174,13 @@ Response `200 OK`:
 }
 ```
 
-### POST /review-excel
+### POST /convert
 
-```http
-POST /review-excel?companyName=nouryon&type=inbound&versionNumber=v2
-```
-
-| Parameter | Rules |
-|---|---|
-| `companyName` (query) | Required, client name, e.g. `nouryon` |
-| `type` (query) | Required, proposal type, e.g. `inbound` or `outbound` |
-| `versionNumber` (query) | Required, version tag or number, e.g. `v2` or `2` |
-
-Response `200 OK`:
-
-```json
-{
-  "decision": "ACCEPTED",
-  "summary": "Mappings are consistent and adhere to schemas.",
-  "findings": [],
-  "checked_mappings": 42
-}
-```
-
-| Status | When |
-|---|---|
-| `200 OK` | Review completed successfully |
-| `400 Bad Request` | Required query parameters are missing or empty |
-| `404 Not Found` | Proposal Excel file not found on SFTP |
-| `422 Unprocessable Entity` | Invalid or unsupported Excel workbook |
-| `502 Bad Gateway` | SFTP storage error or connection failure |
-| `503 Service Unavailable` | Gemini AI review temporarily unavailable |
-
-### POST /convert and POST /convert-and-upload
-
-Both take `multipart/form-data` with the workbook in `file` (`.xlsx` or `.xls`). `/convert` only returns the package; `/convert-and-upload` also needs:
+Takes `multipart/form-data` with the workbook in `file` (`.xlsx` or `.xls`) and stores `MPackage.json` on SFTP:
 
 | Form field | Rules |
 |---|---|
+| `file` | Required, Excel mapping proposal workbook |
 | `company` | Required, e.g. `nouryon` (normalized to a lowercase slug) |
 | `version` | Required, e.g. `v4`, `4` or `1.0.0` (folder normalized to `v<N>`) |
 | `proposal_type` | Required, e.g. `inbound` or `outbound` (lowercase slug) |

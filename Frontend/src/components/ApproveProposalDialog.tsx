@@ -23,7 +23,6 @@ export default function ApproveProposalDialog({
   onConfirm,
 }: Readonly<ApproveProposalDialogProps>) {
   const [description, setDescription] = useState(() => defaultApprovalDescription(customer, version));
-  const isEmpty = description.trim().length === 0;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-anthracite/45">
@@ -43,21 +42,20 @@ export default function ApproveProposalDialog({
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor="approve-description-input" className="text-xs font-semibold text-anthracite">
-            Omschrijving van de wijziging
+            Omschrijving
           </label>
           <textarea
             id="approve-description-input"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             maxLength={MAX_DESCRIPTION_LENGTH}
-            placeholder="Bv. Leverdatum mapt nu op DeliveryDate in plaats van OrderDate"
+            placeholder="Bv. Leverdatum mapt nu op DeliveryDate in plaats van OrderDate (optioneel)"
             rows={3}
             disabled={isSubmitting}
             autoFocus
             className="px-3.5 py-2.5 border border-line-grey rounded-small text-sm outline-none resize-none focus:border-anthracite"
           />
-          <div className="flex justify-between text-[11px]">
-            <span className="text-red">{isEmpty ? "Vul een omschrijving in." : ""}</span>
+          <div className="flex justify-end text-[11px]">
             <span className="text-grey tabular-nums">
               {description.length}/{MAX_DESCRIPTION_LENGTH}
             </span>
@@ -72,7 +70,7 @@ export default function ApproveProposalDialog({
             type="button"
             className="btn btn--primary"
             onClick={() => onConfirm(description.trim())}
-            disabled={isSubmitting || isEmpty}
+            disabled={isSubmitting}
           >
             {isSubmitting ? "Goedkeuren…" : "Bevestigen"}
           </button>

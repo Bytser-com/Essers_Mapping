@@ -223,4 +223,3 @@ def test_alias_endpoint_review(monkeypatch):
 
 def test_existing_endpoints():
     assert CLIENT.get("/health").json()["status"] == "ok"
-    assert CLIENT.get("/").status_code == 200

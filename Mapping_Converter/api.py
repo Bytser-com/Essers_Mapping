@@ -49,9 +49,4 @@ def health() -> dict:
     return {"status": "ok", "service": "mapping-converter"}
 
 
-@app.get("/")
-def root() -> dict:
-    return {"message": "Mapping Converter Service"}
-
-
 __all__ = ["app", "download_proposal_excel_from_sftp"]

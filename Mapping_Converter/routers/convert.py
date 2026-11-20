@@ -1,11 +1,10 @@
-"""Convert endpoints: Excel mapping proposal -> JSON mapping package (story 54).
+"""Convert endpoint: Excel mapping proposal -> JSON mapping package on SFTP.
 
-POST /convert               multipart 'file': returns the JSON package (preview, nothing stored)
-POST /convert-and-upload    multipart 'file' + form fields: stores MPackage.json on the shared storage
-                            (/convert/save is kept as a hidden alias)
+POST /convert               multipart 'file' + form fields: parses proposal and stores MPackage.json on shared SFTP
+                            (/convert-and-upload and /convert/save are kept as hidden aliases)
 
 The parsing and storing live in services/excel_converter.py and services/packages.py; this
-route only checks the upload and translates errors to HTTP:
+route checks the upload and translates errors to HTTP:
 
     400  not an Excel file, empty file, workbook cannot be read, or missing form fields
     502  the shared SFTP storage is not reachable
@@ -36,9 +35,6 @@ router = APIRouter()
 
 ALLOWED_EXTENSIONS = ('.xlsx', '.xls')
 
-PREVIEW_RESPONSES: dict[int | str, dict] = {
-    400: {'description': 'Not an Excel file, empty file or workbook cannot be read'},
-}
 UPLOAD_RESPONSES: dict[int | str, dict] = {
     400: {'description': 'Not an Excel file, empty file, workbook cannot be read or missing form fields'},
     502: {'description': 'The shared SFTP storage is not reachable'},
@@ -49,15 +45,9 @@ def get_packages_storage() -> Storage:
     return packages_storage()
 
 
-@router.post('/convert', summary='Convert an Excel mapping proposal into a JSON mapping package',
-             responses=PREVIEW_RESPONSES)
-async def convert_mapping_proposal(file: Annotated[UploadFile, File()]) -> MappingPackage:
-    """Accept an uploaded Excel mapping proposal and return the extracted source-target paths."""
-    return _parse_upload(file.filename, await file.read())
-
-
-@router.post('/convert-and-upload', status_code=status.HTTP_201_CREATED, responses=UPLOAD_RESPONSES,
-             summary='Convert an Excel proposal and store the JSON package on the shared storage')
+@router.post('/convert', status_code=status.HTTP_201_CREATED, responses=UPLOAD_RESPONSES,
+             summary='Convert an Excel mapping proposal and store the JSON package on the shared storage')
+@router.post('/convert-and-upload', status_code=status.HTTP_201_CREATED, include_in_schema=False)
 @router.post('/convert/save', status_code=status.HTTP_201_CREATED, include_in_schema=False)
 async def convert_and_upload_proposal(
     file: Annotated[UploadFile, File()],

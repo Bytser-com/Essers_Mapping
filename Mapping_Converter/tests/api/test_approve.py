@@ -38,10 +38,17 @@ def test_approve_returns_200_and_updates_status(client, proposals_root):
     assert json.loads(path.read_text(encoding='utf-8'))['status'] == 'AI_CHECKING_REVIEW'
 
 
-@pytest.mark.parametrize('description', ['', '   ', 'a' * 201])
-def test_invalid_description_returns_400(client, proposals_root, description):
+@pytest.mark.parametrize('description', ['', '   '])
+def test_empty_description_is_optional_and_returns_200(client, proposals_root, description):
     write_metadata(proposals_root)
     response = client.post(URL, json={'description': description})
+    assert response.status_code == 200
+    assert response.json()['status'] == 'AI_CHECKING_REVIEW'
+
+
+def test_too_long_description_returns_400(client, proposals_root):
+    write_metadata(proposals_root)
+    response = client.post(URL, json={'description': 'a' * 201})
     assert response.status_code == 400
     assert response.json()['detail']
 

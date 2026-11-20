@@ -1,13 +1,12 @@
 """Approve endpoint for a reviewed mapping proposal (story IT2627T06-185).
 
 POST /approve?company=<customer>&version=v<N>&proposalType=<type>
-    body: {"description": "<what changed, max 200 characters>"}
+    body: {"description": "<what changed, optional, max 200 characters>"}
 
-Sets the proposal to AI_CHECKING_REVIEW ("AI-controle bezig") and stores the
-description. The business rules live in services/approval.py; this route only
-translates them to HTTP:
+Sets the proposal to AI_CHECKING_REVIEW ("AI-controle bezig"), stores the
+description, and launches the AI review in the backend.
 
-    400  invalid input (empty or too long description, invalid parameters)
+    400  invalid input (too long description, invalid parameters)
     404  customer, version, proposal type or metadata not found
     409  proposal cannot be approved in its current status (e.g. AI review running)
     502  the shared SFTP storage is not reachable
@@ -17,7 +16,7 @@ from __future__ import annotations
 import logging
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from pydantic import BaseModel
 
 from scripts.errors import ProposalConflictError, ProposalNotFoundError, StorageError
@@ -39,16 +38,68 @@ def get_proposal_storage() -> Storage:
 
 # Documented in the OpenAPI schema (/docs); the frontend shows ``detail`` to the analyst.
 ERROR_RESPONSES: dict[int | str, dict] = {
-    400: {'description': 'Invalid input: empty or too long description, invalid parameters'},
+    400: {'description': 'Invalid input: too long description, invalid parameters'},
     404: {'description': 'Customer, version, proposal type or metadata not found'},
     409: {'description': 'Proposal cannot be approved in its current status (e.g. AI review running)'},
     502: {'description': 'The shared SFTP storage is not reachable'},
 }
 
 
+def trigger_ai_review(storage: Storage, company: str, version: str, proposal_type: str) -> dict | None:
+    """Download the proposal's Excel file from storage and run the Gemini review."""
+    from scripts.pipeline import run_review
+    from services.proposal_files import find_proposal, read_metadata, write_metadata
+
+    logger.info('Starting AI review for %s/%s/%s', company, version, proposal_type)
+    try:
+        contents = None
+        with storage.session() as s:
+            location = find_proposal(s, company, version, proposal_type)
+            meta = read_metadata(s, location)
+            filename = meta.get('filename')
+            folder = location.folder
+            if filename and s.exists(f'{folder}/{filename}'):
+                if hasattr(s, 'read_bytes'):
+                    contents = s.read_bytes(f'{folder}/{filename}')
+                elif hasattr(s, '_path'):
+                    contents = s._path(f'{folder}/{filename}').read_bytes()
+                elif hasattr(s, 'client'):
+                    with s.client.open(s._path(f'{folder}/{filename}'), 'rb') as h:
+                        contents = h.read()
+
+        if contents is None:
+            import sftp_service
+            contents, _ = sftp_service.download_proposal_excel_from_sftp(company, version, proposal_type)
+
+        review_result = run_review(contents)
+        logger.info('AI review completed for %s/%s/%s: %s', company, version, proposal_type, review_result.get('decision'))
+
+        with storage.session() as s:
+            location = find_proposal(s, company, version, proposal_type)
+            meta = read_metadata(s, location)
+            meta['ai_review'] = review_result
+            meta['ai_status'] = 'COMPLETED' if review_result.get('decision') == 'ACCEPTED' else 'FAILED'
+            write_metadata(s, location, meta)
+        return review_result
+
+    except Exception as exc:
+        logger.warning('AI review for %s/%s/%s did not complete: %s', company, version, proposal_type, exc)
+        try:
+            with storage.session() as s:
+                location = find_proposal(s, company, version, proposal_type)
+                meta = read_metadata(s, location)
+                meta['ai_status'] = 'FAILED'
+                meta['ai_review_error'] = str(exc)
+                write_metadata(s, location, meta)
+        except Exception:
+            pass
+        return None
+
+
 @router.post('/approve', responses=ERROR_RESPONSES)
 def approve(
     request: ApproveRequest,
+    background_tasks: BackgroundTasks,
     storage: Annotated[Storage, Depends(get_proposal_storage)],
     company: Annotated[str, Query()] = '',
     version: Annotated[str, Query()] = '',
@@ -63,9 +114,9 @@ def approve(
     except ProposalConflictError as error:
         raise HTTPException(status_code=409, detail=str(error)) from error
     except StorageError as error:
-        # Do not log the request parameters: they are user input (log injection).
         logger.exception('Approving a proposal failed')
         raise HTTPException(status_code=502, detail='De bestanden zijn tijdelijk niet bereikbaar') from error
 
-    logger.info('Proposal %s/%s/%s approved; AI review pending', result.company, result.version, result.proposal_type)
+    logger.info('Proposal %s/%s/%s approved; AI review scheduled', result.company, result.version, result.proposal_type)
+    background_tasks.add_task(trigger_ai_review, storage, result.company, result.version, result.proposal_type)
     return result.to_dict()

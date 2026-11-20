@@ -42,32 +42,19 @@ FORM = {'company': 'Nouryon', 'version': 'v4', 'proposal_type': 'outbound',
         'user_created': 'analist_a', 'package_version': '1.0.0'}
 
 
-def test_root(client):
-    response = client.get('/')
-    assert response.status_code == 200
-    assert 'Mapping Converter' in response.json()['message']
-
-
-def test_convert_valid_excel_upload(client):
-    response = client.post('/convert', files={'file': ('proposal.xlsx', proposal_xlsx(), XLSX)})
-
-    assert response.status_code == 200
-    assert response.json()['mappings'] == [{'source_path': '/SRC/HEADER/NUMBER', 'target_path': '/DEST/HEADER/DOC_NUM'}]
-
-
 @pytest.mark.parametrize(('filename', 'content', 'detail'), [
     ('data.txt', b'plain text', 'Only Excel files'),
     ('empty.xlsx', b'', 'empty'),
     ('corrupt.xlsx', b'not a zip or excel', 'Failed to parse Excel workbook'),
 ])
 def test_convert_rejects_unusable_files(client, filename, content, detail):
-    response = client.post('/convert', files={'file': (filename, content, XLSX)})
+    response = client.post('/convert', files={'file': (filename, content, XLSX)}, data=FORM)
     assert response.status_code == 400
     assert detail in response.json()['detail']
 
 
-def test_convert_and_upload_stores_the_package(client, packages_root):
-    response = client.post('/convert-and-upload', files={'file': ('proposal.xlsx', proposal_xlsx(), XLSX)}, data=FORM)
+def test_convert_stores_the_package(client, packages_root):
+    response = client.post('/convert', files={'file': ('proposal.xlsx', proposal_xlsx(), XLSX)}, data=FORM)
 
     assert response.status_code == 201
     body = response.json()
@@ -80,24 +67,26 @@ def test_convert_and_upload_stores_the_package(client, packages_root):
     assert stored['mappings'][0]['target_path'] == '/DEST/HEADER/DOC_NUM'
 
 
-def test_convert_save_alias_still_works(client):
-    response = client.post('/convert/save', files={'file': ('proposal.xlsx', proposal_xlsx(), XLSX)}, data=FORM)
-    assert response.status_code == 201
+def test_convert_upload_and_save_aliases_still_work(client):
+    res1 = client.post('/convert-and-upload', files={'file': ('proposal.xlsx', proposal_xlsx(), XLSX)}, data=FORM)
+    assert res1.status_code == 201
+    res2 = client.post('/convert/save', files={'file': ('proposal.xlsx', proposal_xlsx(), XLSX)}, data=FORM)
+    assert res2.status_code == 201
 
 
 @pytest.mark.parametrize('field', ['company', 'version', 'proposal_type'])
-def test_convert_and_upload_requires_the_form_fields(client, field):
-    response = client.post('/convert-and-upload', files={'file': ('proposal.xlsx', proposal_xlsx(), XLSX)},
+def test_convert_requires_the_form_fields(client, field):
+    response = client.post('/convert', files={'file': ('proposal.xlsx', proposal_xlsx(), XLSX)},
                            data={**FORM, field: '  '})
     assert response.status_code == 400
 
 
-def test_convert_and_upload_returns_502_when_storage_fails(client, monkeypatch):
+def test_convert_returns_502_when_storage_fails(client, monkeypatch):
     def broken(*args, **kwargs):
         raise StorageError('Cannot connect to SFTP')
 
     monkeypatch.setattr(convert_router, 'save_mapping_package', broken)
-    response = client.post('/convert-and-upload', files={'file': ('proposal.xlsx', proposal_xlsx(), XLSX)}, data=FORM)
+    response = client.post('/convert', files={'file': ('proposal.xlsx', proposal_xlsx(), XLSX)}, data=FORM)
 
     assert response.status_code == 502
     assert response.json()['detail'] == 'De bestanden zijn tijdelijk niet bereikbaar'
