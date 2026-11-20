@@ -6,7 +6,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 import Home from '../../pages/Home'
-import type { Proposal } from '../../services/proposals'
+import type { Proposal } from '../../services/proposalOverviewService'
 import { useHomeStore } from '../../stores/homeStore'
 
 const brunos: Proposal = {

@@ -1,4 +1,4 @@
-// Proposals overview on Home – unit tests for src/services/proposals.ts
+// Proposals overview on Home – unit tests for src/services/proposalOverviewService.ts
 // (API call, Dutch labels, date format and the link behind "Openen").
 // Every test name starts with its Jira test case (TC-57-xx).
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -12,7 +12,7 @@ import {
   proposalPath,
   normalizeStatus,
   toProposal,
-} from '../../services/proposals'
+} from '../../services/proposalOverviewService'
 
 afterEach(() => {
   vi.unstubAllGlobals()

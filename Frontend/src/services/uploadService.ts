@@ -4,7 +4,7 @@
 // for them: the backend stores them in one folder in Mapping_Proposal/data/source/ and the
 // AI starts automatically.
 //
-// Like services/proposals.ts the request goes through /api/proposal: in Kubernetes the
+// Like services/proposalOverviewService.ts the request goes through /api/proposal: in Kubernetes the
 // frontend proxies it to the backend, locally vite.config.js does the same.
 const API_URL = '/api/proposal'
 
