@@ -63,7 +63,7 @@ test.describe('E2E - Upload card on the Home page', () => {
 
   test('TC-48-03 upload works with a customer name and an XML file', xrayTest('IT2627T06-96'), async ({ page }) => {
     await page.getByLabel('Klantnaam').fill('Ostavel')
-    await page.getByLabel('Type').fill('inbound')
+    await page.getByLabel('Type').selectOption('Inbound')
     await page.getByTestId('file-input').setInputFiles(xmlFile)
     await page.getByRole('button', { name: 'Uploaden' }).click()
 
@@ -73,7 +73,7 @@ test.describe('E2E - Upload card on the Home page', () => {
 
   test('TC-60-01 a message is shown after a successful XML upload', xrayTest('IT2627T06-90'), async ({ page }) => {
     await page.getByLabel('Klantnaam').fill('Ostavel')
-    await page.getByLabel('Type').fill('inbound')
+    await page.getByLabel('Type').selectOption('Inbound')
     // Two XML files are uploaded at the same time
     await page.getByTestId('file-input').setInputFiles([xmlFile, secondXmlFile])
     await expect(page.getByRole('listitem')).toContainText([xmlFile.name, secondXmlFile.name])
@@ -88,7 +88,7 @@ test.describe('E2E - Upload card on the Home page', () => {
 
   test('TC-60-03 a file that is not XML is rejected', xrayTest('IT2627T06-93'), async ({ page }) => {
     await page.getByLabel('Klantnaam').fill('Ostavel')
-    await page.getByLabel('Type').fill('inbound')
+    await page.getByLabel('Type').selectOption('Inbound')
 
     // No file chosen yet
     await page.getByRole('button', { name: 'Uploaden' }).click()

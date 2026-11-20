@@ -38,14 +38,6 @@ def _resolve_historical_dir() -> Path:
     return historical
 
 
-HISTORICAL_DIR = _resolve_historical_dir()
-OUTPUT_DIR = ROOT / 'output'
-RUNS_DIR = OUTPUT_DIR / 'runs'
-TEMPLATE_PATH = ROOT / 'templates' / 'mapping_template.xlsx'
-PROMPT_PATH = ROOT / 'prompt.txt'
-
-DEFAULT_MODEL = 'gemini-3.5-flash-lite'
-
 # Remembers whether .env was already read, so it is loaded only once per process.
 _env_loaded = False
 
@@ -55,6 +47,23 @@ def _load_env() -> None:
     if not _env_loaded:
         load_dotenv(ROOT / '.env')
         _env_loaded = True
+
+
+def _resolve_output_dir() -> Path:
+    _load_env()
+    configured = os.getenv('OUTPUT_DIR')
+    if configured and configured.strip():
+        return Path(configured.strip())
+    return ROOT / 'output'
+
+
+HISTORICAL_DIR = _resolve_historical_dir()
+OUTPUT_DIR = _resolve_output_dir()
+RUNS_DIR = OUTPUT_DIR / 'runs'
+TEMPLATE_PATH = ROOT / 'templates' / 'mapping_template.xlsx'
+PROMPT_PATH = ROOT / 'prompt.txt'
+
+DEFAULT_MODEL = 'gemini-3.5-flash-lite'
 
 
 # frozen=True: the settings cannot be changed by accident after loading.

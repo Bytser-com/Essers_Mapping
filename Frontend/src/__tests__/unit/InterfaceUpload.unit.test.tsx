@@ -44,7 +44,7 @@ describe('InterfaceUpload', () => {
     // Arrange
     const { customer, uploadButton } = renderUpload(vi.fn())
     await userEvent.type(customer, '   ')
-    await userEvent.type(screen.getByLabelText('Type'), 'Inbound')
+    await userEvent.selectOptions(screen.getByLabelText('Type'), 'Inbound')
 
     // Act
     await userEvent.click(uploadButton)
@@ -58,7 +58,7 @@ describe('InterfaceUpload', () => {
     const upload = vi.fn()
     const { customer, uploadButton } = renderUpload(upload)
     await userEvent.type(customer, 'Brunos')
-    await userEvent.type(screen.getByLabelText('Type'), 'Inbound')
+    await userEvent.selectOptions(screen.getByLabelText('Type'), 'Inbound')
 
     // Act
     await userEvent.click(uploadButton)
@@ -73,7 +73,7 @@ describe('InterfaceUpload', () => {
     const upload = vi.fn()
     const { customer, fileInput, uploadButton } = renderUpload(upload)
     await userEvent.type(customer, 'Brunos')
-    await userEvent.type(screen.getByLabelText('Type'), 'Inbound')
+    await userEvent.selectOptions(screen.getByLabelText('Type'), 'Inbound')
     chooseFiles(fileInput, [xmlFile(), new File(['x'], 'notes.txt', { type: 'text/plain' })])
 
     // Act
@@ -89,7 +89,7 @@ describe('InterfaceUpload', () => {
     const upload = vi.fn().mockResolvedValue(true)
     const { customer, fileInput, uploadButton } = renderUpload(upload)
     await userEvent.type(customer, 'Brunos')
-    await userEvent.type(screen.getByLabelText('Type'), 'Inbound')
+    await userEvent.selectOptions(screen.getByLabelText('Type'), 'Inbound')
     chooseFiles(fileInput, [xmlFile('ORDER.XML')])
 
     // Act
@@ -105,14 +105,14 @@ describe('InterfaceUpload', () => {
     const { customer, fileInput, uploadButton } = renderUpload(upload)
     const files = [xmlFile('a.xml'), xmlFile('b.xml')]
     await userEvent.type(customer, '  Brunos  ')
-    await userEvent.type(screen.getByLabelText('Type'), 'inbound')
+    await userEvent.selectOptions(screen.getByLabelText('Type'), 'Inbound')
     chooseFiles(fileInput, files)
 
     // Act
     await userEvent.click(uploadButton)
 
     // Assert
-    expect(upload).toHaveBeenCalledWith('Brunos', 'inbound', files)
+    expect(upload).toHaveBeenCalledWith('Brunos', 'Inbound', files)
     expect(await screen.findByRole('status')).toHaveTextContent(
       'Upload gelukt. De AI is bezig met een mapping proposal voor Brunos.',
     )
@@ -127,7 +127,7 @@ describe('InterfaceUpload', () => {
     })
     const { customer, fileInput, uploadButton } = renderUpload(upload)
     await userEvent.type(customer, 'Brunos')
-    await userEvent.type(screen.getByLabelText('Type'), 'Inbound')
+    await userEvent.selectOptions(screen.getByLabelText('Type'), 'Inbound')
     chooseFiles(fileInput, [xmlFile()])
 
     // Act
@@ -218,7 +218,7 @@ describe('InterfaceUpload', () => {
     // Arrange
     const { customer, fileInput, uploadButton } = renderUpload(vi.fn().mockResolvedValue(true))
     await userEvent.type(customer, 'Brunos')
-    await userEvent.type(screen.getByLabelText('Type'), 'Inbound')
+    await userEvent.selectOptions(screen.getByLabelText('Type'), 'Inbound')
     chooseFiles(fileInput, [xmlFile()])
     await userEvent.click(uploadButton)
     expect(await screen.findByRole('status')).toBeInTheDocument()
@@ -236,7 +236,7 @@ describe('InterfaceUpload', () => {
     const { customer, fileInput, uploadButton } = renderUpload(upload)
     const files = [xmlFile()]
     await userEvent.type(customer, 'Brunos')
-    await userEvent.type(screen.getByLabelText('Type'), 'Inbound')
+    await userEvent.selectOptions(screen.getByLabelText('Type'), 'Inbound')
     chooseFiles(fileInput, files)
 
     // Act
@@ -244,6 +244,14 @@ describe('InterfaceUpload', () => {
 
     // Assert
     expect(upload).toHaveBeenCalledWith('Brunos', 'Inbound', files)
+  })
+
+  it('renders the Type dropdown with Inbound and Outbound options', () => {
+    renderUpload(vi.fn())
+    const select = screen.getByLabelText('Type') as HTMLSelectElement
+    expect(select.tagName).toBe('SELECT')
+    const options = Array.from(select.options).map((opt) => opt.value)
+    expect(options).toEqual(['', 'Inbound', 'Outbound'])
   })
 
   it('shows an error and sends nothing when the type is empty', async () => {
