@@ -194,11 +194,11 @@ describe('proposalService', () => {
       vi.stubGlobal('fetch', respond(200, file))
 
       // Act
-      const result = await getProposalFile('brunos', 'v1')
+      const result = await getProposalFile('brunos', 'v1', 'inbound')
 
       // Assert
       expect(result).toEqual(file)
-      expect(fetch).toHaveBeenCalledWith(`${VERSION_CONTROL_API}/proposals/file?company=brunos&version=v1`)
+      expect(fetch).toHaveBeenCalledWith(`${VERSION_CONTROL_API}/proposals/file?company=brunos&version=v1&proposalType=inbound`)
     })
 
     it('throws when the file cannot be fetched', async () => {
@@ -206,7 +206,7 @@ describe('proposalService', () => {
       vi.stubGlobal('fetch', respond(404))
 
       // Act + Assert
-      await expect(getProposalFile('brunos', 'v1')).rejects.toThrow('Bestand kon niet worden opgehaald (status 404)')
+      await expect(getProposalFile('brunos', 'v1', 'inbound')).rejects.toThrow('Bestand kon niet worden opgehaald (status 404)')
     })
   })
 
@@ -216,11 +216,11 @@ describe('proposalService', () => {
       vi.stubGlobal('fetch', respond(200))
 
       // Act
-      await approveProposal('Brunos', 'v3')
+      await approveProposal('Brunos', 'v3', 'inbound')
 
       // Assert
       expect(fetch).toHaveBeenCalledWith(
-        `${VERSION_CONTROL_API}/proposals?company=Brunos&version=v3`,
+        `${VERSION_CONTROL_API}/proposals?company=Brunos&version=v3&proposalType=inbound`,
         { method: 'POST' }
       )
     })
@@ -235,7 +235,7 @@ describe('proposalService', () => {
       vi.stubGlobal('fetch', respond(501, problemDetail))
 
       // Act + Assert
-      await expect(approveProposal('Brunos', 'v3')).rejects.toThrow(
+      await expect(approveProposal('Brunos', 'v3', 'inbound')).rejects.toThrow(
         "Approving proposal for company 'Brunos' and version 'v3' is not implemented yet"
       )
     })
@@ -245,7 +245,7 @@ describe('proposalService', () => {
       vi.stubGlobal('fetch', respond(501))
 
       // Act + Assert
-      await expect(approveProposal('Brunos', 'v3')).rejects.toThrow(
+      await expect(approveProposal('Brunos', 'v3', 'inbound')).rejects.toThrow(
         'Goedkeuren van voorstellen is nog niet geïmplementeerd'
       )
     })
@@ -255,7 +255,7 @@ describe('proposalService', () => {
       vi.stubGlobal('fetch', respond(503))
 
       // Act + Assert
-      await expect(approveProposal('Brunos', 'v3')).rejects.toThrow(
+      await expect(approveProposal('Brunos', 'v3', 'inbound')).rejects.toThrow(
         'De bestanden zijn tijdelijk niet bereikbaar (status 503)'
       )
     })
@@ -267,11 +267,11 @@ describe('proposalService', () => {
       vi.stubGlobal('fetch', respond(204))
 
       // Act
-      await deleteProposal('vanroey', 'v2', 'vanroey')
+      await deleteProposal('vanroey', 'v2', 'inbound', 'vanroey')
 
       // Assert
       expect(fetch).toHaveBeenCalledWith(
-        `${VERSION_CONTROL_API}/proposals?company=vanroey&version=v2`,
+        `${VERSION_CONTROL_API}/proposals?company=vanroey&version=v2&proposalType=inbound`,
         {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
@@ -290,7 +290,7 @@ describe('proposalService', () => {
       vi.stubGlobal('fetch', respond(400, problemDetail))
 
       // Act + Assert
-      await expect(deleteProposal('vanroey', 'v2', 'wrong')).rejects.toThrow(
+      await expect(deleteProposal('vanroey', 'v2', 'inbound', 'wrong')).rejects.toThrow(
         "Confirmation check failed: deleteCheck ('wrong') must match company name ('vanroey')"
       )
     })
@@ -300,7 +300,7 @@ describe('proposalService', () => {
       vi.stubGlobal('fetch', respond(502))
 
       // Act + Assert
-      await expect(deleteProposal('vanroey', 'v2', 'vanroey')).rejects.toThrow(
+      await expect(deleteProposal('vanroey', 'v2', 'inbound', 'vanroey')).rejects.toThrow(
         'De bestanden zijn tijdelijk niet bereikbaar (status 502)'
       )
     })

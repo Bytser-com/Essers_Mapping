@@ -65,10 +65,13 @@ def _default_run() -> RunMapping:
     return run_mapping
 
 
-def start_proposal(customer: str, store: ProposalStore) -> ProposalRef:
+def start_proposal(customer: str, store: ProposalStore, proposal_type: str = 'inbound') -> ProposalRef:
     """Step 1: the new row appears in the overview: "AI maakt voorstel" / "Bezig"."""
-    ref = store.create_proposal(customer)
-    logger.info(f'Proposal {ref.id} created for {ref.customer}; AI status: running.')
+    try:
+        ref = store.create_proposal(customer, proposal_type=proposal_type)
+    except TypeError:
+        ref = store.create_proposal(customer)
+    logger.info(f'Proposal {ref.id} created for {ref.customer} ({ref.proposal_type}); AI status: running.')
     return ref
 
 
@@ -111,6 +114,7 @@ def run_for_customer(
     customer: str,
     settings: MappingSettings,
     *,
+    proposal_type: str = 'inbound',
     source_dir: Path = SOURCE_DIR,
     store: ProposalStore | None = None,
     run: RunMapping | None = None,
@@ -122,5 +126,5 @@ def run_for_customer(
     store = store or ProposalStore(proposal_storage())
     if not any(Path(source_dir).glob('*.xml')):
         raise InputDataError(f'No customer XML files in {source_dir}.')  # no row for an empty upload
-    ref = start_proposal(customer, store)
+    ref = start_proposal(customer, store, proposal_type=proposal_type)
     return ref, generate_proposal(ref, settings, source_dir, store, run)

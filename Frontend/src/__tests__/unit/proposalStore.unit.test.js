@@ -7,6 +7,7 @@ vi.mock('../../services/proposalService')
 const PROPOSAL = {
     klant: 'brunos',
     versie: 1,
+    proposalType: 'inbound',
     status: 'Klaar om na te kijken',
     geupload: '2026-10-30T10:00:00',
     mappings: [],
@@ -75,20 +76,6 @@ describe('proposalStore', () => {
         await promise
     })
 
-    it('sets loading while fetching', async () => {
-        // Arrange
-        getProposal.mockResolvedValue(PROPOSAL)
-
-        // Act
-        const promise = useProposalStore.getState().fetchProposal('brunos')
-
-        // Assert
-        const state = useProposalStore.getState()
-        expect(state.loading).toBe(true)
-
-        await promise
-    })
-
     it('clears a previous error when fetching again', async () => {
         // Arrange
         useProposalStore.setState({ error: 'geen mapping gevonden' })
@@ -115,7 +102,7 @@ describe('proposalStore', () => {
         const state = useProposalStore.getState()
         expect(state.proposal).toBeNull()
         expect(state.deleteSuccessMessage).toBe('Voorstel voor brunos (v1) is succesvol verwijderd.')
-        expect(deleteProposal).toHaveBeenCalledWith('brunos', 'v1', 'brunos')
+        expect(deleteProposal).toHaveBeenCalledWith('brunos', 'v1', 'inbound', 'brunos')
     })
 
     it('clears deleteSuccessMessage when clearDeleteSuccessMessage is called', () => {

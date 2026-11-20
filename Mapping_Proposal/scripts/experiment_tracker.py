@@ -47,7 +47,7 @@ def utc_now() -> str:
 
 
 def _zero_metrics() -> dict:
-    return {name: 0 for name in METRIC_FIELDS}
+    return dict.fromkeys(METRIC_FIELDS, 0)
 
 
 def _write_json(path: Path, data: dict) -> None:
@@ -68,7 +68,7 @@ class ExperimentTracker:
         self.run_dir = run_dir
         self.root = root
         self.data = {
-            **{column: '' for column in COLUMNS}, **settings,
+            **dict.fromkeys(COLUMNS, ''), **settings,
             'run_id': self.run_id,
             'started_utc': started_utc or utc_now(),
             'status': 'running',
@@ -77,7 +77,7 @@ class ExperimentTracker:
             'expert_review_status': 'pending',
             'run_folder': run_dir.relative_to(root).as_posix(),
         }
-        self.execution_tokens = {name: 0 for name in TOKEN_FIELDS}
+        self.execution_tokens = self.execution_tokens = dict.fromkeys(TOKEN_FIELDS, 0)
         self.last_api_code = ''
         self.current_batch: str | None = None
         self.ledger_path = run_dir / 'usage_ledger.json'

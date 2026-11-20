@@ -10,6 +10,7 @@ export type Proposal = {
   klant: string;
   versie: number;
   status: string;
+  proposalType?: string | null;
   geupload: string;
   uploadDate?: string | null;
   uploadTime?: string | null;
