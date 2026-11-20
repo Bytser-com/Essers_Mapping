@@ -13,7 +13,9 @@ description, and launches the AI review in the backend.
 """
 from __future__ import annotations
 
+import json
 import logging
+import re
 from typing import Annotated
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
@@ -21,11 +23,16 @@ from pydantic import BaseModel
 
 from scripts.errors import ProposalConflictError, ProposalNotFoundError, StorageError
 from services.approval import approve_proposal
+from services.proposal_files import METADATA_FILES, ProposalLocation, read_metadata, write_metadata
+from services.statuses import ProposalStatus
 from services.storage import Storage, proposal_storage
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+_VERSION = re.compile(r'^v\d+$', re.IGNORECASE)
+_active_reviews: set[tuple[str, str, str]] = set()
 
 
 class ApproveRequest(BaseModel):
@@ -50,6 +57,8 @@ def trigger_ai_review(storage: Storage, company: str, version: str, proposal_typ
     from scripts.pipeline import run_review
     from services.proposal_files import find_proposal, read_metadata, write_metadata
 
+    review_key = (company.strip().lower(), version.strip().lower(), proposal_type.strip().lower())
+    _active_reviews.add(review_key)
     logger.info('Starting AI review for %s/%s/%s', company, version, proposal_type)
     try:
         contents = None
@@ -94,6 +103,111 @@ def trigger_ai_review(storage: Storage, company: str, version: str, proposal_typ
         except Exception:
             pass
         return None
+    finally:
+        _active_reviews.discard(review_key)
+
+
+def find_stuck_proposals(
+    storage: Storage,
+    company: str | None = None,
+    version: str | None = None,
+    proposal_type: str | None = None,
+) -> list[ProposalLocation]:
+    company_filter = company.strip().lower() if company else None
+    version_filter = version.strip().lower() if version else None
+    type_filter = proposal_type.strip().lower() if proposal_type else None
+
+    results: list[ProposalLocation] = []
+    with storage.session() as s:
+        try:
+            customers = s.list_dirs('')
+        except Exception as e:
+            logger.warning('Failed to list root dirs on storage: %s', e)
+            return []
+
+        for cust in customers:
+            if company_filter and cust.lower() != company_filter:
+                continue
+            try:
+                versions = s.list_dirs(cust)
+            except Exception:
+                continue
+            for ver in versions:
+                if not _VERSION.fullmatch(ver):
+                    continue
+                if version_filter and ver.lower() != version_filter:
+                    continue
+                try:
+                    types = s.list_dirs(f'{cust}/{ver}')
+                except Exception:
+                    continue
+                for prop_t in types:
+                    if type_filter and prop_t.lower() != type_filter:
+                        continue
+                    folder = f'{cust}/{ver}/{prop_t}'
+                    meta_path = None
+                    for name in METADATA_FILES:
+                        if s.exists(f'{folder}/{name}'):
+                            meta_path = f'{folder}/{name}'
+                            break
+                    if not meta_path:
+                        continue
+                    try:
+                        meta = json.loads(s.read_text(meta_path))
+                        if not isinstance(meta, dict):
+                            continue
+                    except Exception:
+                        continue
+
+                    # A proposal is stuck in AI review if status is AI_CHECKING_REVIEW
+                    status = meta.get('status')
+                    if status == ProposalStatus.AI_CHECKING_REVIEW.value or status == 'AI_CHECKING_REVIEW':
+                        results.append(ProposalLocation(cust, ver, prop_t, meta_path))
+    return results
+
+
+@router.post('/ai-retry')
+def ai_retry(
+    background_tasks: BackgroundTasks,
+    storage: Annotated[Storage, Depends(get_proposal_storage)],
+    company: Annotated[str | None, Query()] = None,
+    version: Annotated[str | None, Query()] = None,
+    proposal_type: Annotated[str | None, Query(alias='proposalType')] = None,
+) -> dict:
+    """Restart stuck AI reviews for all proposals currently in AI_CHECKING_REVIEW."""
+    stuck_locations = find_stuck_proposals(
+        storage, company=company, version=version, proposal_type=proposal_type
+    )
+    retried = []
+
+    for loc in stuck_locations:
+        key = (loc.customer.lower(), loc.version.lower(), loc.proposal_type.lower())
+        if key in _active_reviews:
+            logger.info('Proposal %s/%s/%s is already actively reviewing; skipping retry enqueue.', loc.customer, loc.version, loc.proposal_type)
+            continue
+
+        try:
+            with storage.session() as s:
+                meta = read_metadata(s, loc)
+                meta['ai_status'] = 'RUNNING'
+                meta.pop('ai_review_error', None)
+                write_metadata(s, loc, meta)
+
+            background_tasks.add_task(trigger_ai_review, storage, loc.customer, loc.version, loc.proposal_type)
+            retried.append({
+                'company': loc.customer,
+                'version': loc.version,
+                'proposal_type': loc.proposal_type,
+            })
+            logger.info('Restarted AI review for stuck proposal %s/%s/%s', loc.customer, loc.version, loc.proposal_type)
+        except Exception as e:
+            logger.error('Failed to restart AI review for %s/%s/%s: %s', loc.customer, loc.version, loc.proposal_type, e)
+
+    return {
+        'status': 'ok',
+        'retried_count': len(retried),
+        'retried_proposals': retried,
+    }
 
 
 @router.post('/approve', responses=ERROR_RESPONSES)

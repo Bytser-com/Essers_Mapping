@@ -89,3 +89,56 @@ def test_storage_error_returns_502(client, monkeypatch):
 def test_storage_dependency_uses_the_configured_storage(monkeypatch):
     monkeypatch.setenv('SFTP_SHARED_HOST', '')
     assert isinstance(approve_router.get_proposal_storage(), LocalStorage)
+
+
+def test_ai_retry_restarts_stuck_proposals(client, proposals_root, monkeypatch):
+    # Setup stuck proposal
+    folder = proposals_root / 'nouryon' / 'v1' / 'inbound'
+    folder.mkdir(parents=True, exist_ok=True)
+    meta_path = folder / 'metadata.json'
+    meta_path.write_text(json.dumps({
+        'customer': 'Nouryon',
+        'status': 'AI_CHECKING_REVIEW',
+        'ai_status': 'FAILED',
+        'ai_review_error': 'Gemini 503 error',
+    }), encoding='utf-8')
+
+    triggered = []
+    monkeypatch.setattr(approve_router, 'trigger_ai_review', lambda storage, comp, ver, pt: triggered.append((comp, ver, pt)))
+
+    response = client.post('/ai-retry')
+    assert response.status_code == 200
+    body = response.json()
+    assert body['status'] == 'ok'
+    assert body['retried_count'] == 1
+    assert body['retried_proposals'] == [{
+        'company': 'nouryon',
+        'version': 'v1',
+        'proposal_type': 'inbound',
+    }]
+
+    # Check metadata updated
+    updated_meta = json.loads(meta_path.read_text(encoding='utf-8'))
+    assert updated_meta['ai_status'] == 'RUNNING'
+    assert 'ai_review_error' not in updated_meta
+    assert len(triggered) == 1
+    assert triggered[0] == ('nouryon', 'v1', 'inbound')
+
+
+def test_ai_retry_no_stuck_proposals(client, proposals_root):
+    # Setup proposal not in AI_CHECKING_REVIEW
+    folder = proposals_root / 'nouryon' / 'v1' / 'inbound'
+    folder.mkdir(parents=True, exist_ok=True)
+    meta_path = folder / 'metadata.json'
+    meta_path.write_text(json.dumps({
+        'customer': 'Nouryon',
+        'status': 'READY_FOR_REVIEW',
+        'ai_status': None,
+    }), encoding='utf-8')
+
+    response = client.post('/ai-retry')
+    assert response.status_code == 200
+    body = response.json()
+    assert body['retried_count'] == 0
+    assert body['retried_proposals'] == []
+
