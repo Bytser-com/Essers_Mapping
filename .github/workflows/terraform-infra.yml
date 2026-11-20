@@ -97,15 +97,15 @@ jobs:
         id: plan
         run: |
           ACTION="${{ inputs.action || github.event.inputs.action || 'apply' }}"
-          DESTROY_FLAG=""
+          PLAN_ARGS=()
           if [ "$ACTION" = "destroy" ]; then
             # Target Kubernetes cluster VMs only; never destroy the pipeline runner VM that is executing this workflow
-            DESTROY_FLAG="-destroy -target=proxmox_virtual_environment_vm.basic_vm[\"k8s_master\"] -target=proxmox_virtual_environment_vm.basic_vm[\"k8s_worker\"]"
+            PLAN_ARGS+=("-destroy" "-target=proxmox_virtual_environment_vm.basic_vm[\"k8s_master\"]" "-target=proxmox_virtual_environment_vm.basic_vm[\"k8s_worker\"]")
           fi
 
           set +e
           # Output plan directly inside the current workspace
-          terraform plan $DESTROY_FLAG -detailed-exitcode -out="tfplan.binary"
+          terraform plan "${PLAN_ARGS[@]}" -detailed-exitcode -out="tfplan.binary"
           code=$?
           set -e
 
