@@ -65,7 +65,7 @@ def review_with_gemini(records: list[dict]) -> dict:
             'findings': [finding[:300] for finding in result['findings'][:5]],
             'checked_mappings': len(records),
         }
-    except (json.JSONDecodeError, ValueError) as error:
+    except (ValueError) as error:
         raise ReviewUnavailable('Unable to parse the Gemini review result.') from error
     finally:
         client.close()
