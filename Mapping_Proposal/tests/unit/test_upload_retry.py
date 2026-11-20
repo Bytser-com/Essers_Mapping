@@ -171,3 +171,52 @@ def test_real_pipeline_restores_first_batch_after_transient_second_batch_failure
     assert proposal.version == 1
     assert proposal.status is ProposalStatus.READY_FOR_REVIEW
     assert len(list((tmp_path / 'storage').rglob('*.xlsx'))) == 1
+
+
+def test_pipeline_succeeds_when_output_dir_outside_root(tmp_path, monkeypatch):
+    """When OUTPUT_DIR is outside ROOT (e.g. /tmp/output in container), workbook export must not raise."""
+    from scripts import pipeline
+    from scripts.models import MappingSettings
+
+    fixtures = Path(__file__).resolve().parents[1] / 'fixtures'
+    incoming = tmp_path / 'incoming'
+    store = ProposalStore(tmp_path / 'storage')
+    customer_xml = fixtures / 'source' / 'order_ostavel.xml'
+    folder = incoming / 'upload-1'
+    folder.mkdir(parents=True)
+    (folder / 'order.xml').write_bytes(customer_xml.read_bytes())
+    (folder / 'upload.json').write_text('{"customer":"Ostavel"}', encoding='utf-8')
+
+    root_dir = tmp_path / 'app_root'
+    root_dir.mkdir(parents=True)
+    external_output = tmp_path / 'external_output'
+    external_output.mkdir(parents=True)
+
+    monkeypatch.setattr(pipeline, 'HISTORICAL_DIR', fixtures / 'historical')
+    monkeypatch.setattr(pipeline, 'ROOT', root_dir)
+    monkeypatch.setattr(pipeline, 'OUTPUT_DIR', external_output)
+    monkeypatch.setattr(pipeline, 'RUNS_DIR', external_output / 'runs')
+    monkeypatch.setenv('GEMINI_API_KEY', 'test-key')
+
+    def fake_gemini(source_fields, target_fields, **kwargs):
+        target = target_fields[0]['path']
+        callback = kwargs['on_event']
+        callback({'type': 'attempt'})
+        callback({'type': 'usage', 'input_tokens': 100, 'output_tokens': 10, 'total_tokens': 110})
+        source = next(field['path'] for field in source_fields if field['path'].endswith('/OrderNumber'))
+        return [{
+            'source_path': source, 'target_path': target, 'rule_type': 'DIRECT',
+            'confidence': 80, 'requires_review': True, 'review_priority': 'MEDIUM',
+            'reason': 'Fixture-based test proposal', 'evidence': '', 'fixed_value': '',
+            'transformation': '', 'condition': '', 'lookup': '', 'loop': '',
+            'review_question': 'Verify.', 'risk_category': 'MEDIUM',
+        }]
+
+    monkeypatch.setattr(pipeline, 'run_gemini', fake_gemini)
+    settings = MappingSettings(history_pairs=1, source_samples=1, limit_targets=1, batch_size=1)
+    watcher = IncomingWatcher(incoming, store, settings=settings, run=pipeline.run_mapping)
+    assert watcher.run_once() == 1
+    [proposal] = store.list_proposals()
+    assert proposal.status is ProposalStatus.READY_FOR_REVIEW
+    assert proposal.ai_status is None
+
