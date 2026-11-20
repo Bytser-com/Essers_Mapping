@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import iconSearch from '../assets/version-control/icon-search.svg'
+import SelectActivePackageDialog from '../components/SelectActivePackageDialog'
+import {
+  type MappingPackageOverview,
+} from '../services/mappingPackageOverviewService'
 import { formatUploadedAt } from '../services/proposalOverviewService'
 import { useMappingPackageStore } from '../stores/mappingPackageStore'
 
@@ -23,31 +27,42 @@ function matchToken(text: string, token: string): boolean {
   return text.toLowerCase().includes(token)
 }
 
-function matchField(pkg: { company: string; customerName: string | null; packageType: string | null; latestVersion: string; createdBy: string | null; createdAt: string | null }, token: string): boolean {
+function matchField(pkg: MappingPackageOverview, token: string): boolean {
   const company = pkg.company || ''
   const customerName = pkg.customerName || ''
   const type = pkg.packageType || ''
   const version = pkg.latestVersion || ''
+  const activeVer = pkg.activeVersion || ''
   const user = pkg.createdBy || ''
+  const activeUser = pkg.activeUpdatedBy || ''
   const rawDate = pkg.createdAt || ''
   const formattedDate = pkg.createdAt ? formatUploadedAt(pkg.createdAt) : ''
+  const rawActiveDate = pkg.activeUpdatedAt || ''
+  const formattedActiveDate = pkg.activeUpdatedAt ? formatUploadedAt(pkg.activeUpdatedAt) : ''
 
   return (
     matchToken(company, token) ||
     matchToken(customerName, token) ||
     matchToken(type, token) ||
     matchToken(version, token) ||
+    matchToken(activeVer, token) ||
     matchToken(user, token) ||
+    matchToken(activeUser, token) ||
     matchToken(rawDate, token) ||
-    matchToken(formattedDate, token)
+    matchToken(formattedDate, token) ||
+    matchToken(rawActiveDate, token) ||
+    matchToken(formattedActiveDate, token)
   )
 }
 
 // Version Control overview (Figma "07 · Version Control"): all customers and their mapping packages
 export default function VersionControl() {
   const [searchTerm, setSearchTerm] = useState('')
-  const fetchPackages = useMappingPackageStore((state) => state.fetchPackages);
-  
+  const [selectedPackageForVersions, setSelectedPackageForVersions] = useState<MappingPackageOverview | null>(null)
+
+  const fetchPackages = useMappingPackageStore((state) => state.fetchPackages)
+  const setActivePackage = useMappingPackageStore((state) => state.setActivePackage)
+
   useEffect(() => {
     void fetchPackages()
   }, [fetchPackages])
@@ -67,18 +82,26 @@ export default function VersionControl() {
       const customerName = (pkg.customerName || '').toLowerCase()
       const type = (pkg.packageType || '').toLowerCase()
       const version = (pkg.latestVersion || '').toLowerCase()
+      const activeVer = (pkg.activeVersion || '').toLowerCase()
       const user = (pkg.createdBy || '').toLowerCase()
+      const activeUser = (pkg.activeUpdatedBy || '').toLowerCase()
       const rawDate = (pkg.createdAt || '').toLowerCase()
       const formattedDate = pkg.createdAt ? formatUploadedAt(pkg.createdAt).toLowerCase() : ''
+      const rawActiveDate = (pkg.activeUpdatedAt || '').toLowerCase()
+      const formattedActiveDate = pkg.activeUpdatedAt ? formatUploadedAt(pkg.activeUpdatedAt).toLowerCase() : ''
 
       return (
         company.includes(q) ||
         customerName.includes(q) ||
         type.includes(q) ||
         version.includes(q) ||
+        activeVer.includes(q) ||
         user.includes(q) ||
+        activeUser.includes(q) ||
         rawDate.includes(q) ||
-        formattedDate.includes(q)
+        formattedDate.includes(q) ||
+        rawActiveDate.includes(q) ||
+        formattedActiveDate.includes(q)
       )
     })
 
@@ -90,6 +113,27 @@ export default function VersionControl() {
     const tokens = q.split(/\s+/).filter(Boolean)
     return packages.filter((pkg) => tokens.every((token) => matchField(pkg, token)))
   }, [packages, searchTerm])
+
+  const handleSetActiveVersion = async (version: string) => {
+    if (!selectedPackageForVersions || !selectedPackageForVersions.packageType) return
+    await setActivePackage(
+      selectedPackageForVersions.company,
+      selectedPackageForVersions.packageType,
+      version,
+      'analist'
+    )
+    // Update currently inspected package reference in state
+    setSelectedPackageForVersions((prev) =>
+      prev
+        ? {
+            ...prev,
+            activeVersion: version,
+            activeUpdatedAt: new Date().toISOString(),
+            activeUpdatedBy: 'analist',
+          }
+        : null
+    )
+  }
 
   return (
     <main className="flex flex-col gap-4 px-8 py-7">
@@ -155,39 +199,76 @@ export default function VersionControl() {
                   </td>
                 </tr>
               ) : (
-                filteredPackages.map((mappingPackage) => (
-                  // A company can be listed once per package type (e.g. nouryon inbound + nouryon outbound)
-                  <tr
-                    key={`${mappingPackage.company}/${mappingPackage.packageType ?? ''}`}
-                    className="border-b border-line-grey last:border-b-0"
-                  >
-                    <td className={`${CUSTOMER_CELL} ${BODY_CELL} truncate font-semibold`}>
-                      {mappingPackage.customerName || mappingPackage.company}
-                    </td>
-                    <td className={`${TYPE_CELL} ${BODY_CELL} truncate`} title={mappingPackage.packageType ?? undefined}>
-                      {mappingPackage.packageType || '—'}
-                    </td>
-                    <td className={`${VERSION_CELL} ${BODY_CELL}`}>{mappingPackage.latestVersion}</td>
-                    <td className={`${CHANGE_CELL} ${BODY_CELL}`}>
-                      <div className="flex flex-col gap-0.5">
-                        <span>{mappingPackage.createdAt ? formatUploadedAt(mappingPackage.createdAt) : '—'}</span>
-                        {mappingPackage.createdBy && (
-                          <span className="text-xs text-grey">door {mappingPackage.createdBy}</span>
-                        )}
-                      </div>
-                    </td>
-                    <td className={`${ACTION_CELL} ${BODY_CELL}`}>
-                      {/* Opens the versions of this customer: user story 161 */}
-                      <button type="button" className="btn">
-                        Bekijken
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                filteredPackages.map((mappingPackage) => {
+                  const displayVersion = mappingPackage.activeVersion || mappingPackage.latestVersion
+                  const hasNewerVersion =
+                    Boolean(mappingPackage.activeVersion &&
+                    mappingPackage.latestVersion &&
+                    mappingPackage.activeVersion.toLowerCase() !== mappingPackage.latestVersion.toLowerCase())
+
+                  const changeDate = mappingPackage.activeUpdatedAt || mappingPackage.createdAt
+                  const changeUser = mappingPackage.activeUpdatedBy || mappingPackage.createdBy
+
+                  return (
+                    // A company can be listed once per package type (e.g. nouryon inbound + nouryon outbound)
+                    <tr
+                      key={`${mappingPackage.company}/${mappingPackage.packageType ?? ''}`}
+                      className="border-b border-line-grey last:border-b-0"
+                    >
+                      <td className={`${CUSTOMER_CELL} ${BODY_CELL} truncate font-semibold`}>
+                        {mappingPackage.customerName || mappingPackage.company}
+                      </td>
+                      <td className={`${TYPE_CELL} ${BODY_CELL} truncate`} title={mappingPackage.packageType ?? undefined}>
+                        {mappingPackage.packageType || '—'}
+                      </td>
+                      <td className={`${VERSION_CELL} ${BODY_CELL}`}>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-semibold">{displayVersion}</span>
+                          {hasNewerVersion && (
+                            <span
+                              className="text-[11px] text-grey bg-background px-1.5 py-0.5 rounded border border-line-grey"
+                              title={`Nieuwere versie beschikbaar: ${mappingPackage.latestVersion}`}
+                            >
+                              nieuwste: {mappingPackage.latestVersion}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className={`${CHANGE_CELL} ${BODY_CELL}`}>
+                        <div className="flex flex-col gap-0.5">
+                          <span>{changeDate ? formatUploadedAt(changeDate) : '—'}</span>
+                          {changeUser && (
+                            <span className="text-xs text-grey">door {changeUser}</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className={`${ACTION_CELL} ${BODY_CELL}`}>
+                        {/* Opens the versions modal for this customer and package type */}
+                        <button
+                          type="button"
+                          className="btn"
+                          onClick={() => setSelectedPackageForVersions(mappingPackage)}
+                        >
+                          Bekijken
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })
               )}
             </tbody>
           </table>
         </div>
+      )}
+
+      {selectedPackageForVersions && (
+        <SelectActivePackageDialog
+          company={selectedPackageForVersions.company}
+          customerName={selectedPackageForVersions.customerName}
+          packageType={selectedPackageForVersions.packageType}
+          onClose={() => setSelectedPackageForVersions(null)}
+          onSetActive={handleSetActiveVersion}
+        />
       )}
     </main>
   )

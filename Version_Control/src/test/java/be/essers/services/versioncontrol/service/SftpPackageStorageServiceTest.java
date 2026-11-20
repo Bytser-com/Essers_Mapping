@@ -25,8 +25,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SftpPackageStorageServiceTest {
@@ -448,5 +447,106 @@ class SftpPackageStorageServiceTest {
         assertNull(SftpPackageStorageService.parseUploadTime("22/10/2026"));
         assertNull(SftpPackageStorageService.parseUploadTime(" "));
         assertNull(SftpPackageStorageService.parseUploadTime(null));
+    }
+
+    @Test
+    @DisplayName("listPackages uses active.json to determine active version, updatedBy and updatedAt")
+    void listPackages_withActiveJson_returnsActiveVersion() {
+        when(template.exists("/Packages/Nouryon")).thenReturn(true);
+        mockDirectories("/Packages/Nouryon", "v1", "v2");
+        mockDirectories("/Packages/Nouryon/v1", "inbound");
+        mockDirectories("/Packages/Nouryon/v2", "inbound");
+        mockTypeWithPackage("/Packages/Nouryon/v1/inbound",
+                packageJson("nouryon", "inbound", "2024-06-19T12:00:00Z", "analist_a"));
+        mockTypeWithPackage("/Packages/Nouryon/v2/inbound",
+                packageJson("nouryon", "inbound", "2024-07-20T12:00:00Z", "analist_b"));
+
+        // active.json points inbound to v1
+        String activeJson = """
+                {
+                  "inbound": {
+                    "version": "v1",
+                    "updated_at": "2024-08-01T15:00:00Z",
+                    "updated_by": "lead_analyst"
+                  }
+                }
+                """;
+        when(template.exists("/Packages/Nouryon/active.json")).thenReturn(true);
+        doAnswer(inv -> {
+            InputStreamCallback cb = inv.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(activeJson.getBytes(StandardCharsets.UTF_8))) {
+                cb.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq("/Packages/Nouryon/active.json"), any(InputStreamCallback.class));
+
+        List<MappingPackageOverviewDto> results = service.listPackages("Nouryon");
+        assertEquals(1, results.size());
+        MappingPackageOverviewDto dto = results.get(0);
+        assertEquals("v1", dto.activeVersion());
+        assertEquals("v2", dto.latestVersion());
+        assertEquals("2024-08-01T15:00:00Z", dto.activeUpdatedAt());
+        assertEquals("lead_analyst", dto.activeUpdatedBy());
+        assertEquals("2024-06-19T12:00:00Z", dto.createdAt());
+        assertEquals("analist_a", dto.createdBy());
+    }
+
+    @Test
+    @DisplayName("setActivePackage updates active.json and returns updated overview")
+    void setActivePackage_updatesActiveJson() {
+        when(template.exists("/Packages/Nouryon")).thenReturn(true);
+        when(template.exists("/Packages/Nouryon/v1")).thenReturn(true);
+        when(template.exists("/Packages/Nouryon/v1/inbound")).thenReturn(true);
+        mockDirectories("/Packages/Nouryon", "v1", "v2");
+        mockTypeWithPackage("/Packages/Nouryon/v1/inbound",
+                packageJson("nouryon", "inbound", "2024-06-19T12:00:00Z", "analist_a"));
+
+        when(template.exists("/Packages/Nouryon/active.json")).thenReturn(false);
+
+        MappingPackageOverviewDto updated = service.setActivePackage("Nouryon", "inbound", "v1", "analist_x");
+        assertNotNull(updated);
+        assertEquals("v1", updated.activeVersion());
+        assertEquals("v2", updated.latestVersion());
+        assertEquals("analist_x", updated.activeUpdatedBy());
+        assertNotNull(updated.activeUpdatedAt());
+        verify(template, atLeastOnce()).execute(any());
+    }
+
+    @Test
+    @DisplayName("listVersions returns all versions for a type with active flag")
+    void listVersions_returnsVersionsWithActiveFlag() {
+        when(template.exists("/Packages/Nouryon")).thenReturn(true);
+        mockDirectories("/Packages/Nouryon", "v1", "v2");
+        mockDirectories("/Packages/Nouryon/v1", "inbound");
+        mockDirectories("/Packages/Nouryon/v2", "inbound");
+        mockTypeWithPackage("/Packages/Nouryon/v1/inbound",
+                packageJson("nouryon", "inbound", "2024-06-19T12:00:00Z", "analist_a"));
+        mockTypeWithPackage("/Packages/Nouryon/v2/inbound",
+                packageJson("nouryon", "inbound", "2024-07-20T12:00:00Z", "analist_b"));
+
+        String activeJson = """
+                {
+                  "inbound": {
+                    "version": "v1",
+                    "updated_at": "2024-08-01T15:00:00Z",
+                    "updated_by": "analist_a"
+                  }
+                }
+                """;
+        when(template.exists("/Packages/Nouryon/active.json")).thenReturn(true);
+        doAnswer(inv -> {
+            InputStreamCallback cb = inv.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(activeJson.getBytes(StandardCharsets.UTF_8))) {
+                cb.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq("/Packages/Nouryon/active.json"), any(InputStreamCallback.class));
+
+        var versions = service.listVersions("Nouryon", "inbound");
+        assertEquals(2, versions.size());
+        assertEquals("v2", versions.get(0).version());
+        assertFalse(versions.get(0).isActive());
+        assertEquals("v1", versions.get(1).version());
+        assertTrue(versions.get(1).isActive());
     }
 }

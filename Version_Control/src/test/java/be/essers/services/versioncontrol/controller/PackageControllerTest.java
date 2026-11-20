@@ -23,6 +23,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -232,5 +233,48 @@ class PackageControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadGateway())
                 .andExpect(jsonPath("$.title").value("SFTP Storage Error"));
+    }
+
+    @Test
+    @DisplayName("GET /packages/versions returns list of package versions")
+    void getVersions_returnsList() throws Exception {
+        var v1 = new be.essers.services.versioncontrol.domain.dto.PackageVersionDto("v1", true, "2024-06-19T12:00:00Z", "analist_a", "Initial");
+        var v2 = new be.essers.services.versioncontrol.domain.dto.PackageVersionDto("v2", false, "2024-07-20T12:00:00Z", "analist_b", "Update");
+
+        when(packageStorageService.listVersions("nouryon", "inbound")).thenReturn(List.of(v1, v2));
+
+        mockMvc.perform(get("/packages/versions")
+                        .param("company", "nouryon")
+                        .param("packageType", "inbound")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].version").value("v1"))
+                .andExpect(jsonPath("$[0].isActive").value(true))
+                .andExpect(jsonPath("$[1].version").value("v2"))
+                .andExpect(jsonPath("$[1].isActive").value(false));
+    }
+
+    @Test
+    @DisplayName("PUT /packages/active updates active package and returns 200")
+    void setActivePackage_returnsUpdatedDto() throws Exception {
+        MappingPackageOverviewDto updated = new MappingPackageOverviewDto(
+                "nouryon", "v2", "2024-06-19T12:00:00Z", "analist_a", "Nouryon", "inbound", "v1", "2024-08-01T15:00:00Z", "lead_analyst"
+        );
+
+        when(packageStorageService.setActivePackage("nouryon", "inbound", "v1", "lead_analyst"))
+                .thenReturn(updated);
+
+        mockMvc.perform(put("/packages/active")
+                        .param("company", "nouryon")
+                        .param("packageType", "inbound")
+                        .param("version", "v1")
+                        .param("user", "lead_analyst")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.company").value("nouryon"))
+                .andExpect(jsonPath("$.activeVersion").value("v1"))
+                .andExpect(jsonPath("$.latestVersion").value("v2"))
+                .andExpect(jsonPath("$.activeUpdatedBy").value("lead_analyst"));
     }
 }

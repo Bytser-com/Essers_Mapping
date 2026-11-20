@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useMappingPackageStore } from '../../stores/mappingPackageStore'
-import { fetchPackages } from '../../services/mappingPackageOverviewService'
+import { fetchPackages, setActivePackage } from '../../services/mappingPackageOverviewService'
 
 vi.mock('../../services/mappingPackageOverviewService')
 
@@ -149,5 +149,27 @@ describe('mappingPackageStore', () => {
         const state = useMappingPackageStore.getState()
         expect(state.error).toBe('Onbekende fout')
         expect(state.loading).toBe(false)
+    })
+
+    it('setActivePackage calls service and updates active package in memory', async () => {
+        // Arrange
+        useMappingPackageStore.setState({ packages: [...PACKAGES] })
+        const updatedPackage = {
+            ...PACKAGES[1],
+            activeVersion: 'v1',
+            activeUpdatedAt: '2026-11-20T22:00:00Z',
+            activeUpdatedBy: 'analist_test',
+        }
+        setActivePackage.mockResolvedValue(updatedPackage)
+
+        // Act
+        await useMappingPackageStore.getState().setActivePackage('nouryon', 'inbound', 'v1', 'analist_test')
+
+        // Assert
+        expect(setActivePackage).toHaveBeenCalledWith('nouryon', 'inbound', 'v1', 'analist_test')
+        const state = useMappingPackageStore.getState()
+        const updated = state.packages.find((p) => p.company === 'nouryon' && p.packageType === 'inbound')
+        expect(updated.activeVersion).toBe('v1')
+        expect(updated.activeUpdatedBy).toBe('analist_test')
     })
 })

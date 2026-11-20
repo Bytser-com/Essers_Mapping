@@ -178,4 +178,28 @@ describe('Version Control – mapping packages overview', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     expect(fetchMock).toHaveBeenCalledTimes(2)
   })
+
+  it('renders explicit active version and change info when present in backend response', async () => {
+    const pkgWithActive: MappingPackageOverview = {
+      company: 'nouryon',
+      latestVersion: 'v2',
+      createdAt: '2026-10-01T10:00:00',
+      createdBy: 'analist_a',
+      customerName: 'Nouryon',
+      packageType: 'inbound',
+      activeVersion: 'v1',
+      activeUpdatedAt: '2026-11-18T16:20:00',
+      activeUpdatedBy: 'lead_analyst',
+    }
+
+    fakeBackend([pkgWithActive])
+    renderPage()
+
+    await screen.findByText('Nouryon', { selector: 'td' })
+    const row = rowOf('Nouryon')
+    expect(within(row).getByText('v1')).toBeInTheDocument()
+    expect(within(row).getByText('nieuwste: v2')).toBeInTheDocument()
+    expect(within(row).getByText('18/11/2026 16:20')).toBeInTheDocument()
+    expect(within(row).getByText('door lead_analyst')).toBeInTheDocument()
+  })
 })

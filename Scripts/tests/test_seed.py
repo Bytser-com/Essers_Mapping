@@ -47,10 +47,13 @@ class TestSeed(unittest.TestCase):
 
             props, pkgs = seed_mod.seed_local(props_dir, pkgs_dir, force=True, client="nouryon")
             self.assertEqual(len(props), 0)
-            self.assertEqual(len(pkgs), 1)
+            self.assertEqual(len(pkgs), 2)  # MPackage.json and active.json
 
             nouryon_pkg = pkgs_dir / "nouryon" / "v1" / "inbound" / "MPackage.json"
             self.assertTrue(nouryon_pkg.is_file())
+
+            nouryon_active = pkgs_dir / "nouryon" / "active.json"
+            self.assertTrue(nouryon_active.is_file())
 
             brunos_pkg = pkgs_dir / "brunos" / "v1" / "outbound" / "MPackage.json"
             self.assertFalse(brunos_pkg.exists())
@@ -63,10 +66,13 @@ class TestSeed(unittest.TestCase):
             folder.mkdir(parents=True, exist_ok=True)
             pkg_file = folder / "MPackage.json"
             pkg_file.write_text('{"custom": true}', encoding="utf-8")
+            active_file = pkgs_dir / "nouryon" / "active.json"
+            active_file.write_text('{"custom": true}', encoding="utf-8")
 
             props, pkgs = seed_mod.seed_local(None, pkgs_dir, force=False, client="nouryon")
             self.assertEqual(len(pkgs), 0)
             self.assertEqual(pkg_file.read_text(encoding="utf-8"), '{"custom": true}')
+            self.assertEqual(active_file.read_text(encoding="utf-8"), '{"custom": true}')
 
 
 if __name__ == "__main__":

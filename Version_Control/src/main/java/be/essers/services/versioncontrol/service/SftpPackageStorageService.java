@@ -1,9 +1,12 @@
 package be.essers.services.versioncontrol.service;
 
+import be.essers.services.versioncontrol.domain.dto.ActivePackageInfo;
 import be.essers.services.versioncontrol.domain.dto.MappingPackageOverviewDto;
 import be.essers.services.versioncontrol.domain.dto.MappingPackage;
+import be.essers.services.versioncontrol.domain.dto.PackageVersionDto;
 import be.essers.services.versioncontrol.exception.EntityNotFoundException;
 import be.essers.services.versioncontrol.exception.StorageException;
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import org.apache.sshd.sftp.client.SftpClient;
 import org.apache.sshd.sftp.common.SftpConstants;
@@ -13,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
@@ -23,8 +27,10 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 
 /**
- * Reads mapping packages from SFTP. Layout:
+ * Reads and manages mapping packages from SFTP. Layout:
  * {@code <sftp.packages-path>/<companyName>/<version>/<type>/MPackage.json}
+ * Active package manifest:
+ * {@code <sftp.packages-path>/<companyName>/active.json}
  */
 @Service
 public class SftpPackageStorageService implements PackageStorageService {
@@ -32,6 +38,7 @@ public class SftpPackageStorageService implements PackageStorageService {
     private static final Logger log = LoggerFactory.getLogger(SftpPackageStorageService.class);
 
     private static final String METADATA_FILENAME = "MPackage.json";
+    private static final String ACTIVE_FILENAME = "active.json";
     private static final int MAX_COMPANY_LENGTH = 20;
 
     // Alphabetical on the name shown in the list (customerName, or the company folder), then on the type
@@ -68,6 +75,155 @@ public class SftpPackageStorageService implements PackageStorageService {
             log.error("Failed to list packages from SFTP share at {}: {}", packagesRoot, e.getMessage(), e);
             throw new StorageException("Unable to read packages from SFTP storage: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public MappingPackageOverviewDto setActivePackage(String company, String packageType, String version, String user) {
+        if (company == null || company.isBlank()) {
+            throw new IllegalArgumentException("Company parameter must not be empty");
+        }
+        if (company.length() > MAX_COMPANY_LENGTH) {
+            throw new IllegalArgumentException("Company parameter must not exceed " + MAX_COMPANY_LENGTH + " characters");
+        }
+        if (packageType == null || packageType.isBlank()) {
+            throw new IllegalArgumentException("PackageType parameter must not be empty");
+        }
+        if (version == null || version.isBlank()) {
+            throw new IllegalArgumentException("Version parameter must not be empty");
+        }
+
+        String resolvedCompany = resolveDirectoryName(packagesRoot, sanitizePathSegment(company));
+        if (resolvedCompany == null) {
+            throw new EntityNotFoundException("Company directory '" + company + "' does not exist at " + packagesRoot);
+        }
+
+        String companyPath = packagesRoot + "/" + resolvedCompany;
+        String sanitizedType = sanitizePathSegment(packageType).toLowerCase();
+        String sanitizedVersion = sanitizePathSegment(version);
+
+        // Verify that the requested version directory exists for this company
+        String resolvedVersion = resolveDirectoryName(companyPath, sanitizedVersion);
+        if (resolvedVersion == null) {
+            throw new EntityNotFoundException("Version directory '" + sanitizedVersion + "' does not exist for company '" + resolvedCompany + "'");
+        }
+
+        String versionPath = companyPath + "/" + resolvedVersion;
+        String resolvedType = resolveDirectoryName(versionPath, sanitizedType);
+        if (resolvedType == null) {
+            throw new EntityNotFoundException("Package type '" + sanitizedType + "' does not exist in version '" + resolvedVersion + "' for company '" + resolvedCompany + "'");
+        }
+
+        String typePath = versionPath + "/" + resolvedType;
+        SftpClient.DirEntry[] typeEntries = listEntries(typePath);
+        MappingPackage.Meta metadata = readMetadata(typePath, typeEntries);
+        String problem = findMetadataProblem(metadata);
+        if (problem != null) {
+            throw new EntityNotFoundException("Package at " + typePath + " is invalid: " + problem);
+        }
+
+        // Read current active.json or start empty
+        Map<String, ActivePackageInfo> activeMap = readActivePackages(companyPath);
+        String nowIso = Instant.now().toString();
+        String effectiveUser = (user != null && !user.isBlank()) ? user.trim() : "analist";
+        activeMap.put(sanitizedType, new ActivePackageInfo(resolvedVersion, nowIso, effectiveUser));
+
+        // Write active.json atomically
+        String activeJsonPath = companyPath + "/" + ACTIVE_FILENAME;
+        String tempPath = companyPath + "/." + ACTIVE_FILENAME + ".tmp";
+        try {
+            byte[] bytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(activeMap);
+            template.execute(session -> {
+                session.write(new ByteArrayInputStream(bytes), tempPath);
+                try {
+                    session.rename(tempPath, activeJsonPath);
+                } catch (Exception e) {
+                    try {
+                        session.remove(activeJsonPath);
+                    } catch (Exception ignored) {
+                    }
+                    session.rename(tempPath, activeJsonPath);
+                }
+                return null;
+            });
+            log.info("Updated active package for {}/{}: version={}, user={}", resolvedCompany, sanitizedType, resolvedVersion, effectiveUser);
+        } catch (Exception e) {
+            log.error("Failed to write active.json at {}: {}", activeJsonPath, e.getMessage(), e);
+            throw new StorageException("Unable to update active.json: " + e.getMessage(), e);
+        }
+
+        // Return updated overview directly
+        List<String> versions = listSubdirectories(companyPath);
+        versions.sort(VersionComparator.INSTANCE);
+        String latestVer = versions.isEmpty() ? resolvedVersion : versions.get(versions.size() - 1);
+
+        String createdAt = extractCreatedAt(typeEntries, metadata);
+        String createdBy = metadata != null ? metadata.userCreated() : null;
+        String customerName = metadata != null ? metadata.clientName() : null;
+
+        return new MappingPackageOverviewDto(
+                resolvedCompany,
+                latestVer,
+                createdAt,
+                createdBy,
+                customerName,
+                sanitizedType,
+                resolvedVersion,
+                nowIso,
+                effectiveUser
+        );
+    }
+
+    @Override
+    public List<PackageVersionDto> listVersions(String company, String packageType) {
+        if (company == null || company.isBlank()) {
+            throw new IllegalArgumentException("Company parameter must not be empty");
+        }
+        if (packageType == null || packageType.isBlank()) {
+            throw new IllegalArgumentException("PackageType parameter must not be empty");
+        }
+
+        String resolvedCompany = resolveDirectoryName(packagesRoot, sanitizePathSegment(company));
+        if (resolvedCompany == null) {
+            throw new EntityNotFoundException("Company directory '" + company + "' does not exist at " + packagesRoot);
+        }
+
+        String companyPath = packagesRoot + "/" + resolvedCompany;
+        String sanitizedType = sanitizePathSegment(packageType).toLowerCase();
+        Map<String, ActivePackageInfo> activeMap = readActivePackages(companyPath);
+        ActivePackageInfo activeInfo = activeMap.get(sanitizedType);
+
+        List<String> versions = listSubdirectories(companyPath);
+        versions.sort(VersionComparator.INSTANCE);
+
+        List<PackageVersionDto> result = new ArrayList<>();
+        // Walk from newest to oldest
+        for (int i = versions.size() - 1; i >= 0; i--) {
+            String version = versions.get(i);
+            String versionPath = companyPath + "/" + version;
+
+            for (String typeName : listSubdirectories(versionPath)) {
+                if (sanitizedType.equalsIgnoreCase(typeName)) {
+                    String typePath = versionPath + "/" + typeName;
+                    SftpClient.DirEntry[] typeEntries = listEntries(typePath);
+                    MappingPackage.Meta metadata = readMetadata(typePath, typeEntries);
+                    String problem = findMetadataProblem(metadata);
+                    if (problem != null) {
+                        continue;
+                    }
+
+                    boolean isActive = (activeInfo != null && activeInfo.version() != null)
+                            ? version.equalsIgnoreCase(activeInfo.version())
+                            : (i == versions.size() - 1); // default newest is active if no active.json
+
+                    String createdAt = extractCreatedAt(typeEntries, metadata);
+                    String createdBy = metadata != null ? metadata.userCreated() : null;
+                    String description = metadata != null ? metadata.description() : null;
+
+                    result.add(new PackageVersionDto(version, isActive, createdAt, createdBy, description));
+                }
+            }
+        }
+        return result;
     }
 
     private List<MappingPackageOverviewDto> getOverviewsForCompany(String company) {
@@ -113,14 +269,20 @@ public class SftpPackageStorageService implements PackageStorageService {
         return results;
     }
 
+    private record VersionPackageData(String version, SftpClient.DirEntry[] entries, MappingPackage.Meta metadata) {}
+
     /**
-     * Walks the versions from newest to oldest and returns one overview per package type:
-     * for every type the company has, the newest version with a valid MPackage.json.
-     * A type that only exists in an older version is still returned (with that older version).
+     * Walks the versions and active.json for a company and returns one overview per package type.
+     * The active version is retrieved from {@code active.json} if present, otherwise falling back
+     * to the latest version found.
      */
     private List<MappingPackageOverviewDto> findLatestPackagesForCompany(String companyName, List<String> versions) {
         String companyPath = packagesRoot + "/" + companyName;
-        Map<String, MappingPackageOverviewDto> latestByType = new LinkedHashMap<>();
+        Map<String, ActivePackageInfo> activeMap = readActivePackages(companyPath);
+
+        // Group packages by type: packageType -> (version -> VersionPackageData)
+        Map<String, String> latestVersionByType = new LinkedHashMap<>();
+        Map<String, Map<String, VersionPackageData>> versionsByType = new LinkedHashMap<>();
 
         for (int i = versions.size() - 1; i >= 0; i--) {
             String version = versions.get(i);
@@ -136,13 +298,100 @@ public class SftpPackageStorageService implements PackageStorageService {
                     continue;
                 }
                 String packageType = resolvePackageType(metadata, typeName);
-                // Versions are walked newest first, so the first package of a type is its latest
-                latestByType.putIfAbsent(packageType,
-                        toOverview(companyName, version, packageType, typeEntries, metadata));
+                latestVersionByType.putIfAbsent(packageType, version);
+                versionsByType.computeIfAbsent(packageType, k -> new LinkedHashMap<>())
+                        .put(version, new VersionPackageData(version, typeEntries, metadata));
             }
         }
 
-        return new ArrayList<>(latestByType.values());
+        List<MappingPackageOverviewDto> result = new ArrayList<>();
+        for (Map.Entry<String, String> entry : latestVersionByType.entrySet()) {
+            String packageType = entry.getKey();
+            String latestVer = entry.getValue();
+            ActivePackageInfo activeInfo = activeMap.get(packageType);
+
+            String activeVer = (activeInfo != null && activeInfo.version() != null)
+                    ? activeInfo.version()
+                    : latestVer;
+
+            Map<String, VersionPackageData> typeVersions = versionsByType.get(packageType);
+            VersionPackageData activeData = (typeVersions != null) ? typeVersions.get(activeVer) : null;
+            if (activeData == null && typeVersions != null) {
+                // If active version in active.json points to a version not found, fallback to latest
+                activeData = typeVersions.get(latestVer);
+                activeVer = latestVer;
+            }
+
+            String activeUpdatedAt = (activeInfo != null && activeInfo.updatedAt() != null)
+                    ? activeInfo.updatedAt()
+                    : (activeData != null ? extractCreatedAt(activeData.entries(), activeData.metadata()) : null);
+
+            String activeUpdatedBy = (activeInfo != null && activeInfo.updatedBy() != null)
+                    ? activeInfo.updatedBy()
+                    : (activeData != null && activeData.metadata() != null ? activeData.metadata().userCreated() : null);
+
+            String customerName = activeData != null && activeData.metadata() != null
+                    ? activeData.metadata().clientName()
+                    : null;
+
+            String createdAt = activeData != null
+                    ? extractCreatedAt(activeData.entries(), activeData.metadata())
+                    : null;
+
+            String createdBy = activeData != null && activeData.metadata() != null
+                    ? activeData.metadata().userCreated()
+                    : null;
+
+            result.add(new MappingPackageOverviewDto(
+                    companyName,
+                    latestVer,
+                    createdAt,
+                    createdBy,
+                    customerName,
+                    packageType,
+                    activeVer,
+                    activeUpdatedAt,
+                    activeUpdatedBy
+            ));
+        }
+
+        return result;
+    }
+
+    private Map<String, ActivePackageInfo> readActivePackages(String companyPath) {
+        String activePath = companyPath + "/" + ACTIVE_FILENAME;
+        if (!template.exists(activePath)) {
+            return new HashMap<>();
+        }
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            boolean success = template.get(activePath, in -> in.transferTo(baos));
+            if (success && baos.size() > 0) {
+                JsonNode root = objectMapper.readTree(baos.toByteArray());
+                if (root == null || !root.isObject()) {
+                    return new HashMap<>();
+                }
+                JsonNode typesNode = root.has("types") && root.get("types").isObject() ? root.get("types") : root;
+                Map<String, ActivePackageInfo> result = new HashMap<>();
+                for (var entry : typesNode.properties()) {
+                    String type = entry.getKey().toLowerCase();
+                    ActivePackageInfo info = objectMapper.treeToValue(entry.getValue(), ActivePackageInfo.class);
+                    if (info != null && info.version() != null && !info.version().isBlank()) {
+                        result.put(type, info);
+                    }
+                }
+                return result;
+            }
+        } catch (Exception e) {
+            log.warn("Failed to read active.json at {}: {}", activePath, e.getMessage());
+        }
+        return new HashMap<>();
+    }
+
+    private String extractCreatedAt(SftpClient.DirEntry[] entries, MappingPackage.Meta metadata) {
+        return (metadata != null && metadata.dateCreated() != null)
+                ? metadata.dateCreated()
+                : extractLatestFileTimestamp(entries);
     }
 
     // meta.package_type of the package, or the type folder name when it is missing; lowercase
@@ -164,16 +413,10 @@ public class SftpPackageStorageService implements PackageStorageService {
         String typePath = versionPath + "/" + typeName;
         SftpClient.DirEntry[] typeEntries = listEntries(typePath);
         MappingPackage.Meta metadata = readMetadata(typePath, typeEntries);
-        return toOverview(companyName, version, resolvePackageType(metadata, typeName), typeEntries, metadata);
-    }
-
-    private MappingPackageOverviewDto toOverview(String companyName, String version, String packageType,
-                                                 SftpClient.DirEntry[] entries, MappingPackage.Meta metadata) {
-        String createdAt = (metadata != null && metadata.dateCreated() != null)
-                ? metadata.dateCreated()
-                : extractLatestFileTimestamp(entries);
-        String createdBy = (metadata != null) ? metadata.userCreated() : null;
-        String customerName = (metadata != null) ? metadata.clientName() : null;
+        String createdAt = extractCreatedAt(typeEntries, metadata);
+        String createdBy = metadata != null ? metadata.userCreated() : null;
+        String customerName = metadata != null ? metadata.clientName() : null;
+        String packageType = resolvePackageType(metadata, typeName);
 
         return new MappingPackageOverviewDto(
                 companyName,
@@ -181,7 +424,10 @@ public class SftpPackageStorageService implements PackageStorageService {
                 createdAt,
                 createdBy,
                 customerName,
-                packageType
+                packageType,
+                version,
+                createdAt,
+                createdBy
         );
     }
 

@@ -154,3 +154,4 @@ htmlcov/
 
 # Testbestanden voor de lokale SFTP
 sftp-data/data/
+data/

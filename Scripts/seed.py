@@ -157,6 +157,24 @@ PACKAGE_EXAMPLES: list[dict[str, Any]] = [
     }
 ]
 
+# Dedicated active packages configuration per company
+ACTIVE_PACKAGE_EXAMPLES: dict[str, dict[str, dict[str, str]]] = {
+    "nouryon": {
+        "inbound": {
+            "version": "v1",
+            "updated_at": "2024-06-19T12:00:00Z",
+            "updated_by": "analist_a",
+        }
+    },
+    "brunos": {
+        "outbound": {
+            "version": "v1",
+            "updated_at": "2024-07-01T09:30:00Z",
+            "updated_by": "analist_b",
+        }
+    },
+}
+
 
 # ---------------------------------------------------------------------------
 # Environment Loader
@@ -249,6 +267,20 @@ def seed_local(
                 created_pkgs.append(str(pkg_file))
             else:
                 logger.info("Local mapping package exists, skipped: %s", pkg_file)
+
+        # Seed active packages config (active.json per company)
+        for company, active_data in ACTIVE_PACKAGE_EXAMPLES.items():
+            if client and company.lower() != client.lower():
+                continue
+            active_file = target_packages / company / "active.json"
+            if force or not active_file.is_file():
+                content = json.dumps(active_data, indent=2, ensure_ascii=False) + "\n"
+                active_file.parent.mkdir(parents=True, exist_ok=True)
+                active_file.write_text(content, encoding="utf-8")
+                logger.info("Created local active packages config: %s", active_file)
+                created_pkgs.append(str(active_file))
+            else:
+                logger.info("Local active packages config exists, skipped: %s", active_file)
 
     return created_props, created_pkgs
 
@@ -384,6 +416,38 @@ def seed_sftp(
                     created_pkgs.append(remote_file)
                 else:
                     logger.info("SFTP mapping package exists, skipped: %s", remote_file)
+
+            # Seed active packages config (active.json per company)
+            for company, active_data in ACTIVE_PACKAGE_EXAMPLES.items():
+                if client and company.lower() != client.lower():
+                    continue
+                company_folder = posixpath.join(pkgs_base, company)
+                make_remote_dirs(company_folder)
+                remote_active = posixpath.join(company_folder, "active.json")
+                exists = False
+                try:
+                    sftp.stat(remote_active)
+                    exists = True
+                except OSError:
+                    pass
+
+                if force or not exists:
+                    content = json.dumps(active_data, indent=2, ensure_ascii=False) + "\n"
+                    temp_file = posixpath.join(company_folder, ".active.json.tmp")
+                    with sftp.open(temp_file, "wb") as f:
+                        f.write(content.encode("utf-8"))
+                    try:
+                        sftp.posix_rename(temp_file, remote_active)
+                    except OSError:
+                        try:
+                            sftp.remove(remote_active)
+                        except OSError:
+                            pass
+                        sftp.rename(temp_file, remote_active)
+                    logger.info("Created SFTP active packages config: %s", remote_active)
+                    created_pkgs.append(remote_active)
+                else:
+                    logger.info("SFTP active packages config exists, skipped: %s", remote_active)
 
     finally:
         sftp.close()
