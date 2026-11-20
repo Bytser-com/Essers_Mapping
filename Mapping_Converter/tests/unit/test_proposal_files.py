@@ -6,6 +6,7 @@ from scripts.errors import ProposalConflictError, ProposalNotFoundError
 from services.proposal_files import (
     ProposalLocation,
     find_proposal,
+    find_workbook,
     read_metadata,
     validate_reference,
     write_metadata,
@@ -63,3 +64,39 @@ def test_statuses_compare_equal_to_the_codes_in_the_metadata():
     assert ProposalStatus.AI_CHECKING_REVIEW == 'AI_CHECKING_REVIEW'
     assert {'READY_FOR_REVIEW', 'IN_REVIEW', 'In review'} == set(APPROVABLE_STATUSES)
     assert 'RETURNED' not in APPROVABLE_STATUSES
+
+
+# ---------------------------------------------------------------------------
+# find_workbook: which Excel file belongs to the proposal
+# ---------------------------------------------------------------------------
+def workbook_folder(root, *names):
+    folder = root / 'nouryon' / 'v2' / 'inbound'
+    folder.mkdir(parents=True)
+    for name in names:
+        (folder / name).write_bytes(b'x')
+    return ProposalLocation('nouryon', 'v2', 'inbound', 'nouryon/v2/inbound/metadata.json')
+
+
+def test_workbook_from_the_metadata_filename_wins(proposals_root, proposals_storage):
+    location = workbook_folder(proposals_root, 'MProposal-Nouryon_V2.xlsx', 'custom.xlsx')
+    with proposals_storage.session() as s:
+        assert find_workbook(s, location, {'filename': 'custom.xlsx'}) == 'nouryon/v2/inbound/custom.xlsx'
+
+
+def test_mproposal_workbook_is_preferred(proposals_root, proposals_storage):
+    location = workbook_folder(proposals_root, 'aaa.xlsx', 'MProposal-Nouryon_V2.xlsx', 'notes.txt')
+    with proposals_storage.session() as s:
+        path = find_workbook(s, location, {'filename': 'missing.xlsx'})
+    assert path == 'nouryon/v2/inbound/MProposal-Nouryon_V2.xlsx'
+
+
+def test_hidden_files_and_other_types_are_ignored(proposals_root, proposals_storage):
+    location = workbook_folder(proposals_root, '.MProposal.xlsx.tmp', '.hidden.xlsx', 'notes.txt', 'mapping.xlsx')
+    with proposals_storage.session() as s:
+        assert find_workbook(s, location, {}) == 'nouryon/v2/inbound/mapping.xlsx'
+
+
+def test_folder_without_workbook_is_not_found(proposals_root, proposals_storage):
+    location = workbook_folder(proposals_root, 'notes.txt')
+    with proposals_storage.session() as s, pytest.raises(ProposalNotFoundError):
+        find_workbook(s, location, {})

@@ -4,6 +4,7 @@ Covers the flow from approving a reviewed proposal up to storing the mapping pac
 on the shared SFTP server. The endpoints live in routers/ (one file per resource):
 
     routers/approve.py   POST /approve              approve a reviewed proposal (story 185)
+    routers/review.py    POST /review-excel         AI consistency review of a proposal (story 51)
     routers/convert.py   POST /convert              Excel proposal -> JSON mapping package (story 54)
                          POST /convert-and-upload   ... and store it as MPackage.json
 
@@ -19,7 +20,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import approve, convert
+from routers import approve, convert, review
 from scripts.config import cors_origins
 
 logging.basicConfig(level=logging.INFO)
@@ -32,6 +33,7 @@ if _origins:
     app.add_middleware(CORSMiddleware, allow_origins=_origins, allow_methods=['GET', 'POST'], allow_headers=['*'])
 
 app.include_router(approve.router)
+app.include_router(review.router)
 app.include_router(convert.router)
 
 

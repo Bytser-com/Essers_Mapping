@@ -273,6 +273,10 @@ def test_sftp_session_reads_and_writes_files(disk):
         assert s.read_text('nouryon/v1/inbound/metadata.json') == '{"status": "In review"}'
         assert s.list_dirs('nouryon') == ['v1']
         assert s.list_dirs('onbekend') == []
+        assert s.list_files('nouryon/v1/inbound') == ['metadata.json']
+        assert s.list_files('nouryon') == []
+        assert s.list_files('onbekend') == []
+        assert s.read_bytes('nouryon/v1/inbound/metadata.json') == b'{"status": "In review"}'
 
     assert (disk / 'Proposals/nouryon/v1/inbound/metadata.json').is_file()
 
@@ -308,3 +312,15 @@ def test_sftp_session_rejects_paths_outside_the_root(disk):
     storage = FakeSftpStorage(disk, base_dir='/')
     with storage.session() as s, pytest.raises(StorageError):
         s.read_text('../secret.txt')
+
+
+def test_local_storage_lists_files_and_reads_bytes(tmp_path):
+    storage = LocalStorage(tmp_path)
+    (tmp_path / 'nouryon' / 'v1').mkdir(parents=True)
+    (tmp_path / 'nouryon' / 'v1' / 'MProposal.xlsx').write_bytes(b'\x50\x4b')
+
+    with storage.session() as s:
+        assert s.list_files('nouryon/v1') == ['MProposal.xlsx']
+        assert s.list_files('nouryon') == []
+        assert s.list_files('onbekend') == []
+        assert s.read_bytes('nouryon/v1/MProposal.xlsx') == b'PK'

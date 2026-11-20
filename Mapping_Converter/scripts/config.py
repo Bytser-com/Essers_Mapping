@@ -6,6 +6,7 @@ services point at the same shared SFTP server (sftp-shared).
 from __future__ import annotations
 
 import os
+from dataclasses import dataclass
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -14,6 +15,7 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / 'data'
 LOCAL_SHARED_DIR = DATA_DIR / 'sftp-shared'
+PROMPT_PATH = ROOT / 'review_prompt.txt'  # instructions for the Gemini review
 
 _env_loaded = False
 
@@ -98,3 +100,37 @@ def cors_origins() -> list[str]:
     """Browser origins allowed to call the API directly (comma-separated CORS_ORIGINS)."""
     _load_env()
     return [origin.strip() for origin in os.getenv('CORS_ORIGINS', '').split(',') if origin.strip()]
+
+
+# ---------------------------------------------------------------------------
+# Gemini review (story 51)
+# ---------------------------------------------------------------------------
+DEFAULT_REVIEW_TIMEOUT_MS = 60_000
+
+
+@dataclass(frozen=True)
+class ReviewSettings:
+    api_key: str
+    model: str
+    timeout_ms: int = DEFAULT_REVIEW_TIMEOUT_MS
+
+
+def load_review_settings() -> ReviewSettings:
+    """Gemini settings. GEMINI_REVIEW_MODEL overrides the shared GEMINI_MODEL; the timeout
+    comes from GEMINI_REVIEW_TIMEOUT_SECONDS, else GEMINI_REVIEW_TIMEOUT_MS (default 60 s)."""
+    load_dotenv(REPO_ROOT / '.env', override=False)
+    return ReviewSettings(
+        api_key=os.getenv('GEMINI_API_KEY', '').strip(),
+        model=(os.getenv('GEMINI_REVIEW_MODEL') or os.getenv('GEMINI_MODEL') or '').strip(),
+        timeout_ms=_review_timeout_ms(),
+    )
+
+
+def _review_timeout_ms() -> int:
+    seconds = os.getenv('GEMINI_REVIEW_TIMEOUT_SECONDS', '').strip()
+    if seconds.isdigit():
+        return int(seconds) * 1000
+    milliseconds = os.getenv('GEMINI_REVIEW_TIMEOUT_MS', '').strip()
+    if milliseconds.isdigit():
+        return int(milliseconds)
+    return DEFAULT_REVIEW_TIMEOUT_MS

@@ -10,7 +10,18 @@ This service does **not** generate proposals (that is `Mapping_Proposal`) and do
 2. **The frontend calls `POST /approve`** on this service (through `/api/converter/*`).
 3. **The converter checks the proposal** on the shared SFTP server (`sftp-shared`): it must exist and be in review (`READY_FOR_REVIEW`, `IN_REVIEW` or `In review`).
 4. **The converter updates the metadata** of that version: status `AI_CHECKING_REVIEW` ("AI-controle bezig"), the description and the approval time.
-5. **The AI review starts.** It picks up proposals with status `AI_CHECKING_REVIEW` (separate story). While it runs, the proposal cannot be approved again.
+5. **The AI review starts.** It picks up proposals with status `AI_CHECKING_REVIEW` (story 187 links this). While it runs, the proposal cannot be approved again.
+
+## What does the AI review check?
+
+`POST /review-excel` reads the proposal workbook from the shared SFTP server and asks Gemini whether the mappings are **internally consistent**: suspicious duplicate target fields, conflicting source mappings and obvious rule contradictions. Conditional or otherwise justified mappings need not be rejected.
+
+1. **Find the workbook** (`services/review.py`, `services/proposal_files.py`): the `filename` in the metadata, otherwise the `MProposal-*.xlsx` in the proposal folder.
+2. **Extract the rows** (`scripts/excel_review.py`) from the `Mapping Proposal` sheet (name is case-insensitive).
+3. **Ask Gemini** (`scripts/gemini_review.py`, instructions in `review_prompt.txt`).
+4. **Return** `ACCEPTED` or `REJECTED` with a summary and findings. Nothing is written yet.
+
+`ACCEPTED` means the workbook passed Gemini's consistency check, **not** that the business mappings were verified independently. An error response is never an acceptance.
 
 ## What happens when you convert a proposal?
 
@@ -48,21 +59,27 @@ Mapping_Converter/
 ├── Dockerfile              Container image (python:3.12-slim, port 8000)
 ├── routers/                HTTP endpoints, one file per resource (thin: they call services/)
 │   ├── approve.py          POST /approve – approve a reviewed proposal
+│   ├── review.py           POST /review-excel – AI consistency review of a stored proposal
 │   └── convert.py          POST /convert and /convert-and-upload – Excel proposal -> JSON package
 ├── services/               Business logic
 │   ├── approval.py         Validation and status update when a proposal is approved
 │   ├── excel_converter.py  Parse an Excel mapping proposal into a MappingPackage
 │   ├── packages.py         Name, add metadata to and store MPackage.json
-│   ├── proposal_files.py   Find a proposal version and read/write its metadata (reuse this in new steps)
+│   ├── proposal_files.py   Find a proposal version, its workbook and its metadata (reuse this in new steps)
+│   ├── review.py           Read a proposal workbook from the storage and run the AI review
 │   ├── statuses.py         ProposalStatus enum and the statuses that may be approved
 │   └── storage.py          Connection to the shared SFTP server (or a local stand-in folder)
 ├── scripts/                Shared basics
 │   ├── config.py           Settings from the shared .env in the repo root (read in one place)
 │   ├── errors.py           Clear error types (StorageError, ProposalNotFoundError, ...)
 │   ├── models.py           Pydantic models: MappingEntry, PackageMeta, MappingPackage, responses
+│   ├── pipeline.py         AI review: extract the Excel rows, then ask Gemini
+│   ├── excel_review.py     Read the mapping rows of a workbook for the AI review (with size limits)
+│   ├── gemini_review.py    Call Gemini and check its structured answer
 │   └── safe_files.py       Safe paths and atomic file writes
+├── review_prompt.txt       Instructions for the Gemini review
 └── tests/
-    ├── conftest.py         Shared fixtures (a temporary proposals folder)
+    ├── conftest.py         Shared fixtures (a temporary proposals folder, a test workbook)
     ├── api/                Endpoint tests with FastAPI's TestClient
     └── unit/               Tests for services/ and scripts/
 ```
@@ -106,6 +123,9 @@ Variables that are already set in the terminal or in Kubernetes always win over 
 | `SFTP_SHARED_PROPOSALS_DIR` | Folder with the proposals | `/Proposals` |
 | `SFTP_SHARED_PACKAGES_DIR` | Folder for the mapping packages | `/Packages` |
 | `CORS_ORIGINS` | Only when a browser calls this API directly | `http://localhost:5173` |
+| `GEMINI_API_KEY` | API key for the AI review | your own key |
+| `GEMINI_REVIEW_MODEL` | Model for the AI review; empty = `GEMINI_MODEL` | `gemini-3.5-flash-lite` |
+| `GEMINI_REVIEW_TIMEOUT_SECONDS` | Timeout of one review call (or `GEMINI_REVIEW_TIMEOUT_MS`) | `60` |
 
 **Never commit `.env`.** It is ignored by Git.
 
@@ -116,6 +136,7 @@ Variables that are already set in the terminal or in Kubernetes always win over 
 | `GET /health` | `{"status": "ok", "service": "mapping-converter"}` |
 | `GET /` | `{"message": "Mapping Converter Service"}` |
 | `POST /approve` | approves a reviewed proposal and starts the AI review |
+| `POST /review-excel` | AI consistency review of a stored proposal: `ACCEPTED` or `REJECTED` (`/review` is a hidden alias) |
 | `POST /convert` | **preview:** converts an Excel proposal to the JSON package, nothing is stored |
 | `POST /convert-and-upload` | converts an Excel proposal and stores `MPackage.json` on SFTP (`/convert/save` is a hidden alias) |
 
@@ -157,6 +178,38 @@ Response `200 OK`:
 | `502 Bad Gateway` | The shared SFTP server cannot be reached |
 
 Errors return `{"detail": "<Dutch message>"}`; the frontend shows that message as is.
+
+### POST /review-excel
+
+```http
+POST /review-excel?company=nouryon&version=v2&proposalType=inbound
+```
+
+No body. `version` may be `v2` or `2`. Response `200`:
+
+```json
+{
+  "decision": "REJECTED",
+  "summary": "Conflicting target mappings were detected.",
+  "findings": ["Two unconditional mappings target the same CITY field with different source paths."],
+  "checked_mappings": 96
+}
+```
+
+`findings` are plain strings for now.
+
+| Status | When |
+|---|---|
+| `400` | invalid parameters |
+| `404` | customer, version, proposal type, metadata or workbook not found |
+| `409` | the metadata is not valid JSON |
+| `422` | the workbook is not a valid mapping proposal |
+| `502` | the SFTP server is not reachable |
+| `503` | the AI review is temporarily unavailable (no key, quota, timeout, invalid answer) |
+
+```powershell
+curl.exe -X POST "http://localhost:8001/review-excel?company=voorbeeldbedrijf-b&version=v2&proposalType=outbound"
+```
 
 ### POST /convert and POST /convert-and-upload
 
@@ -309,11 +362,13 @@ python -m ruff check .
 
 The tests never use the real SFTP server: they use a temporary folder or a fake SFTP client.
 
-- `tests/api/`: endpoint tests (`/approve`, `/`, `/convert`, `/convert-and-upload`, validation and errors).
-- `tests/unit/`: approval, proposal files and statuses, Excel parsing, package naming/storage, config and storage.
+- `tests/api/`: endpoint tests (`/approve`, `/review-excel`, `/`, `/convert`, `/convert-and-upload`, validation and errors).
+- `tests/unit/`: approval, proposal files and statuses, AI review (workbook, pipeline, settings), Excel parsing, package naming/storage, config and storage.
+
+The tests never call Gemini: the review is replaced by a fake.
 
 Some Excel tests use the real example `data/shared-sftp/Proposals/nouryon/v4/MProposal-Nouryon_V4.xlsx` in the repo root and are skipped when it is not there. The project norm is **at least 70% coverage**. To run the tests of all projects at once, use `.\Scripts\run-tests.cmd` from the repo root.
 
 ## Kubernetes
 
-The service runs as the `mapping-converter` deployment (`Kubernetes/base/preparation/mapping-converter.yaml`), listens on port 8000 and is only reachable through the frontend, which proxies `/api/converter/*`. The SFTP settings come from the `common-config` ConfigMap and the `sftp-shared-credentials` Secret. A NetworkPolicy allows access to `sftp-shared` and blocks `sftp-runtime`.
+The service runs as the `mapping-converter` deployment (`Kubernetes/base/preparation/mapping-converter.yaml`), listens on port 8000 and is only reachable through the frontend, which proxies `/api/converter/*`. The SFTP settings come from the `common-config` ConfigMap and the `sftp-shared-credentials` Secret, the Gemini key from the `gemini-api` Secret. A NetworkPolicy allows access to `sftp-shared` and blocks `sftp-runtime`.

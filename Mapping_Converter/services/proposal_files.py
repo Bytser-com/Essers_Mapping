@@ -18,6 +18,7 @@ from services.storage import StorageSession
 
 # Same preference as Version_Control: metadata.json first, then proposal.json.
 METADATA_FILES = ('metadata.json', 'proposal.json')
+WORKBOOK_SUFFIXES = ('.xlsx', '.xls')
 MAX_NAME_LENGTH = 20  # company and proposal type, same limit as Version_Control
 _VERSION = re.compile(r'^v\d+$', re.IGNORECASE)
 
@@ -80,6 +81,24 @@ def read_metadata(s: StorageSession, location: ProposalLocation) -> dict:
 def write_metadata(s: StorageSession, location: ProposalLocation, data: dict) -> None:
     """Write the metadata back (atomic on both storages)."""
     s.write_text(location.metadata_path, json.dumps(data, indent=2, ensure_ascii=False) + '\n')
+
+
+def find_workbook(s: StorageSession, location: ProposalLocation, metadata: dict) -> str:
+    """Path of the proposal's Excel workbook. Raises ProposalNotFoundError.
+
+    Prefers the ``filename`` from the metadata (set by Mapping_Proposal), then an
+    ``MProposal-*`` workbook, then any other Excel file in the proposal folder.
+    """
+    files = s.list_files(location.folder)
+    preferred = metadata.get('filename')
+    if isinstance(preferred, str) and preferred in files:
+        return f'{location.folder}/{preferred}'
+
+    workbooks = [f for f in files if f.lower().endswith(WORKBOOK_SUFFIXES) and not f.startswith('.')]
+    if not workbooks:
+        raise ProposalNotFoundError(f"Geen Excel-bestand gevonden in '{location.folder}'")
+    chosen = next((f for f in workbooks if f.lower().startswith('mproposal')), workbooks[0])
+    return f'{location.folder}/{chosen}'
 
 
 def _check_name(value: str | None, label: str) -> str:
