@@ -26,6 +26,8 @@ Mapping_Converter/
 │   └── approve.py          POST /approve – approve a reviewed proposal
 ├── services/               Business logic
 │   ├── approval.py         Validation and status update when a proposal is approved
+│   ├── proposal_files.py   Find a proposal version and read/write its metadata (reuse this in new steps)
+│   ├── statuses.py         ProposalStatus enum and the statuses that may be approved
 │   └── storage.py          Connection to the shared SFTP server (or a local stand-in folder)
 ├── scripts/                Shared basics
 │   ├── config.py           Settings from the shared .env in the repo root (read in one place)

@@ -74,6 +74,7 @@ describe('proposalService', () => {
         klant: 'Brunos',
         versie: 3,
         status: 'In review',
+        statusCode: 'IN_REVIEW',
         geupload: '2026-10-30T10:00:00',
         mappings: DTO.mappings,
       })

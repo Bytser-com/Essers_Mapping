@@ -4,8 +4,10 @@ from datetime import UTC, datetime
 import pytest
 
 from scripts.errors import ProposalConflictError, ProposalNotFoundError
-from services.approval import AI_CHECKING_REVIEW, approve_proposal, clean_description
+from services.approval import approve_proposal, clean_description
+from services.statuses import ProposalStatus
 
+AI_CHECKING_REVIEW = ProposalStatus.AI_CHECKING_REVIEW.value
 NOW = datetime(2026, 11, 20, 10, 0, tzinfo=UTC)
 
 

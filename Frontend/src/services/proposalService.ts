@@ -65,6 +65,12 @@ function parseScore(score: string | number | null | undefined): number | null {
   return Number.isFinite(num) ? Math.round(num) : null;
 }
 
+/** Raw status code as the backend writes it, normalised (e.g. "In review" -> "IN_REVIEW"). */
+function normalizeStatusCode(rawStatus?: string | null): string | undefined {
+  if (!rawStatus) return undefined;
+  return rawStatus.trim().toUpperCase().replace(/\s+/g, "_");
+}
+
 function mapStatusLabel(rawStatus?: string | null): string {
   if (!rawStatus) return "Klaar om na te kijken";
   const s = rawStatus.toUpperCase();
@@ -91,6 +97,7 @@ export async function getProposal(company: string, version?: string, proposalTyp
         versie: versionNum,
         
         status: mapStatusLabel(fileData.status),
+        statusCode: normalizeStatusCode(fileData.status),
         geupload: isoUpload,
         mappings: (fileData.rows || []).map((row, index) => ({
           id: `row-${index + 1}`,
@@ -147,6 +154,7 @@ export async function getProposal(company: string, version?: string, proposalTyp
       klant: item.company || company,
       versie: versionNum,
       status: mapStatusLabel(item.status),
+      statusCode: normalizeStatusCode(item.status),
       geupload: item.createdDate || new Date().toISOString(),
       mappings: item.mappings,
     };
@@ -173,6 +181,7 @@ export async function getProposal(company: string, version?: string, proposalTyp
       klant: fileData.companyname || item.company || company,
       versie: versionNum,
       status: mapStatusLabel(fileData.status || item.status),
+      statusCode: normalizeStatusCode(fileData.status || item.status),
       geupload: isoUpload,
       mappings: (fileData.rows || []).map((row, index) => ({
         id: `row-${index + 1}`,
@@ -200,6 +209,7 @@ export async function getProposal(company: string, version?: string, proposalTyp
       klant: item.company || company,
       versie: versionNum,
       status: mapStatusLabel(item.status),
+      statusCode: normalizeStatusCode(item.status),
       geupload: item.createdDate || new Date().toISOString(),
       mappings: item.mappings || [],
     };

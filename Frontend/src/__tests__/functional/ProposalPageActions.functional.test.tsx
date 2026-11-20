@@ -295,7 +295,7 @@ describe('ProposalPage actions', () => {
 
     it('disables "Goedkeuren" while the AI review is running', () => {
       // Arrange
-      useProposalStore.setState({ proposal: { ...PROPOSAL, status: 'AI-controle bezig' } })
+      useProposalStore.setState({ proposal: { ...PROPOSAL, status: 'AI-controle bezig', statusCode: 'AI_CHECKING_REVIEW' } })
 
       // Act
       renderPage()

@@ -20,7 +20,7 @@ type ConfidenceProps = {
 
 const REVIEW_REQUIRED = "REVIEW_REQUIRED";
 const IN_REVIEW = "In review";
-const AI_CHECKING = "AI-controle bezig";
+const AI_CHECKING_REVIEW = "AI_CHECKING_REVIEW";
 
 const thClass =
   "px-3 py-2.5 first:pl-4 last:pr-4 text-left font-bold text-[11px] tracking-[0.06em] uppercase text-grey select-none";
@@ -214,7 +214,7 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
   const reviewCount = proposal.mappings.filter((m) => !m.bronveld).length;
   const matchedCount = totalMappings - reviewCount;
   const hasReviewFields = reviewCount > 0;
-  const isAiChecking = proposal.status === AI_CHECKING;
+  const isAiChecking = proposal.statusCode === AI_CHECKING_REVIEW;
   const approveDisabledReason = hasReviewFields
     ? "Goedkeuren is pas mogelijk als alle velden zijn nagekeken"
     : isAiChecking

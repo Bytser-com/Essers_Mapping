@@ -10,6 +10,8 @@ export type Proposal = {
   klant: string;
   versie: number;
   status: string;
+  /** Raw backend status code (e.g. "AI_CHECKING_REVIEW"); use this for logic, `status` is the Dutch label. */
+  statusCode?: string | undefined;
   proposalType?: string | null;
   geupload: string;
   uploadDate?: string | null;
