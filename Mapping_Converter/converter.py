@@ -106,10 +106,16 @@ def _column_mapping(col_indices: dict[str, int]) -> dict[str, int | None]:
     return {
         "source_full": _find_column(col_indices, "Source full path", "Source path", "sourcefullpath", "sourcepath"),
         "source_segment": _find_column(col_indices, "Source segment path", "sourcesegmentpath"),
-        "source_field": _find_column(col_indices, "Source field name", "Source field", "sourcefieldname", "sourcefield"),
+        "source_field": _find_column(
+            col_indices, "Source field name", "Source field", "sourcefieldname", "sourcefield"
+        ),
         "target_full": _find_column(col_indices, "Target full path", "Target path", "targetfullpath", "targetpath"),
-        "target_segment": _find_column(col_indices, "Target segment path", "Target segment", "targetsegmentpath", "targetsegment"),
-        "target_field": _find_column(col_indices, "Target field name", "Target field", "targetfieldname", "targetfield"),
+        "target_segment": _find_column(
+            col_indices, "Target segment path", "Target segment", "targetsegmentpath", "targetsegment"
+        ),
+        "target_field": _find_column(
+            col_indices, "Target field name", "Target field", "targetfieldname", "targetfield"
+        ),
     }
 
 
@@ -184,4 +190,3 @@ def convert_excel_to_sftp(
         package_version=package_version,
     )
     return package, sftp_path
-

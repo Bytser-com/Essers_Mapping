@@ -51,6 +51,22 @@ def test_read_excel_fields():
     assert records[0]["excel_row"] == 3
 
 
+def test_case_insensitive_sheet_name():
+    # Replace 'Mapping Proposal' with lowercase 'mapping proposal'
+    raw_xlsx = example_xlsx()
+    buf = io.BytesIO()
+    with zipfile.ZipFile(io.BytesIO(raw_xlsx), "r") as zin, zipfile.ZipFile(buf, "w") as zout:
+        for item in zin.infolist():
+            content = zin.read(item.filename)
+            if item.filename == "xl/workbook.xml":
+                content = content.replace(b'name="Mapping Proposal"', b'name="mapping proposal"')
+            zout.writestr(item, content)
+
+    records = read_mapping_proposal(buf.getvalue())
+    assert len(records) == 1
+    assert records[0]["Source full path"] == "/Order/Id"
+
+
 def test_corrupt_workbook_rejected():
     try:
         read_mapping_proposal(b"not a workbook")
