@@ -17,39 +17,115 @@ def _normalize_header(value: Any) -> str:
     return str(value).strip().lower().replace(" ", "").replace("_", "")
 
 
-def _find_header_row_and_sheet(workbook: openpyxl.Workbook) -> tuple[Any, int]:
-    """Locate the mapping sheet and the row containing column headers."""
-    sheet = None
-    # 1. Prefer 'Mapping Proposal' (case-insensitive)
+def _select_mapping_sheet(workbook: openpyxl.Workbook) -> Any:
+    """Select the worksheet containing the mapping proposal."""
     for name in workbook.sheetnames:
         if name.strip().lower() == "mapping proposal":
-            sheet = workbook[name]
-            break
+            return workbook[name]
 
-    # 2. Fallback to any sheet containing 'mapping' or 'proposal'
-    if sheet is None:
-        for name in workbook.sheetnames:
-            lower = name.strip().lower()
-            if "mapping" in lower or "proposal" in lower:
-                sheet = workbook[name]
-                break
+    for name in workbook.sheetnames:
+        lower = name.strip().lower()
+        if "mapping" in lower or "proposal" in lower:
+            return workbook[name]
 
-    # 3. Fallback to active sheet
-    if sheet is None:
-        sheet = workbook.active
-
+    sheet = workbook.active
     if sheet is None:
         raise ValueError("Workbook contains no readable worksheets")
+    return sheet
 
-    # Locate the header row by looking for target/source columns in the first 5 rows
+
+def _find_header_row(sheet: Any) -> int:
+    """Locate the row containing column headers."""
     header_row = 2  # standard Nouryon template row
     for r in range(1, min(6, sheet.max_row + 1)):
         row_vals = [_normalize_header(sheet.cell(r, c).value) for c in range(1, sheet.max_column + 1)]
         if any("sourcefullpath" in v or "sourcepath" in v or "targetfield" in v for v in row_vals):
-            header_row = r
-            break
+            return r
+    return header_row
 
-    return sheet, header_row
+
+def _find_header_row_and_sheet(workbook: openpyxl.Workbook) -> tuple[Any, int]:
+    """Locate the mapping sheet and the row containing column headers."""
+    sheet = _select_mapping_sheet(workbook)
+    return sheet, _find_header_row(sheet)
+
+
+def _get_column_indices(sheet: Any, header_row: int) -> dict[str, int]:
+    """Index normalized column headers by their worksheet column."""
+    return {
+        _normalize_header(sheet.cell(header_row, col_idx).value): col_idx
+        for col_idx in range(1, sheet.max_column + 1)
+        if sheet.cell(header_row, col_idx).value is not None
+    }
+
+
+def _find_column(col_indices: dict[str, int], *candidates: str) -> int | None:
+    """Find a column by trying multiple header names."""
+    for candidate in candidates:
+        column = col_indices.get(_normalize_header(candidate))
+        if column is not None:
+            return column
+    return None
+
+
+def _get_cell_text(sheet: Any, row_idx: int, col_idx: int | None) -> str | None:
+    """Read a trimmed, non-empty cell value."""
+    if col_idx is None:
+        return None
+    value = sheet.cell(row_idx, col_idx).value
+    text = str(value).strip() if value is not None else ""
+    return text or None
+
+
+def _build_path(segment: str | None, field: str | None) -> str | None:
+    """Build a path from segment and field components."""
+    if segment and field:
+        return f"{segment.rstrip('/')}/{field.lstrip('/')}"
+    return segment or field
+
+
+def _extract_path(
+    sheet: Any,
+    row_idx: int,
+    full_column: int | None,
+    segment_column: int | None,
+    field_column: int | None,
+) -> str | None:
+    """Read a full path or construct one from segment and field columns."""
+    full_path = _get_cell_text(sheet, row_idx, full_column)
+    if full_path:
+        return full_path
+    return _build_path(
+        _get_cell_text(sheet, row_idx, segment_column),
+        _get_cell_text(sheet, row_idx, field_column),
+    )
+
+
+def _column_mapping(col_indices: dict[str, int]) -> dict[str, int | None]:
+    """Resolve the supported source and target column names."""
+    return {
+        "source_full": _find_column(col_indices, "Source full path", "Source path", "sourcefullpath", "sourcepath"),
+        "source_segment": _find_column(col_indices, "Source segment path", "sourcesegmentpath"),
+        "source_field": _find_column(col_indices, "Source field name", "Source field", "sourcefieldname", "sourcefield"),
+        "target_full": _find_column(col_indices, "Target full path", "Target path", "targetfullpath", "targetpath"),
+        "target_segment": _find_column(col_indices, "Target segment path", "Target segment", "targetsegmentpath", "targetsegment"),
+        "target_field": _find_column(col_indices, "Target field name", "Target field", "targetfieldname", "targetfield"),
+    }
+
+
+def _read_mapping_rows(sheet: Any, header_row: int, columns: dict[str, int | None]) -> list[MappingEntry]:
+    """Extract valid mapping entries from worksheet rows."""
+    mappings: list[MappingEntry] = []
+    for row_idx in range(header_row + 1, sheet.max_row + 1):
+        target_path = _extract_path(
+            sheet, row_idx, columns["target_full"], columns["target_segment"], columns["target_field"]
+        )
+        source_path = _extract_path(
+            sheet, row_idx, columns["source_full"], columns["source_segment"], columns["source_field"]
+        )
+        if target_path:
+            mappings.append(MappingEntry(source_path=source_path, target_path=target_path))
+    return mappings
 
 
 def parse_mapping_excel(file_source: str | Path | bytes | BinaryIO) -> MappingPackage:
@@ -69,84 +145,9 @@ def parse_mapping_excel(file_source: str | Path | bytes | BinaryIO) -> MappingPa
     try:
         sheet, header_row = _find_header_row_and_sheet(workbook)
 
-        # Index columns
-        col_indices: dict[str, int] = {}
-        for col_idx in range(1, sheet.max_column + 1):
-            val = sheet.cell(header_row, col_idx).value
-            if val is not None:
-                norm = _normalize_header(val)
-                col_indices[norm] = col_idx
-
-        # Helper to find column index by multiple candidates
-        def find_col(*candidates: str) -> int | None:
-            for cand in candidates:
-                norm_cand = _normalize_header(cand)
-                if norm_cand in col_indices:
-                    return col_indices[norm_cand]
-            return None
-
-        col_source_full = find_col("Source full path", "Source path", "sourcefullpath", "sourcepath")
-        col_source_seg = find_col("Source segment path", "sourcesegmentpath")
-        col_source_field = find_col("Source field name", "Source field", "sourcefieldname", "sourcefield")
-
-        col_target_full = find_col("Target full path", "Target path", "targetfullpath", "targetpath")
-        col_target_seg = find_col("Target segment path", "Target segment", "targetsegmentpath", "targetsegment")
-        col_target_field = find_col("Target field name", "Target field", "targetfieldname", "targetfield")
-
-        mappings: list[MappingEntry] = []
-
-        for row_idx in range(header_row + 1, sheet.max_row + 1):
-            # Extract target path
-            target_path = None
-            if col_target_full:
-                val = sheet.cell(row_idx, col_target_full).value
-                if val is not None and str(val).strip():
-                    target_path = str(val).strip()
-
-            if not target_path:
-                seg_val = sheet.cell(row_idx, col_target_seg).value if col_target_seg else None
-                field_val = sheet.cell(row_idx, col_target_field).value if col_target_field else None
-
-                seg_str = str(seg_val).strip() if seg_val is not None and str(seg_val).strip() else None
-                field_str = str(field_val).strip() if field_val is not None and str(field_val).strip() else None
-
-                if seg_str and field_str:
-                    target_path = f"{seg_str.rstrip('/')}/{field_str.lstrip('/')}"
-                elif seg_str:
-                    target_path = seg_str
-                elif field_str:
-                    target_path = field_str
-
-            # Extract source path
-            source_path = None
-            if col_source_full:
-                val = sheet.cell(row_idx, col_source_full).value
-                if val is not None and str(val).strip():
-                    source_path = str(val).strip()
-
-            if not source_path:
-                seg_val = sheet.cell(row_idx, col_source_seg).value if col_source_seg else None
-                field_val = sheet.cell(row_idx, col_source_field).value if col_source_field else None
-
-                seg_str = str(seg_val).strip() if seg_val is not None and str(seg_val).strip() else None
-                field_str = str(field_val).strip() if field_val is not None and str(field_val).strip() else None
-
-                if seg_str and field_str:
-                    source_path = f"{seg_str.rstrip('/')}/{field_str.lstrip('/')}"
-                elif seg_str:
-                    source_path = seg_str
-                elif field_str:
-                    source_path = field_str
-
-            # Ignore pre-styled blank rows
-            if not target_path and not source_path:
-                continue
-
-            # Target path is mandatory for a valid mapping rule
-            if target_path:
-                mappings.append(MappingEntry(source_path=source_path, target_path=target_path))
-
-        return MappingPackage(mappings=mappings)
+        col_indices = _get_column_indices(sheet, header_row)
+        columns = _column_mapping(col_indices)
+        return MappingPackage(mappings=_read_mapping_rows(sheet, header_row, columns))
     finally:
         workbook.close()
 

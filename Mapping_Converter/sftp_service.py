@@ -15,6 +15,7 @@ from typing import Any
 from models import MappingPackage, PackageMeta
 
 logger = logging.getLogger(__name__)
+DEFAULT_PACKAGES_DIR = "/Packages"
 
 # Try loading .env if python-dotenv is present
 try:
@@ -43,7 +44,7 @@ class SftpConfig:
     port: int = 2222
     user: str = "shareduser"
     password: str = "devpassword"
-    packages_dir: str = "/Packages"
+    packages_dir: str = DEFAULT_PACKAGES_DIR
     allow_unknown_keys: bool = True
     timeout: float = 15.0
 
@@ -56,7 +57,7 @@ def get_sftp_config() -> SftpConfig:
     except ValueError:
         port = 2222
 
-    pkg_dir = os.getenv("SFTP_SHARED_PACKAGES_DIR", "/Packages").strip() or "/Packages"
+    pkg_dir = os.getenv("SFTP_SHARED_PACKAGES_DIR", DEFAULT_PACKAGES_DIR).strip() or DEFAULT_PACKAGES_DIR
     if not pkg_dir.startswith("/"):
         pkg_dir = "/" + pkg_dir
 
