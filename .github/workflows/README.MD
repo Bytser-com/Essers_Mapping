@@ -360,9 +360,10 @@ Kubernetes apply/diff dry-run is required. Client-side object serialization is
 used only during live reconciliation to preserve released image digests.
 
 Ansible lint explicitly includes `site.yml`, `playbooks/` and `roles/`, rather
-than relying on directory discovery. The existing shared variable prefixes are
-reported as visible `var-naming[no-role-prefix]` warnings to retain the inventory
-configuration API; other lint failures block CI. Task-name style is enforced.
+than relying on directory discovery. The `var-naming[no-role-prefix]` convention
+is skipped because inventories and cooperating roles share public variable
+names. Other variable-naming checks and lint failures still block CI.
+Task-name style is enforced.
 
 The existing order is Terraform plan/apply -> Ansible -> Kubernetes. Ansible
 also runs when an authorized apply request produces a successful no-change plan;
