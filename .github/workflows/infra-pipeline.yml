@@ -100,7 +100,7 @@ jobs:
   ansible:
     name: 2. Configure Infrastructure
     needs: terraform
-    if: inputs.terraform_action != 'destroy'
+    if: github.event_name != 'workflow_dispatch' || inputs.terraform_action != 'destroy'
     uses: ./.github/workflows/ansible-infra.yml
     with:
       mode: ${{ (github.event_name == 'pull_request' && 'validate') || (inputs.ansible_mode) || 'apply' }}
@@ -114,7 +114,7 @@ jobs:
   kubernetes:
     name: 3. Deploy Cluster Workloads
     needs: ansible
-    if: inputs.terraform_action != 'destroy' && inputs.target_scope != 'runner-only'
+    if: github.event_name != 'workflow_dispatch' || (inputs.terraform_action != 'destroy' && inputs.target_scope != 'runner-only')
     uses: ./.github/workflows/kubernetes-deploy.yml
     with:
       mode: ${{ (github.event_name == 'pull_request' && 'validate') || (inputs.kubernetes_mode) || 'apply' }}
