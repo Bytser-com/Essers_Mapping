@@ -18,6 +18,7 @@ The **Version Control Service** is a Java Spring Boot microservice within the Pr
   - [3. GET `/proposals/filedata`](#3-get-proposalsfiledata)
   - [4. PUT `/proposals/file`](#4-put-proposalsfile)
   - [5. DELETE `/proposals`](#5-delete-proposals)
+  - [6. GET `/packages`](#6-get-packages)
 - [How to Run Locally](#how-to-run-locally)
 - [How to Test](#how-to-test)
 
@@ -60,6 +61,26 @@ Proposal files are organized on the SFTP storage under the base directory (defau
         └── <proposal-type>/
             ├── MProposal-Customer_V1.xlsx
             └── proposal.json
+```
+
+### Mapping Packages Directory Hierarchy
+
+Mapping packages (`MPackage.json`) are organized under the packages base directory (default `/Packages/`):
+
+```text
+/Packages/                                 <-- Base directory (configurable via SFTP_SHARED_PACKAGES_DIR)
+├── <customer-slug>/                       <-- Customer directory (e.g. nouryon, brunos)
+│   ├── v1/
+│   │   └── <package-type>/                <-- Package type folder (e.g. inbound, outbound)
+│   │       └── MPackage.json              <-- Mapping package schema, metadata, and field mappings
+│   └── v2/
+│       └── <package-type>/
+│           └── MPackage.json
+```
+
+To seed sample mapping packages for local development and testing, run from the repository root:
+```bash
+python Scripts/seed.py --packages
 ```
 
 ### Companion Metadata (`proposal.json` / `metadata.json`)
@@ -390,6 +411,48 @@ Content-Type: application/json
 #### Example Response (`204 No Content`)
 
 *(Empty response body)*
+
+---
+
+### 6. GET `/packages`
+
+Retrieves the latest mapping package overview for all companies, or for a specific company.
+
+* **URL**: `/packages` (or `/Packages`)
+* **Method**: `GET`
+* **Query Parameters**:
+  * `company` *(optional, string, max 20 chars)*: Filter packages by company slug.
+
+#### Response Codes
+
+| Status Code | Description |
+| :--- | :--- |
+| `200 OK` | Successfully retrieved packages list. |
+| `400 Bad Request` | Invalid `company` parameter (empty or exceeding 20 characters). |
+| `404 Not Found` | Specified company has no packages. |
+| `502 Bad Gateway` | SFTP storage unreachable. |
+
+#### Example Request
+
+```http
+GET /packages HTTP/1.1
+Host: localhost:8085
+```
+
+#### Example Response (`200 OK`)
+
+```json
+[
+  {
+    "company": "nouryon",
+    "latestVersion": "v1",
+    "createdAt": "2024-06-19T12:00:00Z",
+    "createdBy": "analist_a",
+    "customerName": "nouryon",
+    "packageType": "inbound"
+  }
+]
+```
 
 ---
 

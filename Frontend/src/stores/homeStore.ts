@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { fetchProposals as fetchProposalsRequest, type ProposalList } from "../services/proposals";
+import { fetchProposals as fetchProposalsRequest, type ProposalList } from "../services/proposalOverviewService";
 import { uploadInterface as uploadInterfaceRequest } from "../services/uploadService";
 
 // How long the list keeps checking for the new row after an upload.

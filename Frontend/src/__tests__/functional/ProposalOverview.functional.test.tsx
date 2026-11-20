@@ -6,13 +6,13 @@ import { act, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import ProposalOverview from '../../components/ProposalOverview'
-import { fetchProposals, type Proposal, type ProposalList } from '../../services/proposals'
+import { fetchProposals, type Proposal, type ProposalList } from '../../services/proposalOverviewService'
 import { useHomeStore } from '../../stores/homeStore'
 
 // Keep the real helpers (labels, formatting) but replace the API call,
 // and use a short refresh interval so the tests do not have to wait 2 seconds.
-vi.mock('../../services/proposals', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('../../services/proposals')>()),
+vi.mock('../../services/proposalOverviewService', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../services/proposalOverviewService')>()),
   POLL_INTERVAL_MS: 20,
   fetchProposals: vi.fn(),
 }))

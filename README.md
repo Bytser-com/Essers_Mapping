@@ -86,6 +86,12 @@ docker compose -f Scripts/docker-compose.sftp.yml up -d
   docker compose -f Scripts/docker-compose.sftp.yml ps
   ```
 
+* *(Optional)* Seed mapping packages and proposals onto the SFTP server:
+  ```bash
+  # Seed proposals (/Proposals) and mapping packages (/Packages)
+  python Scripts/seed.py
+  ```
+
 ---
 
 ### Step 3: Start the Version Control Service
@@ -122,7 +128,7 @@ The Mapping Proposal service ingests customer XML files, communicates with Gemin
    ```
 3. *(Optional)* Seed sample customer proposals onto the SFTP server:
    ```bash
-   python -m scripts.dev_seed
+   python Scripts/seed.py
    ```
 4. Start the FastAPI server (with reload and background upload watcher):
    ```bash

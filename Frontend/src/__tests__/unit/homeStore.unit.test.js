@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useHomeStore } from '../../stores/homeStore'
-import { fetchProposals } from '../../services/proposals'
+import { fetchProposals } from '../../services/proposalOverviewService'
 import { uploadInterface } from '../../services/uploadService'
 
 vi.mock('../../services/uploadService')
-vi.mock('../../services/proposals')
+vi.mock('../../services/proposalOverviewService')
 
 const LIST = { total: 0, proposals: [] }
 

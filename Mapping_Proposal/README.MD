@@ -40,8 +40,7 @@ Mapping_Proposal/
 │   ├── readprompt.py       Builds Gemini's request; handles API calls, quota/retries
 │   ├── mapping_validator.py  Flags unknown source/target paths or invalid rule types
 │   ├── excel_generator.py  Fills the original mapping Excel template
-│   ├── experiment_tracker.py  Writes the experiment log
-│   └── dev_seed.py         Example proposals for local development
+│   └── experiment_tracker.py  Writes the experiment log
 ├── tests/                  unit/, integration/, api/ and fixtures/ (small test XML, in Git)
 ├── data/
 │   ├── source/             Original XML files from the NEW customer (currently Nouryon)
@@ -326,15 +325,15 @@ The `proposal.json` of one version:
   ```
 
   The files on that server are visible in `data/sftp-server/`. `pytest -m integration` tests against it (skipped when it is not running).
-- Without `SFTP_SHARED_HOST` (no Docker) the local folder `data/sftp-shared/proposals/` is used instead. Fill it with example data: `python -m scripts.dev_seed`.
+- Without `SFTP_SHARED_HOST` (no Docker) the local folder `data/sftp-shared/proposals/` is used instead. Fill it with example data: `python Scripts/seed.py`.
 - When the SFTP server cannot be reached, uploads wait in the source folder until it is back.
 
-**Run locally** (from `Mapping_Proposal/`):
+**Run locally** (from repository root):
 
 ```powershell
-python -m pip install -r requirements.txt
-python -m scripts.dev_seed
-uvicorn api:app --reload --port 8000
+python -m pip install -r Mapping_Proposal/requirements.txt
+python Scripts/seed.py
+uvicorn api:app --reload --port 8000  # inside Mapping_Proposal
 ```
 
 Open http://localhost:8000/docs to try the endpoints. When the Vite frontend calls the API directly, add `CORS_ORIGINS=http://localhost:5173` to `.env`.
