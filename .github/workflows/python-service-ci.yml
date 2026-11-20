@@ -28,6 +28,7 @@ jobs:
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - name: Checkout repository
+        id: checkout
         uses: actions/checkout@v6
         with:
           persist-credentials: false
@@ -39,12 +40,12 @@ jobs:
           service-path: ${{ inputs.service-path }}
 
       - name: Lint Python
-        if: steps.setup.outputs.enabled == 'true'
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' && steps.setup.outputs.enabled == 'true' }}
         run: python -m ruff check .
 
       # All test categories under tests/ run together; pytest fails if none exist.
       - name: Unit, integration and functional tests with coverage
-        if: steps.setup.outputs.enabled == 'true'
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' && steps.setup.outputs.enabled == 'true' }}
         run: >-
           python -m pytest tests -ra
           --junitxml=test-results/pytest-junit.xml
@@ -54,24 +55,27 @@ jobs:
           --cov-report=html:coverage
 
       - name: Export installed application and test dependencies
-        if: steps.setup.outputs.enabled == 'true'
+        id: inventory
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' && steps.setup.outputs.enabled == 'true' }}
         run: >-
           python "$GITHUB_WORKSPACE/Scripts/dependency-inventory.py"
           --python --output test-results/dependencies.json
 
       - name: Audit installed dependencies
-        if: steps.setup.outputs.enabled == 'true'
+        if: ${{ !cancelled() && steps.inventory.outcome == 'success' }}
         uses: ./.github/actions/dependency-audit
         with:
           lockfile: osv-scanner:${{ inputs.service-path }}/test-results/dependencies.json
           report-path: ${{ inputs.service-path }}/test-results/dependency-audit.json
 
       - name: Setup Docker Buildx
-        if: steps.setup.outputs.enabled == 'true' && hashFiles(format('{0}/Dockerfile', inputs.service-path)) != ''
+        id: buildx
+        if: ${{ !cancelled() && steps.checkout.outcome == 'success' && hashFiles(format('{0}/Dockerfile', inputs.service-path)) != '' }}
         uses: docker/setup-buildx-action@v4
 
       - name: Build container for validation
-        if: steps.setup.outputs.enabled == 'true' && hashFiles(format('{0}/Dockerfile', inputs.service-path)) != ''
+        id: image
+        if: ${{ !cancelled() && steps.buildx.outcome == 'success' }}
         uses: docker/build-push-action@v7
         with:
           context: ${{ inputs.service-path }}
@@ -80,7 +84,7 @@ jobs:
           tags: service-ci:local
 
       - name: Validate container startup and health
-        if: steps.setup.outputs.enabled == 'true' && hashFiles(format('{0}/Dockerfile', inputs.service-path)) != ''
+        if: ${{ !cancelled() && steps.image.outcome == 'success' }}
         working-directory: ${{ github.workspace }}
         env:
           IMAGE: service-ci:local
