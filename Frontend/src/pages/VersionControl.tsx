@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import iconSearch from '../assets/version-control/icon-search.svg'
 import { formatUploadedAt } from '../services/proposalOverviewService'
 import { useMappingPackageStore } from '../stores/mappingPackageStore'
@@ -16,8 +16,8 @@ const BODY_CELL = 'py-[13px] align-middle'
 
 // Version Control overview (Figma "07 · Version Control"): all customers and their mapping packages
 export default function VersionControl() {
+  const [searchTerm, setSearchTerm] = useState('')
   const fetchPackages = useMappingPackageStore((state) => state.fetchPackages);
-  
   
   useEffect(() => {
     void fetchPackages()
@@ -26,6 +26,34 @@ export default function VersionControl() {
   const packages = useMappingPackageStore((state) => state.packages)
   const loading = useMappingPackageStore((state) => state.loading)
   const error = useMappingPackageStore((state) => state.error)
+
+  const filteredPackages = useMemo(() => {
+    if (!packages) return []
+    const q = searchTerm.trim().toLowerCase()
+    if (!q) return packages
+
+    return packages.filter((pkg) => {
+      const companyMatch = (pkg.company || '').toLowerCase().includes(q)
+      const customerNameMatch = (pkg.customerName || '').toLowerCase().includes(q)
+      const typeMatch = (pkg.packageType || '').toLowerCase().includes(q)
+      const versionMatch = (pkg.latestVersion || '').toLowerCase().includes(q)
+      const userMatch = (pkg.createdBy || '').toLowerCase().includes(q)
+      const rawDateMatch = (pkg.createdAt || '').toLowerCase().includes(q)
+      const formattedDateMatch = pkg.createdAt
+        ? formatUploadedAt(pkg.createdAt).toLowerCase().includes(q)
+        : false
+
+      return (
+        companyMatch ||
+        customerNameMatch ||
+        typeMatch ||
+        versionMatch ||
+        userMatch ||
+        rawDateMatch ||
+        formattedDateMatch
+      )
+    })
+  }, [packages, searchTerm])
 
   return (
     <main className="flex flex-col gap-4 px-8 py-7">
@@ -39,6 +67,8 @@ export default function VersionControl() {
         <img src={iconSearch} alt="" width={18} height={18} />
         <input
           type="search"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Zoek een klant op naam…"
           aria-label="Zoek een klant op naam"
           className="flex-1 bg-transparent text-[13px] text-anthracite placeholder:text-grey focus:outline-none"
@@ -82,35 +112,43 @@ export default function VersionControl() {
               </tr>
             </thead>
             <tbody>
-              {packages.map((mappingPackage) => (
-                // A company can be listed once per package type (e.g. nouryon inbound + nouryon outbound)
-                <tr
-                  key={`${mappingPackage.company}/${mappingPackage.packageType ?? ''}`}
-                  className="border-b border-line-grey last:border-b-0"
-                >
-                  <td className={`${CUSTOMER_CELL} ${BODY_CELL} truncate font-semibold`}>
-                    {mappingPackage.customerName || mappingPackage.company}
-                  </td>
-                  <td className={`${TYPE_CELL} ${BODY_CELL} truncate`} title={mappingPackage.packageType ?? undefined}>
-                    {mappingPackage.packageType || '—'}
-                  </td>
-                  <td className={`${VERSION_CELL} ${BODY_CELL}`}>{mappingPackage.latestVersion}</td>
-                  <td className={`${CHANGE_CELL} ${BODY_CELL}`}>
-                    <div className="flex flex-col gap-0.5">
-                      <span>{mappingPackage.createdAt ? formatUploadedAt(mappingPackage.createdAt) : '—'}</span>
-                      {mappingPackage.createdBy && (
-                        <span className="text-xs text-grey">door {mappingPackage.createdBy}</span>
-                      )}
-                    </div>
-                  </td>
-                  <td className={`${ACTION_CELL} ${BODY_CELL}`}>
-                    {/* Opens the versions of this customer: user story 161 */}
-                    <button type="button" className="btn">
-                      Bekijken
-                    </button>
+              {filteredPackages.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-6 text-center text-[13px] text-grey">
+                    Geen mapping packages gevonden die voldoen aan de zoekcriteria.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredPackages.map((mappingPackage) => (
+                  // A company can be listed once per package type (e.g. nouryon inbound + nouryon outbound)
+                  <tr
+                    key={`${mappingPackage.company}/${mappingPackage.packageType ?? ''}`}
+                    className="border-b border-line-grey last:border-b-0"
+                  >
+                    <td className={`${CUSTOMER_CELL} ${BODY_CELL} truncate font-semibold`}>
+                      {mappingPackage.customerName || mappingPackage.company}
+                    </td>
+                    <td className={`${TYPE_CELL} ${BODY_CELL} truncate`} title={mappingPackage.packageType ?? undefined}>
+                      {mappingPackage.packageType || '—'}
+                    </td>
+                    <td className={`${VERSION_CELL} ${BODY_CELL}`}>{mappingPackage.latestVersion}</td>
+                    <td className={`${CHANGE_CELL} ${BODY_CELL}`}>
+                      <div className="flex flex-col gap-0.5">
+                        <span>{mappingPackage.createdAt ? formatUploadedAt(mappingPackage.createdAt) : '—'}</span>
+                        {mappingPackage.createdBy && (
+                          <span className="text-xs text-grey">door {mappingPackage.createdBy}</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className={`${ACTION_CELL} ${BODY_CELL}`}>
+                      {/* Opens the versions of this customer: user story 161 */}
+                      <button type="button" className="btn">
+                        Bekijken
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

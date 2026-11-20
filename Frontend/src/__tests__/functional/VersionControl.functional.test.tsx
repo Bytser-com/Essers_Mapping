@@ -193,4 +193,71 @@ describe('VersionControl', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('De mapping packages konden niet geladen worden.')
     expect(fetchMock).toHaveBeenCalledTimes(2)
   })
+
+  describe('search functionality', () => {
+    beforeEach(async () => {
+      answers([brevalis, nouryonInbound, nouryonOutbound])
+      render(<VersionControl />)
+      await screen.findByText('Brevalis')
+    })
+
+    it('filters packages by company / customer name', async () => {
+      const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
+      await userEvent.type(searchInput, 'brev')
+
+      expect(screen.getByText('Brevalis')).toBeInTheDocument()
+      expect(screen.queryByText('Nouryon')).not.toBeInTheDocument()
+    })
+
+    it('filters packages by package type', async () => {
+      const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
+      await userEvent.type(searchInput, 'inbound')
+
+      expect(screen.getByText('Nouryon')).toBeInTheDocument()
+      expect(screen.queryByText('Brevalis')).not.toBeInTheDocument()
+      expect(bodyRows()).toHaveLength(1)
+    })
+
+    it('filters packages by version', async () => {
+      const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
+      await userEvent.type(searchInput, 'v4')
+
+      expect(screen.getByText('Brevalis')).toBeInTheDocument()
+      expect(screen.queryByText('Nouryon')).not.toBeInTheDocument()
+    })
+
+    it('filters packages by createdBy user name', async () => {
+      const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
+      await userEvent.type(searchInput, 'Analist A')
+
+      expect(screen.queryByText('Brevalis')).not.toBeInTheDocument()
+      expect(screen.getAllByText('Nouryon')).toHaveLength(2)
+    })
+
+    it('filters packages by creation date', async () => {
+      const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
+      // Brevalis date: 11/10/2026 14:32
+      await userEvent.type(searchInput, '11/10')
+
+      expect(screen.getByText('Brevalis')).toBeInTheDocument()
+      expect(screen.queryByText('Nouryon')).not.toBeInTheDocument()
+    })
+
+    it('shows empty search result message when no packages match criteria', async () => {
+      const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
+      await userEvent.type(searchInput, 'nonexistent')
+
+      expect(screen.getByText('Geen mapping packages gevonden die voldoen aan de zoekcriteria.')).toBeInTheDocument()
+      expect(bodyRows()).toHaveLength(1)
+    })
+
+    it('restores all packages when search input is cleared', async () => {
+      const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
+      await userEvent.type(searchInput, 'Brevalis')
+      expect(bodyRows()).toHaveLength(1)
+
+      await userEvent.clear(searchInput)
+      expect(bodyRows()).toHaveLength(3)
+    })
+  })
 })
