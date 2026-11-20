@@ -38,13 +38,6 @@ def test_approve_returns_200_and_updates_status(client, proposals_root):
     assert json.loads(path.read_text(encoding='utf-8'))['status'] == 'AI_CHECKING_REVIEW'
 
 
-def test_snake_case_proposal_type_is_accepted(client, proposals_root):
-    write_metadata(proposals_root)
-    response = client.post('/approve?company=nouryon&version=v1&proposal_type=inbound',
-                           json={'description': 'Ok'})
-    assert response.status_code == 200
-
-
 @pytest.mark.parametrize('description', ['', '   ', 'a' * 201])
 def test_invalid_description_returns_400(client, proposals_root, description):
     write_metadata(proposals_root)

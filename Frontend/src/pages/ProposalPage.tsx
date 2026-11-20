@@ -4,6 +4,7 @@ import { useProposalStore } from "../stores/proposalStore";
 import iconUpload from "../assets/home/icon-upload.svg";
 import iconError from "../assets/home/icon-error.svg";
 import iconSuccess from "../assets/home/icon-success.svg";
+import ApproveProposalDialog from "../components/ApproveProposalDialog";
 
 
 type ProposalPageProps = {
@@ -19,6 +20,7 @@ type ConfidenceProps = {
 
 const REVIEW_REQUIRED = "REVIEW_REQUIRED";
 const IN_REVIEW = "In review";
+const AI_CHECKING = "AI-controle bezig";
 
 const thClass =
   "px-3 py-2.5 first:pl-4 last:pr-4 text-left font-bold text-[11px] tracking-[0.06em] uppercase text-grey select-none";
@@ -86,6 +88,8 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showApproveDialog, setShowApproveDialog] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
   const actionError = useProposalStore((state) => state.actionError);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -126,13 +130,20 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
     URL.revokeObjectURL(url);
   }
 
-  async function handleApprove() {
+  function handleApprove() {
     if (onApprove) {
       onApprove();
       return;
     }
+    setShowApproveDialog(true);
+  }
+
+  async function handleConfirmApprove(description: string) {
     if (!proposal || !company) return;
-    await approveProposal(company, `v${proposal.versie}`);
+    setIsApproving(true);
+    await approveProposal(company, `v${proposal.versie}`, description);
+    setIsApproving(false);
+    setShowApproveDialog(false);
   }
 
   function openDeleteDialog() {
@@ -203,6 +214,12 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
   const reviewCount = proposal.mappings.filter((m) => !m.bronveld).length;
   const matchedCount = totalMappings - reviewCount;
   const hasReviewFields = reviewCount > 0;
+  const isAiChecking = proposal.status === AI_CHECKING;
+  const approveDisabledReason = hasReviewFields
+    ? "Goedkeuren is pas mogelijk als alle velden zijn nagekeken"
+    : isAiChecking
+      ? "De AI-controle is bezig; het voorstel kan nu niet opnieuw goedgekeurd worden"
+      : undefined;
 
   const filteredMappings = proposal.mappings.filter((mapping) => {
     if (filterMissingOnly && mapping.bronveld) {
@@ -261,8 +278,8 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
             type="button"
             className="btn btn--primary"
             onClick={handleApprove}
-            disabled={hasReviewFields}
-            title={hasReviewFields ? "Goedkeuren is pas mogelijk als alle velden zijn nagekeken" : undefined}
+            disabled={approveDisabledReason !== undefined}
+            title={approveDisabledReason}
           >
             Goedkeuren
           </button>
@@ -417,6 +434,15 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
           </tbody>
         </table>
       </div>
+      {showApproveDialog && (
+        <ApproveProposalDialog
+          customer={proposal.klant}
+          version={proposal.versie}
+          isSubmitting={isApproving}
+          onCancel={() => setShowApproveDialog(false)}
+          onConfirm={(description) => void handleConfirmApprove(description)}
+        />
+      )}
       {showUploadDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-anthracite/45">
           <dialog

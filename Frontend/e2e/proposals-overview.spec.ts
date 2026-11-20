@@ -130,7 +130,7 @@ test.describe('E2E - Proposals overview on Home', () => {
       ['Klant A', 'AI maakt voorstel', 'Bezig'],
       ['Klant B', 'Klaar om na te kijken', '—'],
       ['Klant C', 'In review', '—'],
-      ['Klant D', 'AI controleert review van analist', 'Bezig'],
+      ['Klant D', 'AI-controle bezig', 'Bezig'],
       ['Klant E', 'Teruggestuurd', 'Mislukt'],
     ]
     for (const [customer, status, aiStatus] of expected) {
