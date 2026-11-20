@@ -27,10 +27,10 @@ on:
         type: boolean
         default: false
 
-# One Kubernetes deployment per environment at a time
+# One Kubernetes deployment per environment at a time.
+# When called by infra-pipeline.yml, the caller already holds the cluster-write lock.
 concurrency:
-  # Service CD uses this same lock while changing images and pull credentials.
-  group: cluster-write-${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}
+  group: ${{ github.workflow != 'Kubernetes - Cluster Deploy' && format('k8s-stage-{0}', github.run_id) || format('cluster-write-{0}', (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing') }}
   queue: max
   cancel-in-progress: false
 
