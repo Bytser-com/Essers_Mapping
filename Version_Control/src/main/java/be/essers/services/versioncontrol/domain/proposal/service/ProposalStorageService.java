@@ -5,6 +5,7 @@ import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalFileDat
 import be.essers.services.versioncontrol.domain.proposal.api.dto.ProposalFileDetailsDto;
 
 import java.util.List;
+import tools.jackson.databind.JsonNode;
 
 public interface ProposalStorageService {
     List<CompanyProposalOverviewDto> listProposals(String company);
@@ -13,6 +14,7 @@ public interface ProposalStorageService {
     ProposalFileDataDto getProposalFileData(String company, String version, String proposalType);
     ProposalFileDetailsDto overwriteProposalFile(String company, String version, String proposalType, byte[] fileBytes, String originalFilename);
     void deleteProposal(String company, String version, String proposalType);
+    JsonNode saveAiReview(String company, String version, String proposalType, JsonNode review);
 
     default ProposalFileDetailsDto getProposalFile(String company, String version) {
         return getProposalFile(company, version, null);

@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
+import tools.jackson.databind.JsonNode;
 
 @RestController
 @RequestMapping({"/proposals", "/Proposals"})
@@ -171,6 +172,28 @@ public class ProposalController {
         ProposalFileDetailsDto details = proposalStorageService.overwriteProposalFile(
                 company, version, effectiveProposalType, fileBytes, null);
         return ResponseEntity.ok(details);
+    }
+
+    /**
+     * Persist the latest completed Gemini review in the EXISTING proposal.json.
+     * This operation never creates a proposal version or replaces the Excel.
+     * Intended for trusted backend-to-backend calls, not untrusted browsers.
+     */
+    @PutMapping(value = "/review", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<JsonNode> saveAiReview(
+            @RequestParam String company,
+            @RequestParam String version,
+            @RequestParam(name = "proposalType") String proposalType,
+            @RequestBody JsonNode review
+    ) {
+        validateCompany(company);
+        validateVersion(version);
+        if (proposalType == null || proposalType.isBlank()) {
+            throw new IllegalArgumentException("Proposal type is required for AI review storage");
+        }
+        return ResponseEntity.ok(
+                proposalStorageService.saveAiReview(company, version, proposalType, review)
+        );
     }
 
     /**

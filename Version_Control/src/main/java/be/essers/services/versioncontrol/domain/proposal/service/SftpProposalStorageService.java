@@ -347,6 +347,113 @@ public class SftpProposalStorageService implements ProposalStorageService {
         }
     }
 
+    /**
+     * Update the latest completed AI review without changing the workbook or version.
+     * The existing JSON object is read before updating only its ai_review property.
+     */
+    @Override
+    public JsonNode saveAiReview(String company, String version, String proposalType, JsonNode review) {
+        validateCompany(company);
+        validateVersion(version);
+        validateProposalTypeIfPresent(proposalType);
+        if (proposalType == null || proposalType.isBlank()) {
+            throw new IllegalArgumentException("Proposal type is required");
+        }
+        validateAiReview(review);
+
+        try {
+            String rootPath = normalizePath(properties.basePath());
+            String resolvedCompany = resolveDirectoryName(rootPath, sanitizePathSegment(company));
+            if (resolvedCompany == null) {
+                throw new EntityNotFoundException("Company directory does not exist: " + company);
+            }
+            String companyPath = rootPath + "/" + resolvedCompany;
+            String resolvedVersion = resolveDirectoryName(companyPath, sanitizePathSegment(version));
+            if (resolvedVersion == null) {
+                throw new EntityNotFoundException("Version directory does not exist: " + version);
+            }
+            String versionPath = companyPath + "/" + resolvedVersion;
+            String resolvedType = resolveDirectoryName(versionPath, sanitizePathSegment(proposalType));
+            String targetDir;
+            if (resolvedType != null) {
+                targetDir = versionPath + "/" + resolvedType;
+            } else if (template.exists(versionPath + "/" + FALLBACK_METADATA_FILENAME)
+                    || template.exists(versionPath + "/" + METADATA_FILENAME)) {
+                // Support older proposals without a direction subdirectory.
+                targetDir = versionPath;
+            } else {
+                throw new EntityNotFoundException("Proposal type directory does not exist: " + proposalType);
+            }
+
+            // Prefer proposal.json for new proposals, but support legacy metadata.json.
+            String metadataPath = targetDir + "/" + FALLBACK_METADATA_FILENAME;
+            if (!template.exists(metadataPath)) {
+                metadataPath = targetDir + "/" + METADATA_FILENAME;
+                if (!template.exists(metadataPath)) {
+                    throw new EntityNotFoundException("Existing proposal metadata not found at " + targetDir);
+                }
+            }
+
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            boolean found = template.get(metadataPath, stream -> stream.transferTo(bytes));
+            if (!found || bytes.size() == 0) {
+                throw new StorageException("Unable to read existing proposal metadata: " + metadataPath);
+            }
+            JsonNode parsed = objectMapper.readTree(bytes.toByteArray());
+            if (!parsed.isObject()) {
+                throw new StorageException("Proposal metadata must be a JSON object: " + metadataPath);
+            }
+            ObjectNode updated = (ObjectNode) parsed;
+            ObjectNode aiReview = objectMapper.createObjectNode();
+            aiReview.put("decision", review.get("decision").asText());
+            aiReview.put("summary", review.get("summary").asText());
+            aiReview.set("findings", review.get("findings").deepCopy());
+            aiReview.put("checked_mappings", review.get("checked_mappings").asInt());
+            aiReview.put("reviewed_at", Instant.now().toString());
+            updated.set("ai_review", aiReview);
+
+            byte[] output = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(updated);
+            String destination = metadataPath;
+            template.execute(session -> {
+                session.write(new ByteArrayInputStream(output), destination);
+                return null;
+            });
+            return aiReview;
+        } catch (EntityNotFoundException | IllegalArgumentException | StorageException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new StorageException("Unable to save AI review to proposal metadata", e);
+        }
+    }
+
+    private static void validateAiReview(JsonNode review) {
+        if (review == null || !review.isObject()) {
+            throw new IllegalArgumentException("AI review must be a JSON object");
+        }
+        JsonNode decision = review.get("decision");
+        if (decision == null || !decision.isTextual()
+                || !("ACCEPTED".equals(decision.asText()) || "REJECTED".equals(decision.asText()))) {
+            throw new IllegalArgumentException("AI review decision must be ACCEPTED or REJECTED");
+        }
+        JsonNode summary = review.get("summary");
+        if (summary == null || !summary.isTextual()) {
+            throw new IllegalArgumentException("AI review summary must be a string");
+        }
+        JsonNode findings = review.get("findings");
+        if (findings == null || !findings.isArray()) {
+            throw new IllegalArgumentException("AI review findings must be an array");
+        }
+        for (JsonNode finding : findings) {
+            if (!finding.isTextual() && !finding.isObject()) {
+                throw new IllegalArgumentException("AI review findings must contain strings or objects");
+            }
+        }
+        JsonNode checked = review.get("checked_mappings");
+        if (checked == null || !checked.isIntegralNumber() || checked.asInt() < 0) {
+            throw new IllegalArgumentException("AI review checked_mappings must be a nonnegative integer");
+        }
+    }
+
     @Override
     public ProposalFileDetailsDto overwriteProposalFile(String company, String version, byte[] fileBytes, String originalFilename) {
         return overwriteProposalFile(company, version, null, fileBytes, originalFilename);

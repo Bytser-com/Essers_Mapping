@@ -484,3 +484,31 @@ The JaCoCo coverage report will be available at:
 ```text
 Version_Control/target/site/jacoco-ut/index.html
 ```
+
+## Persist the latest AI Excel review (backend integration)
+
+`PUT /proposals/review?company=nouryon&version=v2&proposalType=inbound`
+accepts the completed JSON result returned by Mapping Converter's `POST /review-excel`:
+
+```json
+{
+  "decision": "REJECTED",
+  "summary": "Conflicting source mappings for CITY",
+  "findings": ["Two unconditional mappings use the same CITY target"],
+  "checked_mappings": 96
+}
+```
+
+Version Control adds a server-generated `reviewed_at` (UTC) and replaces only the
+`ai_review` object in the **existing** proposal's `proposal.json` on shared SFTP
+(or `metadata.json` for legacy proposals). All other metadata stays intact.
+It does **not** change the stored Excel, create a proposal version, or approve
+anything. Missing proposal/metadata returns 404; malformed decisions return 400.
+The response body is the newly persisted `ai_review` object.
+
+**Integration:** This endpoint is for trusted services. It does not call Gemini;
+the caller must first upload the workbook to Mapping Converter's `/review-excel`
+and relay the completed response. The existing `POST /proposals` approval route
+still returns HTTP 501. The existing `PUT /proposals/file` route still overwrites
+an Excel without review: do not use it to store rejected workbooks. Restrict
+access to the review-write endpoint before deploying it publicly.
