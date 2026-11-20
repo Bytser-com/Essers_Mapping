@@ -12,8 +12,24 @@ URL = '/approve?company=nouryon&version=v1&proposalType=inbound'
 
 
 @pytest.fixture
-def client(proposals_root):
+def packages_root(tmp_path):
+    root = tmp_path / 'packages'
+    root.mkdir()
+    return root
+
+
+@pytest.fixture
+def started(monkeypatch):
+    """Records the background tasks instead of running the AI review."""
+    calls = []
+    monkeypatch.setattr(approve_router, 'finalize_in_background', lambda *args: calls.append(args))
+    return calls
+
+
+@pytest.fixture
+def client(proposals_root, packages_root, started):
     app.dependency_overrides[approve_router.get_proposal_storage] = lambda: LocalStorage(proposals_root)
+    app.dependency_overrides[approve_router.get_packages_storage] = lambda: LocalStorage(packages_root)
     yield TestClient(app)
     app.dependency_overrides.clear()
 
@@ -82,3 +98,43 @@ def test_storage_error_returns_502(client, monkeypatch):
 def test_storage_dependency_uses_the_configured_storage(monkeypatch):
     monkeypatch.setenv('SFTP_SHARED_HOST', '')
     assert isinstance(approve_router.get_proposal_storage(), LocalStorage)
+
+
+# ---------------------------------------------------------------------------
+# Story 187: after approving, the AI review starts in the background
+# ---------------------------------------------------------------------------
+def test_approve_starts_the_ai_review_in_the_background(client, proposals_root, started):
+    write_metadata(proposals_root)
+
+    assert client.post(URL, json={'description': 'Ok'}).status_code == 200
+
+    assert len(started) == 1
+    proposals, packages, company, version, proposal_type = started[0]
+    assert isinstance(proposals, LocalStorage)
+    assert isinstance(packages, LocalStorage)
+    assert (company, version, proposal_type) == ('nouryon', 'v1', 'inbound')
+
+
+def test_failed_approval_starts_nothing(client, started):
+    assert client.post(URL, json={'description': 'Ok'}).status_code == 404
+    assert started == []
+
+
+def test_background_review_updates_the_proposal(proposals_root, packages_root, mapping_workbook, monkeypatch):
+    """End to end without Gemini: approve -> background task -> RETURNED with the findings."""
+    path = write_metadata(proposals_root)
+    (path.parent / 'MProposal-Nouryon_V1.xlsx').write_bytes(mapping_workbook())
+    monkeypatch.setattr('scripts.pipeline.review_with_gemini', lambda rows: {
+        'decision': 'REJECTED', 'summary': 'Conflict', 'findings': ['Rij 3: dubbel doelveld'], 'checked_mappings': 1,
+    })
+    app.dependency_overrides[approve_router.get_proposal_storage] = lambda: LocalStorage(proposals_root)
+    app.dependency_overrides[approve_router.get_packages_storage] = lambda: LocalStorage(packages_root)
+    try:
+        response = TestClient(app).post(URL, json={'description': 'Ok'})  # TestClient runs background tasks
+    finally:
+        app.dependency_overrides.clear()
+
+    assert response.json()['status'] == 'AI_CHECKING_REVIEW'  # the analyst gets an answer straight away
+    data = json.loads(path.read_text(encoding='utf-8'))
+    assert data['status'] == 'RETURNED'
+    assert data['ai_review']['findings'] == ['Rij 3: dubbel doelveld']

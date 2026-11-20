@@ -64,6 +64,7 @@ def test_statuses_compare_equal_to_the_codes_in_the_metadata():
     assert ProposalStatus.AI_CHECKING_REVIEW == 'AI_CHECKING_REVIEW'
     assert {'READY_FOR_REVIEW', 'IN_REVIEW', 'In review'} == set(APPROVABLE_STATUSES)
     assert 'RETURNED' not in APPROVABLE_STATUSES
+    assert 'APPROVED' not in APPROVABLE_STATUSES  # an approved proposal cannot be approved again
 
 
 # ---------------------------------------------------------------------------

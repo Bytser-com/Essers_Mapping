@@ -17,6 +17,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 
+from routers.dependencies import get_packages_storage
 from scripts.errors import StorageError
 from scripts.models import MappingPackage, SavePackageResponse
 from services.excel_converter import parse_mapping_excel
@@ -28,7 +29,7 @@ from services.packages import (
     normalize_version,
     save_mapping_package,
 )
-from services.storage import Storage, packages_storage
+from services.storage import Storage
 
 logger = logging.getLogger(__name__)
 
@@ -43,10 +44,6 @@ UPLOAD_RESPONSES: dict[int | str, dict] = {
     400: {'description': 'Not an Excel file, empty file, workbook cannot be read or missing form fields'},
     502: {'description': 'The shared SFTP storage is not reachable'},
 }
-
-
-def get_packages_storage() -> Storage:
-    return packages_storage()
 
 
 @router.post('/convert', summary='Convert an Excel mapping proposal into a JSON mapping package',

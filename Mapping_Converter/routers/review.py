@@ -21,7 +21,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from routers.approve import get_proposal_storage
+from routers.dependencies import get_proposal_storage
 from scripts.errors import ProposalConflictError, ProposalNotFoundError, StorageError
 from scripts.excel_review import InvalidWorkbook
 from scripts.gemini_review import ReviewUnavailable

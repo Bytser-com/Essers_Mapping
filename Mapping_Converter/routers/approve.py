@@ -3,8 +3,10 @@
 POST /approve?company=<customer>&version=v<N>&proposalType=<type>
     body: {"description": "<what changed, max 200 characters>"}
 
-Sets the proposal to AI_CHECKING_REVIEW ("AI-controle bezig") and stores the
-description. The business rules live in services/approval.py; this route only
+Sets the proposal to AI_CHECKING_REVIEW ("AI-controle bezig"), stores the
+description and answers immediately. The AI review and what follows (mapping
+package or back to the analyst, story 187) then run in the background, see
+services/finalization.py. The business rules live in services/; this route only
 translates them to HTTP:
 
     400  invalid input (empty or too long description, invalid parameters)
@@ -17,12 +19,14 @@ from __future__ import annotations
 import logging
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from pydantic import BaseModel
 
+from routers.dependencies import get_packages_storage, get_proposal_storage
 from scripts.errors import ProposalConflictError, ProposalNotFoundError, StorageError
 from services.approval import approve_proposal
-from services.storage import Storage, proposal_storage
+from services.finalization import finalize_in_background
+from services.storage import Storage
 
 logger = logging.getLogger(__name__)
 
@@ -31,10 +35,6 @@ router = APIRouter()
 
 class ApproveRequest(BaseModel):
     description: str = ''
-
-
-def get_proposal_storage() -> Storage:
-    return proposal_storage()
 
 
 # Documented in the OpenAPI schema (/docs); the frontend shows ``detail`` to the analyst.
@@ -49,7 +49,9 @@ ERROR_RESPONSES: dict[int | str, dict] = {
 @router.post('/approve', responses=ERROR_RESPONSES)
 def approve(
     request: ApproveRequest,
+    background_tasks: BackgroundTasks,
     storage: Annotated[Storage, Depends(get_proposal_storage)],
+    packages: Annotated[Storage, Depends(get_packages_storage)],
     company: Annotated[str, Query()] = '',
     version: Annotated[str, Query()] = '',
     proposal_type: Annotated[str, Query(alias='proposalType')] = '',
@@ -68,4 +70,8 @@ def approve(
         raise HTTPException(status_code=502, detail='De bestanden zijn tijdelijk niet bereikbaar') from error
 
     logger.info('Proposal %s/%s/%s approved; AI review pending', result.company, result.version, result.proposal_type)
+    # Runs after the response is sent: the analyst does not wait for Gemini.
+    background_tasks.add_task(
+        finalize_in_background, storage, packages, result.company, result.version, result.proposal_type,
+    )
     return result.to_dict()

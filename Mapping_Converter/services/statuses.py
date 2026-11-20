@@ -14,6 +14,7 @@ class ProposalStatus(StrEnum):
     IN_REVIEW = 'IN_REVIEW'                    # "In review"
     AI_CHECKING_REVIEW = 'AI_CHECKING_REVIEW'  # "AI-controle bezig"
     RETURNED = 'RETURNED'                      # "Teruggestuurd"
+    APPROVED = 'APPROVED'                      # "Goedgekeurd": AI review passed, mapping package stored
 
 
 # Version_Control writes this spelling after a reviewed Excel was uploaded again.

@@ -25,6 +25,8 @@ class PackageMeta(BaseModel):
     package_type: str = Field(..., description='Proposal / package type, e.g. inbound or outbound')
     date_created: str = Field(..., description='ISO 8601 creation timestamp')
     user_created: str = Field(default='analist_a', description='Author or analyst identifier')
+    description: str | None = Field(default=None, description='What changed in this version (from the approval)')
+    approved_at: str | None = Field(default=None, description='ISO 8601 time the analyst approved the proposal')
 
 
 class MappingPackage(BaseModel):
