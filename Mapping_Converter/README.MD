@@ -1,60 +1,216 @@
-# Mapping Converter — Excel consistency review (prototype)
+# Mapping Converter Service
 
-This service accepts a mapping workbook and uses Gemini to assess obvious
-internal inconsistencies. It does **not** execute mappings, access historical
-XML, write to SFTP, or intercept frontend uploads yet.
+The **Mapping Converter Service** is a FastAPI microservice in the H. Essers Mapping Platform. It provides two currently independent capabilities:
+
+1. **Gemini Excel consistency review** — examines a mapping proposal workbook for internal contradictions and returns an `ACCEPTED` or `REJECTED` decision with findings.
+2. **Excel-to-JSON conversion** — converts an approved mapping proposal into a structured `MPackage.json`, optionally uploading it to shared SFTP storage for the Runtime Engine.
+
+> **Important:** These are separate API operations. At present, `/convert` and `/convert-and-upload` **do not automatically invoke** `/review-excel` or verify a prior AI acceptance. The approval gate must be integrated into the full workflow before relying on it to prevent publication of rejected workbooks.
 
 ## Architecture
 
-- `api.py` — FastAPI routes, upload validation and HTTP responses.
-- `scripts/pipeline.py` — Coordinates Excel extraction followed by AI review.
-- `scripts/excel_review.py` — Extracts mapping fields from uploaded XLSX files.
-- `scripts/gemini_review.py` — Calls Gemini and validates its JSON response.
-- `scripts/config.py` — Reads settings from the shared **repository-root `.env`**
-  locally (environment variables override it).
-- `review_prompt.txt` — Instructions for Gemini's accept/reject decision.
-- `tests/` — Local endpoint and extraction tests; no live Gemini calls.
+```mermaid
+flowchart TD
+    Analyst["Analyst / Frontend"]
+    Review["POST /review-excel"]
+    Gemini["Gemini consistency check"]
+    Convert["POST /convert"]
+    Upload["POST /convert-and-upload"]
+    SFTP["Shared SFTP: /Packages"]
+    Runtime["Runtime Engine"]
 
-The public API and response format are unchanged by this refactor.
-
-## Setup (from `Mapping_Converter/`)
-
-```bash
-python -m pip install -r requirements.txt
+    Analyst -->|Excel workbook| Review
+    Review --> Gemini
+    Gemini -->|ACCEPTED / REJECTED + findings| Analyst
+    Analyst -->|Excel workbook - separate operation| Convert
+    Analyst -->|Excel workbook - separate operation| Upload
+    Upload -->|MPackage.json| SFTP
+    SFTP --> Runtime
 ```
 
-Store `GEMINI_API_KEY` and `GEMINI_REVIEW_MODEL` (or `GEMINI_MODEL`) in the
-**Essers_Mapping repository-root `.env`**, or provide them as environment
-variables. `.env.example` lists the variables; do not commit API keys.
+### Main files
 
-```bash
-python -m uvicorn api:app --reload --port 8001
+| File | Responsibility |
+| --- | --- |
+| `api.py` | FastAPI endpoints, upload validation, and HTTP responses |
+| `scripts/pipeline.py` | Coordinates Excel extraction and Gemini review |
+| `scripts/excel_review.py` | Extracts mapping fields from uploaded `.xlsx` workbooks |
+| `scripts/gemini_review.py` | Calls Gemini and interprets its structured response |
+| `scripts/config.py` | Loads review settings from the repository-root `.env` or environment |
+| `review_prompt.txt` | Gemini review instructions and decision guidance |
+| `converter.py` | Parses mapping workbooks into JSON mapping packages |
+| `models.py` | Mapping package and API response models |
+| `sftp_service.py` | SFTP configuration, directory handling, and package upload |
+| `tests/` | API, Excel review, converter, architecture, and SFTP-related tests |
+
+## API endpoints
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/health` | Service health check |
+| `GET` | `/` | Service identifier |
+| `POST` | `/review-excel` | Gemini consistency review; does not upload a package |
+| `POST` | `/convert` | Convert an Excel mapping proposal to JSON without uploading |
+| `POST` | `/convert-and-upload` | Convert Excel to JSON and upload `MPackage.json` to SFTP |
+| `POST` | `/convert/save` | Alias for `/convert-and-upload`; hidden from Swagger |
+
+Swagger documentation: <http://localhost:8001/docs>
+
+### Gemini consistency review: `POST /review-excel`
+
+Upload a `.xlsx` workbook as multipart form field `file`. The service extracts mapping details from the **Mapping Proposal** worksheet and asks Gemini to assess internal consistency, including suspicious duplicate target fields, conflicting source mappings, and obvious rule contradictions. Conditional or otherwise justified mappings need not be rejected.
+
+A successful request returns HTTP `200` with a result such as:
+
+```json
+{
+  "decision": "REJECTED",
+  "summary": "Conflicting target mappings were detected.",
+  "findings": [
+    "Two unconditional mappings target the same CITY field with different source paths."
+  ],
+  "checked_mappings": 96
+}
 ```
 
-Swagger: http://localhost:8001/docs
+The example above is illustrative. `findings` are currently strings, not structured objects with separate mapping/problem/suggestion properties.
 
-## Review an Excel file
+- `decision: "ACCEPTED"` means the workbook passed Gemini's consistency review, **not** that business mapping correctness was independently verified.
+- `decision: "REJECTED"` indicates Gemini found actionable inconsistencies.
+- HTTP `400` means an unsupported file extension; `422` means an invalid or unsupported workbook; `503` means the AI review is unavailable. **None of these error responses is an acceptance.**
+
+The review uses **only fields extracted from the uploaded Excel**. It does not access historical XML data or write results to SFTP. Only upload files that your organization permits sending to the configured AI provider.
+
+Example:
 
 ```bash
 curl -F "file=@mapping_package.xlsx" http://localhost:8001/review-excel
 ```
 
-A successful review request returns HTTP 200 and a JSON `decision` of
-`ACCEPTED` or `REJECTED`, along with `summary`, `findings`, and
-`checked_mappings`. HTTP 400/422 means an invalid upload/workbook; HTTP 503
-means the AI review is unavailable. **Neither is an acceptance.**
+### Excel-to-JSON preview: `POST /convert`
 
-The frontend/Java service must integrate this endpoint before publishing
-any reviewed package. Only a result with `decision == "ACCEPTED"` should
-proceed; the service does not currently implement that integration.
+Accepts multipart form field `file` and returns a JSON mapping package without writing to SFTP. It reads source/target paths from the workbook according to the conversion implementation:
 
-Only Excel-derived mapping fields are sent to Gemini. A human specialist
-still needs to verify business correctness. Confirm that uploaded workbook
-content is permitted to leave your environment for the AI provider.
+- Source path: `Source full path`, with supported fallbacks to source segment and field columns.
+- Target path: the target segment path combined with the target field name.
+
+```bash
+curl -F "file=@mapping_package.xlsx" http://localhost:8001/convert
+```
+
+### Convert and upload: `POST /convert-and-upload`
+
+Accepts a multipart upload and writes a JSON mapping package to the shared SFTP server.
+
+| Form field | Required | Meaning |
+| --- | --- | --- |
+| `file` | Yes | Excel mapping workbook |
+| `company` | Yes | Customer/company name, e.g. `nouryon` |
+| `version` | Yes | Version identifier, e.g. `v4` |
+| `message_type` | Yes | Mapping direction, e.g. `outbound` |
+| `user_created` | No | Analyst identifier; defaults to `analist_a` |
+| `package_version` | No | Optional package version override |
+
+```bash
+curl -X POST "http://localhost:8001/convert-and-upload" \
+  -F "file=@mapping_package.xlsx" \
+  -F "company=nouryon" \
+  -F "version=v4" \
+  -F "message_type=outbound" \
+  -F "user_created=analist_a"
+```
+
+On success the endpoint returns HTTP `201` with upload details and the mapping package. Invalid inputs may return `400`; SFTP errors may return `502`; unexpected server errors may return `500`. This endpoint **does not currently enforce AI approval**.
+
+### Mapping package structure
+
+A converted package contains metadata and a list of source-to-target mappings:
+
+```json
+{
+  "schema_version": "1.0",
+  "meta": {
+    "client_name": "nouryon",
+    "package_version": "1.0.0",
+    "package_type": "inbound",
+    "date_created": "2026-11-20T12:00:00Z",
+    "user_created": "analist_a"
+  },
+  "mappings": [
+    {
+      "source_path": "/DELVRY03/IDOC/E1EDL20/VBELN",
+      "target_path": "/SHP_OBDLV_SAVE_REPLICA05/IDOC/E1BPOBDLVHDR/DELIV_NUMB"
+    }
+  ]
+}
+```
+
+This example shows the general shape, not a promise of exact metadata values.
+
+### SFTP storage
+
+Uploaded packages are stored under:
+
+```text
+/Packages/<company>/<version>/<message_type>/MPackage.json
+```
+
+For example:
+
+```text
+/Packages/nouryon/v4/outbound/MPackage.json
+```
+
+Company names, message types, and version folder names are normalized by the SFTP service.
+
+## Local development
+
+From `Mapping_Converter/`:
+
+```powershell
+python -m pip install -r requirements.txt
+```
+
+Set `GEMINI_API_KEY` and optionally `GEMINI_REVIEW_MODEL` (falling back to `GEMINI_MODEL`) in the **repository-root `.env`** or the process environment. The review service uses the shared root configuration for local development. Never commit API keys or real passwords.
+
+If testing SFTP uploads locally, configure `SFTP_SHARED_HOST`, `SFTP_SHARED_PORT`, `SFTP_SHARED_USER`, `SFTP_SHARED_PASSWORD`, and `SFTP_SHARED_PACKAGES_DIR` as appropriate for your environment. The Docker SFTP containers can be started from `Mapping_Converter/`:
+
+```powershell
+docker compose -f ../Scripts/docker-compose.sftp.yml up -d
+```
+
+Run the service:
+
+```powershell
+python -m uvicorn api:app --reload --port 8001
+```
+
+Open <http://localhost:8001/docs> to upload a workbook using Swagger. The shared SFTPGo web interface is typically accessible locally at <http://localhost:8081> when the corresponding Docker service is running.
+
+If using a virtual environment on Windows PowerShell:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+```
+
+On Linux/macOS, activation is `source .venv/bin/activate` instead.
 
 ## Tests
 
-```bash
+From `Mapping_Converter/`:
+
+```powershell
 python -m pytest -q
 python -m ruff check .
 ```
+
+The tests cover relevant review and conversion behavior without requiring a live Gemini API call for ordinary unit tests. Check the test modules for any environment-dependent SFTP integration setup.
+
+## Known integration work
+
+- Connect the frontend/Version Control approval flow to `/review-excel`.
+- Allow conversion and package publication **only after** a successful acceptance for the submitted workbook.
+- Persist the latest AI review result in the existing proposal metadata (`proposal.json`) through the designated storage-owning service, without creating a new version for rejected workbooks.
+- Return actionable review findings to the frontend. Today, `findings` are plain strings; structured mapping/problem/suggestion objects would require extending the response contract.

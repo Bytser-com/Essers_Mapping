@@ -7,9 +7,7 @@ exclude_paths:
 
 skip_list:
   - yaml[line-length]
-
-# Existing inventories and cooperating Kubernetes roles share public variable
-# names (security_*, runner_*, k8s_*). Report prefix style without renaming that
-# configuration API. Syntax, modules, arguments and other lint rules still fail.
-warn_list:
+  # Inventories and cooperating roles share public security_*, runner_* and
+  # k8s_* variables. Skip the role-prefix convention for this configuration API;
+  # all other variable naming, syntax, module and argument checks remain enabled.
   - var-naming[no-role-prefix]
