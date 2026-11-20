@@ -64,6 +64,18 @@ def _build_metadata(
     if excel_name:
         metadata['filename'] = excel_name
 
+    if status == 'RETURNED':
+        metadata['ai_review'] = {
+            'decision': 'REJECTED',
+            'summary': 'Het voorstel bevat tegenstrijdige mappings en ongeldige regels voor meerdere doelvelden.',
+            'findings': [
+                "Doelveld '/Order/DeliveryDate' heeft tegenstrijdige bronpaden: '/Shipment/EstDate' en '/Shipment/ActualDate' zonder conditie.",
+                "Doelveld '/Order/Lines/Quantity' heeft regel DIRECT geselecteerd maar het bronpad ontbreekt op rij 4.",
+                "Doelveld '/Order/TotalAmount' heeft regel FIXED geselecteerd maar geen vaste waarde ingevuld op rij 7.",
+            ],
+            'checked_mappings': 7,
+        }
+
     return metadata
 
 

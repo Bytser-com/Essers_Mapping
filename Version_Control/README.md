@@ -17,8 +17,7 @@ The **Version Control Service** is a Java Spring Boot microservice within the Pr
   - [2. GET `/proposals/file`](#2-get-proposalsfile)
   - [3. GET `/proposals/filedata`](#3-get-proposalsfiledata)
   - [4. PUT `/proposals/file`](#4-put-proposalsfile)
-  - [5. POST `/proposals`](#5-post-proposals)
-  - [6. DELETE `/proposals`](#6-delete-proposals)
+  - [5. DELETE `/proposals`](#5-delete-proposals)
 - [How to Run Locally](#how-to-run-locally)
 - [How to Test](#how-to-test)
 
@@ -354,52 +353,7 @@ Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 
 ---
 
-### 5. POST `/proposals`
-
-Approves a proposal for a given company, version, and proposal type.
-
-> **Note**: This endpoint is currently a placeholder and returns `501 Not Implemented`.
-
-* **URL**: `/proposals` (or `/Proposals`)
-* **Method**: `POST`
-* **Query Parameters**:
-  * `company` *(required, string, max 20 chars)*: Company name (e.g. `vanroey`).
-  * `version` *(required, string)*: Proposal version (e.g. `v3`).
-  * `proposalType` or `proposal_type` *(required, string, max 20 chars, case-insensitive)*: Proposal type (e.g. `inbound`). Both camelCase and snake_case parameter names are accepted; values are case-insensitive and normalized to lowercase.
-
-#### Response Codes
-
-| Status Code | Description |
-| :--- | :--- |
-| `501 Not Implemented` | The feature is planned and not implemented yet. |
-| `400 Bad Request` | Missing required `company`, `version`, or `proposalType`/`proposal_type` parameter, or parameter exceeding 20 characters. |
-
-#### Example Request
-
-```http
-POST /Proposals?company=vanroey&version=v3&proposalType=inbound HTTP/1.1
-Host: localhost:8080
-```
-
-#### Example Response (`501 Not Implemented`)
-
-```json
-{
-  "type": "about:blank",
-  "title": "Not Implemented",
-  "status": 501,
-  "detail": "Approving proposal for company 'vanroey', version 'v3', and proposalType 'inbound' is not implemented yet",
-  "instance": "/Proposals",
-  "company": "vanroey",
-  "version": "v3",
-  "proposalType": "inbound",
-  "timestamp": "2026-11-12T13:12:00Z"
-}
-```
-
----
-
-### 6. DELETE `/proposals`
+### 5. DELETE `/proposals`
 
 Deletes a proposal for a given company, version, and proposal type from the SFTP server. To prevent accidental deletions, the request body must contain a confirmation matching the company name.
 

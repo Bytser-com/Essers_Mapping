@@ -20,7 +20,7 @@ type ProposalState = {
   fetchProposal: (company: string) => Promise<void>;
   downloadProposal: (company: string, version: string) => Promise<ProposalFileDetailsDto | null>;
   uploadProposal: (company: string, version: string, file: File) => Promise<boolean>;
-  approveProposal: (company: string, version: string) => Promise<boolean>;
+  approveProposal: (company: string, version: string, description: string) => Promise<boolean>;
   deleteProposal: (company: string, version: string, deleteCheck: string) => Promise<boolean>;
 };
 
@@ -69,11 +69,11 @@ export const useProposalStore = create<ProposalState>()((set, get) => ({
     }
   },
 
-  approveProposal: async (company, version) => {
+    approveProposal: async (company, version, description) => {
     set({ actionError: null });
     try {
       const proposalType = get().proposal?.proposalType ?? "";
-      await approveProposal(company, version, proposalType);
+      await approveProposal(company, version, proposalType, description);
       await get().fetchProposal(company);
       return true;
     } catch (err) {

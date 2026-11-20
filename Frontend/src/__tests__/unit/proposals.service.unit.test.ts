@@ -65,7 +65,7 @@ describe('labels', () => {
       AI_GENERATING: 'AI maakt voorstel',
       READY_FOR_REVIEW: 'Klaar om na te kijken',
       IN_REVIEW: 'In review',
-      AI_CHECKING_REVIEW: 'AI controleert review van analist',
+      AI_CHECKING_REVIEW: 'AI-controle bezig',
       RETURNED: 'Teruggestuurd',
     })
     expect(AI_STATUS_LABELS).toEqual({ RUNNING: 'Bezig', FAILED: 'Mislukt' })

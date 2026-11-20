@@ -323,6 +323,7 @@ public class SftpProposalStorageService implements ProposalStorageService {
 
             String createdBy = (metadata != null) ? metadata.createdBy() : null;
             String status = (metadata != null) ? metadata.status() : null;
+            Object aiReview = (metadata != null) ? metadata.aiReview() : null;
             String finalProposalType = (resolvedProposalType != null)
                     ? resolvedProposalType.toLowerCase()
                     : (metadata != null && metadata.proposalType() != null ? metadata.proposalType().toLowerCase() : (proposalType != null ? proposalType.toLowerCase() : null));
@@ -337,7 +338,8 @@ public class SftpProposalStorageService implements ProposalStorageService {
                     updatedDate,
                     createdBy,
                     status,
-                    rows
+                    rows,
+                    aiReview
             );
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             throw e;
@@ -767,6 +769,9 @@ public class SftpProposalStorageService implements ProposalStorageService {
                     String typePath = versionPath + "/" + typeName;
                     SftpClient.DirEntry[] typeEntries = listVersionEntries(typePath);
                     ProposalMetadata metadata = readMetadata(typePath, typeEntries);
+                    if (metadata == null || metadata.status() == null) {
+                        continue;
+                    }
                     String problem = findMetadataProblem(metadata);
                     if (problem != null) {
                         log.warn("Skipping proposal {}: {}", typePath, problem);
@@ -777,6 +782,9 @@ public class SftpProposalStorageService implements ProposalStorageService {
                 }
             } else {
                 ProposalMetadata metadata = readMetadata(versionPath, versionEntries);
+                if (metadata == null || metadata.status() == null) {
+                    continue;
+                }
                 String problem = findMetadataProblem(metadata);
                 if (problem != null) {
                     log.warn("Skipping proposal {}: {}", versionPath, problem);
