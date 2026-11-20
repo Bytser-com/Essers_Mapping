@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import iconSearch from '../assets/version-control/icon-search.svg'
-import SelectActivePackageDialog from '../components/SelectActivePackageDialog'
 import {
   type MappingPackageOverview,
 } from '../services/mappingPackageOverviewService'
@@ -58,10 +57,7 @@ function matchField(pkg: MappingPackageOverview, token: string): boolean {
 // Version Control overview (Figma "07 · Version Control"): all customers and their mapping packages
 export default function VersionControl() {
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedPackageForVersions, setSelectedPackageForVersions] = useState<MappingPackageOverview | null>(null)
-
   const fetchPackages = useMappingPackageStore((state) => state.fetchPackages)
-  const setActivePackage = useMappingPackageStore((state) => state.setActivePackage)
 
   useEffect(() => {
     void fetchPackages()
@@ -113,27 +109,6 @@ export default function VersionControl() {
     const tokens = q.split(/\s+/).filter(Boolean)
     return packages.filter((pkg) => tokens.every((token) => matchField(pkg, token)))
   }, [packages, searchTerm])
-
-  const handleSetActiveVersion = async (version: string) => {
-    if (!selectedPackageForVersions || !selectedPackageForVersions.packageType) return
-    await setActivePackage(
-      selectedPackageForVersions.company,
-      selectedPackageForVersions.packageType,
-      version,
-      'analist'
-    )
-    // Update currently inspected package reference in state
-    setSelectedPackageForVersions((prev) =>
-      prev
-        ? {
-            ...prev,
-            activeVersion: version,
-            activeUpdatedAt: new Date().toISOString(),
-            activeUpdatedBy: 'analist',
-          }
-        : null
-    )
-  }
 
   return (
     <main className="flex flex-col gap-4 px-8 py-7">
@@ -243,12 +218,8 @@ export default function VersionControl() {
                         </div>
                       </td>
                       <td className={`${ACTION_CELL} ${BODY_CELL}`}>
-                        {/* Opens the versions modal for this customer and package type */}
-                        <button
-                          type="button"
-                          className="btn"
-                          onClick={() => setSelectedPackageForVersions(mappingPackage)}
-                        >
+                        {/* Opens the versions of this customer: user story 161 */}
+                        <button type="button" className="btn">
                           Bekijken
                         </button>
                       </td>
@@ -259,16 +230,6 @@ export default function VersionControl() {
             </tbody>
           </table>
         </div>
-      )}
-
-      {selectedPackageForVersions && (
-        <SelectActivePackageDialog
-          company={selectedPackageForVersions.company}
-          customerName={selectedPackageForVersions.customerName}
-          packageType={selectedPackageForVersions.packageType}
-          onClose={() => setSelectedPackageForVersions(null)}
-          onSetActive={handleSetActiveVersion}
-        />
       )}
     </main>
   )

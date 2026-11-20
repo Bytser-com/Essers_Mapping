@@ -5,26 +5,16 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import VersionControl from '../../pages/VersionControl'
-import {
-  fetchPackages,
-  fetchPackageVersions,
-  setActivePackage,
-  type MappingPackageOverview,
-  type PackageVersion,
-} from '../../services/mappingPackageOverviewService'
+import { fetchPackages, type MappingPackageOverview } from '../../services/mappingPackageOverviewService'
 import { useMappingPackageStore } from '../../stores/mappingPackageStore'
 
 // Keep the real types and helpers but replace the API call
 vi.mock('../../services/mappingPackageOverviewService', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../services/mappingPackageOverviewService')>()),
   fetchPackages: vi.fn(),
-  fetchPackageVersions: vi.fn(),
-  setActivePackage: vi.fn(),
 }))
 
 const fetchMock = vi.mocked(fetchPackages)
-const fetchVersionsMock = vi.mocked(fetchPackageVersions)
-const setActivePackageMock = vi.mocked(setActivePackage)
 
 // createdAt without timezone: shown as is, whatever the timezone of the test machine
 const brevalis: MappingPackageOverview = {
@@ -341,43 +331,6 @@ describe('VersionControl', () => {
       expect(within(row).getByText('nieuwste: v2')).toBeInTheDocument()
       expect(within(row).getByText('15/11/2026 09:00')).toBeInTheDocument()
       expect(within(row).getByText('door lead_analyst')).toBeInTheDocument()
-    })
-
-    it('opens version selection dialog when clicking "Bekijken" and displays all versions', async () => {
-      answers([pkgWithActive])
-      fetchVersionsMock.mockResolvedValue(versionsList)
-
-      render(<VersionControl />)
-      await screen.findByText('Nouryon')
-
-      const bekijkenBtn = screen.getByRole('button', { name: 'Bekijken' })
-      await userEvent.click(bekijkenBtn)
-
-      expect(screen.getByRole('heading', { name: 'Versiebeheer mapping package' })).toBeInTheDocument()
-      expect(screen.getByText('Eerste versie')).toBeInTheDocument()
-      expect(screen.getByText('Tweede versie')).toBeInTheDocument()
-      expect(screen.getByText('Actief')).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Actief maken' })).toBeInTheDocument()
-    })
-
-    it('activating another version calls setActivePackage and updates active status in dialog', async () => {
-      answers([pkgWithActive])
-      fetchVersionsMock.mockResolvedValue(versionsList)
-      setActivePackageMock.mockResolvedValue({
-        ...pkgWithActive,
-        activeVersion: 'v2',
-        activeUpdatedAt: '2026-11-20T12:00:00',
-        activeUpdatedBy: 'analist',
-      })
-
-      render(<VersionControl />)
-      await screen.findByText('Nouryon')
-
-      await userEvent.click(screen.getByRole('button', { name: 'Bekijken' }))
-      const activateBtn = await screen.findByRole('button', { name: 'Actief maken' })
-      await userEvent.click(activateBtn)
-
-      expect(setActivePackageMock).toHaveBeenCalledWith('nouryon', 'inbound', 'v2', 'analist')
     })
   })
 })
