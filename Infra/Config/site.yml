@@ -17,9 +17,9 @@
     - cicd
     - github_runner
 
-- name: Stage 4 - Kubernetes Monitoring & Grafana Stack (Prometheus & Dashboards)
+- name: Stage 4 - Virtual Machine Host Telemetry (Node Exporter & Alloy)
   ansible.builtin.import_playbook: playbooks/monitoring.yml
   tags:
-    - monitoring
-    - grafana
-    - prometheus
+    - node_monitoring
+    - alloy
+    - node_exporter

@@ -43,13 +43,15 @@
         - alloy
         - node_exporter
 
-- name: Stage 2 - Deploy Prometheus Operator & Grafana Monitoring Stack on Kubernetes
+- name: Stage 2 - Deploy Prometheus Operator & Grafana Monitoring Stack on Kubernetes (Opt-In via --tags k8s_monitoring)
   hosts: k8s_masters
   become: true
   gather_facts: false
   run_once: true
   tags:
-    - monitoring
+    - never
+    - k8s_monitoring
+    - monitoring_k8s
     - grafana
     - prometheus
     - addons

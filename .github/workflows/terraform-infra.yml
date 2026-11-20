@@ -99,7 +99,8 @@ jobs:
           ACTION="${{ inputs.action || github.event.inputs.action || 'apply' }}"
           DESTROY_FLAG=""
           if [ "$ACTION" = "destroy" ]; then
-            DESTROY_FLAG="-destroy"
+            # Target Kubernetes cluster VMs only; never destroy the pipeline runner VM that is executing this workflow
+            DESTROY_FLAG="-destroy -target=proxmox_virtual_environment_vm.basic_vm[\"k8s_master\"] -target=proxmox_virtual_environment_vm.basic_vm[\"k8s_worker\"]"
           fi
 
           set +e
