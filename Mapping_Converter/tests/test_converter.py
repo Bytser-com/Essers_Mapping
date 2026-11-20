@@ -2,11 +2,12 @@
 
 import io
 from pathlib import Path
+from unittest.mock import patch
 
 import openpyxl
 import pytest
 
-from converter import convert_excel_to_json_file, parse_mapping_excel
+from converter import convert_excel_to_json_file, convert_excel_to_sftp, parse_mapping_excel
 from models import MappingEntry, MappingPackage
 
 
@@ -141,3 +142,30 @@ def test_convert_excel_to_json_file(tmp_path):
     assert "/ORDER/HEADER/ORDER_NUM" in content
     assert "/INVOICE/INV_NUM" in content
     assert len(package.mappings) == 1
+
+
+def test_convert_excel_to_sftp():
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Mapping Proposal"
+    ws.append(["Target segment path", "Target field name", "Source full path"])
+    ws.append(["/ORDER/HEADER", "ORDER_NUM", "/INVOICE/INV_NUM"])
+
+    buf = io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+
+    with patch("converter.save_mapping_package_to_sftp", return_value="/Packages/nouryon/v4/outbound/MPackage.json") as mock_save:
+        package, sftp_path = convert_excel_to_sftp(
+            excel_source=buf.getvalue(),
+            company="Nouryon",
+            version="v4",
+            message_type="outbound",
+            user_created="analist_a",
+            package_version="1.0.0",
+        )
+
+    assert len(package.mappings) == 1
+    assert sftp_path == "/Packages/nouryon/v4/outbound/MPackage.json"
+    assert mock_save.called
+
