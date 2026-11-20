@@ -40,3 +40,10 @@ class GeminiError(MappingError):
 
 class QuotaExceededError(GeminiError):
     """Gemini rate limit (429) or overload (503). Completed batches are kept."""
+
+class ProposalNotFoundError(MappingError):
+    """The proposal (customer, version or proposal type folder) does not exist."""
+
+
+class ProposalConflictError(MappingError):
+    """The proposal is not in a state that allows this action (e.g. AI review running)."""
