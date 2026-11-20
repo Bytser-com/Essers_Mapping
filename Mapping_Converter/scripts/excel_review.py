@@ -20,17 +20,28 @@ MAX_UNCOMPRESSED_BYTES = 25 * 1024 * 1024
 MAX_MAPPING_ROWS = 300
 MAX_CELL_LENGTH = 800
 
-# These names match the existing Mapping Proposal worksheet's row 2.
+MAPPING_ID = 'Mapping ID'
+TARGET_FIELD_NAME = 'Target field name'
+SOURCE_FULL_PATH = 'Source full path'
+RULE_TYPE = 'Proposed rule type'
+
+# These names match the Mapping Proposal worksheet's row 2.
 FIELDS = (
-    'Mapping ID', 'Target segment path', 'Target field name',
-    'Source full path', 'Proposed rule type', 'Fixed value',
+    MAPPING_ID, 'Target segment path', TARGET_FIELD_NAME,
+    SOURCE_FULL_PATH, RULE_TYPE, 'Fixed value',
     'Transformation logic', 'Condition logic', 'Lookup logic',
     'Loop mapping logic', 'Requires review', 'Reviewer decision',
     'Reviewer corrected source path', 'Reviewer corrected rule type',
     'Reviewer corrected fixed value', 'Reviewer corrected transformation logic',
     'Reviewer corrected condition logic',
 )
-REQUIRED_HEADERS = {'Mapping ID', 'Target field name', 'Proposed rule type', 'Source full path'}
+
+REQUIRED_HEADERS = {
+    MAPPING_ID,
+    TARGET_FIELD_NAME,
+    RULE_TYPE,
+    SOURCE_FULL_PATH,
+}
 
 
 class InvalidWorkbook(ValueError):
@@ -70,27 +81,52 @@ def _shared_strings(archive: zipfile.ZipFile) -> list[str]:
     return [''.join(item.itertext()) for item in root.findall('m:si', NS)]
 
 
-def _mapping_sheet_path(archive: zipfile.ZipFile) -> str:
+def _mapping_sheet_id(archive: zipfile.ZipFile) -> str:
     workbook = ET.fromstring(archive.read('xl/workbook.xml'))
-    relationship_id = None
+
     for sheet in workbook.findall('m:sheets/m:sheet', NS):
         if sheet.get('name') == 'Mapping Proposal':
             relationship_id = sheet.get(f'{{{NS["r"]}}}id')
-            break
-    if not relationship_id:
-        raise InvalidWorkbook('Missing "Mapping Proposal" worksheet.')
-    relationships = ET.fromstring(archive.read('xl/_rels/workbook.xml.rels'))
+            if relationship_id:
+                return relationship_id
+
+    raise InvalidWorkbook('Missing "Mapping Proposal" worksheet.')
+
+
+def _mapping_sheet_path(archive: zipfile.ZipFile) -> str:
+    relationship_id = _mapping_sheet_id(archive)
+    relationships = ET.fromstring(
+        archive.read('xl/_rels/workbook.xml.rels')
+    )
+
     for rel in relationships.findall('p:Relationship', NS):
-        if rel.get('Id') == relationship_id:
-            target = rel.get('Target', '')
-            if rel.get('TargetMode') == 'External':
-                raise InvalidWorkbook('External worksheet reference is not supported.')
-            from posixpath import normpath
-            path = normpath(target.lstrip('/') if target.startswith('/') else f'xl/{target}')
-            if not path.startswith('xl/worksheets/') or '..' in path.split('/'):
-                raise InvalidWorkbook('Invalid mapping worksheet reference.')
-            return path
-    raise InvalidWorkbook('Cannot locate the Mapping Proposal worksheet.')
+        if rel.get('Id') != relationship_id:
+            continue
+
+        if rel.get('TargetMode') == 'External':
+            raise InvalidWorkbook(
+                'External worksheet reference is not supported.'
+            )
+
+        target = rel.get('Target', '')
+        from posixpath import normpath
+
+        path = normpath(
+            target.lstrip('/')
+            if target.startswith('/')
+            else f'xl/{target}'
+        )
+
+        if not path.startswith('xl/worksheets/') or '..' in path.split('/'):
+            raise InvalidWorkbook(
+                'Invalid mapping worksheet reference.'
+            )
+
+        return path
+
+    raise InvalidWorkbook(
+        'Cannot locate the Mapping Proposal worksheet.'
+    )
 
 
 def _rows(archive: zipfile.ZipFile, sheet_path: str, shared: list[str]) -> dict[int, dict[int, str]]:
@@ -129,7 +165,7 @@ def read_mapping_proposal(contents: bytes) -> list[dict[str, str]]:
     except (zipfile.BadZipFile, KeyError, ET.ParseError) as error:
         raise InvalidWorkbook('Invalid or unsupported .xlsx workbook.') from error
 
-    headers = {number: name for number, name in rows.get(2, {}).items()}
+    headers = dict(rows.get(2, {}))
     if not REQUIRED_HEADERS.issubset(set(headers.values())):
         missing = sorted(REQUIRED_HEADERS - set(headers.values()))
         raise InvalidWorkbook(f'Missing required column(s): {", ".join(missing)}')
@@ -154,8 +190,13 @@ def simple_stats(records: list[dict]) -> dict:
     """Non-judgmental overview; actual approval is decided by Gemini."""
     return {
         'mappings': len(records),
-        'rule_types': dict(Counter(item.get('Proposed rule type', '') for item in records)),
-        'missing_target_names': sum(not item.get('Target field name') for item in records),
-        'unresolved_review_rows': sum(item.get('Requires review', '').lower() in {'yes', 'true', '1'}
-                                      and not item.get('Reviewer decision') for item in records),
+        'rule_types': dict(Counter(item.get(RULE_TYPE, '') for item in records)),
+        'missing_target_names': sum(
+            not item.get(TARGET_FIELD_NAME) for item in records
+        ),
+        'unresolved_review_rows': sum(
+            item.get('Requires review', '').lower() in {'yes', 'true', '1'}
+            and not item.get('Reviewer decision')
+            for item in records
+        ),
     }
