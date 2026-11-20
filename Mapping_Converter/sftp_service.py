@@ -20,11 +20,8 @@ DEFAULT_PACKAGES_DIR = "/Packages"
 try:
     from dotenv import load_dotenv
 
-    for candidate in [
-        Path(__file__).resolve().parents[1] / ".env",
-        Path(__file__).resolve().parents[2] / ".env",
-        Path(__file__).resolve().parent / ".env",
-    ]:
+    for parent in Path(__file__).resolve().parents:
+        candidate = parent / ".env"
         if candidate.is_file():
             load_dotenv(candidate)
             break
@@ -165,9 +162,9 @@ def save_json_to_sftp(
         data_bytes = json_content
 
     if config.host.lower() in ("none", "local", "offline"):
-        local_base = (
-            Path(__file__).resolve().parents[1] / "data" / "sftp-shared"
-        )
+        parents = list(Path(__file__).resolve().parents)
+        base_dir = parents[1] if len(parents) > 1 else parents[0]
+        local_base = base_dir / "data" / "sftp-shared"
         clean_rel = remote_path.lstrip("/")
         local_target = local_base / clean_rel
         local_target.parent.mkdir(parents=True, exist_ok=True)
