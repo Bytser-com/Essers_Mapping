@@ -61,12 +61,19 @@ class ExperimentTracker:
     """Tracks one CLI execution and cumulative usage of its resumable job."""
 
     def __init__(self, *, settings: dict, run_dir: Path, root: Path,
+                 output_dir: Path | None = None,
                  job_signature: str = '', started_monotonic: float | None = None,
                  started_utc: str | None = None):
         self.started = started_monotonic if started_monotonic is not None else time.perf_counter()
         self.run_id = datetime.now(UTC).strftime('%Y%m%dT%H%M%S') + '_' + uuid4().hex[:8]
         self.run_dir = run_dir
         self.root = root
+        self.output_dir = output_dir or (root / 'output')
+        run_folder = (
+            run_dir.relative_to(root).as_posix()
+            if run_dir.is_relative_to(root)
+            else run_dir.as_posix()
+        )
         self.data = {
             **dict.fromkeys(COLUMNS, ''), **settings,
             'run_id': self.run_id,
@@ -75,7 +82,7 @@ class ExperimentTracker:
             'batches_restored': 0,
             'api_attempts': 0, 'api_retries': 0, 'api_errors': 0,
             'expert_review_status': 'pending',
-            'run_folder': run_dir.relative_to(root).as_posix(),
+            'run_folder': run_folder,
         }
         self.execution_tokens = self.execution_tokens = dict.fromkeys(TOKEN_FIELDS, 0)
         self.last_api_code = ''
@@ -184,7 +191,7 @@ class ExperimentTracker:
                 if isinstance(getattr(error, 'code', None), int) else ''
             )
         _write_json(self.ledger_path, self.ledger)
-        output_dir = self.root / 'output'
+        output_dir = self.output_dir
         _write_json(output_dir / 'experiments' / (self.run_id + '.json'), self.data)
         self._append_csv(output_dir / 'experiments.csv')
         return self.data
