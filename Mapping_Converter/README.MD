@@ -58,7 +58,12 @@ Swagger documentation: <http://localhost:8001/docs>
 
 ### Gemini consistency review: `POST /review-excel`
 
-Upload a `.xlsx` workbook as multipart form field `file`. The service extracts mapping details from the **Mapping Proposal** worksheet and asks Gemini to assess internal consistency, including suspicious duplicate target fields, conflicting source mappings, and obvious rule contradictions. Conditional or otherwise justified mappings need not be rejected.
+Takes query parameters `companyName`, `type`, and `versionNumber` (e.g. `?companyName=nouryon&type=inbound&versionNumber=v2`) and does not require any request body. The service retrieves the proposal `.xlsx` workbook directly from the SFTP server (from `/Proposals/<companyName>/<versionNumber>/<type>/` or fallback to `/Proposals/<companyName>/<versionNumber>/`), extracts mapping details from the **Mapping Proposal** worksheet, and asks Gemini to assess internal consistency, including suspicious duplicate target fields, conflicting source mappings, and obvious rule contradictions. Conditional or otherwise justified mappings need not be rejected.
+
+All three parameters are required:
+- `companyName`: Name or slug of the company/client (e.g., `nouryon`).
+- `type`: Proposal type (e.g., `inbound` or `outbound`).
+- `versionNumber`: Version identifier or number (e.g., `v2` or `2`).
 
 A successful request returns HTTP `200` with a result such as:
 
@@ -77,14 +82,12 @@ The example above is illustrative. `findings` are currently strings, not structu
 
 - `decision: "ACCEPTED"` means the workbook passed Gemini's consistency review, **not** that business mapping correctness was independently verified.
 - `decision: "REJECTED"` indicates Gemini found actionable inconsistencies.
-- HTTP `400` means an unsupported file extension; `422` means an invalid or unsupported workbook; `503` means the AI review is unavailable. **None of these error responses is an acceptance.**
-
-The review uses **only fields extracted from the uploaded Excel**. It does not access historical XML data or write results to SFTP. Only upload files that your organization permits sending to the configured AI provider.
+- HTTP `400` means invalid or empty query parameters; `404` means the workbook was not found on SFTP; `422` means missing required query parameters or an invalid/corrupted workbook; `502` means an SFTP connection or transfer error; `503` means the AI review is temporarily unavailable. **None of these error responses is an acceptance.**
 
 Example:
 
 ```bash
-curl -F "file=@mapping_package.xlsx" http://localhost:8001/review-excel
+curl -X POST "http://localhost:8001/review-excel?companyName=nouryon&type=inbound&versionNumber=v2"
 ```
 
 ### Excel-to-JSON preview: `POST /convert`
