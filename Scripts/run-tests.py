@@ -99,6 +99,8 @@ def main(argv: list[str] | None = None) -> int:
                         help='Skip browser-based Playwright tests')
     parser.add_argument('--only-e2e', '-OnlyE2E', action='store_true',
                         help='Only run frontend build + Playwright tests')
+    parser.add_argument('--seed', '-Seed', action='store_true',
+                        help='Seed sample proposals and mapping packages into storage before running checks')
     args = parser.parse_args(argv)
     if args.skip_e2e and args.only_e2e:
         parser.error('--skip-e2e and --only-e2e cannot be used together')
@@ -108,18 +110,22 @@ def main(argv: list[str] | None = None) -> int:
     print(f'Platform:   {sys.platform}')
     results: list[tuple[str, str, str]] = []
 
+    if args.seed:
+        run_check('Seed Development Data', '.',
+                  [sys.executable, str(ROOT / 'Scripts' / 'seed.py')], results)
+
     if not args.only_e2e:
         run_check('Mapping Proposal - pytest', 'Mapping_Proposal',
                   [sys.executable, '-m', 'pytest', '-q'], results)
         run_check('Mapping Proposal - Ruff', 'Mapping_Proposal',
-                  [sys.executable, '-m', 'ruff', 'check', '.'], results)
+                  [sys.executable, '-m', 'ruff', 'check', '--no-cache', '.'], results)
 
         # Automatically include Mapping Converter once it contains tests.
         if (ROOT / 'Mapping_Converter' / 'tests').is_dir():
             run_check('Mapping Converter - pytest', 'Mapping_Converter',
                       [sys.executable, '-m', 'pytest', '-q'], results)
             run_check('Mapping Converter - Ruff', 'Mapping_Converter',
-                      [sys.executable, '-m', 'ruff', 'check', '.'], results)
+                      [sys.executable, '-m', 'ruff', 'check', '--no-cache', '.'], results)
         else:
             print('Mapping Converter: no tests directory yet (not counted).')
 

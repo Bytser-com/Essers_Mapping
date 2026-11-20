@@ -15,7 +15,7 @@ Layout on the storage: one folder per customer, one subfolder per version, one s
 The files live on the shared SFTPGo server of the infrastructure (sftp-shared, see
 Kubernetes/base/shared-storage/sftp-shared.yaml); this service connects to it directly
 over SFTP (services/storage.py). Locally, when SFTP_SHARED_HOST is not set, the same
-layout lives in data/sftp-shared/proposals/ (see scripts/dev_seed.py for example data).
+layout lives in data/sftp-shared/proposals/ (see Scripts/seed.py for example data).
 
 Example proposal.json:
     {
