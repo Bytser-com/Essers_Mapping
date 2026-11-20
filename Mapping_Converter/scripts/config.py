@@ -1,22 +1,26 @@
 """Central configuration for the Mapping Converter: paths and settings from ``.env``.
 
-``.env`` is read exactly once, here. Same variables as Mapping_Proposal, so both
+``.env`` is read in one place. Same variables as Mapping_Proposal, so both
 services point at the same shared SFTP server (sftp-shared).
+Also provides configuration for the Excel-only Gemini review service.
 """
 from __future__ import annotations
 
 import os
+from dataclasses import dataclass
 from pathlib import Path
 
 from dotenv import load_dotenv
 
 # Mapping_Converter/ folder (this file lives in Mapping_Converter/scripts/).
 ROOT = Path(__file__).resolve().parent.parent
+SERVICE_DIR = ROOT
+REPOSITORY_DIR = ROOT.parent
 DATA_DIR = ROOT / 'data'
 LOCAL_SHARED_DIR = DATA_DIR / 'sftp-shared'
+PROMPT_PATH = ROOT / 'review_prompt.txt'
 
 _env_loaded = False
-
 
 # Repo root (Essers_Mapping/): one shared .env for all services.
 REPO_ROOT = ROOT.parent
@@ -27,7 +31,7 @@ def _load_env() -> None:
     (terminal, Kubernetes secrets) always win: load_dotenv never overrides them."""
     global _env_loaded
     if not _env_loaded:
-        load_dotenv(REPO_ROOT / '.env')
+        load_dotenv(REPO_ROOT / '.env', override=False)
         _env_loaded = True
 
 
@@ -98,3 +102,31 @@ def cors_origins() -> list[str]:
     """Browser origins allowed to call the API directly (comma-separated CORS_ORIGINS)."""
     _load_env()
     return [origin.strip() for origin in os.getenv('CORS_ORIGINS', '').split(',') if origin.strip()]
+
+
+@dataclass(frozen=True)
+class ReviewSettings:
+    api_key: str
+    model: str
+    timeout_ms: int = 60000
+
+
+def load_review_settings() -> ReviewSettings:
+    """Load shared .env without overriding values injected by the environment."""
+    load_dotenv(REPOSITORY_DIR / '.env', override=False)
+    model = (os.getenv('GEMINI_REVIEW_MODEL') or os.getenv('GEMINI_MODEL') or '').strip()
+
+    timeout_ms = 60000
+    timeout_sec = (os.getenv('GEMINI_REVIEW_TIMEOUT_SECONDS') or '').strip()
+    if timeout_sec.isdigit():
+        timeout_ms = int(timeout_sec) * 1000
+    else:
+        timeout_review_ms = (os.getenv('GEMINI_REVIEW_TIMEOUT_MS') or '').strip()
+        if timeout_review_ms.isdigit():
+            timeout_ms = int(timeout_review_ms)
+
+    return ReviewSettings(
+        api_key=os.getenv('GEMINI_API_KEY', '').strip(),
+        model=model,
+        timeout_ms=timeout_ms,
+    )
