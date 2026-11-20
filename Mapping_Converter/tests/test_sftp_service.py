@@ -1,18 +1,15 @@
 """Unit tests for SFTP storage service in Mapping Converter."""
 
 import json
-from unittest.mock import MagicMock, patch
 from pathlib import Path
-import pytest
+from unittest.mock import MagicMock, patch
 
-from models import MappingEntry, MappingPackage, PackageMeta
+from models import MappingEntry, MappingPackage
 from sftp_service import (
     SftpConfig,
-    SftpError,
     _sftp_makedirs,
     build_package_sftp_path,
     format_semver,
-    get_sftp_config,
     normalize_slug,
     normalize_version,
     save_json_to_sftp,

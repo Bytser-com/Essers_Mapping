@@ -2,8 +2,8 @@ import io
 from pathlib import Path
 from unittest.mock import patch
 
-from fastapi.testclient import TestClient
 import openpyxl
+from fastapi.testclient import TestClient
 
 from api import app
 

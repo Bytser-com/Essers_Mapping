@@ -29,7 +29,7 @@ def root():
 
 @app.post(
     "/convert",
-    
+
     status_code=status.HTTP_200_OK,
     summary="Convert an Excel mapping proposal into a JSON mapping package",
 )
@@ -62,13 +62,13 @@ async def convert_mapping_proposal(file: UploadFile = File(...)) -> MappingPacka
 
 @app.post(
     "/convert-and-upload",
-    
+
     status_code=status.HTTP_201_CREATED,
     summary="Convert Excel proposal and upload the JSON package directly to SFTP",
 )
 @app.post(
     "/convert/save",
-    
+
     status_code=status.HTTP_201_CREATED,
     include_in_schema=False,
 )

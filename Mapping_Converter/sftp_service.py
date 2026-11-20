@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-import json
 import logging
 import os
-from dataclasses import dataclass
-from pathlib import Path
 import posixpath
 import re
+from dataclasses import dataclass
+from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 from models import MappingPackage, PackageMeta
@@ -230,7 +229,7 @@ def save_mapping_package_to_sftp(
 
     # Attach metadata header if not already present
     if package.meta is None:
-        now_utc = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        now_utc = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
         package.meta = PackageMeta(
             client_name=clean_company,
             package_version=resolved_pkg_ver,
