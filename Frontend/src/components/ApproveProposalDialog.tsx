@@ -50,6 +50,7 @@ export default function ApproveProposalDialog({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             maxLength={MAX_DESCRIPTION_LENGTH}
+            placeholder="Bv. Leverdatum mapt nu op DeliveryDate in plaats van OrderDate"
             rows={3}
             disabled={isSubmitting}
             autoFocus
