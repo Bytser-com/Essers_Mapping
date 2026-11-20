@@ -4,7 +4,8 @@ FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PORT=8000 \
-    INCOMING_DIR=/tmp/source
+    INCOMING_DIR=/tmp/source \
+    OUTPUT_DIR=/tmp/output
 
 WORKDIR /app
 
@@ -17,7 +18,7 @@ COPY . .
 
 # Create non-root user (UID 1000) and prepare writable directories
 RUN useradd -u 1000 -m -s /bin/sh appuser && \
-    mkdir -p /tmp/source /app/output && \
+    mkdir -p /tmp/source /tmp/output /app/output && \
     chown -R 1000:1000 /app
 
 USER 1000:1000

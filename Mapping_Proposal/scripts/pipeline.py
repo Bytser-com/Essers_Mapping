@@ -17,6 +17,7 @@ from pathlib import Path
 
 from .config import (
     HISTORICAL_DIR,
+    OUTPUT_DIR,
     PROMPT_PATH,
     ROOT,
     RUNS_DIR,
@@ -280,7 +281,7 @@ def run_mapping(settings: MappingSettings) -> MappingResult:
     run_dir = RUNS_DIR / name
     checkpoints = run_dir / 'checkpoints'
     tracker = ExperimentTracker(
-        root=ROOT, run_dir=run_dir, job_signature=signature,
+        root=ROOT, run_dir=run_dir, output_dir=OUTPUT_DIR, job_signature=signature,
         started_monotonic=started, started_utc=started_utc, settings={
             'model': model,
             'dataset_version': dataset_hash[:12],
@@ -385,10 +386,15 @@ def run_mapping(settings: MappingSettings) -> MappingResult:
             verified_historical_evidence=reference_evidence,
         ))
         # Write one row to output/experiments.csv for this execution.
+        workbook_path_str = (
+            workbook.relative_to(ROOT).as_posix()
+            if workbook.is_relative_to(ROOT)
+            else workbook.as_posix()
+        )
         tracker.finish(status='completed', results={
             'mapping_rows': len(accepted), 'placeholders': len(missing),
             'rejected_proposals': len(rejected), 'structural_issues': len(issues),
-            'workbook_path': workbook.relative_to(ROOT).as_posix(),
+            'workbook_path': workbook_path_str,
             'historical_evidence_checked': len(reference_evidence),
             'historical_evidence_rejected': 0,
         })

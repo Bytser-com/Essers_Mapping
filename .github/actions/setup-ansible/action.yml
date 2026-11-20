@@ -55,8 +55,11 @@ runs:
         rm -rf "$GALAXY_DIR"
         mkdir -p "$GALAXY_DIR/collections" "$GALAXY_DIR/roles"
 
-        echo "ANSIBLE_COLLECTIONS_PATH=$GALAXY_DIR/collections" >> "$GITHUB_ENV"
-        echo "ANSIBLE_ROLES_PATH=$PWD/roles:$GALAXY_DIR/roles" >> "$GITHUB_ENV"
+        # Galaxy needs these paths in this step; GITHUB_ENV applies to later steps.
+        export ANSIBLE_COLLECTIONS_PATH="$GALAXY_DIR/collections"
+        export ANSIBLE_ROLES_PATH="$PWD/roles:$GALAXY_DIR/roles"
+        echo "ANSIBLE_COLLECTIONS_PATH=$ANSIBLE_COLLECTIONS_PATH" >> "$GITHUB_ENV"
+        echo "ANSIBLE_ROLES_PATH=$ANSIBLE_ROLES_PATH" >> "$GITHUB_ENV"
 
         for req in requirements.yml collections/requirements.yml roles/requirements.yml; do
           if [ -f "$req" ]; then
@@ -68,6 +71,7 @@ runs:
 
     - name: Show versions
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
       run: |
         ansible --version
         ansible-lint --version

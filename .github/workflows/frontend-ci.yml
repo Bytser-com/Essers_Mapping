@@ -57,6 +57,7 @@ jobs:
       CI: 'true'
     steps:
       - name: Checkout repository
+        id: checkout
         uses: actions/checkout@v6
         with:
           persist-credentials: false
@@ -69,32 +70,45 @@ jobs:
           cache-dependency-path: Frontend/package-lock.json
 
       - name: Install locked dependencies
+        id: install
         run: npm ci
 
       - name: Lint
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run lint
 
       - name: Check TypeScript types
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run typecheck
 
       # This command runs unit, integration and functional tests once, with coverage.
       - name: Unit, integration and functional tests with coverage
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run test:coverage
 
       - name: Build production frontend
+        id: build
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run build
 
       - name: Install Playwright Chromium
+        id: playwright
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npx playwright install --with-deps chromium
 
       # playwright.config.js starts Vite preview against the production dist bundle.
       - name: Browser end-to-end tests
+        if: ${{ !cancelled() && steps.playwright.outcome == 'success' }}
         run: npm run test:e2e
 
       - name: Setup Docker Buildx
+        id: buildx
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         uses: docker/setup-buildx-action@v4
 
       - name: Build container for validation
+        id: image
+        if: ${{ !cancelled() && steps.buildx.outcome == 'success' }}
         uses: docker/build-push-action@v7
         with:
           context: Frontend
@@ -103,6 +117,7 @@ jobs:
           tags: service-ci:local
 
       - name: Validate container startup and health
+        if: ${{ !cancelled() && steps.image.outcome == 'success' }}
         env:
           IMAGE: service-ci:local
           SERVICE_PATH: Frontend
@@ -110,6 +125,7 @@ jobs:
         working-directory: ${{ github.workspace }}
 
       - name: Audit locked dependencies including development tools
+        if: ${{ !cancelled() && steps.checkout.outcome == 'success' }}
         uses: ./.github/actions/dependency-audit
         with:
           lockfile: Frontend/package-lock.json
@@ -128,6 +144,7 @@ jobs:
           retention-days: 14
 
       - name: Upload production bundle
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         uses: actions/upload-artifact@v6
         with:
           name: frontend-dist

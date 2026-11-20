@@ -82,7 +82,7 @@ describe('Home – proposals overview', () => {
     await screen.findByText('Brunos')
 
     await userEvent.type(screen.getByLabelText('Klantnaam'), 'Ostavel')
-    await userEvent.type(screen.getByLabelText('Type'), 'outbound')
+    await userEvent.selectOptions(screen.getByLabelText('Type'), 'Outbound')
     await userEvent.upload(screen.getByTestId('file-input'), new File(['<root />'], 'order.xml', { type: 'text/xml' }))
     await userEvent.click(screen.getByRole('button', { name: 'Uploaden' }))
 

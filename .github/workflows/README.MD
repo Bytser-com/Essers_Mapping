@@ -54,6 +54,12 @@ pushes compare the previous commit with the new head.
 
 Test reports are uploaded even when a check fails, if any were generated. Reports
 are retained for 14 days; successful build artifacts are retained for 7 days.
+Independent CI checks continue after another check fails, provided their own
+prerequisites succeeded and the run was not cancelled. For example, Python tests
+still run after lint failures, and dependency audits still run after test or
+container failures. Container health checks require a successful image build;
+frontend browser and container checks require the production bundle. Failures
+still fail the service CI gate and block CD; they are not ignored.
 Frontend browser tests use Vite preview to serve the production build. A separate
 container smoke test checks Nginx health and SPA fallback. No CI test deploys to
 the Kubernetes environment.
@@ -360,9 +366,10 @@ Kubernetes apply/diff dry-run is required. Client-side object serialization is
 used only during live reconciliation to preserve released image digests.
 
 Ansible lint explicitly includes `site.yml`, `playbooks/` and `roles/`, rather
-than relying on directory discovery. The existing shared variable prefixes are
-reported as visible `var-naming[no-role-prefix]` warnings to retain the inventory
-configuration API; other lint failures block CI. Task-name style is enforced.
+than relying on directory discovery. The `var-naming[no-role-prefix]` convention
+is skipped because inventories and cooperating roles share public variable
+names. Other variable-naming checks and lint failures still block CI.
+Task-name style is enforced.
 
 The existing order is Terraform plan/apply -> Ansible -> Kubernetes. Ansible
 also runs when an authorized apply request produces a successful no-change plan;
