@@ -14,6 +14,35 @@ const ACTION_CELL = 'w-[176px] pr-4 text-right' // 160 + 16
 const HEADER_TEXT = 'py-2.5 text-left align-middle text-[11px] font-bold tracking-[0.66px] text-grey'
 const BODY_CELL = 'py-[13px] align-middle'
 
+function matchToken(text: string, token: string): boolean {
+  if (!text) return false
+  if (token.length === 1) {
+    const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    return new RegExp(`(?:^|\\s|[^a-zA-Z0-9])${escaped}`, 'i').test(text)
+  }
+  return text.toLowerCase().includes(token)
+}
+
+function matchField(pkg: { company: string; customerName: string | null; packageType: string | null; latestVersion: string; createdBy: string | null; createdAt: string | null }, token: string): boolean {
+  const company = pkg.company || ''
+  const customerName = pkg.customerName || ''
+  const type = pkg.packageType || ''
+  const version = pkg.latestVersion || ''
+  const user = pkg.createdBy || ''
+  const rawDate = pkg.createdAt || ''
+  const formattedDate = pkg.createdAt ? formatUploadedAt(pkg.createdAt) : ''
+
+  return (
+    matchToken(company, token) ||
+    matchToken(customerName, token) ||
+    matchToken(type, token) ||
+    matchToken(version, token) ||
+    matchToken(user, token) ||
+    matchToken(rawDate, token) ||
+    matchToken(formattedDate, token)
+  )
+}
+
 // Version Control overview (Figma "07 · Version Control"): all customers and their mapping packages
 export default function VersionControl() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -32,27 +61,34 @@ export default function VersionControl() {
     const q = searchTerm.trim().toLowerCase()
     if (!q) return packages
 
-    return packages.filter((pkg) => {
-      const companyMatch = (pkg.company || '').toLowerCase().includes(q)
-      const customerNameMatch = (pkg.customerName || '').toLowerCase().includes(q)
-      const typeMatch = (pkg.packageType || '').toLowerCase().includes(q)
-      const versionMatch = (pkg.latestVersion || '').toLowerCase().includes(q)
-      const userMatch = (pkg.createdBy || '').toLowerCase().includes(q)
-      const rawDateMatch = (pkg.createdAt || '').toLowerCase().includes(q)
-      const formattedDateMatch = pkg.createdAt
-        ? formatUploadedAt(pkg.createdAt).toLowerCase().includes(q)
-        : false
+    // Check if the entire query matches directly as a phrase in any field
+    const phraseMatches = packages.filter((pkg) => {
+      const company = (pkg.company || '').toLowerCase()
+      const customerName = (pkg.customerName || '').toLowerCase()
+      const type = (pkg.packageType || '').toLowerCase()
+      const version = (pkg.latestVersion || '').toLowerCase()
+      const user = (pkg.createdBy || '').toLowerCase()
+      const rawDate = (pkg.createdAt || '').toLowerCase()
+      const formattedDate = pkg.createdAt ? formatUploadedAt(pkg.createdAt).toLowerCase() : ''
 
       return (
-        companyMatch ||
-        customerNameMatch ||
-        typeMatch ||
-        versionMatch ||
-        userMatch ||
-        rawDateMatch ||
-        formattedDateMatch
+        company.includes(q) ||
+        customerName.includes(q) ||
+        type.includes(q) ||
+        version.includes(q) ||
+        user.includes(q) ||
+        rawDate.includes(q) ||
+        formattedDate.includes(q)
       )
     })
+
+    if (phraseMatches.length > 0) {
+      return phraseMatches
+    }
+
+    // Otherwise, multi-token AND matching across fields
+    const tokens = q.split(/\s+/).filter(Boolean)
+    return packages.filter((pkg) => tokens.every((token) => matchField(pkg, token)))
   }, [packages, searchTerm])
 
   return (

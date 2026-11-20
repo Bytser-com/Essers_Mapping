@@ -243,6 +243,36 @@ describe('VersionControl', () => {
       expect(screen.queryByText('Nouryon')).not.toBeInTheDocument()
     })
 
+    it('filters packages by combining company and type (e.g. "nouryon outbound")', async () => {
+      const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
+      await userEvent.type(searchInput, 'nouryon outbound')
+
+      expect(bodyRows()).toHaveLength(1)
+      const cells = within(bodyRows()[0]!).getAllByRole('cell')
+      expect(cells[0]).toHaveTextContent('Nouryon')
+      expect(cells[1]).toHaveTextContent('outbound')
+    })
+
+    it('filters packages by combining author and year (e.g. "Analist B 2026")', async () => {
+      const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
+      await userEvent.type(searchInput, 'Analist B 2026')
+
+      expect(bodyRows()).toHaveLength(1)
+      expect(screen.getByText('Brevalis')).toBeInTheDocument()
+      expect(screen.queryByText('Nouryon')).not.toBeInTheDocument()
+    })
+
+    it('filters packages by combining multiple terms across fields (e.g. "nouryon inbound v2")', async () => {
+      const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
+      await userEvent.type(searchInput, 'nouryon inbound v2')
+
+      expect(bodyRows()).toHaveLength(1)
+      const cells = within(bodyRows()[0]!).getAllByRole('cell')
+      expect(cells[0]).toHaveTextContent('Nouryon')
+      expect(cells[1]).toHaveTextContent('inbound')
+      expect(cells[2]).toHaveTextContent('v2')
+    })
+
     it('shows empty search result message when no packages match criteria', async () => {
       const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
       await userEvent.type(searchInput, 'nonexistent')
