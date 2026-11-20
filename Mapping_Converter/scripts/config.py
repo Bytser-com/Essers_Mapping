@@ -75,6 +75,12 @@ def sftp_shared_packages_config() -> dict | None:
     }
 
 
+def packages_remote_dir() -> str:
+    """Folder of the mapping packages on the SFTP server (SFTP_SHARED_PACKAGES_DIR, default /Packages)."""
+    _load_env()
+    return _absolute(os.getenv('SFTP_SHARED_PACKAGES_DIR', ''), '/Packages')
+
+
 def shared_storage_dir() -> Path:
     """Local stand-in for the SFTP server (used when SFTP_SHARED_HOST is not set)."""
     return LOCAL_SHARED_DIR
