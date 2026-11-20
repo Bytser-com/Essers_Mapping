@@ -33,6 +33,7 @@ export type ProposalFileDetailsDto = {
 export type ProposalFileDataDto = {
   version: string;
   companyname: string;
+  proposalType?: string | null;
   upload_date?: string | null;
   upload_time?: string | null;
   updated_time?: string | null;
@@ -45,6 +46,12 @@ export type ProposalFileDataDto = {
     score?: string | number | null;
     comment?: string | null;
   }>;
+  ai_review?: {
+    decision?: string;
+    summary?: string;
+    findings?: string[];
+    checked_mappings?: number;
+  } | null;
 };
 
 export async function getProposalFileData(company: string, version: string, proposalType: string): Promise<ProposalFileDataDto> {
@@ -112,6 +119,7 @@ export async function getProposal(company: string, version?: string, proposalTyp
       if (fileData.updated_date) proposal.updatedDate = fileData.updated_date;
       if (fileData.updated_time) proposal.updatedTime = fileData.updated_time;
       if (fileData.createdBy) proposal.createdBy = fileData.createdBy;
+      if (fileData.ai_review) proposal.aiReview = fileData.ai_review;
       proposal.proposalType = proposalType;
       return proposal;
     } catch (err) {
@@ -197,6 +205,7 @@ export async function getProposal(company: string, version?: string, proposalTyp
     if (fileData.updated_time) proposal.updatedTime = fileData.updated_time;
     const user = fileData.createdBy || item.createdBy;
     if (user) proposal.createdBy = user;
+    if (fileData.ai_review) proposal.aiReview = fileData.ai_review;
     if (item.proposalType) proposal.proposalType = item.proposalType
     return proposal;
   } catch (err) {
