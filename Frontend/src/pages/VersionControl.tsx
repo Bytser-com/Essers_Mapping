@@ -30,8 +30,7 @@ function matchField(pkg: MappingPackageOverview, token: string): boolean {
   const company = pkg.company || ''
   const customerName = pkg.customerName || ''
   const type = pkg.packageType || ''
-  const version = pkg.latestVersion || ''
-  const activeVer = pkg.activeVersion || ''
+  const version = pkg.activeVersion || pkg.latestVersion || ''
   const user = pkg.createdBy || ''
   const activeUser = pkg.activeUpdatedBy || ''
   const rawDate = pkg.createdAt || ''
@@ -44,7 +43,6 @@ function matchField(pkg: MappingPackageOverview, token: string): boolean {
     matchToken(customerName, token) ||
     matchToken(type, token) ||
     matchToken(version, token) ||
-    matchToken(activeVer, token) ||
     matchToken(user, token) ||
     matchToken(activeUser, token) ||
     matchToken(rawDate, token) ||
@@ -77,8 +75,7 @@ export default function VersionControl() {
       const company = (pkg.company || '').toLowerCase()
       const customerName = (pkg.customerName || '').toLowerCase()
       const type = (pkg.packageType || '').toLowerCase()
-      const version = (pkg.latestVersion || '').toLowerCase()
-      const activeVer = (pkg.activeVersion || '').toLowerCase()
+      const version = (pkg.activeVersion || pkg.latestVersion || '').toLowerCase()
       const user = (pkg.createdBy || '').toLowerCase()
       const activeUser = (pkg.activeUpdatedBy || '').toLowerCase()
       const rawDate = (pkg.createdAt || '').toLowerCase()
@@ -91,7 +88,6 @@ export default function VersionControl() {
         customerName.includes(q) ||
         type.includes(q) ||
         version.includes(q) ||
-        activeVer.includes(q) ||
         user.includes(q) ||
         activeUser.includes(q) ||
         rawDate.includes(q) ||
@@ -176,11 +172,6 @@ export default function VersionControl() {
               ) : (
                 filteredPackages.map((mappingPackage) => {
                   const displayVersion = mappingPackage.activeVersion || mappingPackage.latestVersion
-                  const hasNewerVersion =
-                    Boolean(mappingPackage.activeVersion &&
-                    mappingPackage.latestVersion &&
-                    mappingPackage.activeVersion.toLowerCase() !== mappingPackage.latestVersion.toLowerCase())
-
                   const changeDate = mappingPackage.activeUpdatedAt || mappingPackage.createdAt
                   const changeUser = mappingPackage.activeUpdatedBy || mappingPackage.createdBy
 
@@ -196,18 +187,8 @@ export default function VersionControl() {
                       <td className={`${TYPE_CELL} ${BODY_CELL} truncate`} title={mappingPackage.packageType ?? undefined}>
                         {mappingPackage.packageType || '—'}
                       </td>
-                      <td className={`${VERSION_CELL} ${BODY_CELL}`}>
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="font-semibold">{displayVersion}</span>
-                          {hasNewerVersion && (
-                            <span
-                              className="text-[11px] text-grey bg-background px-1.5 py-0.5 rounded border border-line-grey"
-                              title={`Nieuwere versie beschikbaar: ${mappingPackage.latestVersion}`}
-                            >
-                              nieuwste: {mappingPackage.latestVersion}
-                            </span>
-                          )}
-                        </div>
+                      <td className={`${VERSION_CELL} ${BODY_CELL} font-semibold`}>
+                        {displayVersion}
                       </td>
                       <td className={`${CHANGE_CELL} ${BODY_CELL}`}>
                         <div className="flex flex-col gap-0.5">

@@ -198,7 +198,6 @@ describe('Version Control – mapping packages overview', () => {
     await screen.findByText('Nouryon', { selector: 'td' })
     const row = rowOf('Nouryon')
     expect(within(row).getByText('v1')).toBeInTheDocument()
-    expect(within(row).getByText('nieuwste: v2')).toBeInTheDocument()
     expect(within(row).getByText('18/11/2026 16:20')).toBeInTheDocument()
     expect(within(row).getByText('door lead_analyst')).toBeInTheDocument()
   })

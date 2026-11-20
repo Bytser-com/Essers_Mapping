@@ -152,17 +152,13 @@ public class SftpPackageStorageService implements PackageStorageService {
         }
 
         // Return updated overview directly
-        List<String> versions = listSubdirectories(companyPath);
-        versions.sort(VersionComparator.INSTANCE);
-        String latestVer = versions.isEmpty() ? resolvedVersion : versions.get(versions.size() - 1);
-
         String createdAt = extractCreatedAt(typeEntries, metadata);
         String createdBy = metadata != null ? metadata.userCreated() : null;
         String customerName = metadata != null ? metadata.clientName() : null;
 
         return new MappingPackageOverviewDto(
                 resolvedCompany,
-                latestVer,
+                resolvedVersion,
                 createdAt,
                 createdBy,
                 customerName,
@@ -344,7 +340,7 @@ public class SftpPackageStorageService implements PackageStorageService {
 
             result.add(new MappingPackageOverviewDto(
                     companyName,
-                    latestVer,
+                    activeVer,
                     createdAt,
                     createdBy,
                     customerName,

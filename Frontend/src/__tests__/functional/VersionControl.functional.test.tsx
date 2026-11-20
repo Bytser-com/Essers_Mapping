@@ -311,7 +311,6 @@ describe('VersionControl', () => {
       await screen.findByText('Nouryon')
       const row = bodyRows()[0]!
       expect(within(row).getByText('v1')).toBeInTheDocument()
-      expect(within(row).getByText('nieuwste: v2')).toBeInTheDocument()
       expect(within(row).getByText('15/11/2026 09:00')).toBeInTheDocument()
       expect(within(row).getByText('door lead_analyst')).toBeInTheDocument()
     })

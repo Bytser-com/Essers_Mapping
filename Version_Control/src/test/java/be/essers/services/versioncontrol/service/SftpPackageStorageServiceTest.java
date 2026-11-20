@@ -484,7 +484,7 @@ class SftpPackageStorageServiceTest {
         assertEquals(1, results.size());
         MappingPackageOverviewDto dto = results.get(0);
         assertEquals("v1", dto.activeVersion());
-        assertEquals("v2", dto.latestVersion());
+        assertEquals("v1", dto.latestVersion());
         assertEquals("2024-08-01T15:00:00Z", dto.activeUpdatedAt());
         assertEquals("lead_analyst", dto.activeUpdatedBy());
         assertEquals("2024-06-19T12:00:00Z", dto.createdAt());
@@ -497,7 +497,6 @@ class SftpPackageStorageServiceTest {
         when(template.exists("/Packages/Nouryon")).thenReturn(true);
         when(template.exists("/Packages/Nouryon/v1")).thenReturn(true);
         when(template.exists("/Packages/Nouryon/v1/inbound")).thenReturn(true);
-        mockDirectories("/Packages/Nouryon", "v1", "v2");
         mockTypeWithPackage("/Packages/Nouryon/v1/inbound",
                 packageJson("nouryon", "inbound", "2024-06-19T12:00:00Z", "analist_a"));
 
@@ -506,7 +505,7 @@ class SftpPackageStorageServiceTest {
         MappingPackageOverviewDto updated = service.setActivePackage("Nouryon", "inbound", "v1", "analist_x");
         assertNotNull(updated);
         assertEquals("v1", updated.activeVersion());
-        assertEquals("v2", updated.latestVersion());
+        assertEquals("v1", updated.latestVersion());
         assertEquals("analist_x", updated.activeUpdatedBy());
         assertNotNull(updated.activeUpdatedAt());
         verify(template, atLeastOnce()).execute(any());
