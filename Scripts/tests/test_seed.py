@@ -47,13 +47,18 @@ class TestSeed(unittest.TestCase):
 
             props, pkgs = seed_mod.seed_local(props_dir, pkgs_dir, force=True, client="nouryon")
             self.assertEqual(len(props), 0)
-            self.assertEqual(len(pkgs), 2)  # MPackage.json and active.json
+            self.assertEqual(len(pkgs), 6)  # 5 MPackage.json files + 1 active.json
 
-            nouryon_pkg = pkgs_dir / "nouryon" / "v1" / "inbound" / "MPackage.json"
-            self.assertTrue(nouryon_pkg.is_file())
+            nouryon_pkg_v1 = pkgs_dir / "nouryon" / "v1" / "inbound" / "MPackage.json"
+            self.assertTrue(nouryon_pkg_v1.is_file())
+
+            nouryon_pkg_v3 = pkgs_dir / "nouryon" / "v3" / "inbound" / "MPackage.json"
+            self.assertTrue(nouryon_pkg_v3.is_file())
 
             nouryon_active = pkgs_dir / "nouryon" / "active.json"
             self.assertTrue(nouryon_active.is_file())
+            active_data = json.loads(nouryon_active.read_text(encoding="utf-8"))
+            self.assertEqual(active_data["inbound"]["version"], "v3")
 
             brunos_pkg = pkgs_dir / "brunos" / "v1" / "outbound" / "MPackage.json"
             self.assertFalse(brunos_pkg.exists())
@@ -62,8 +67,9 @@ class TestSeed(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             base = Path(tmp_dir)
             pkgs_dir = base / "packages"
+            seed_mod.seed_local(None, pkgs_dir, force=True, client="nouryon")
+
             folder = pkgs_dir / "nouryon" / "v1" / "inbound"
-            folder.mkdir(parents=True, exist_ok=True)
             pkg_file = folder / "MPackage.json"
             pkg_file.write_text('{"custom": true}', encoding="utf-8")
             active_file = pkgs_dir / "nouryon" / "active.json"

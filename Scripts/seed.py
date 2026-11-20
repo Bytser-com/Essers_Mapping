@@ -91,6 +91,7 @@ def _build_proposal_metadata(
 # Sample Mapping Packages Configuration
 # ---------------------------------------------------------------------------
 PACKAGE_EXAMPLES: list[dict[str, Any]] = [
+    # Nouryon - Inbound (4 versions, v3 active)
     {
         "company": "nouryon",
         "version": "v1",
@@ -132,6 +133,94 @@ PACKAGE_EXAMPLES: list[dict[str, Any]] = [
         }
     },
     {
+        "company": "nouryon",
+        "version": "v2",
+        "package_type": "inbound",
+        "package": {
+            "schema_version": "1.0",
+            "meta": {
+                "client_name": "nouryon",
+                "package_version": "2.0.0",
+                "package_type": "inbound",
+                "date_created": "2024-08-10T14:15:00Z",
+                "user_created": "analist_b",
+                "description": "Added partner email and language mappings for Nouryon inbound delivery"
+            },
+            "mappings": [
+                {"source_path": "/DELVRY03/IDOC/@BEGIN", "target_path": "/SHP_OBDLV_SAVE_REPLICA05/IDOC/@BEGIN"},
+                {"source_path": "/DELVRY03/IDOC/E1EDL20/@SEGMENT", "target_path": "/SHP_OBDLV_SAVE_REPLICA05/IDOC/E1SHP_OBDLV_SAVE_REPLICA/@SEGMENT"},
+                {"source_path": "/DELVRY03/IDOC/E1EDL20/E1ADRM1/PARTNER_ID", "target_path": "/SHP_OBDLV_SAVE_REPLICA05/IDOC/E1SHP_OBDLV_SAVE_REPLICA/E1BPADR1/ADDR_NO"},
+                {"source_path": "/DELVRY03/IDOC/E1EDL20/E1ADRM1/E_MAIL", "target_path": "/SHP_OBDLV_SAVE_REPLICA05/IDOC/E1SHP_OBDLV_SAVE_REPLICA/E1BPADR1/E1BPADR11/E_MAIL"},
+                {"source_path": "/DELVRY03/IDOC/E1EDL20/E1ADRM1/LANGUAGE", "target_path": "/SHP_OBDLV_SAVE_REPLICA05/IDOC/E1SHP_OBDLV_SAVE_REPLICA/E1BPADR1/E1BPADR11/LANGU_ISO"}
+            ]
+        }
+    },
+    {
+        "company": "nouryon",
+        "version": "v3",
+        "package_type": "inbound",
+        "package": {
+            "schema_version": "1.0",
+            "meta": {
+                "client_name": "nouryon",
+                "package_version": "3.0.0",
+                "package_type": "inbound",
+                "date_created": "2024-09-25T11:00:00Z",
+                "user_created": "lead_analyst",
+                "description": "Optimized delivery deadline segment mapping (production active)"
+            },
+            "mappings": [
+                {"source_path": "/DELVRY03/IDOC/@BEGIN", "target_path": "/SHP_OBDLV_SAVE_REPLICA05/IDOC/@BEGIN"},
+                {"source_path": "/DELVRY03/IDOC/E1EDL20/@SEGMENT", "target_path": "/SHP_OBDLV_SAVE_REPLICA05/IDOC/E1SHP_OBDLV_SAVE_REPLICA/@SEGMENT"},
+                {"source_path": "/DELVRY03/IDOC/E1EDL20/E1EDT13/NTANF", "target_path": "/SHP_OBDLV_SAVE_REPLICA05/IDOC/E1SHP_OBDLV_SAVE_REPLICA/E1BPDLVDEADLN/TIMESTAMP_UTC"},
+                {"source_path": "/DELVRY03/IDOC/E1EDL20/E1EDT13/QUALF", "target_path": "/SHP_OBDLV_SAVE_REPLICA05/IDOC/E1SHP_OBDLV_SAVE_REPLICA/E1BPDLVDEADLN/TIMETYPE"}
+            ]
+        }
+    },
+    {
+        "company": "nouryon",
+        "version": "v4",
+        "package_type": "inbound",
+        "package": {
+            "schema_version": "1.0",
+            "meta": {
+                "client_name": "nouryon",
+                "package_version": "4.0.0-draft",
+                "package_type": "inbound",
+                "date_created": "2024-11-15T16:45:00Z",
+                "user_created": "analist_c",
+                "description": "Draft extension with carrier tracking status codes (experimental)"
+            },
+            "mappings": [
+                {"source_path": "/DELVRY03/IDOC/@BEGIN", "target_path": "/SHP_OBDLV_SAVE_REPLICA05/IDOC/@BEGIN"},
+                {"source_path": "/DELVRY03/IDOC/E1EDL20/@SEGMENT", "target_path": "/SHP_OBDLV_SAVE_REPLICA05/IDOC/E1SHP_OBDLV_SAVE_REPLICA/@SEGMENT"},
+                {"source_path": "/DELVRY03/IDOC/E1EDL20/TRACK_ID", "target_path": "/SHP_OBDLV_SAVE_REPLICA05/IDOC/E1SHP_OBDLV_SAVE_REPLICA/TRACKING_NO"}
+            ]
+        }
+    },
+    # Nouryon - Outbound
+    {
+        "company": "nouryon",
+        "version": "v1",
+        "package_type": "outbound",
+        "package": {
+            "schema_version": "1.0",
+            "meta": {
+                "client_name": "nouryon",
+                "package_version": "1.0.0",
+                "package_type": "outbound",
+                "date_created": "2024-10-01T10:00:00Z",
+                "user_created": "analist_a",
+                "description": "Nouryon outbound delivery dispatch notification"
+            },
+            "mappings": [
+                {"source_path": "/DELVRY03/IDOC/E1EDL20/VBELN", "target_path": "/SHP_OBDLV_SAVE_REPLICA05/IDOC/E1SHP_OBDLV_SAVE_REPLICA/DELIVERY_NUMBER"},
+                {"source_path": "/DELVRY03/IDOC/E1EDL20/LFDAT", "target_path": "/SHP_OBDLV_SAVE_REPLICA05/IDOC/E1SHP_OBDLV_SAVE_REPLICA/DELIVERY_DATE"}
+            ]
+        }
+    },
+    # Brunos - Outbound
+    {
         "company": "brunos",
         "version": "v1",
         "package_type": "outbound",
@@ -154,6 +243,110 @@ PACKAGE_EXAMPLES: list[dict[str, Any]] = [
                 {"source_path": "/ORDER/LINES/LINE/QTY", "target_path": "/SHIPMENT/ITEMS/ITEM/QUANTITY"}
             ]
         }
+    },
+    # Brunos - Inbound
+    {
+        "company": "brunos",
+        "version": "v1",
+        "package_type": "inbound",
+        "package": {
+            "schema_version": "1.0",
+            "meta": {
+                "client_name": "brunos",
+                "package_version": "1.0.0",
+                "package_type": "inbound",
+                "date_created": "2024-07-15T11:00:00Z",
+                "user_created": "analist_b",
+                "description": "Brunos inbound purchase order receipt"
+            },
+            "mappings": [
+                {"source_path": "/PO/HEADER/PO_NUMBER", "target_path": "/ORDER/HEADER/ID"},
+                {"source_path": "/PO/SUPPLIER/NAME", "target_path": "/ORDER/VENDOR/NAME"}
+            ]
+        }
+    },
+    # Brevalis - Inbound & Outbound
+    {
+        "company": "brevalis",
+        "version": "v1",
+        "package_type": "inbound",
+        "package": {
+            "schema_version": "1.0",
+            "meta": {
+                "client_name": "brevalis",
+                "package_version": "1.0.0",
+                "package_type": "inbound",
+                "date_created": "2024-08-20T13:00:00Z",
+                "user_created": "analist_a",
+                "description": "Brevalis inbound EDIFACT DESADV conversion"
+            },
+            "mappings": [
+                {"source_path": "/DESADV/BGM/1004", "target_path": "/DELIVERY/HEADER/DOCUMENT_NUMBER"},
+                {"source_path": "/DESADV/DTM/2038", "target_path": "/DELIVERY/HEADER/DESPATCH_DATE"}
+            ]
+        }
+    },
+    {
+        "company": "brevalis",
+        "version": "v2",
+        "package_type": "outbound",
+        "package": {
+            "schema_version": "1.0",
+            "meta": {
+                "client_name": "brevalis",
+                "package_version": "2.0.0",
+                "package_type": "outbound",
+                "date_created": "2024-10-12T16:00:00Z",
+                "user_created": "analist_c",
+                "description": "Brevalis outbound dispatch advice notification"
+            },
+            "mappings": [
+                {"source_path": "/DELIVERY/HEADER/DOCUMENT_NUMBER", "target_path": "/DESADV/BGM/1004"},
+                {"source_path": "/DELIVERY/HEADER/DESPATCH_DATE", "target_path": "/DESADV/DTM/2038"}
+            ]
+        }
+    },
+    # ArcelorMittal - Inbound
+    {
+        "company": "arcelormittal",
+        "version": "v1",
+        "package_type": "inbound",
+        "package": {
+            "schema_version": "1.0",
+            "meta": {
+                "client_name": "arcelormittal",
+                "package_version": "1.0.0",
+                "package_type": "inbound",
+                "date_created": "2024-09-05T08:45:00Z",
+                "user_created": "analist_d",
+                "description": "ArcelorMittal steel coil delivery mapping"
+            },
+            "mappings": [
+                {"source_path": "/COIL/HEADER/COIL_ID", "target_path": "/INVENTORY/ITEMS/BATCH_NO"},
+                {"source_path": "/COIL/SPECS/WEIGHT", "target_path": "/INVENTORY/ITEMS/NET_WEIGHT"}
+            ]
+        }
+    },
+    # Katoen Natie - Outbound
+    {
+        "company": "katoennatie",
+        "version": "v1",
+        "package_type": "outbound",
+        "package": {
+            "schema_version": "1.0",
+            "meta": {
+                "client_name": "katoennatie",
+                "package_version": "1.0.0",
+                "package_type": "outbound",
+                "date_created": "2024-10-22T15:20:00Z",
+                "user_created": "analist_e",
+                "description": "Katoen Natie warehouse shipment interface"
+            },
+            "mappings": [
+                {"source_path": "/WAREHOUSE/SHIPMENT/CONSIGNMENT_ID", "target_path": "/TRANSPORT/SHIPMENT/NUMBER"},
+                {"source_path": "/WAREHOUSE/SHIPMENT/PALLETS", "target_path": "/TRANSPORT/SHIPMENT/PACKAGE_COUNT"}
+            ]
+        }
     }
 ]
 
@@ -161,17 +354,53 @@ PACKAGE_EXAMPLES: list[dict[str, Any]] = [
 ACTIVE_PACKAGE_EXAMPLES: dict[str, dict[str, dict[str, str]]] = {
     "nouryon": {
         "inbound": {
+            "version": "v3",
+            "updated_at": "2024-10-15T14:30:00Z",
+            "updated_by": "lead_analyst",
+        },
+        "outbound": {
             "version": "v1",
-            "updated_at": "2024-06-19T12:00:00Z",
+            "updated_at": "2024-10-01T10:00:00Z",
             "updated_by": "analist_a",
-        }
+        },
     },
     "brunos": {
         "outbound": {
             "version": "v1",
             "updated_at": "2024-07-01T09:30:00Z",
             "updated_by": "analist_b",
-        }
+        },
+        "inbound": {
+            "version": "v1",
+            "updated_at": "2024-07-15T11:00:00Z",
+            "updated_by": "analist_b",
+        },
+    },
+    "brevalis": {
+        "inbound": {
+            "version": "v1",
+            "updated_at": "2024-08-20T13:00:00Z",
+            "updated_by": "analist_a",
+        },
+        "outbound": {
+            "version": "v2",
+            "updated_at": "2024-10-12T16:00:00Z",
+            "updated_by": "analist_c",
+        },
+    },
+    "arcelormittal": {
+        "inbound": {
+            "version": "v1",
+            "updated_at": "2024-09-05T08:45:00Z",
+            "updated_by": "analist_d",
+        },
+    },
+    "katoennatie": {
+        "outbound": {
+            "version": "v1",
+            "updated_at": "2024-10-22T15:20:00Z",
+            "updated_by": "analist_e",
+        },
     },
 }
 

@@ -304,23 +304,6 @@ describe('VersionControl', () => {
       createdBy: 'Analist A',
     }
 
-    const versionsList: PackageVersion[] = [
-      {
-        version: 'v2',
-        isActive: false,
-        createdAt: '2026-11-01T10:00:00',
-        createdBy: 'Analist A',
-        description: 'Tweede versie',
-      },
-      {
-        version: 'v1',
-        isActive: true,
-        createdAt: '2026-10-01T10:00:00',
-        createdBy: 'Analist A',
-        description: 'Eerste versie',
-      },
-    ]
-
     it('displays the active version and active updater instead of creation info when active.json is present', async () => {
       answers([pkgWithActive])
       render(<VersionControl />)
