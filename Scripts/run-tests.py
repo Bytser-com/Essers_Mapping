@@ -120,7 +120,7 @@ def run_quality_checks(results: list[Result]) -> None:
                             'Install Gitleaks (see README-test-runner.md).', results)
     if gitleaks:
         run_check('Quality - Gitleaks', '.',
-                  [gitleaks, 'dir', '.', '--redact', '--no-banner'], results)
+                  [gitleaks, 'dir', '.', '--redact', '--no-banner', '--verbose'], results)
 
     jscpd_bin = ROOT / 'Scripts' / 'node_modules' / '.bin' / ('jscpd.cmd' if IS_WINDOWS else 'jscpd')
     if jscpd_bin.is_file():
@@ -131,7 +131,7 @@ def run_quality_checks(results: list[Result]) -> None:
         run_check('Quality - jscpd', '.',
                   [jscpd, '.', '--min-lines', '10', '--min-tokens', '70',
                    '--threshold', '10', '--gitignore',
-                   '--ignore', '**/node_modules/**,**/.git/**,**/.venv/**,**/target/**,**/dist/**,**/coverage/**',
+                   '--ignore', '**/node_modules/**,**/.git/**,**/.venv/**,**/target/**,**/dist/**,**/coverage/**,**/data/**,**/output/**',
                    '--reporters', 'console'], results)
     else:
         detail = 'jscpd not found. From Scripts/: run npm install (see README-test-runner.md)'

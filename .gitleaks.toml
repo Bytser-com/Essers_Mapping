@@ -1,0 +1,14 @@
+title = "Essers Mapping Gitleaks Configuration"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Exclude local environments and dependencies"
+paths = [
+    '''(^|/)\.venv/''',
+    '''(^|/)venv/''',
+    '''(^|/)node_modules/''',
+    '''(^|/)__pycache__/''',
+    '''(^|/)\.env$'''
+]

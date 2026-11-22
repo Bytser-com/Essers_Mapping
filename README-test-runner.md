@@ -208,9 +208,7 @@ cd ..
 
 ### F. Mapping Converter — Python
 
-The `Mapping_Converter` service does not currently contain a `tests/` directory.
-
-Once tests are added, the automatic runner will include its pytest and Ruff checks.
+The `Mapping_Converter` service already contains a `tests/` directory, so the automatic runner includes its pytest and Ruff checks.
 
 **Windows:**
 
@@ -234,7 +232,7 @@ python3 -m ruff check .
 cd ..
 ```
 
-These commands are intended for future use once the service contains tests and its required Python dependencies.
+These commands run the Mapping Converter tests and Ruff check. Install its dependencies from `Mapping_Converter/requirements.txt` first (see Section 3).
 
 ---
 
@@ -253,10 +251,10 @@ This uses the same ruleset and excludes as the automated runner. `--error` retur
 **Gitleaks — current files (same as the runner)** (Windows / Linux):
 
 ```powershell
-gitleaks dir . --redact --no-banner
+gitleaks dir . --redact --no-banner --verbose
 ```
 
-This scans files currently present on disk, potentially including **untracked and Git-ignored files** (such as local `.env` files or `data/`). It can fail even when Git history is clean. `--redact` avoids printing full detected secrets; do not share actual secret values.
+This scans files currently present on disk, potentially including **untracked and Git-ignored files** (such as local `.env` files or `data/`). It can fail even when Git history is clean. `--redact` masks detected secret values and `--verbose` prints the file paths and findings needed for investigation. **Review the output before sharing it; do not share actual secret values.**
 
 **Gitleaks — Git history (additional, separate check)** (Windows / Linux):
 
@@ -269,14 +267,16 @@ This scans commits and is **not** the check currently executed by `run-tests.py`
 **jscpd — duplicate code** (Windows PowerShell):
 
 ```powershell
-.\Scripts\node_modules\.bin\jscpd.cmd . --min-lines 10 --min-tokens 70 --threshold 10 --gitignore --ignore '**/node_modules/**,**/.git/**,**/.venv/**,**/target/**,**/dist/**,**/coverage/**' --reporters console
+.\Scripts\node_modules\.bin\jscpd.cmd . --min-lines 10 --min-tokens 70 --threshold 10 --gitignore --ignore '**/node_modules/**,**/.git/**,**/.venv/**,**/target/**,**/dist/**,**/coverage/**,**/data/**,**/output/**' --reporters console
 ```
 
 **jscpd — duplicate code** (Linux/macOS):
 
 ```bash
-./Scripts/node_modules/.bin/jscpd . --min-lines 10 --min-tokens 70 --threshold 10 --gitignore --ignore '**/node_modules/**,**/.git/**,**/.venv/**,**/target/**,**/dist/**,**/coverage/**' --reporters console
+./Scripts/node_modules/.bin/jscpd . --min-lines 10 --min-tokens 70 --threshold 10 --gitignore --ignore '**/node_modules/**,**/.git/**,**/.venv/**,**/target/**,**/dist/**,**/coverage/**,**/data/**,**/output/**' --reporters console
 ```
+
+**Excluded duplication scan folders:** jscpd intentionally ignores all `data/` and `output/` directories at any depth (for example, `Mapping_Proposal/data/historical/` and `Mapping_Proposal/output/experiments/`). These contain input examples and generated results, where repeated XML/JSON structures are expected. This is **only a jscpd exclusion**; it does not change the application tests, Semgrep, or Gitleaks. Source code and automated test files remain in scope.
 
 The `10` in `--threshold 10` is the team's configured **10% duplication threshold**. Exceeding it causes exit code `1`; this is a quality finding, not an installation failure. Run `npm install` (or `npm ci` after committing the lockfile) **inside `Scripts/`** first.
 
@@ -526,6 +526,54 @@ bash Scripts/run-tests.sh --skip-e2e
 
 Skipping E2E tests does not mean they passed.
 
+### Semgrep: Cannot Create Auto Config When Metrics Are Off
+
+This happened with an older version of `Scripts/run-tests.py` that combined `--config auto` with `--metrics off`. The runner now uses `--config p/default` instead. Replace your runner with the updated script and retry.
+
+### Local Quality Tool Not Found
+
+Use the tool-specific instructions in **First-Time Setup**. In particular:
+
+- **Gitleaks:** Winget may install `gitleaks.exe` without an alias. Use **Section 3C** to locate it and update your PATH.
+- **jscpd:** Run `npm install` **inside `Scripts/`** and verify that `Scripts/node_modules/.bin/jscpd.cmd` exists (Windows).
+- **Semgrep:** Install `Scripts/requirements-quality.txt` into the same active Python environment that runs `Scripts/run-tests.py`.
+
+### Gitleaks Finds Local Secrets (Exit Code 1)
+
+The directory scan intentionally checks untracked and Git-ignored files too. Run
+`gitleaks dir . --redact --no-banner --verbose` from the repository root to
+see redacted finding details and the affected file paths. **Do not commit the
+report or paste unredacted credentials into chat.**
+
+For a real API key or password, revoke/rotate it and move it to a local `.env`
+file or a secret manager. Keep `.env` excluded from Git. For a synthetic fixture
+that is clearly a false positive, investigate a narrowly scoped Gitleaks
+allowlist/fingerprint entry and document why it is safe. Do **not** blanket-ignore
+`data/`, `output/`, or `.env` merely to get a green result; these can contain
+real credentials.
+
+### Semgrep Findings (Exit Code 1)
+
+An exit code of `1` with `--error` means a rule found a match, not that Semgrep
+could not run. The `p/default` ruleset checks the application, GitHub Actions,
+and Kubernetes definitions. Review each issue before changing security-sensitive
+infrastructure. Changing a rule exclusion to make the scan pass does not fix
+its underlying security concern.
+
+The XML parser should use `defusedxml` for untrusted XML inputs. Install the
+`Mapping_Proposal/requirements.txt` requirements after adding that dependency.
+Token-usage counters in the Gemini logger contain numerical metadata rather
+than credentials; document any verified false positive before narrowly
+suppressing the specific rule.
+
+### Gitleaks Git History Passes but the Test Runner Fails
+
+The runner uses `gitleaks dir . --redact --no-banner --verbose` (local files), while `gitleaks git . --redact` checks Git commit history. Both can produce different results. Inspect the relevant findings and **avoid staging local secrets or example data indiscriminately**. A new untracked `data/` folder should be reviewed before any `git add` or commit.
+
+### Quality Check Exits With Code 1
+
+This frequently indicates a *successful scan with reported findings*, not a broken installation. Semgrep fails when rules match (`--error`); jscpd fails above the configured duplication threshold; Gitleaks fails if it finds suspected secrets. Consult the detailed scan output, investigate false positives, and fix actual issues before merging.
+
 ---
 
 ## 5. Recommended Workflow
@@ -549,23 +597,3 @@ bash Scripts/run-tests.sh
 Verify that all checks pass and review the GitHub Actions CI results.
 
 The local test runner does not replace Kubernetes deployment verification or integration testing against external services.
-
-### Semgrep: Cannot Create Auto Config When Metrics Are Off
-
-This happened with an older version of `Scripts/run-tests.py` that combined `--config auto` with `--metrics off`. The runner now uses `--config p/default` instead. Replace your runner with the updated script and retry.
-
-### Local Quality Tool Not Found
-
-Use the tool-specific instructions in **First-Time Setup**. In particular:
-
-- **Gitleaks:** Winget may install `gitleaks.exe` without an alias. Use **Section 3C** to locate it and update your PATH.
-- **jscpd:** Run `npm install` **inside `Scripts/`** and verify that `Scripts/node_modules/.bin/jscpd.cmd` exists (Windows).
-- **Semgrep:** Install `Scripts/requirements-quality.txt` into the same active Python environment that runs `Scripts/run-tests.py`.
-
-### Gitleaks Git History Passes but the Test Runner Fails
-
-The runner uses `gitleaks dir . --redact --no-banner` (local files), while `gitleaks git . --redact` checks Git commit history. Both can produce different results. Inspect the relevant findings and **avoid staging local secrets or example data indiscriminately**. A new untracked `data/` folder should be reviewed before any `git add` or commit.
-
-### Quality Check Exits With Code 1
-
-This frequently indicates a *successful scan with reported findings*, not a broken installation. Semgrep fails when rules match (`--error`); jscpd fails above the configured duplication threshold; Gitleaks fails if it finds suspected secrets. Consult the detailed scan output, investigate false positives, and fix actual issues before merging.
