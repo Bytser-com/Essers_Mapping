@@ -186,7 +186,7 @@ describe('ProposalPage actions', () => {
       return screen.getByRole('textbox', { name: 'Omschrijving' })
     }
 
-    it('opens "Proposal goedkeuren?" with an explanation of the AI review', async () => {
+    it('TC-185-01 opens "Proposal goedkeuren?" with an explanation of the AI review', async () => {
       // Arrange
       renderPage()
 
@@ -199,7 +199,7 @@ describe('ProposalPage actions', () => {
       expect(approveProposal).not.toHaveBeenCalled()
     })
 
-    it('prefills "Eerste versie voor <klant>" for version 1', async () => {
+    it('TC-185-01 prefills "Eerste versie voor <klant>" for version 1', async () => {
       // Arrange
       useProposalStore.setState({ proposal: { ...PROPOSAL, versie: 1 } })
       renderPage()
@@ -246,7 +246,7 @@ describe('ProposalPage actions', () => {
       expect(description).toHaveAttribute('maxLength', '200')
     })
 
-    it('closes without changes when "Annuleren" is clicked', async () => {
+    it('TC-185-01 closes without changes when "Annuleren" is clicked', async () => {
       // Arrange
       renderPage()
       await openApproveDialog()
