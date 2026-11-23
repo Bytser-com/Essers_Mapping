@@ -30,7 +30,7 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Query, UploadFile
 
 from scripts.config import incoming_dir
 from services.incoming_watcher import PROPOSAL_REF, UPLOAD_MARKER
@@ -130,13 +130,38 @@ async def upload_xml(
     return {'upload_id': upload_id, 'customer': customer, 'proposal_type': prop_type, 'files': names}
 
 
-@router.post('/seed')
-def seed(force: bool = False) -> dict:
-    """Seed sample proposals into the storage (used for testing and dev)."""
-    from scripts.dev_seed import seed_proposals
+def trigger_watcher_retry(store: ProposalStore) -> None:
+    from services.incoming_watcher import IncomingWatcher
     try:
-        seed_proposals(force=force)
-        return {'status': 'ok', 'message': 'Proposals seeded successfully'}
+        IncomingWatcher(incoming_dir(), store).run_once()
     except Exception as e:
-        logger.error('Failed to seed proposals: %s', e)
-        raise HTTPException(status_code=500, detail=f'Seeding failed: {e}')
+        logger.warning('Error running watcher after ai-retry: %s', e)
+
+
+@router.post('/ai-retry')
+def ai_retry(
+    background_tasks: BackgroundTasks,
+    store: ProposalStore = Depends(get_proposal_store),
+    customer: str | None = Query(None),
+    version: int | None = Query(None),
+    proposal_type: str | None = Query(None, alias='proposalType'),
+) -> dict:
+    """Restart stuck (mislukt) proposals by recovering failed uploads and resetting status."""
+    from services.retry import retry_failed_proposals
+
+    retried = retry_failed_proposals(
+        store=store,
+        incoming=incoming_dir(),
+        customer=customer,
+        version=version,
+        proposal_type=proposal_type,
+    )
+
+    background_tasks.add_task(trigger_watcher_retry, store)
+
+    return {
+        'status': 'ok',
+        'retried_count': len(retried),
+        'retried_proposals': retried,
+    }
+

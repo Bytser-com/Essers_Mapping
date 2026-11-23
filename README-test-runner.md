@@ -48,6 +48,7 @@ If any automated check fails, the runner exits with code `1`. The IDE review is 
 | Skip quality checks | `python Scripts/run-tests.py --skip-quality` | `python3 Scripts/run-tests.py --skip-quality` |
 | Skip Playwright E2E | `.\Scripts\run-tests.cmd --skip-e2e` | `bash Scripts/run-tests.sh --skip-e2e` |
 | Only frontend build + E2E | `.\Scripts\run-tests.cmd --only-e2e` | `bash Scripts/run-tests.sh --only-e2e` |
+| Seed proposals and packages before testing | `.\Scripts\run-tests.cmd --seed` | `bash Scripts/run-tests.sh --seed` |
 | Show help | `python Scripts/run-tests.py --help` | `python3 Scripts/run-tests.py --help` |
 
 **Note:** `--only-e2e` executes the frontend production build followed by the Playwright tests.

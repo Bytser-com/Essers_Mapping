@@ -72,52 +72,32 @@ describe('ProposalPage integration', () => {
     expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/proposals?company=brunos'))
   })
 
-  it('displays the 501 error alert banner when clicking Goedkeuren', async () => {
+  it('sends the approval to the converter and shows a 409 as an alert banner', async () => {
     // Arrange
-    const problemDetail = {
-      type: 'about:blank',
-      title: 'Not Implemented',
-      status: 501,
-      detail: "Approving proposal for company 'brunos' and version 'v1' is not implemented yet",
-      company: 'brunos',
-      version: 'v1',
-    }
-
+    const detail = 'De AI-controle is al bezig; dit voorstel kan niet opnieuw goedgekeurd worden'
     const fetchMock = vi.fn().mockImplementation((url, options) => {
       if (options?.method === 'POST') {
-        return Promise.resolve({
-          ok: false,
-          status: 501,
-          json: async () => problemDetail,
-        })
+        return Promise.resolve({ ok: false, status: 409, json: async () => ({ detail }) })
       }
-      return Promise.resolve({
-        ok: true,
-        status: 200,
-        json: async () => PROPOSAL,
-      })
+      return Promise.resolve({ ok: true, status: 200, json: async () => PROPOSAL })
     })
     vi.stubGlobal('fetch', fetchMock)
 
     // Act
     renderPage()
     expect(await screen.findByText('brunos · v1 · inbound')).toBeInTheDocument()
-
-    const button = screen.getByRole('button', { name: 'Goedkeuren' })
-    await userEvent.click(button)
+    await userEvent.click(screen.getByRole('button', { name: 'Goedkeuren' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Bevestigen' }))
 
     // Assert
-    await waitFor(() => {
-      const alert = screen.getByRole('alert')
-      expect(alert).toBeInTheDocument()
-      expect(alert).toHaveTextContent(
-        "Approving proposal for company 'brunos' and version 'v1' is not implemented yet"
-      )
-    })
-
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(detail))
     expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining('/proposals?company=brunos&version=v1&proposalType=inbound'),
-      { method: 'POST' }
+      expect.stringContaining('/api/converter/approve?company=brunos&version=v1&proposalType=inbound'),
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: 'Eerste versie voor brunos' }),
+      }
     )
   })
 

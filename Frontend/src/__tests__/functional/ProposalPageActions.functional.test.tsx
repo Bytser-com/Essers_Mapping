@@ -176,34 +176,134 @@ describe('ProposalPage actions', () => {
     expect(onApprove).toHaveBeenCalledTimes(1)
   })
 
-  it('calls approveProposal with company and version when "Goedkeuren" is clicked without onApprove prop', async () => {
-    // Arrange
-    vi.mocked(approveProposal).mockResolvedValue(undefined)
-    renderPage()
+  describe('approve dialog (IT2627T06-185)', () => {
+    beforeEach(() => {
+      vi.mocked(approveProposal).mockReset()
+    })
 
-    // Act
-    await userEvent.click(screen.getByRole('button', { name: 'Goedkeuren' }))
+    async function openApproveDialog() {
+      await userEvent.click(screen.getByRole('button', { name: 'Goedkeuren' }))
+      return screen.getByRole('textbox', { name: 'Omschrijving' })
+    }
 
-    // Assert
-    await waitFor(() =>
-      expect(approveProposal).toHaveBeenCalledWith('brunos', 'v2', 'inbound'),
-    )
-  })
+    it('TC-185-01 opens "Proposal goedkeuren?" with an explanation of the AI review', async () => {
+      // Arrange
+      renderPage()
 
-  it('displays the error banner when approving fails', async () => {
-    // Arrange
-    const errorMsg = "Approving proposal for company 'brunos' and version 'v2' is not implemented yet"
-    vi.mocked(approveProposal).mockRejectedValue(new Error(errorMsg))
-    renderPage()
+      // Act
+      await openApproveDialog()
 
-    // Act
-    await userEvent.click(screen.getByRole('button', { name: 'Goedkeuren' }))
+      // Assert
+      expect(screen.getByRole('heading', { name: 'Proposal goedkeuren?' })).toBeInTheDocument()
+      expect(screen.getByText(/controleert de AI het voorstel/)).toBeInTheDocument()
+      expect(approveProposal).not.toHaveBeenCalled()
+    })
 
-    // Assert
-    await waitFor(() => {
-      const alert = screen.getByRole('alert')
-      expect(alert).toBeInTheDocument()
-      expect(alert).toHaveTextContent(errorMsg)
+    it('TC-185-01 prefills "Eerste versie voor <klant>" for version 1', async () => {
+      // Arrange
+      useProposalStore.setState({ proposal: { ...PROPOSAL, versie: 1 } })
+      renderPage()
+
+      // Act
+      const description = await openApproveDialog()
+
+      // Assert
+      expect(description).toHaveValue('Eerste versie voor brunos')
+    })
+
+    it('starts empty for later versions and is optional', async () => {
+      // Arrange
+      renderPage()
+
+      // Act
+      const description = await openApproveDialog()
+
+      // Assert
+      expect(description).toHaveValue('')
+      expect(screen.getByRole('button', { name: 'Bevestigen' })).toBeEnabled()
+    })
+
+    it('can be confirmed when the description is empty', async () => {
+      // Arrange
+      renderPage()
+      const description = await openApproveDialog()
+
+      // Act
+      await userEvent.clear(description)
+
+      // Assert
+      expect(screen.getByRole('button', { name: 'Bevestigen' })).toBeEnabled()
+    })
+
+    it('limits the description to 200 characters', async () => {
+      // Arrange
+      renderPage()
+
+      // Act
+      const description = await openApproveDialog()
+
+      // Assert
+      expect(description).toHaveAttribute('maxLength', '200')
+    })
+
+    it('TC-185-01 closes without changes when "Annuleren" is clicked', async () => {
+      // Arrange
+      renderPage()
+      await openApproveDialog()
+
+      // Act
+      await userEvent.click(screen.getByRole('button', { name: 'Annuleren' }))
+
+      // Assert
+      expect(screen.queryByRole('heading', { name: 'Proposal goedkeuren?' })).not.toBeInTheDocument()
+      expect(approveProposal).not.toHaveBeenCalled()
+    })
+
+    it('approves with the trimmed description and closes the dialog', async () => {
+      // Arrange
+      vi.mocked(approveProposal).mockResolvedValue(undefined)
+      renderPage()
+      const description = await openApproveDialog()
+
+      // Act
+      await userEvent.type(description, '  Kolom leverdatum aangepast  ')
+      await userEvent.click(screen.getByRole('button', { name: 'Bevestigen' }))
+
+      // Assert
+      await waitFor(() =>
+        expect(approveProposal).toHaveBeenCalledWith('brunos', 'v2', 'inbound', 'Kolom leverdatum aangepast'),
+      )
+      await waitFor(() =>
+        expect(screen.queryByRole('heading', { name: 'Proposal goedkeuren?' })).not.toBeInTheDocument(),
+      )
+    })
+
+    it('displays the error banner when approving fails', async () => {
+      // Arrange
+      const errorMsg = 'De AI-controle is al bezig; dit voorstel kan niet opnieuw goedgekeurd worden'
+      vi.mocked(approveProposal).mockRejectedValue(new Error(errorMsg))
+      renderPage()
+      const description = await openApproveDialog()
+
+      // Act
+      await userEvent.type(description, 'Ok')
+      await userEvent.click(screen.getByRole('button', { name: 'Bevestigen' }))
+
+      // Assert
+      await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(errorMsg))
+    })
+
+    it('disables "Goedkeuren" while the AI review is running', () => {
+      // Arrange
+      useProposalStore.setState({ proposal: { ...PROPOSAL, status: 'AI-controle bezig', statusCode: 'AI_CHECKING_REVIEW' } })
+
+      // Act
+      renderPage()
+
+      // Assert
+      const button = screen.getByRole('button', { name: 'Goedkeuren' })
+      expect(button).toBeDisabled()
+      expect(button).toHaveAttribute('title', expect.stringContaining('AI-controle is bezig'))
     })
   })
 
