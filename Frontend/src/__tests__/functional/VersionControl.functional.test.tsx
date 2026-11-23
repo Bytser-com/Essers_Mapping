@@ -201,7 +201,7 @@ describe('VersionControl', () => {
       await screen.findByText('Brevalis')
     })
 
-    it('filters packages by company / customer name', async () => {
+    it('TC-159-01 filters packages by company / customer name', async () => {
       const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
       await userEvent.type(searchInput, 'brev')
 
@@ -273,7 +273,7 @@ describe('VersionControl', () => {
       expect(cells[2]).toHaveTextContent('v2')
     })
 
-    it('shows empty search result message when no packages match criteria', async () => {
+    it('TC-159-01 shows empty search result message when no packages match criteria', async () => {
       const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
       await userEvent.type(searchInput, 'nonexistent')
 
@@ -281,7 +281,7 @@ describe('VersionControl', () => {
       expect(bodyRows()).toHaveLength(1)
     })
 
-    it('restores all packages when search input is cleared', async () => {
+    it('TC-159-01 restores all packages when search input is cleared', async () => {
       const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
       await userEvent.type(searchInput, 'Brevalis')
       expect(bodyRows()).toHaveLength(1)
