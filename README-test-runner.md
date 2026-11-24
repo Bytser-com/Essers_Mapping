@@ -252,7 +252,7 @@ This uses the same ruleset and excludes as the automated runner. `--error` retur
 **Gitleaks — current files (same as the runner)** (Windows / Linux):
 
 ```powershell
-gitleaks dir . --redact --no-banner --verbose
+gitleaks detect --no-git --source=. --redact --no-banner --verbose
 ```
 
 This scans files currently present on disk, potentially including **untracked and Git-ignored files** (such as local `.env` files or `data/`). It can fail even when Git history is clean. `--redact` masks detected secret values and `--verbose` prints the file paths and findings needed for investigation. **Review the output before sharing it; do not share actual secret values.**
@@ -260,7 +260,7 @@ This scans files currently present on disk, potentially including **untracked an
 **Gitleaks — Git history (additional, separate check)** (Windows / Linux):
 
 ```powershell
-gitleaks git . --redact
+gitleaks detect --redact
 ```
 
 This scans commits and is **not** the check currently executed by `run-tests.py`. A clean Git-history result does not imply that local files are clean, or vice versa.
@@ -542,7 +542,7 @@ Use the tool-specific instructions in **First-Time Setup**. In particular:
 ### Gitleaks Finds Local Secrets (Exit Code 1)
 
 The directory scan intentionally checks untracked and Git-ignored files too. Run
-`gitleaks dir . --redact --no-banner --verbose` from the repository root to
+`gitleaks detect --no-git --source=. --redact --no-banner --verbose` from the repository root to
 see redacted finding details and the affected file paths. **Do not commit the
 report or paste unredacted credentials into chat.**
 
@@ -569,7 +569,7 @@ suppressing the specific rule.
 
 ### Gitleaks Git History Passes but the Test Runner Fails
 
-The runner uses `gitleaks dir . --redact --no-banner --verbose` (local files), while `gitleaks git . --redact` checks Git commit history. Both can produce different results. Inspect the relevant findings and **avoid staging local secrets or example data indiscriminately**. A new untracked `data/` folder should be reviewed before any `git add` or commit.
+The runner uses `gitleaks detect --no-git --source=. --redact --no-banner --verbose` (local files), while `gitleaks detect --redact` checks Git commit history. Both can produce different results. Inspect the relevant findings and **avoid staging local secrets or example data indiscriminately**. A new untracked `data/` folder should be reviewed before any `git add` or commit.
 
 ### Quality Check Exits With Code 1
 

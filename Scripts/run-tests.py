@@ -120,7 +120,7 @@ def run_quality_checks(results: list[Result]) -> None:
                             'Install Gitleaks (see README-test-runner.md).', results)
     if gitleaks:
         run_check('Quality - Gitleaks', '.',
-                  [gitleaks, 'dir', '.', '--redact', '--no-banner', '--verbose'], results)
+                  [gitleaks, 'detect', '--no-git', '--source', '.', '--redact', '--no-banner', '--verbose'], results)
 
     jscpd_bin = ROOT / 'Scripts' / 'node_modules' / '.bin' / ('jscpd.cmd' if IS_WINDOWS else 'jscpd')
     if jscpd_bin.is_file():
