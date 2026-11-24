@@ -179,6 +179,26 @@ def cors_origins() -> list[str]:
     return [origin.strip() for origin in os.getenv('CORS_ORIGINS', '').split(',') if origin.strip()]
 
 
+def is_swagger_enabled() -> bool:
+    """Whether Swagger UI and OpenAPI docs should be served.
+
+    Enabled in development and testing. Strictly disabled in staging and production.
+    """
+    _load_env()
+    override = os.getenv('SWAGGER_ENABLED', '').strip().lower()
+    if override in {'false', '0', 'no', 'off'}:
+        return False
+
+    env = os.getenv('ENVIRONMENT', '').strip().lower()
+    if env in {'staging', 'stage', 'production', 'prod'}:
+        return False
+
+    if override in {'true', '1', 'yes', 'on'}:
+        return True
+
+    return not env or env in {'development', 'dev', 'local', 'testing', 'test'}
+
+
 # ---------------------------------------------------------------------------
 # Incoming uploads: the AI starts automatically for every complete upload in a
 # subfolder of the source folder (see services/incoming_watcher.py). Local folder,

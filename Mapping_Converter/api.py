@@ -23,30 +23,54 @@ import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 from routers import approve, convert, review
-from scripts.config import cors_origins
+from scripts.config import cors_origins, is_swagger_enabled
 
 # Re-exported for backward compatibility and test patching:
 from sftp_service import download_proposal_excel_from_sftp
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Mapping Converter API", version="1.1.0")
 
-# Only needed when a browser calls this API directly (local frontend development).
-_origins = cors_origins()
-if _origins:
-    app.add_middleware(CORSMiddleware, allow_origins=_origins, allow_methods=["GET", "POST"], allow_headers=["*"])
+def create_app() -> FastAPI:
+    swagger_on = is_swagger_enabled()
+    application = FastAPI(
+        title="Mapping Converter API",
+        version="1.1.0",
+        docs_url="/docs" if swagger_on else None,
+        redoc_url=None,
+        openapi_url="/openapi.json" if swagger_on else None,
+    )
 
-app.include_router(approve.router)
-app.include_router(convert.router)
-app.include_router(review.router)
+    # Only needed when a browser calls this API directly (local frontend development).
+    _origins = cors_origins()
+    if _origins:
+        application.add_middleware(
+            CORSMiddleware,
+            allow_origins=_origins,
+            allow_methods=["GET", "POST"],
+            allow_headers=["*"],
+        )
+
+    application.include_router(approve.router)
+    application.include_router(convert.router)
+    application.include_router(review.router)
+
+    if swagger_on:
+        @application.get("/swagger", include_in_schema=False)
+        def swagger_redirect():
+            return RedirectResponse(url="/docs")
+
+    @application.get("/health")
+    def health() -> dict:
+        return {"status": "ok", "service": "mapping-converter"}
+
+    return application
 
 
-@app.get("/health")
-def health() -> dict:
-    return {"status": "ok", "service": "mapping-converter"}
+app = create_app()
 
 
 __all__ = ["app", "download_proposal_excel_from_sftp"]
