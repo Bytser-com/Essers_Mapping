@@ -25,7 +25,7 @@ from scripts.errors import ProposalConflictError, ProposalNotFoundError, Storage
 from services.approval import approve_proposal
 from services.proposal_files import METADATA_FILES, ProposalLocation, read_metadata, write_metadata
 from services.statuses import ProposalStatus
-from services.storage import Storage, proposal_storage
+from services.storage import Storage, packages_storage, proposal_storage
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +43,10 @@ def get_proposal_storage() -> Storage:
     return proposal_storage()
 
 
+def get_packages_storage() -> Storage:
+    return packages_storage()
+
+
 # Documented in the OpenAPI schema (/docs); the frontend shows ``detail`` to the analyst.
 ERROR_RESPONSES: dict[int | str, dict] = {
     400: {'description': 'Invalid input: too long description, invalid parameters'},
@@ -52,8 +56,16 @@ ERROR_RESPONSES: dict[int | str, dict] = {
 }
 
 
-def trigger_ai_review(storage: Storage, company: str, version: str, proposal_type: str) -> dict | None:
-    """Download the proposal's Excel file from storage and run the Gemini review."""
+def trigger_ai_review(
+    storage: Storage,
+    company: str,
+    version: str,
+    proposal_type: str,
+    pkg_storage: Storage | None = None,
+) -> dict | None:
+    """Download the proposal's Excel file from storage, run the Gemini review,
+    and if accepted by AI, convert the proposal to a mapping package on the packages storage.
+    """
     from scripts.pipeline import run_review
     from services.proposal_files import find_proposal, read_metadata, write_metadata
 
@@ -78,17 +90,46 @@ def trigger_ai_review(storage: Storage, company: str, version: str, proposal_typ
         decision = review_result.get('decision', 'ACCEPTED')
         logger.info('AI review completed for %s/%s/%s: %s', company, version, proposal_type, decision)
 
-        with storage.session() as s:
-            location = find_proposal(s, company, version, proposal_type)
-            meta = read_metadata(s, location)
-            meta['ai_review'] = review_result
-            if decision == 'REJECTED':
+        if decision == 'REJECTED':
+            with storage.session() as s:
+                location = find_proposal(s, company, version, proposal_type)
+                meta = read_metadata(s, location)
+                meta['ai_review'] = review_result
                 meta['status'] = 'RETURNED'
                 meta['ai_status'] = 'FAILED'
-            else:
+                write_metadata(s, location, meta)
+        else:
+            from services.packages import DEFAULT_USER, convert_excel_to_package, format_semver
+
+            if pkg_storage is None:
+                pkg_storage = get_packages_storage()
+
+            with storage.session() as s:
+                location = find_proposal(s, company, version, proposal_type)
+                meta = read_metadata(s, location)
+                user_created = meta.get('uploadUser') or meta.get('upload_user') or meta.get('createdBy') or DEFAULT_USER
+                package_ver = meta.get('package_version') or format_semver(version)
+
+            _, sftp_path = convert_excel_to_package(
+                pkg_storage,
+                contents,
+                company,
+                version,
+                proposal_type,
+                user_created=user_created,
+                package_version=package_ver,
+            )
+            logger.info('Proposal %s/%s/%s converted and saved to package: %s', company, version, proposal_type, sftp_path)
+
+            with storage.session() as s:
+                location = find_proposal(s, company, version, proposal_type)
+                meta = read_metadata(s, location)
+                meta['ai_review'] = review_result
                 meta['status'] = None
                 meta['ai_status'] = None
-            write_metadata(s, location, meta)
+                meta['package_path'] = sftp_path
+                write_metadata(s, location, meta)
+
         return review_result
 
     except Exception as exc:
