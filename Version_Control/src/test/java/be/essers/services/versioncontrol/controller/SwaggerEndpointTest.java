@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -31,13 +31,13 @@ class SwaggerEndpointTest {
 
     @Nested
     @SpringBootTest
-    @ActiveProfiles("production")
+    @TestPropertySource(properties = "ENVIRONMENT=production")
     class ProductionSwaggerTest {
         @Autowired
         private WebApplicationContext context;
 
         @Test
-        @DisplayName("Swagger endpoints return 404 in production environment")
+        @DisplayName("Swagger endpoints return 404 when ENVIRONMENT is production")
         void swaggerDisabledInProduction() throws Exception {
             MockMvc mvc = MockMvcBuilders.webAppContextSetup(context).build();
             mvc.perform(get("/swagger")).andExpect(status().isNotFound());
@@ -48,13 +48,13 @@ class SwaggerEndpointTest {
 
     @Nested
     @SpringBootTest
-    @ActiveProfiles("staging")
+    @TestPropertySource(properties = "ENVIRONMENT=staging")
     class StagingSwaggerTest {
         @Autowired
         private WebApplicationContext context;
 
         @Test
-        @DisplayName("Swagger endpoints return 404 in staging environment")
+        @DisplayName("Swagger endpoints return 404 when ENVIRONMENT is staging")
         void swaggerDisabledInStaging() throws Exception {
             MockMvc mvc = MockMvcBuilders.webAppContextSetup(context).build();
             mvc.perform(get("/swagger")).andExpect(status().isNotFound());
