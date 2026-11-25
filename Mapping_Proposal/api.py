@@ -19,6 +19,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from routers import metrics as metrics_router
 from routers import upload
 from scripts.config import cors_origins, watch_incoming_enabled
 from services import incoming_watcher
@@ -46,6 +47,7 @@ if _origins:
     app.add_middleware(CORSMiddleware, allow_origins=_origins, allow_methods=['GET', 'POST'], allow_headers=['*'])
 
 app.include_router(upload.router)
+app.include_router(metrics_router.router)
 
 
 @app.get('/health')
