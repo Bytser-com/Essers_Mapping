@@ -23,22 +23,33 @@ data:
           }
         ]
       },
+      "description": "Issue IT2627T06-164: Kubernetes pod & cluster resource monitoring for testing and production MiniPC clusters with cluster, namespace, and pod filters.",
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 1,
       "id": null,
-      "links": [],
+      "links": [
+        {
+          "asDropdown": false,
+          "icon": "external link",
+          "includeVars": true,
+          "keepTime": true,
+          "tags": ["essers"],
+          "targetBlank": false,
+          "title": "Essers Dashboards",
+          "type": "dashboards"
+        }
+      ],
       "liveNow": false,
       "panels": [
         {
           "collapsed": false,
           "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
           "id": 100,
-          "title": "CLUSTER HEALTH & CAPACITY OVERVIEW",
+          "title": "CLUSTER & PROMETHEUS TARGET HEALTH (${cluster})",
           "type": "row"
         },
         {
-          "collapsed": false,
           "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
           "id": 1,
           "title": "Cluster CPU Utilization",
@@ -62,17 +73,16 @@ data:
           },
           "targets": [
             {
-              "expr": "100 * (1 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m])))",
+              "expr": "100 * (1 - avg(rate(node_cpu_seconds_total{cluster=~\"$cluster\", mode=\"idle\"}[5m])))",
               "legendFormat": "Cluster CPU",
               "refId": "A"
             }
           ]
         },
         {
-          "collapsed": false,
           "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
           "id": 2,
-          "title": "Cluster Memory Utilization",
+          "title": "Cluster RAM Utilization",
           "type": "gauge",
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
@@ -85,7 +95,7 @@ data:
                 "steps": [
                   { "color": "green", "value": null },
                   { "color": "#EAB839", "value": 75 },
-                  { "color": "red", "value": 90 }
+                  { "color": "red", "value": 85 }
                 ]
               },
               "unit": "percent"
@@ -93,14 +103,13 @@ data:
           },
           "targets": [
             {
-              "expr": "100 * (1 - (sum(node_memory_MemAvailable_bytes) / sum(node_memory_MemTotal_bytes)))",
+              "expr": "100 * (1 - (sum(node_memory_MemAvailable_bytes{cluster=~\"$cluster\"}) / sum(node_memory_MemTotal_bytes{cluster=~\"$cluster\"})))",
               "legendFormat": "Cluster RAM",
               "refId": "A"
             }
           ]
         },
         {
-          "collapsed": false,
           "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
           "id": 3,
           "title": "Ready Nodes",
@@ -121,17 +130,16 @@ data:
           },
           "targets": [
             {
-              "expr": "sum(kube_node_status_condition{condition=\"Ready\",status=\"true\"})",
+              "expr": "sum(kube_node_status_condition{cluster=~\"$cluster\", condition=\"Ready\", status=\"true\"})",
               "legendFormat": "Ready Nodes",
               "refId": "A"
             }
           ]
         },
         {
-          "collapsed": false,
           "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
           "id": 4,
-          "title": "Total Running Pods",
+          "title": "Selected Running Pods",
           "type": "stat",
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
@@ -139,24 +147,26 @@ data:
               "color": { "mode": "thresholds" },
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "blue", "value": null }]
+                "steps": [
+                  { "color": "orange", "value": null },
+                  { "color": "green", "value": 1 }
+                ]
               },
               "unit": "none"
             }
           },
           "targets": [
             {
-              "expr": "sum(kube_pod_status_phase{phase=\"Running\"})",
+              "expr": "sum(kube_pod_status_phase{cluster=~\"$cluster\", namespace=~\"$namespace\", pod=~\"$pod\", phase=\"Running\"}) or vector(0)",
               "legendFormat": "Running Pods",
               "refId": "A"
             }
           ]
         },
         {
-          "collapsed": false,
           "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
           "id": 5,
-          "title": "Pod Restarts (Last 1h)",
+          "title": "Selected Pod Restarts (1h)",
           "type": "stat",
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
@@ -175,266 +185,455 @@ data:
           },
           "targets": [
             {
-              "expr": "sum(increase(kube_pod_container_status_restarts_total[1h]))",
+              "expr": "round(sum(increase(kube_pod_container_status_restarts_total{cluster=~\"$cluster\", namespace=~\"$namespace\", pod=~\"$pod\"}[1h]))) or vector(0)",
               "legendFormat": "Restarts (1h)",
               "refId": "A"
             }
           ]
         },
         {
-          "collapsed": false,
           "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
           "id": 6,
-          "title": "Storage Volume Usage",
-          "type": "gauge",
+          "title": "Prometheus Targets UP / DOWN",
+          "type": "stat",
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
             "defaults": {
               "color": { "mode": "thresholds" },
-              "max": 100,
-              "min": 0,
               "thresholds": {
                 "mode": "absolute",
                 "steps": [
                   { "color": "green", "value": null },
-                  { "color": "#EAB839", "value": 70 },
-                  { "color": "red", "value": 85 }
+                  { "color": "red", "value": 1 }
                 ]
               },
-              "unit": "percent"
-            }
+              "unit": "none"
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byName", "options": "UP" },
+                "properties": [
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        { "color": "red", "value": null },
+                        { "color": "green", "value": 1 }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
           },
           "targets": [
             {
-              "expr": "100 * (sum(kubelet_volume_stats_used_bytes) / sum(kubelet_volume_stats_capacity_bytes))",
-              "legendFormat": "PVC Storage",
+              "expr": "count(up{cluster=~\"$cluster\"} == 1) or vector(0)",
+              "legendFormat": "UP",
               "refId": "A"
+            },
+            {
+              "expr": "count(up{cluster=~\"$cluster\"} == 0) or vector(0)",
+              "legendFormat": "DOWN",
+              "refId": "B"
             }
           ]
         },
         {
           "collapsed": false,
           "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
-          "id": 101,
-          "title": "NODE COMPUTE INFRASTRUCTURE (PROXMOX K8S NODES)",
+          "id": 102,
+          "title": "POD CPU & RAM RESOURCES (FILTER: ${cluster} / ${namespace} / ${pod})",
           "type": "row"
         },
         {
-          "collapsed": false,
-          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 6 },
-          "id": 11,
-          "title": "CPU Usage per Node",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+          "id": 21,
+          "title": "Pod CPU Usage vs Request & Limit (Cores)",
+          "description": "CPU usage per pod (cAdvisor container_cpu_usage_seconds_total) alongside configured CPU requests and limits. Filtered strictly by cluster, namespace, and pod.",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "lineInterpolation": "smooth", "fillOpacity": 10 },
+              "unit": "short"
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byRegexp", "options": ".*\\(Limit\\)$" },
+                "properties": [
+                  { "id": "custom.lineStyle", "value": { "dash": [6, 4], "fill": "dash" } },
+                  { "id": "custom.fillOpacity", "value": 0 }
+                ]
+              },
+              {
+                "matcher": { "id": "byRegexp", "options": ".*\\(Request\\)$" },
+                "properties": [
+                  { "id": "custom.lineStyle", "value": { "dash": [2, 4], "fill": "dot" } },
+                  { "id": "custom.fillOpacity", "value": 0 }
+                ]
+              }
+            ]
+          },
+          "targets": [
+            {
+              "expr": "sum by (cluster, namespace, pod) (rate(container_cpu_usage_seconds_total{cluster=~\"$cluster\", namespace=~\"$namespace\", pod=~\"$pod\", container!=\"\", container!=\"POD\"}[5m]))",
+              "legendFormat": "{{cluster}} | {{namespace}}/{{pod}} (Usage)",
+              "refId": "A"
+            },
+            {
+              "expr": "sum by (cluster, namespace, pod) (kube_pod_container_resource_requests{cluster=~\"$cluster\", namespace=~\"$namespace\", pod=~\"$pod\", resource=\"cpu\"})",
+              "legendFormat": "{{cluster}} | {{namespace}}/{{pod}} (Request)",
+              "refId": "B"
+            },
+            {
+              "expr": "sum by (cluster, namespace, pod) (kube_pod_container_resource_limits{cluster=~\"$cluster\", namespace=~\"$namespace\", pod=~\"$pod\", resource=\"cpu\"})",
+              "legendFormat": "{{cluster}} | {{namespace}}/{{pod}} (Limit)",
+              "refId": "C"
+            }
+          ]
+        },
+        {
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+          "id": 22,
+          "title": "Pod RAM Usage (Working Set) vs Request & Limit",
+          "description": "RAM working set per pod (cAdvisor container_memory_working_set_bytes) alongside configured memory requests and limits. Filtered strictly by cluster, namespace, and pod.",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "lineInterpolation": "smooth", "fillOpacity": 10 },
+              "unit": "bytes"
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byRegexp", "options": ".*\\(Limit\\)$" },
+                "properties": [
+                  { "id": "custom.lineStyle", "value": { "dash": [6, 4], "fill": "dash" } },
+                  { "id": "custom.fillOpacity", "value": 0 }
+                ]
+              },
+              {
+                "matcher": { "id": "byRegexp", "options": ".*\\(Request\\)$" },
+                "properties": [
+                  { "id": "custom.lineStyle", "value": { "dash": [2, 4], "fill": "dot" } },
+                  { "id": "custom.fillOpacity", "value": 0 }
+                ]
+              }
+            ]
+          },
+          "targets": [
+            {
+              "expr": "sum by (cluster, namespace, pod) (container_memory_working_set_bytes{cluster=~\"$cluster\", namespace=~\"$namespace\", pod=~\"$pod\", container!=\"\", container!=\"POD\"})",
+              "legendFormat": "{{cluster}} | {{namespace}}/{{pod}} (Working Set)",
+              "refId": "A"
+            },
+            {
+              "expr": "sum by (cluster, namespace, pod) (kube_pod_container_resource_requests{cluster=~\"$cluster\", namespace=~\"$namespace\", pod=~\"$pod\", resource=\"memory\"})",
+              "legendFormat": "{{cluster}} | {{namespace}}/{{pod}} (Request)",
+              "refId": "B"
+            },
+            {
+              "expr": "sum by (cluster, namespace, pod) (kube_pod_container_resource_limits{cluster=~\"$cluster\", namespace=~\"$namespace\", pod=~\"$pod\", resource=\"memory\"})",
+              "legendFormat": "{{cluster}} | {{namespace}}/{{pod}} (Limit)",
+              "refId": "C"
+            }
+          ]
+        },
+        {
+          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 14 },
+          "id": 27,
+          "title": "Pod CPU Throttling (%)",
+          "description": "Percentage of CFS CPU periods throttled for the selected pod(s).",
           "type": "timeseries",
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
             "defaults": {
               "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
+              "max": 100,
+              "min": 0,
               "unit": "percent"
             }
           },
           "targets": [
             {
-              "expr": "100 * (1 - rate(node_cpu_seconds_total{mode=\"idle\"}[5m]))",
-              "legendFormat": "{{instance}}",
+              "expr": "100 * (sum by (cluster, namespace, pod) (rate(container_cpu_cfs_throttled_periods_total{cluster=~\"$cluster\", namespace=~\"$namespace\", pod=~\"$pod\", container!=\"\", container!=\"POD\"}[5m])) / (sum by (cluster, namespace, pod) (rate(container_cpu_cfs_periods_total{cluster=~\"$cluster\", namespace=~\"$namespace\", pod=~\"$pod\", container!=\"\", container!=\"POD\"}[5m])) > 0))",
+              "legendFormat": "{{cluster}} | {{namespace}}/{{pod}}",
               "refId": "A"
             }
           ]
         },
         {
-          "collapsed": false,
-          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 6 },
-          "id": 12,
-          "title": "Memory Usage per Node",
-          "type": "timeseries",
+          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 14 },
+          "id": 28,
+          "title": "Selected Pods — Current CPU, RAM & Restarts",
+          "type": "table",
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
             "defaults": {
-              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
-              "unit": "bytes"
-            }
+              "custom": { "align": "auto" }
+            },
+            "overrides": [
+              { "matcher": { "id": "byName", "options": "Value #A" }, "properties": [{ "id": "displayName", "value": "CPU (cores)" }, { "id": "unit", "value": "short" }, { "id": "decimals", "value": 4 }] },
+              { "matcher": { "id": "byName", "options": "Value #B" }, "properties": [{ "id": "displayName", "value": "RAM (Working Set)" }, { "id": "unit", "value": "bytes" }] },
+              { "matcher": { "id": "byName", "options": "Value #C" }, "properties": [{ "id": "displayName", "value": "Restarts (1h)" }, { "id": "unit", "value": "none" }, { "id": "decimals", "value": 0 }] }
+            ]
           },
+          "transformations": [
+            { "id": "merge", "options": {} },
+            { "id": "organize", "options": { "excludeByName": { "Time": true } } }
+          ],
           "targets": [
             {
-              "expr": "node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes",
-              "legendFormat": "{{instance}} (Used)",
+              "expr": "sum by (cluster, namespace, pod) (rate(container_cpu_usage_seconds_total{cluster=~\"$cluster\", namespace=~\"$namespace\", pod=~\"$pod\", container!=\"\", container!=\"POD\"}[5m]))",
+              "format": "table",
+              "instant": true,
               "refId": "A"
             },
             {
-              "expr": "node_memory_MemTotal_bytes",
-              "legendFormat": "{{instance}} (Total)",
+              "expr": "sum by (cluster, namespace, pod) (container_memory_working_set_bytes{cluster=~\"$cluster\", namespace=~\"$namespace\", pod=~\"$pod\", container!=\"\", container!=\"POD\"})",
+              "format": "table",
+              "instant": true,
               "refId": "B"
+            },
+            {
+              "expr": "sum by (cluster, namespace, pod) (increase(kube_pod_container_status_restarts_total{cluster=~\"$cluster\", namespace=~\"$namespace\", pod=~\"$pod\"}[1h]))",
+              "format": "table",
+              "instant": true,
+              "refId": "C"
             }
           ]
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 },
-          "id": 102,
-          "title": "POD METRICS: CPU, RAM, DISK I/O, DISK SPACE & NETWORK",
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 21 },
+          "id": 103,
+          "title": "POD NETWORK & DISK METRICS + NODE / VOLUME FALLBACKS",
           "type": "row"
         },
         {
-          "collapsed": false,
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
-          "id": 21,
-          "title": "Pod CPU Usage (Cores)",
-          "type": "timeseries",
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
-              "unit": "short"
-            }
-          },
-          "targets": [
-            {
-              "expr": "sum by (pod, namespace) (rate(container_cpu_usage_seconds_total{namespace=~\"$namespace\", pod=~\"$pod\", container!=\"\", container!=\"POD\"}[5m]))",
-              "legendFormat": "{{namespace}} / {{pod}}",
-              "refId": "A"
-            }
-          ]
-        },
-        {
-          "collapsed": false,
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
-          "id": 22,
-          "title": "Pod Memory Usage (Working Set)",
-          "type": "timeseries",
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
-              "unit": "bytes"
-            }
-          },
-          "targets": [
-            {
-              "expr": "sum by (pod, namespace) (container_memory_working_set_bytes{namespace=~\"$namespace\", pod=~\"$pod\", container!=\"\", container!=\"POD\"})",
-              "legendFormat": "{{namespace}} / {{pod}}",
-              "refId": "A"
-            }
-          ]
-        },
-        {
-          "collapsed": false,
           "gridPos": { "h": 8, "w": 12, "x": 0, "y": 22 },
-          "id": 23,
-          "title": "Pod Disk I/O (Read & Write Bytes/sec)",
-          "type": "timeseries",
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "custom": { "drawStyle": "line" },
-              "unit": "Bps"
-            }
-          },
-          "targets": [
-            {
-              "expr": "sum by (pod) (rate(container_fs_reads_bytes_total{namespace=~\"$namespace\", pod=~\"$pod\", container!=\"\", container!=\"POD\"}[5m]))",
-              "legendFormat": "{{pod}} (Read)",
-              "refId": "A"
-            },
-            {
-              "expr": "sum by (pod) (rate(container_fs_writes_bytes_total{namespace=~\"$namespace\", pod=~\"$pod\", container!=\"\", container!=\"POD\"}[5m]))",
-              "legendFormat": "{{pod}} (Write)",
-              "refId": "B"
-            }
-          ]
-        },
-        {
-          "collapsed": false,
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 22 },
           "id": 24,
           "title": "Pod Network Traffic (RX & TX Bytes/sec)",
+          "description": "Pod-level network bandwidth from cAdvisor (excluding loopback interface lo). Filtered strictly by cluster, namespace, and pod.",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
+              "unit": "Bps"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum by (cluster, namespace, pod) (rate(container_network_receive_bytes_total{cluster=~\"$cluster\", namespace=~\"$namespace\", pod=~\"$pod\", interface!=\"lo\"}[5m]))",
+              "legendFormat": "{{cluster}} | {{namespace}}/{{pod}} (RX)",
+              "refId": "A"
+            },
+            {
+              "expr": "sum by (cluster, namespace, pod) (rate(container_network_transmit_bytes_total{cluster=~\"$cluster\", namespace=~\"$namespace\", pod=~\"$pod\", interface!=\"lo\"}[5m]))",
+              "legendFormat": "{{cluster}} | {{namespace}}/{{pod}} (TX)",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 22 },
+          "id": 23,
+          "title": "Pod Disk I/O (cAdvisor — Fallback: Node Disk & PVC Panels Below)",
+          "description": "Per-pod filesystem I/O (container_fs_reads/writes_bytes_total). On containerd + overlayfs/cgroup v2 this metric can be unavailable or 0; use the PVC Volume Usage and Node Disk I/O fallback panels below (documented in monitoring README).",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line" },
+              "noValue": "Niet beschikbaar op containerd/overlayfs — zie PVC- & Node Disk-panelen hieronder",
+              "unit": "Bps"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum by (cluster, namespace, pod) (rate(container_fs_reads_bytes_total{cluster=~\"$cluster\", namespace=~\"$namespace\", pod=~\"$pod\", container!=\"\", container!=\"POD\"}[5m]))",
+              "legendFormat": "{{cluster}} | {{namespace}}/{{pod}} (Read)",
+              "refId": "A"
+            },
+            {
+              "expr": "sum by (cluster, namespace, pod) (rate(container_fs_writes_bytes_total{cluster=~\"$cluster\", namespace=~\"$namespace\", pod=~\"$pod\", container!=\"\", container!=\"POD\"}[5m]))",
+              "legendFormat": "{{cluster}} | {{namespace}}/{{pod}} (Write)",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 30 },
+          "id": 25,
+          "title": "Longhorn PVC Volume Usage (Volume Fallback per Namespace)",
+          "description": "Volume usage from kubelet_volume_stats_* for persistent volumes (SFTP, Prometheus, Grafana, Loki, Alertmanager).",
+          "type": "table",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": { "custom": { "align": "auto" } },
+            "overrides": [
+              { "matcher": { "id": "byName", "options": "Value #A" }, "properties": [{ "id": "displayName", "value": "Used" }, { "id": "unit", "value": "bytes" }] },
+              { "matcher": { "id": "byName", "options": "Value #B" }, "properties": [{ "id": "displayName", "value": "Capacity" }, { "id": "unit", "value": "bytes" }] },
+              { "matcher": { "id": "byName", "options": "Value #C" }, "properties": [{ "id": "displayName", "value": "Used %" }, { "id": "unit", "value": "percent" }, { "id": "decimals", "value": 1 }] }
+            ]
+          },
+          "transformations": [
+            { "id": "merge", "options": {} },
+            { "id": "organize", "options": { "excludeByName": { "Time": true } } }
+          ],
+          "targets": [
+            {
+              "expr": "max by (cluster, namespace, persistentvolumeclaim) (kubelet_volume_stats_used_bytes{cluster=~\"$cluster\", namespace=~\"$namespace\"})",
+              "format": "table",
+              "instant": true,
+              "refId": "A"
+            },
+            {
+              "expr": "max by (cluster, namespace, persistentvolumeclaim) (kubelet_volume_stats_capacity_bytes{cluster=~\"$cluster\", namespace=~\"$namespace\"})",
+              "format": "table",
+              "instant": true,
+              "refId": "B"
+            },
+            {
+              "expr": "100 * (max by (cluster, namespace, persistentvolumeclaim) (kubelet_volume_stats_used_bytes{cluster=~\"$cluster\", namespace=~\"$namespace\"}) / (max by (cluster, namespace, persistentvolumeclaim) (kubelet_volume_stats_capacity_bytes{cluster=~\"$cluster\", namespace=~\"$namespace\"}) > 0))",
+              "format": "table",
+              "instant": true,
+              "refId": "C"
+            }
+          ]
+        },
+        {
+          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 30 },
+          "id": 29,
+          "title": "Node Disk I/O & Root Filesystem Usage (Node Fallback — MiniPC VMs)",
+          "description": "Node-level disk read/write throughput (node_disk_*) and root filesystem fill percentage from node-exporter (fallback when per-pod disk I/O is not exposed by containerd).",
           "type": "timeseries",
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
             "defaults": {
               "custom": { "drawStyle": "line" },
               "unit": "Bps"
-            }
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byRegexp", "options": ".*Root FS %$" },
+                "properties": [
+                  { "id": "unit", "value": "percent" },
+                  { "id": "custom.axisPlacement", "value": "right" }
+                ]
+              }
+            ]
           },
           "targets": [
             {
-              "expr": "sum by (pod) (rate(container_network_receive_bytes_total{namespace=~\"$namespace\", pod=~\"$pod\"}[5m]))",
-              "legendFormat": "{{pod}} (RX)",
+              "expr": "sum by (cluster, instance) (rate(node_disk_read_bytes_total{cluster=~\"$cluster\"}[5m]))",
+              "legendFormat": "{{cluster}} | {{instance}} Disk Read",
               "refId": "A"
             },
             {
-              "expr": "sum by (pod) (rate(container_network_transmit_bytes_total{namespace=~\"$namespace\", pod=~\"$pod\"}[5m]))",
-              "legendFormat": "{{pod}} (TX)",
+              "expr": "sum by (cluster, instance) (rate(node_disk_written_bytes_total{cluster=~\"$cluster\"}[5m]))",
+              "legendFormat": "{{cluster}} | {{instance}} Disk Write",
               "refId": "B"
+            },
+            {
+              "expr": "100 * (1 - (node_filesystem_avail_bytes{cluster=~\"$cluster\", mountpoint=\"/\", fstype!~\"tmpfs|overlay\"} / (node_filesystem_size_bytes{cluster=~\"$cluster\", mountpoint=\"/\", fstype!~\"tmpfs|overlay\"} > 0)))",
+              "legendFormat": "{{cluster}} | {{instance}} Root FS %",
+              "refId": "C"
             }
           ]
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 6, "w": 12, "x": 0, "y": 30 },
-          "id": 25,
-          "title": "Longhorn Persistent Volume Claims (PVC) Capacity & Used Space",
-          "type": "table",
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "custom": { "align": "auto" }
-            }
-          },
-          "targets": [
-            {
-              "expr": "kubelet_volume_stats_capacity_bytes{namespace=~\"$namespace\"}",
-              "format": "table",
-              "instant": true,
-              "legendFormat": "Capacity",
-              "refId": "A"
-            },
-            {
-              "expr": "kubelet_volume_stats_used_bytes{namespace=~\"$namespace\"}",
-              "format": "table",
-              "instant": true,
-              "legendFormat": "Used",
-              "refId": "B"
-            }
-          ]
-        },
-        {
-          "collapsed": false,
-          "gridPos": { "h": 6, "w": 12, "x": 12, "y": 30 },
-          "id": 26,
-          "title": "Deployment Replicas (Desired vs Available)",
-          "type": "table",
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "custom": { "align": "auto" }
-            }
-          },
-          "targets": [
-            {
-              "expr": "kube_deployment_status_replicas_available{namespace=~\"$namespace\"}",
-              "format": "table",
-              "instant": true,
-              "legendFormat": "Available",
-              "refId": "A"
-            },
-            {
-              "expr": "kube_deployment_spec_replicas{namespace=~\"$namespace\"}",
-              "format": "table",
-              "instant": true,
-              "legendFormat": "Desired",
-              "refId": "B"
-            }
-          ]
-        },
-        {
-          "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 36 },
-          "id": 103,
-          "title": "LIVE POD CONTAINER LOGS (LOKI LOG EXPLORATION)",
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 37 },
+          "id": 101,
+          "title": "MINIPC NODE COMPUTE & MONITORING STACK FOOTPRINT",
           "type": "row"
         },
         {
+          "gridPos": { "h": 7, "w": 8, "x": 0, "y": 38 },
+          "id": 11,
+          "title": "Node CPU Usage (%)",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
+              "max": 100,
+              "min": 0,
+              "unit": "percent"
+            }
+          },
+          "targets": [
+            {
+              "expr": "100 * (1 - avg by (cluster, instance) (rate(node_cpu_seconds_total{cluster=~\"$cluster\", mode=\"idle\"}[5m])))",
+              "legendFormat": "{{cluster}} | {{instance}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "gridPos": { "h": 7, "w": 8, "x": 8, "y": 38 },
+          "id": 12,
+          "title": "Node RAM Usage (Used vs Total)",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
+              "unit": "bytes"
+            }
+          },
+          "targets": [
+            {
+              "expr": "node_memory_MemTotal_bytes{cluster=~\"$cluster\"} - node_memory_MemAvailable_bytes{cluster=~\"$cluster\"}",
+              "legendFormat": "{{cluster}} | {{instance}} (Used)",
+              "refId": "A"
+            },
+            {
+              "expr": "node_memory_MemTotal_bytes{cluster=~\"$cluster\"}",
+              "legendFormat": "{{cluster}} | {{instance}} (Total)",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "gridPos": { "h": 7, "w": 8, "x": 16, "y": 38 },
+          "id": 30,
+          "title": "Monitoring Stack RAM & Prometheus TSDB Footprint",
+          "description": "Tracks monitoring namespace pod memory against MiniPC limits and Prometheus TSDB disk blocks.",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
+              "unit": "bytes"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum by (cluster, pod) (container_memory_working_set_bytes{cluster=~\"$cluster\", namespace=\"monitoring\", container!=\"\", container!=\"POD\"})",
+              "legendFormat": "{{pod}} (RAM)",
+              "refId": "A"
+            },
+            {
+              "expr": "max by (cluster) (prometheus_tsdb_storage_blocks_bytes{cluster=~\"$cluster\"})",
+              "legendFormat": "Prometheus TSDB Blocks ({{cluster}})",
+              "refId": "B"
+            }
+          ]
+        },
+        {
           "collapsed": false,
-          "gridPos": { "h": 12, "w": 24, "x": 0, "y": 37 },
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 45 },
+          "id": 104,
+          "title": "LIVE POD CONTAINER LOGS (LOKI: ${namespace} / ${pod})",
+          "type": "row"
+        },
+        {
+          "gridPos": { "h": 10, "w": 24, "x": 0, "y": 46 },
           "id": 35,
           "title": "Live Container Logs (${namespace} / ${pod})",
           "type": "logs",
@@ -456,87 +655,12 @@ data:
               "refId": "A"
             }
           ]
-        },
-        {
-          "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 49 },
-          "id": 104,
-          "title": "EDGE INGRESS & NETWORK GATEWAY (192.168.100.101 / .201)",
-          "type": "row"
-        },
-        {
-          "collapsed": false,
-          "gridPos": { "h": 7, "w": 8, "x": 0, "y": 50 },
-          "id": 31,
-          "title": "Ingress Request Rate (req/sec)",
-          "type": "timeseries",
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
-              "unit": "reqps"
-            }
-          },
-          "targets": [
-            {
-              "expr": "sum(rate(nginx_ingress_controller_requests[5m]))",
-              "legendFormat": "Total Requests",
-              "refId": "A"
-            }
-          ]
-        },
-        {
-          "collapsed": false,
-          "gridPos": { "h": 7, "w": 8, "x": 8, "y": 50 },
-          "id": 32,
-          "title": "Ingress HTTP Status Codes (2xx / 3xx / 4xx / 5xx)",
-          "type": "timeseries",
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "custom": { "drawStyle": "line" },
-              "unit": "reqps"
-            }
-          },
-          "targets": [
-            {
-              "expr": "sum by (status) (rate(nginx_ingress_controller_requests[5m]))",
-              "legendFormat": "HTTP {{status}}",
-              "refId": "A"
-            }
-          ]
-        },
-        {
-          "collapsed": false,
-          "gridPos": { "h": 7, "w": 8, "x": 16, "y": 50 },
-          "id": 33,
-          "title": "Ingress Latency (p95 & p99)",
-          "type": "timeseries",
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "custom": { "drawStyle": "line" },
-              "unit": "s"
-            }
-          },
-          "targets": [
-            {
-              "expr": "histogram_quantile(0.95, sum(rate(nginx_ingress_controller_request_duration_seconds_bucket[5m])) by (le))",
-              "legendFormat": "p95 Latency",
-              "refId": "A"
-            },
-            {
-              "expr": "histogram_quantile(0.99, sum(rate(nginx_ingress_controller_request_duration_seconds_bucket[5m])) by (le))",
-              "legendFormat": "p99 Latency",
-              "refId": "B"
-            }
-          ]
         }
       ],
-      "refresh": "10s",
+      "refresh": "15s",
       "schemaVersion": 38,
       "style": "dark",
-      "tags": ["kubernetes", "essers", "infrastructure", "metrics", "logs"],
+      "tags": ["kubernetes", "essers", "infrastructure", "pods", "issue-164"],
       "templating": {
         "list": [
           {
@@ -553,13 +677,14 @@ data:
             "allValue": ".*",
             "current": { "selected": true, "text": "All", "value": "$__all" },
             "datasource": { "type": "prometheus", "uid": "${datasource}" },
-            "definition": "label_values(kube_pod_info, namespace)",
+            "definition": "label_values(kube_pod_info, cluster)",
             "hide": 0,
             "includeAll": true,
-            "label": "Namespace",
-            "name": "namespace",
+            "label": "Omgeving / Cluster",
+            "multi": false,
+            "name": "cluster",
             "options": [],
-            "query": { "query": "label_values(kube_pod_info, namespace)", "refId": "StandardVariableQuery" },
+            "query": { "query": "label_values(kube_pod_info, cluster)", "refId": "ClusterQuery" },
             "refresh": 2,
             "sort": 1,
             "type": "query"
@@ -568,13 +693,30 @@ data:
             "allValue": ".*",
             "current": { "selected": true, "text": "All", "value": "$__all" },
             "datasource": { "type": "prometheus", "uid": "${datasource}" },
-            "definition": "label_values(kube_pod_info{namespace=~\"$namespace\"}, pod)",
+            "definition": "label_values(kube_pod_info{cluster=~\"$cluster\"}, namespace)",
+            "hide": 0,
+            "includeAll": true,
+            "label": "Namespace",
+            "multi": true,
+            "name": "namespace",
+            "options": [],
+            "query": { "query": "label_values(kube_pod_info{cluster=~\"$cluster\"}, namespace)", "refId": "NamespaceQuery" },
+            "refresh": 2,
+            "sort": 1,
+            "type": "query"
+          },
+          {
+            "allValue": ".*",
+            "current": { "selected": true, "text": "All", "value": "$__all" },
+            "datasource": { "type": "prometheus", "uid": "${datasource}" },
+            "definition": "label_values(kube_pod_info{cluster=~\"$cluster\", namespace=~\"$namespace\"}, pod)",
             "hide": 0,
             "includeAll": true,
             "label": "Pod",
+            "multi": true,
             "name": "pod",
             "options": [],
-            "query": { "query": "label_values(kube_pod_info{namespace=~\"$namespace\"}, pod)", "refId": "PodQuery" },
+            "query": { "query": "label_values(kube_pod_info{cluster=~\"$cluster\", namespace=~\"$namespace\"}, pod)", "refId": "PodQuery" },
             "refresh": 2,
             "sort": 1,
             "type": "query"
@@ -590,15 +732,10 @@ data:
           }
         ]
       },
-      "time": {
-        "from": "now-1h",
-        "to": "now"
-      },
-      "timepicker": {
-        "refresh_intervals": ["5s", "10s", "30s", "1m", "5m"]
-      },
+      "time": { "from": "now-1h", "to": "now" },
+      "timepicker": { "refresh_intervals": ["10s", "15s", "30s", "1m", "5m"] },
       "timezone": "browser",
-      "title": "Kubernetes Cluster & Workload Health",
+      "title": "Kubernetes Pod & Cluster Resource Health",
       "uid": "essers-k8s-cluster-overview",
-      "version": 2
+      "version": 3
     }
