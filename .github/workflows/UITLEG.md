@@ -5,8 +5,9 @@
 - `frontend-ci.yml`: lint, TypeScript, tests, build, browsertests en dependencycheck.
 - `runtime-ci.yml`: bepaalt of Runtime gecontroleerd moet worden en roept Java-CI aan.
 - `java-service-ci.yml`: Maven-tests, coverage, dependencycheck en containercontrole.
-- `mapping-*-ci.yml`: dezelfde opzet voor de toekomstige Python-services.
-- `*-cd.yml`: publicatie en deployment na een geslaagde CI-run.
+- `mapping-*-ci.yml`: dezelfde opzet voor de Python-services.
+- `service-cd.yml`: publicatie en deployment na een geslaagde CI-run.
+- De losse servicebestanden `*-cd.yml`: handmatig een deployment opnieuw proberen.
 
 ## CI in drie stappen
 
@@ -18,11 +19,10 @@ De eindcheck heeft een vaste naam, zoals `Runtime CI Gate`. Die naam kun je verp
 maken in de branchregels. Een ongewijzigde service mag de controles overslaan;
 een fout bij wijzigingsdetectie mag geen groene eindcheck opleveren.
 
-PR's en pushes naar `Development` gebruiken de filters om CI-minuten te besparen.
-Een handmatige run controleert alles. Pushes naar `Testing` en `main` controleren
-ook alles: CD moet artifacts van de nieuwste releasecommit kunnen downloaden.
-Anders zou een nieuwe documentatiecommit een nog wachtende app-deployment kunnen
-blokkeren zonder een vervangend build-artifact te maken.
+PR's en pushes gebruiken filters om CI-minuten te besparen, ook op `Testing` en
+`main`. Een handmatige CI-run controleert de gekozen service altijd. Als een nieuwe
+commit een wachtende deployment inhaalt, weigert CD de oude commit. Start dan de
+service-CI handmatig op de nieuwste `Testing`-commit om opnieuw te bouwen en deployen.
 
 `Scripts/detect-service-changes.py` bevat deze Git-logica. De regressietests maken
 echte tijdelijke Git-commits om onder meer verplaatste bestanden en snelle
@@ -37,8 +37,10 @@ opeenvolgende pushes te controleren.
 4. Met Maven de daadwerkelijk gekozen dependencyversies exporteren, ook testdependencies.
 5. Die lijst met `dependency-inventory.py` omzetten naar het OSV-formaat.
 6. OSV laten controleren op bekende kwetsbaarheden.
-7. De Docker-image bouwen en het HTTP-healthendpoint controleren.
-8. Rapporten bewaren; de JAR wordt alleen bij succes beschikbaar voor CD.
+7. De Docker-image bouwen en het HTTP-healthendpoint controleren; op `main` wordt
+   deze image niet opnieuw gebouwd.
+8. Rapporten en de JAR bewaren. Alleen geslaagde Testing-CI bewaart ook de geteste
+   container voor CD.
 
 Een lang Maven- of pytest-commando bevat vooral opties. `run: >-` vouwt de regels
 samen tot één commando. `run: |` voert meerdere shellregels uit. De workflow houdt
@@ -91,11 +93,15 @@ blijft de controles voor pull requests uitvoeren.
 De scan uploadt eerst de analyse zonder zelf op de gate te wachten. Daarna leest
 `Scripts/check-sonar-quality-gate.py` het taaknummer uit `.scannerwork/report-task.txt`.
 Het script wacht maximaal vijf minuten op die taak en controleert de voorwaarden
-van precies die analyse. Alleen `new_coverage` geeft een `::warning::` en exitcode 0.
-Andere gefaalde voorwaarden, ontbrekende resultaten, API-fouten en timeouts geven
+van precies die analyse. Gefaalde voorwaarden (inclusief `new_coverage`), ontbrekende resultaten, API-fouten en timeouts geven
 exitcode 1. Een fout tijdens het scannen zelf blijft ook blokkeren.
 Het JSON-gateresultaat staat in het artifact `sonarqube-reports`, onder
 `test-results/sonarqube-quality-gate.json`.
+De waarschuwingen en fouten bevatten een link naar de bijbehorende analyse op
+SonarQube. De samenvatting van de Actions-run toont die link ook, naast het exacte
+gateresultaat en het projectdashboard. Dat dashboard toont altijd de nieuwste
+analyse. Als de analysehistoriek niet beschikbaar is, verwijst de analyselink
+naar het exacte gateresultaat als JSON; de regels voor slagen of falen blijven gelijk.
 
 De scanner controleert bij de installatie een GPG-handtekening. We bewaren de
 geverifieerde scanner in een cache, ook als de analyse vervolgens een rode gate
@@ -118,16 +124,62 @@ Vitest- en auditrapporten blijven behouden. Rapporten worden ook na een fout bew
 ## Waarom is CD uitgebreider?
 
 CD heeft rechten om images te publiceren en Kubernetes aan te passen. Daarom
-controleert `service-cd.yml` de bronrepository, releasebranch, succesvolle push-run,
+controleert `service-cd.yml` de repository, releasebranch, geslaagde CI-checks,
 commit en artifacts. Oude commits, PR-runs en forks mogen niet deployen.
 
-Daarna wordt de geteste artifact verpakt, de container gecontroleerd en een image
-naar GHCR gepubliceerd. Kubernetes gebruikt de vaste image-digest. Een tweede
-commitcontrole na het wachten voorkomt deployment van een achterhaalde image.
-Deze controles beschermen de omgeving en blijven behouden.
+## Een keer bouwen, dezelfde image doorzetten
+
+1. Merge `Development` naar `Testing`: CI test de gewijzigde services, bouwt hun
+   containers en controleert het healthendpoint.
+2. Testing-CD publiceert precies die containers naar GHCR en deployt ze met een
+   vaste image-digest. Na een geslaagde rollout bewaart CD per service een klein
+   `release.json`-bestand met de digest en de broncodeversie.
+3. Test de applicatie op Testing. Er wordt niets automatisch naar productie
+   doorgezet. Daarvoor moet iemand apart `Testing` naar `main` mergen.
+4. Main-CD zoekt de geslaagde Testing-release voor dezelfde servicecode en
+   gebruikt dezelfde digest. Er wordt geen nieuwe productie-image gebouwd.
+
+Mergecommits kunnen andere commitnummers hebben. Daarom vergelijkt het script
+de Git-hash van de servicemap: gelijke inhoud geeft dezelfde hash. De download
+komt alleen uit een geslaagde, vertrouwde Testing-workflow. Ontbreekt die release,
+dan stopt productie. Er is geen terugval naar opnieuw bouwen.
+
+De container wordt 7 dagen bewaard als CI-artifact; het kleine releasebestand
+90 dagen. GHCR bewaart de image zelf. Na verlopen artifacts draai je Testing-CI
+opnieuw. Bij de eerste ingebruikname moet elke gewenste productierelease dus
+eerst met deze nieuwe flow succesvol op Testing draaien.
+
+Testing en productie hebben elk hun eigen pods, instellingen, Secrets en opslag.
+Alleen de image wordt hergebruikt. De frontend gebruikt relatieve API-paden;
+Kubernetes levert de proxyconfiguratie en omgevingsinstellingen tijdens het draaien.
+Zet dus geen vaste Testing-URL of echte `.env` in de image.
+Testing publiceert alleen een commit-tag en `:testing`; het gedeelde `:latest`
+wordt niet bijgewerkt. Zo verandert een Testing-build ook geen oude bootstrap-tag
+waar een productiepod mogelijk nog naar verwijst. Deployments gebruiken de digest.
+
+`Scripts/select-service-release.cjs` kiest de vertrouwde run en artifacts.
+`publish-service-image.sh` publiceert de bestaande container; `service-release.py`
+schrijft of controleert het releasebestand. De workflows houden die stappen apart
+zichtbaar. Een tweede commitcontrole na wachten op de omgeving blijft behouden.
 
 De bestaande infrastructuurvolgorde is Terraform → Ansible → Kubernetes.
 Een wijziging aan alleen service-CI start die infrastructuurketen niet.
+Voor infrastructuurchecks bij een PR zijn alleen `Development → Testing` en
+`Testing → main` toegestaan. Een feature-PR naar `main` of `Testing` slaat de
+infrastructuurjobs meteen over, voordat er een eigen runner wordt aangevraagd.
+GitHub kan de workflow nog wel tonen; er start dan geen Terraform-job.
+
+`PR Branch Policy` meldt een verkeerde doelbranch met een rode check. Die check
+draait ook opnieuw wanneer iemand de doelbranch corrigeert. Voeg na de eerste
+GitHub-run `Check PR branch direction` toe aan de vereiste checks van `main` en
+`Testing` om ook het mergen van verkeerd gerichte PR's te blokkeren.
+Branch protection alleen voorkomt niet dat iemand zo'n PR opent.
+
+PR-validaties hebben een eigen wachtrij per PR en blokkeren geen live deployment.
+Een nieuwe PR-update annuleert de oudere validatie voor diezelfde PR.
+Live deployments blijven hun bestaande gedeelde lock gebruiken en annuleren
+elkaar niet. Handmatig starten van de infrastructuurketen blijft mogelijk.
+
 De Proxmox-voorcontrole kijkt alleen of de vereiste VM's bestaan en draaien;
 die controle maakt geen infrastructuur aan.
 De hulptests draaien in `Pipeline Validation`, niet opnieuw bij elke deployment.

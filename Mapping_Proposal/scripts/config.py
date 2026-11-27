@@ -169,18 +169,6 @@ def packages_dir() -> Path:
     return shared_storage_dir() / 'packages'
 
 
-def auto_seed_enabled() -> bool:
-    """Whether example proposals should be seeded into storage on startup."""
-    _load_env()
-    val = os.getenv('SEED_PROPOSALS', '').strip().lower()
-    if val in ('1', 'true', 'yes'):
-        return True
-    if val in ('0', 'false', 'no'):
-        return False
-    env = os.getenv('ENVIRONMENT', '').strip().lower()
-    return env in ('testing', 'test', 'development', 'dev')
-
-
 def cors_origins() -> list[str]:
     """Browser origins allowed to call the API directly (comma-separated CORS_ORIGINS).
 
@@ -189,6 +177,26 @@ def cors_origins() -> list[str]:
     """
     _load_env()
     return [origin.strip() for origin in os.getenv('CORS_ORIGINS', '').split(',') if origin.strip()]
+
+
+def is_swagger_enabled() -> bool:
+    """Whether Swagger UI and OpenAPI docs should be served.
+
+    Enabled in development and testing. Strictly disabled in staging and production.
+    """
+    _load_env()
+    override = os.getenv('SWAGGER_ENABLED', '').strip().lower()
+    if override in {'false', '0', 'no', 'off'}:
+        return False
+
+    env = os.getenv('ENVIRONMENT', '').strip().lower()
+    if env in {'staging', 'stage', 'production', 'prod'}:
+        return False
+
+    if override in {'true', '1', 'yes', 'on'}:
+        return True
+
+    return not env or env in {'development', 'dev', 'local', 'testing', 'test'}
 
 
 # ---------------------------------------------------------------------------

@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { approveProposal, deleteProposal, getProposal, getProposalFile, VERSION_CONTROL_API } from '../../services/proposalService'
-
+import { approveProposal, CONVERTER_API, deleteProposal, getProposal, getProposalFile, VERSION_CONTROL_API } from '../../services/proposalService'
 // Fake fetch response: only the fields proposalService reads
 function respond(status: number, body?: unknown) {
   return vi.fn().mockResolvedValue({ ok: status >= 200 && status < 300, status, json: async () => body })
@@ -75,6 +74,7 @@ describe('proposalService', () => {
         klant: 'Brunos',
         versie: 3,
         status: 'In review',
+        statusCode: 'IN_REVIEW',
         geupload: '2026-10-30T10:00:00',
         mappings: DTO.mappings,
       })
@@ -211,42 +211,40 @@ describe('proposalService', () => {
   })
 
   describe('approveProposal', () => {
-    it('sends a POST request to approve the proposal', async () => {
+    it('sends a POST with the description to the converter', async () => {
       // Arrange
-      vi.stubGlobal('fetch', respond(200))
+      vi.stubGlobal('fetch', respond(200, { status: 'AI_CHECKING_REVIEW' }))
 
       // Act
-      await approveProposal('Brunos', 'v3', 'inbound')
+      await approveProposal('Brunos', 'v3', 'inbound', 'Eerste versie voor Brunos')
 
       // Assert
       expect(fetch).toHaveBeenCalledWith(
-        `${VERSION_CONTROL_API}/proposals?company=Brunos&version=v3&proposalType=inbound`,
-        { method: 'POST' }
+        `${CONVERTER_API}/approve?company=Brunos&version=v3&proposalType=inbound`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ description: 'Eerste versie voor Brunos' }),
+        }
       )
     })
 
-    it('throws backend problem detail when 501 Not Implemented', async () => {
+    it('throws the backend detail when the AI review is already running (409)', async () => {
       // Arrange
-      const problemDetail = {
-        title: 'Not Implemented',
-        status: 501,
-        detail: "Approving proposal for company 'Brunos' and version 'v3' is not implemented yet",
-      }
-      vi.stubGlobal('fetch', respond(501, problemDetail))
+      const detail = 'De AI-controle is al bezig; dit voorstel kan niet opnieuw goedgekeurd worden'
+      vi.stubGlobal('fetch', respond(409, { detail }))
 
       // Act + Assert
-      await expect(approveProposal('Brunos', 'v3', 'inbound')).rejects.toThrow(
-        "Approving proposal for company 'Brunos' and version 'v3' is not implemented yet"
-      )
+      await expect(approveProposal('Brunos', 'v3', 'inbound', 'Tweede')).rejects.toThrow(detail)
     })
 
-    it('throws generic error when 501 has no detail', async () => {
-      // Arrange
-      vi.stubGlobal('fetch', respond(501))
+    it('throws a generic error when the response has no usable detail', async () => {
+      // Arrange: FastAPI validation errors (422) return a list instead of a string
+      vi.stubGlobal('fetch', respond(422, { detail: [{ msg: 'field required' }] }))
 
       // Act + Assert
-      await expect(approveProposal('Brunos', 'v3', 'inbound')).rejects.toThrow(
-        'Goedkeuren van voorstellen is nog niet geïmplementeerd'
+      await expect(approveProposal('Brunos', 'v3', 'inbound', 'Ok')).rejects.toThrow(
+        'Voorstel kon niet worden goedgekeurd (status 422)'
       )
     })
 
@@ -255,7 +253,7 @@ describe('proposalService', () => {
       vi.stubGlobal('fetch', respond(503))
 
       // Act + Assert
-      await expect(approveProposal('Brunos', 'v3', 'inbound')).rejects.toThrow(
+      await expect(approveProposal('Brunos', 'v3', 'inbound', 'Ok')).rejects.toThrow(
         'De bestanden zijn tijdelijk niet bereikbaar (status 503)'
       )
     })

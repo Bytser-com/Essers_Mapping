@@ -3,24 +3,8 @@ kind: Kustomization
 
 namespace: monitoring
 
-# Pre-packaged ConfigMaps
+# Pre-packaged ConfigMaps auto-discovered by the Grafana sidecar (grafana_dashboard="1")
 resources:
   - k8s-cluster-overview-cm.yaml
+  - essers-proposals-ai-pipeline-cm.yaml
   - essers-services-overview-cm.yaml
-
-# ==============================================================================
-# HOW TO DROP IN NEW EXPORTED GRAFANA DASHBOARDS:
-# 1. Export your dashboard from Grafana UI (Dashboard Settings -> JSON Model).
-# 2. Save it as `my-dashboard.json` in this directory.
-# 3. Add an entry below under configMapGenerator:
-# ==============================================================================
-# configMapGenerator:
-#   - name: grafana-dashboard-my-custom-dashboard
-#     files:
-#       - my-dashboard.json
-#     options:
-#       labels:
-#         grafana_dashboard: "1"
-#         app.kubernetes.io/part-of: essers-mapping
-#       annotations:
-#         k8s-sidecar-target-directory: "/tmp/dashboards/essers"

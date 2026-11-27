@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import ProposalTable from './ProposalTable'
-import { POLL_INTERVAL_MS } from '../services/proposals'
+import { POLL_INTERVAL_MS } from '../services/proposalOverviewService'
 import { useHomeStore } from '../stores/homeStore'
 
 // "Proposals" section of the Home page: loads the list and shows it in a table.

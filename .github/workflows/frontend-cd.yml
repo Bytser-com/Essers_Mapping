@@ -1,10 +1,7 @@
 name: Frontend CD
 
+# Automatic delivery is called once by the CI workflow; this file is manual recovery.
 on:
-  workflow_run:
-    workflows: ['Frontend CI']
-    branches: [Testing, main]
-    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -13,22 +10,15 @@ permissions:
   packages: write
 
 concurrency:
-  group: frontend-cd-${{ github.event.workflow_run.head_branch || github.ref_name }}
+  group: frontend-cd-${{ github.ref_name }}
   cancel-in-progress: false
 
 jobs:
   delivery:
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.event == 'push' &&
-       github.event.workflow_run.head_repository.full_name == github.repository)
     uses: ./.github/workflows/service-cd.yml
     with:
       service-path: Frontend
       image-name: frontend
       deployment: frontend
       ci-workflow: frontend-ci.yml
-      artifact-name: frontend-dist
-      artifact-path: 'Frontend/dist'
     secrets: inherit

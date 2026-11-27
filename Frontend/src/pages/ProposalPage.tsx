@@ -4,6 +4,7 @@ import { useProposalStore } from "../stores/proposalStore";
 import iconUpload from "../assets/home/icon-upload.svg";
 import iconError from "../assets/home/icon-error.svg";
 import iconSuccess from "../assets/home/icon-success.svg";
+import ApproveProposalDialog from "../components/ApproveProposalDialog";
 
 
 type ProposalPageProps = {
@@ -19,6 +20,7 @@ type ConfidenceProps = {
 
 const REVIEW_REQUIRED = "REVIEW_REQUIRED";
 const IN_REVIEW = "In review";
+const AI_CHECKING_REVIEW = "AI_CHECKING_REVIEW";
 
 const thClass =
   "px-3 py-2.5 first:pl-4 last:pr-4 text-left font-bold text-[11px] tracking-[0.06em] uppercase text-grey select-none";
@@ -44,6 +46,55 @@ function formatDateOnly(dateStr?: string | null): string {
     return `${parts[2]}/${parts[1]}/${parts[0]}`;
   }
   return dateStr;
+}
+
+/** Why "Goedkeuren" is disabled, or undefined when the proposal can be approved. */
+function getApproveDisabledReason(status?: string, statusCode?: string): string | undefined {
+  const isAiChecking = statusCode === AI_CHECKING_REVIEW || status === "AI-controle bezig";
+  if (isAiChecking) {
+    return "De AI-controle is bezig; het voorstel kan nu niet opnieuw goedgekeurd worden";
+  }
+  const isInReview = status === IN_REVIEW || status?.toLowerCase() === "in review" || statusCode === "IN_REVIEW";
+  if (!isInReview) {
+    return "Alleen voorstellen met de status 'In review' kunnen worden goedgekeurd";
+  }
+  return undefined;
+}
+
+/**
+ * State of the "Proposal goedkeuren?" dialog (story IT2627T06-185), kept out of the page
+ * component so the page stays readable.
+ */
+function useApproveDialog(
+  company: string | undefined,
+  version: number | undefined,
+  onApprove?: () => void,
+  onComplete?: (success: boolean) => void,
+) {
+  const approveProposal = useProposalStore((state) => state.approveProposal);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
+
+  function open() {
+    if (onApprove) {
+      onApprove();
+      return;
+    }
+    setIsOpen(true);
+  }
+
+  async function confirm(description: string) {
+    if (!company || version === undefined) return;
+    setIsApproving(true);
+    const success = await approveProposal(company, `v${version}`, description);
+    setIsApproving(false);
+    setIsOpen(false);
+    if (onComplete) {
+      onComplete(success);
+    }
+  }
+
+  return { isOpen, isApproving, open, close: () => setIsOpen(false), confirm };
 }
 
 function Confidence({ value }: Readonly<ConfidenceProps>) {
@@ -78,7 +129,6 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
   const fetchProposal = useProposalStore((state) => state.fetchProposal);
   const downloadProposal = useProposalStore((state) => state.downloadProposal);
   const uploadProposal = useProposalStore((state) => state.uploadProposal);
-  const approveProposal = useProposalStore((state) => state.approveProposal);
   const deleteProposal = useProposalStore((state) => state.deleteProposal);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
@@ -86,6 +136,37 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const approveDialog = useApproveDialog(
+    company,
+    proposal?.versie,
+    onApprove,
+    (success) => {
+      if (success) {
+        void navigate("/", {
+          state: {
+            approvalMessage: {
+              type: "success",
+              title: "Voorstel goedgekeurd.",
+              message: "Het voorstel is goedgekeurd en geconverteerd naar een Mapping Package.",
+            },
+          },
+        });
+      } else {
+        const errorMsg =
+          useProposalStore.getState().actionError ||
+          "Er is een probleem opgetreden bij het goedkeuren van het voorstel.";
+        void navigate("/", {
+          state: {
+            approvalMessage: {
+              type: "error",
+              title: "Goedkeuren mislukt.",
+              message: errorMsg,
+            },
+          },
+        });
+      }
+    }
+  );
   const actionError = useProposalStore((state) => state.actionError);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -124,15 +205,6 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
-  }
-
-  async function handleApprove() {
-    if (onApprove) {
-      onApprove();
-      return;
-    }
-    if (!proposal || !company) return;
-    await approveProposal(company, `v${proposal.versie}`);
   }
 
   function openDeleteDialog() {
@@ -203,6 +275,7 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
   const reviewCount = proposal.mappings.filter((m) => !m.bronveld).length;
   const matchedCount = totalMappings - reviewCount;
   const hasReviewFields = reviewCount > 0;
+  const approveDisabledReason = getApproveDisabledReason(proposal.status, proposal.statusCode);
 
   const filteredMappings = proposal.mappings.filter((mapping) => {
     if (filterMissingOnly && mapping.bronveld) {
@@ -260,9 +333,9 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
           <button
             type="button"
             className="btn btn--primary"
-            onClick={handleApprove}
-            disabled={hasReviewFields}
-            title={hasReviewFields ? "Goedkeuren is pas mogelijk als alle velden zijn nagekeken" : undefined}
+            onClick={approveDialog.open}
+            disabled={approveDisabledReason !== undefined}
+            title={approveDisabledReason}
           >
             Goedkeuren
           </button>
@@ -326,11 +399,52 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
 
       {/* Action banner if review is required */}
       {hasReviewFields && (
-        <div className="flex items-center gap-2.5 px-3.5 py-2.5 border border-mid-grey rounded-small bg-white text-[13px]">
-          <span className="inline-flex justify-center items-center size-4.5 shrink-0 rounded-full bg-anthracite text-white text-[11px] font-bold" aria-hidden="true">
-            i
+        <div className="flex items-center gap-2.5 px-3.5 py-2.5 border border-red/40 rounded-small bg-[#fee2e2] text-[13px] text-anthracite">
+          <span className="inline-flex justify-center items-center size-4.5 shrink-0 rounded-full bg-red text-white text-[11px] font-bold" aria-hidden="true">
+            !
           </span>
           <span>Velden met REVIEW_REQUIRED kon de AI niet invullen. Pas ze aan in de Excel en upload die opnieuw.</span>
+        </div>
+      )}
+
+      {/* Rejection notice and findings if proposal was returned / rejected by AI */}
+      {(proposal.statusCode === "RETURNED" || proposal.status === "Teruggestuurd") && (
+        <div
+          role="alert"
+          className="flex flex-col gap-3 p-4.5 rounded-small border border-red/40 bg-[#fee2e2] text-anthracite shadow-xs"
+        >
+          <div className="flex items-start gap-3">
+            <img src={iconError} alt="" width={22} height={22} className="mt-0.5 shrink-0" />
+            <div className="flex flex-col gap-1 flex-1">
+              <h3 className="m-0 text-sm font-bold text-red">
+                Voorstel afgekeurd door AI-controle
+              </h3>
+              <p className="m-0 text-[13px] text-anthracite leading-relaxed">
+                {proposal.aiReview?.summary || "Dit voorstel is afgekeurd door de AI-kwaliteitscontrole en teruggestuurd voor aanpassingen."}
+              </p>
+            </div>
+          </div>
+
+          {proposal.aiReview?.findings && proposal.aiReview.findings.length > 0 && (
+            <div className="flex flex-col gap-2 pt-1 pl-8.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-red">
+                Gevonden inconsistenties en redenen van afkeuring:
+              </span>
+              <ul className="flex flex-col gap-2 m-0 p-0 list-none">
+                {proposal.aiReview.findings.map((finding, idx) => (
+                  <li
+                    key={idx}
+                    className="flex items-start gap-2.5 p-2.5 rounded bg-white/80 border border-red/25 text-xs text-anthracite leading-relaxed"
+                  >
+                    <span className="inline-flex items-center justify-center size-4 rounded-full bg-red text-white text-[10px] font-bold shrink-0 mt-0.5">
+                      {idx + 1}
+                    </span>
+                    <span className="font-medium">{finding}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
 
@@ -417,6 +531,15 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
           </tbody>
         </table>
       </div>
+      {approveDialog.isOpen && (
+        <ApproveProposalDialog
+          customer={proposal.klant}
+          version={proposal.versie}
+          isSubmitting={approveDialog.isApproving}
+          onCancel={approveDialog.close}
+          onConfirm={(description) => void approveDialog.confirm(description)}
+        />
+      )}
       {showUploadDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-anthracite/45">
           <dialog
@@ -472,7 +595,7 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
           <dialog
             open
             aria-labelledby="delete-dialog-title"
-            className="static flex flex-col gap-4 w-120 max-w-[calc(100vw-32px)] m-0 p-7 rounded-large bg-white"
+            className="static flex flex-col gap-4 w-120 max-w-[calc(100vw-32px)] m-0 p-7 rounded-large bg-[#fef2f2] border border-red/30 shadow-lg"
           >
             <h2 id="delete-dialog-title" className="m-0 font-title text-xl font-bold text-red">
               Voorstel verwijderen

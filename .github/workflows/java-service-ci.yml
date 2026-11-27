@@ -30,6 +30,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup Java 21
+        id: setup
         uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -39,40 +40,55 @@ jobs:
 
       # The service POM configures Surefire, Failsafe and merged JaCoCo coverage.
       - name: Unit, integration and functional tests with coverage and packaging
+        id: verify
         run: mvn --batch-mode --no-transfer-progress -DfailIfNoTests=true clean verify
 
       - name: Require the JaCoCo coverage report
+        if: ${{ !cancelled() && steps.verify.outcome == 'success' }}
         run: test -s target/site/jacoco/jacoco.xml
 
       - name: Export resolved dependencies including test scope
+        id: inventory
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         run: >-
           mvn --batch-mode --no-transfer-progress
           org.apache.maven.plugins:maven-dependency-plugin:3.8.1:tree
           -DoutputType=json -DoutputFile=target/dependency-tree.json
 
       - name: Convert the Maven inventory for OSV
+        id: osv-inventory
+        if: ${{ !cancelled() && steps.inventory.outcome == 'success' }}
         run: >-
           python3 "$GITHUB_WORKSPACE/Scripts/dependency-inventory.py"
           --maven-tree target/dependency-tree.json --output target/dependencies.json
 
       - name: Audit resolved dependencies
+        if: ${{ !cancelled() && steps.osv-inventory.outcome == 'success' }}
         uses: ./.github/actions/dependency-audit
         with:
           lockfile: osv-scanner:${{ inputs.service-path }}/target/dependencies.json
           report-path: ${{ inputs.service-path }}/target/dependency-audit.json
 
       - name: Setup Docker Buildx
+        id: buildx
+        if: ${{ !cancelled() && steps.verify.outcome == 'success' && github.ref_name != 'main' }}
         uses: docker/setup-buildx-action@v4
 
       - name: Build container for validation
+        id: image
+        if: ${{ !cancelled() && steps.buildx.outcome == 'success' }}
         uses: docker/build-push-action@v7
         with:
           context: ${{ inputs.service-path }}
           load: true
           push: false
           tags: service-ci:local
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
 
       - name: Validate container startup and health
+        if: ${{ !cancelled() && steps.image.outcome == 'success' }}
         working-directory: ${{ github.workspace }}
         env:
           IMAGE: service-ci:local
@@ -95,9 +111,26 @@ jobs:
           retention-days: 14
 
       - name: Upload application JAR
+        if: ${{ !cancelled() && steps.verify.outcome == 'success' }}
         uses: actions/upload-artifact@v6
         with:
           name: ${{ inputs.artifact-prefix }}-jar
           path: ${{ inputs.service-path }}/target/*.jar
           if-no-files-found: error
+          retention-days: 7
+
+      # Only Testing exports a deployable image. Production reuses its recorded digest.
+      - name: Save the tested container for Testing CD
+        if: success() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'Testing' && steps.image.outcome == 'success'
+        run: docker save --output "$RUNNER_TEMP/image.tar" service-ci:local
+
+      - name: Upload the tested container
+        if: success() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'Testing' && steps.image.outcome == 'success'
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ inputs.service-path }}-image
+          path: ${{ runner.temp }}/image.tar
+          if-no-files-found: error
+          compression-level: 1
+          overwrite: true
           retention-days: 7

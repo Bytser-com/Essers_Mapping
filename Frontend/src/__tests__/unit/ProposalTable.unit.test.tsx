@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useParams } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 import ProposalTable from '../../components/ProposalTable'
-import { formatUploadedAt, type Proposal } from '../../services/proposals'
+import { formatUploadedAt, type Proposal } from '../../services/proposalOverviewService'
 
 function proposal(overrides: Partial<Proposal> = {}): Proposal {
   return {
@@ -63,7 +63,7 @@ describe('ProposalTable', () => {
     ['In review', 'In review'],
     ['in review', 'In review'],
     ['Klaar om na te kijken', 'Klaar om na te kijken'],
-    ['AI_CHECKING_REVIEW', 'AI controleert review van analist'],
+    ['AI_CHECKING_REVIEW', 'AI-controle bezig'],
     ['RETURNED', 'Teruggestuurd'],
   ] as const)('TC-57-05 status %s is shown as "%s"', (status, label) => {
     render(<ProposalTable proposals={[proposal({ status: status as unknown as Proposal['status'] })]} />)

@@ -105,20 +105,22 @@ describe('ProposalPage', () => {
         expect(screen.queryByText(/kon de AI niet invullen/)).not.toBeInTheDocument()
     })
 
-    it('disables approving when a field needs review', () => {
+    it('disables approving when status is not In review', () => {
         // Arrange
-        useProposalStore.setState({ proposal: { ...PROPOSAL, mappings: [REVIEW_MAPPING] } })
+        useProposalStore.setState({ proposal: PROPOSAL })
 
         // Act
         renderPage()
 
         // Assert
-        expect(screen.getByRole('button', { name: 'Goedkeuren' })).toBeDisabled()
+        const button = screen.getByRole('button', { name: 'Goedkeuren' })
+        expect(button).toBeDisabled()
+        expect(button).toHaveAttribute('title', "Alleen voorstellen met de status 'In review' kunnen worden goedgekeurd")
     })
 
-    it('enables approving when all fields are filled', () => {
+    it('enables approving when the proposal is In review', () => {
         // Arrange
-        useProposalStore.setState({ proposal: { ...PROPOSAL, mappings: [MAPPING] } })
+        useProposalStore.setState({ proposal: { ...PROPOSAL, status: 'In review', statusCode: 'IN_REVIEW', mappings: [REVIEW_MAPPING] } })
 
         // Act
         renderPage()
@@ -177,5 +179,33 @@ describe('ProposalPage', () => {
 
         // Assert
         expect(useProposalStore.getState().fetchProposal).toHaveBeenCalledWith('brunos')
+    })
+
+    it('shows the rejection banner above the fields when proposal status is RETURNED', () => {
+        useProposalStore.setState({
+            proposal: {
+                klant: 'Klant A',
+                versie: 1,
+                status: 'Teruggestuurd',
+                statusCode: 'RETURNED',
+                geupload: '2026-03-24T00:00:00Z',
+                mappings: [],
+                aiReview: {
+                    decision: 'REJECTED',
+                    summary: 'Conflict found in target fields',
+                    findings: [
+                        'Target field /Order/Id has multiple conflicting source paths',
+                        'Rule DIRECT is missing source path on row 3'
+                    ]
+                }
+            }
+        })
+
+        renderPage()
+
+        expect(screen.getByText('Voorstel afgekeurd door AI-controle')).toBeInTheDocument()
+        expect(screen.getByText('Conflict found in target fields')).toBeInTheDocument()
+        expect(screen.getByText('Target field /Order/Id has multiple conflicting source paths')).toBeInTheDocument()
+        expect(screen.getByText('Rule DIRECT is missing source path on row 3')).toBeInTheDocument()
     })
 })

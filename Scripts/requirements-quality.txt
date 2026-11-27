@@ -1,0 +1,3 @@
+# Python CLI used for local static analysis.
+# Use the same Python interpreter as run-tests.py.
+semgrep>=1,<2

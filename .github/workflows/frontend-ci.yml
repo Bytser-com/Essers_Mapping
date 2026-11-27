@@ -43,6 +43,9 @@ jobs:
             .github/workflows/service-cd.yml
             Scripts/smoke-service-image.sh
             Scripts/registry-pull-secret.py
+            Scripts/select-service-release.cjs
+            Scripts/service-release.py
+            Scripts/publish-service-image.sh
 
   checks:
     name: Frontend - lint, types, tests and build
@@ -57,6 +60,7 @@ jobs:
       CI: 'true'
     steps:
       - name: Checkout repository
+        id: checkout
         uses: actions/checkout@v6
         with:
           persist-credentials: false
@@ -69,40 +73,57 @@ jobs:
           cache-dependency-path: Frontend/package-lock.json
 
       - name: Install locked dependencies
+        id: install
         run: npm ci
 
       - name: Lint
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run lint
 
       - name: Check TypeScript types
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run typecheck
 
       # This command runs unit, integration and functional tests once, with coverage.
       - name: Unit, integration and functional tests with coverage
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run test:coverage
 
       - name: Build production frontend
+        id: build
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run build
 
       - name: Install Playwright Chromium
+        id: playwright
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: npx playwright install --with-deps chromium
 
       # playwright.config.js starts Vite preview against the production dist bundle.
       - name: Browser end-to-end tests
+        if: ${{ !cancelled() && steps.playwright.outcome == 'success' }}
         run: npm run test:e2e
 
       - name: Setup Docker Buildx
+        id: buildx
+        if: ${{ !cancelled() && steps.build.outcome == 'success' && github.ref_name != 'main' }}
         uses: docker/setup-buildx-action@v4
 
       - name: Build container for validation
+        id: image
+        if: ${{ !cancelled() && steps.buildx.outcome == 'success' }}
         uses: docker/build-push-action@v7
         with:
           context: Frontend
           load: true
           push: false
           tags: service-ci:local
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
 
       - name: Validate container startup and health
+        if: ${{ !cancelled() && steps.image.outcome == 'success' }}
         env:
           IMAGE: service-ci:local
           SERVICE_PATH: Frontend
@@ -110,6 +131,7 @@ jobs:
         working-directory: ${{ github.workspace }}
 
       - name: Audit locked dependencies including development tools
+        if: ${{ !cancelled() && steps.checkout.outcome == 'success' }}
         uses: ./.github/actions/dependency-audit
         with:
           lockfile: Frontend/package-lock.json
@@ -128,11 +150,28 @@ jobs:
           retention-days: 14
 
       - name: Upload production bundle
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         uses: actions/upload-artifact@v6
         with:
           name: frontend-dist
           path: Frontend/dist/
           if-no-files-found: error
+          retention-days: 7
+
+      # Only Testing exports a deployable image. Production reuses its recorded digest.
+      - name: Save the tested container for Testing CD
+        if: success() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'Testing' && steps.image.outcome == 'success'
+        run: docker save --output "$RUNNER_TEMP/image.tar" service-ci:local
+
+      - name: Upload the tested container
+        if: success() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'Testing' && steps.image.outcome == 'success'
+        uses: actions/upload-artifact@v6
+        with:
+          name: Frontend-image
+          path: ${{ runner.temp }}/image.tar
+          if-no-files-found: error
+          compression-level: 1
+          overwrite: true
           retention-days: 7
 
   quality-gate:
@@ -156,13 +195,11 @@ jobs:
   delivery:
     name: Frontend CD
     needs: [changes, checks, quality-gate]
-    if: github.event_name == 'push' && (github.ref_name == 'Testing' || github.ref_name == 'main') && needs.changes.outputs.changed == 'true'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.ref_name == 'Testing' || github.ref_name == 'main') && needs.changes.outputs.changed == 'true'
     uses: ./.github/workflows/service-cd.yml
     with:
       service-path: Frontend
       image-name: frontend
       deployment: frontend
       ci-workflow: frontend-ci.yml
-      artifact-name: frontend-dist
-      artifact-path: 'Frontend/dist'
     secrets: inherit

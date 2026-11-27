@@ -115,6 +115,42 @@ Na het mergen van deze fix kan dezelfde workflow opnieuw worden gestart op
 voor dit hostname. Een echte SonarQube-rechtenfout moet apart worden opgelost;
 deze wijziging verleent geen extra rechten.
 
+## Lokaal controleren voor een push
+
+Gebruik voor featurewerk een eigen lokale SonarQube-instance en projectkey.
+Zo blijft het gezamenlijke rapport op `Development` behouden. De instance voor
+deze controle gebruikt dezelfde Community Build-versie als de pipeline:
+
+```powershell
+docker run -d --name essers-sonar-local -p 127.0.0.1:9001:9000 --memory 3g sonarqube:26.11.0.134175-community
+```
+
+Voer dit alleen uit als de container nog niet bestaat; daarna volstaat
+`docker start essers-sonar-local`. Open `http://127.0.0.1:9001`, wijzig bij een
+nieuwe installatie het standaardwachtwoord, maak project `Essers_Mapping_Local`
+aan en genereer daar een analysetoken. Bewaar dat token uitsluitend lokaal.
+
+1. Gebruik dezelfde quality profile en gate als de gedeelde server. De gate van
+   de onderzochte run controleerde nieuwe coverage op 70%, duplicatie op maximaal
+   3% en geen nieuwe issues. Dit zijn de gemeten gatevoorwaarden van die run;
+   de afspraak over totale coverage blijft een aparte controle.
+2. Voer eerst de coveragecommando's uit die in
+   [de workflowhandleiding](../.github/workflows/README.MD#run-the-same-checks-locally) staan.
+   Bouw beide Java-services en voer ook de stap **Prepare Java libraries for
+   SonarQube** uit `sonarqube.yml` uit. De scanner verzamelt zelf geen testcoverage.
+3. Installeer SonarScanner CLI 8.1.0.6389 en geef het pad naar de scanner mee:
+
+```powershell
+# SONAR_TOKEN bevat het token van de lokale instance, niet het gedeelde project.
+./Scripts/sonar-local.ps1 -ScannerPath 'C:/tools/sonar-scanner/bin/sonar-scanner.bat'
+```
+
+Het script accepteert alleen een lokaal serveradres en wacht op de quality gate.
+De analyse blijft lokaal. Gebruik een passende baseline voor nieuwe code; een
+vers lokaal project heeft niet automatisch dezelfde analysehistoriek als CI.
+Een lokale groene gate helpt codeproblemen eerder vinden, maar vervangt de
+GitHub-checks op Linux en hun dependencychecks niet.
+
 ## Documentatie
 
 - [Sonar-project handmatig aanmaken](https://docs.sonarsource.com/sonarqube-community-build/project-administration/creating-project/creating-manually)

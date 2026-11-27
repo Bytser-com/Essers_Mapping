@@ -166,7 +166,7 @@ If the shared SFTP volume was wiped or recreated, trigger sample proposal seedin
 * **Via `kubectl` inside cluster**:
   ```bash
   kubectl exec -n testing $(kubectl get pod -n testing -l app=mapping-proposal -o jsonpath='{.items[0].metadata.name}') -- \
-    python -m scripts.dev_seed --force
+    python Scripts/seed.py --force
   ```
 
 ---

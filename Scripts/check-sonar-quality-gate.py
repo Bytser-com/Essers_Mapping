@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Check this scan's gate: new-code coverage warns; other failures block CI."""
+"""Check this scan's gate: quality-gate failures (including coverage) block CI."""
 
 import json
 import os
+from datetime import datetime
 from pathlib import Path
 import sys
 import time
@@ -56,13 +57,45 @@ def wait_for_gate(server, token, task_id, project_key, timeout=300):
             analysis_id = task.get('analysisId')
             if not isinstance(analysis_id, str) or not analysis_id:
                 raise ValueError('Completed Sonar task has no analysis ID.')
-            return fetch('/api/qualitygates/project_status', {'analysisId': analysis_id})
+            payload = fetch('/api/qualitygates/project_status', {'analysisId': analysis_id})
+            return {**payload, 'analysisId': analysis_id}
         if task['status'] not in ('PENDING', 'IN_PROGRESS'):
             raise ValueError(f"Sonar processing did not succeed: {task['status']}.")
         time.sleep(max(0, min(5, deadline - time.monotonic())))
 
 
-def check_gate(payload):
+def analysis_report_url(server, token, project, analysis_id):
+    """Select this analysis in Activity; its exact gate JSON is a safe fallback."""
+    exact_gate = f'{server}/api/qualitygates/project_status?{urlencode({"analysisId": analysis_id})}'
+    try:
+        history = get_json(server, token, '/api/project_analyses/search', {'project': project, 'ps': 100}, 15)
+        for analysis in history['analyses']:
+            if analysis['key'] == analysis_id:
+                # Activity selects an analysis by its timestamp, not by an analysisId parameter.
+                date = analysis['date']
+                datetime.fromisoformat(date)
+                return f'{server}/project/activity?{urlencode({"id": project, "selected_date": date})}'
+    except (OSError, URLError, ValueError, KeyError, TypeError) as error:
+        if isinstance(error, HTTPError):
+            error.close()
+        # Report navigation must not change the quality-gate result.
+    return exact_gate
+
+
+def publish_report_links(server, project, analysis_id, report_url):
+    dashboard = f'{server}/dashboard?{urlencode({"id": project})}'
+    exact_gate = f'{server}/api/qualitygates/project_status?{urlencode({"analysisId": analysis_id})}'
+    print(f'SonarQube report for this analysis: {report_url}')
+    summary = os.environ.get('GITHUB_STEP_SUMMARY')
+    if summary:
+        with Path(summary).open('a', encoding='utf-8') as output:
+            output.write('\n### SonarQube report\n\n'
+                         f'- [This analysis]({report_url})\n'
+                         f'- [Exact quality-gate result (JSON)]({exact_gate})\n'
+                         f'- [Project dashboard and issues (latest analysis)]({dashboard})\n')
+
+
+def check_gate(payload, report_url=None):
     gate = payload['projectStatus']
     conditions = gate['conditions']
     if not isinstance(conditions, list) or any(
@@ -80,16 +113,17 @@ def check_gate(payload):
     blocking = False
     for condition in failed:
         metric = condition['metricKey']
+        report = f'See this analysis: {report_url}' if report_url else 'See the SonarQube report.'
         if metric == 'new_coverage':
             if any(not 0 <= float(condition[key]) <= 100 for key in ('actualValue', 'errorThreshold')):
                 raise ValueError('Sonar returned invalid coverage percentages.')
-            annotation('warning',
-                       f"Sonar new-code coverage: {condition['actualValue']}%; "
-                       f"required: {condition['errorThreshold']}%. Coverage is advisory in GitHub Actions; "
-                       'the SonarQube gate remains failed.')
+            blocking = True
+            annotation('error',
+                       f"Sonar quality gate failed: new-code coverage is {condition['actualValue']}%; "
+                       f"required: {condition['errorThreshold']}%. {report}")
         else:
             blocking = True
-            annotation('error', f'Sonar quality gate failed: {metric}. See the SonarQube report.')
+            annotation('error', f'Sonar quality gate failed: {metric}. {report}')
     return 1 if blocking else 0
 
 
@@ -114,10 +148,13 @@ def main():
         if not task_id:
             raise ValueError('Scanner metadata is missing ceTaskId.')
         payload = wait_for_gate(server, token, task_id, project)
+        analysis_id = payload['analysisId']
+        report_url = analysis_report_url(server, token, project, analysis_id)
+        publish_report_links(server, project, analysis_id, report_url)
         report = Path('test-results/sonarqube-quality-gate.json')
         report.parent.mkdir(parents=True, exist_ok=True)
         report.write_text(json.dumps(payload, indent=2), encoding='utf-8')
-        return check_gate(payload)
+        return check_gate(payload, report_url)
     except HTTPError as error:
         try:
             payload = json.loads(error.read(8192)) if error.fp is not None else {}

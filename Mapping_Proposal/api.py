@@ -14,31 +14,18 @@ While the API runs, the incoming watcher starts the AI automatically for every c
 upload in INCOMING_DIR (see services/incoming_watcher.py). WATCH_INCOMING=0 turns it off.
 """
 import logging
-import threading
-import time
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
+from routers import metrics as metrics_router
 from routers import upload
-from scripts.config import auto_seed_enabled, cors_origins, watch_incoming_enabled
+from scripts.config import cors_origins, is_swagger_enabled, watch_incoming_enabled
 from services import incoming_watcher
 
 logger = logging.getLogger(__name__)
-
-
-def _run_auto_seed() -> None:
-    for attempt in range(1, 6):
-        try:
-            from scripts.dev_seed import seed_proposals
-            seed_proposals()
-            logger.info('Auto-seeding proposals completed successfully.')
-            break
-        except Exception as e:
-            logger.warning('Auto-seeding attempt %d/5 failed: %s', attempt, e)
-            if attempt < 5:
-                time.sleep(3)
 
 
 @asynccontextmanager
@@ -48,25 +35,40 @@ async def lifespan(app: FastAPI):
     if watch_incoming_enabled():
         _, stop = incoming_watcher.start_in_background()
 
-    # Automatically seed proposals on startup in testing/development environments
-    if auto_seed_enabled():
-        threading.Thread(target=_run_auto_seed, daemon=True, name='auto-seed').start()
-
     yield
     if stop is not None:
         stop.set()
 
 
-app = FastAPI(title='Mapping Proposal API', version='0.1.0', lifespan=lifespan)
+def create_app() -> FastAPI:
+    swagger_on = is_swagger_enabled()
+    application = FastAPI(
+        title='Mapping Proposal API',
+        version='0.1.0',
+        docs_url='/docs' if swagger_on else None,
+        redoc_url=None,
+        openapi_url='/openapi.json' if swagger_on else None,
+        lifespan=lifespan,
+    )
 
-# Only needed when a browser calls this API directly (local frontend development).
-_origins = cors_origins()
-if _origins:
-    app.add_middleware(CORSMiddleware, allow_origins=_origins, allow_methods=['GET', 'POST'], allow_headers=['*'])
+    # Only needed when a browser calls this API directly (local frontend development).
+    _origins = cors_origins()
+    if _origins:
+        application.add_middleware(CORSMiddleware, allow_origins=_origins, allow_methods=['GET', 'POST'], allow_headers=['*'])
 
-app.include_router(upload.router)
+    application.include_router(upload.router)
+    application.include_router(metrics_router.router)
+
+    if swagger_on:
+        @application.get('/swagger', include_in_schema=False)
+        def swagger_redirect():
+            return RedirectResponse(url='/docs')
+
+    @application.get('/health')
+    def health() -> dict:
+        return {'status': 'ok'}
+
+    return application
 
 
-@app.get('/health')
-def health() -> dict:
-    return {'status': 'ok'}
+app = create_app()

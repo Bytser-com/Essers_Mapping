@@ -54,6 +54,12 @@ pushes compare the previous commit with the new head.
 
 Test reports are uploaded even when a check fails, if any were generated. Reports
 are retained for 14 days; successful build artifacts are retained for 7 days.
+Independent CI checks continue after another check fails, provided their own
+prerequisites succeeded and the run was not cancelled. For example, Python tests
+still run after lint failures, and dependency audits still run after test or
+container failures. Container health checks require a successful image build;
+frontend browser and container checks require the production bundle. Failures
+still fail the service CI gate and block CD; they are not ignored.
 Frontend browser tests use Vite preview to serve the production build. A separate
 container smoke test checks Nginx health and SPA fallback. No CI test deploys to
 the Kubernetes environment.
@@ -255,26 +261,42 @@ validation via pull requests targeting `Development` without deploying.
 | --- | --- | --- |
 | [Frontend CD](./frontend-cd.yml) | `Frontend CI` | `frontend` |
 | [Runtime CD](./runtime-cd.yml) | `Runtime CI` | `runtime-backend` |
+| [Version Control CD](./version-control-cd.yml) | `Version Control CI` | `version-control-backend` |
 | [Mapping Proposal CD](./mapping-proposal-cd.yml) | `Mapping Proposal CI` | `mapping-proposal` |
 | [Mapping Converter CD](./mapping-converter-cd.yml) | `Mapping Converter CI` | `mapping-converter` |
 
-The workflows share [service-cd.yml](./service-cd.yml). A successful **push** CI
-run on `Testing` or `main` triggers CD via `workflow_run`. PR and fork runs never
-deploy. `Development` keeps CI and its combined SonarQube analysis. Manual CD
-requires a successful push CI run for the current revision of `Testing` or `main`.
-Keep CD deployment checks out of the required PR checks; they run after pushes.
+The workflows share [service-cd.yml](./service-cd.yml). CI calls it directly
+after successful checks for a changed service on `Testing` or `main` (push or
+manual CI). The separate service CD files are manual recovery entry points;
+there is no second automatic `workflow_run` route. PR and fork runs never deploy.
+`Development` keeps CI and its combined SonarQube analysis. Manual CD requires
+successful CI for the current branch revision. Keep CD out of required PR checks.
 
-GitHub only starts `workflow_run` workflows after their definitions exist on the
-repository's default branch. Merge these workflow definitions there before
-expecting automatic CD from `Testing`.
+**Build once:** Testing CI builds and smoke-tests the container, then uploads it
+as `<service-path>-image`. Testing CD downloads that exact artifact, verifies its
+revision label, and publishes it without rebuilding. After a successful rollout,
+CD records the immutable image digest and service source tree in `release.json`.
+Only a later, separate merge to `main` deploys production. Main CI still runs
+tests, but skips Docker builds; production CD downloads a matching successful
+Testing release and uses exactly its GHCR digest.
 
-CD verifies the workflow/repository/branch and current SHA, then downloads the
-build artifact from that exact CI run. Frontend packages CI's `dist/` and Java
-services package CI's JAR. Python images build from the tested source revision. Container
-startup and HTTP health checks pass before publication. Images use
-`ghcr.io/<owner>/<repository>/<service>:sha-<full-commit>`; Kubernetes deploys the
-returned immutable registry digest. Unchanged/placeholder services without
-artifacts skip CD; expired artifacts require CI to be rerun.
+Matching uses the service directory's Git tree hash, so a different merge commit
+SHA does not require another build. The artifact must come from the same
+repository's successful Testing CI or manual CD workflow. Missing/expired releases
+or different service source stop production; CD never rebuilds as a fallback.
+Containers are retained as CI artifacts for 7 days; release records for 90 days.
+The image itself stays in GHCR. First deploy through the new Testing flow before
+promoting to production. Rerun Testing CI if a required artifact has expired.
+
+Change detection remains active on release pushes. Unchanged services stay on
+their current images. If an unrelated commit supersedes a waiting deployment,
+run that service's CI manually on the newest Testing revision to recover.
+Testing and production keep separate pods, runtime configuration, Secrets and
+storage. Frontend API paths are relative and its proxy configuration is mounted
+by Kubernetes; environment-specific URLs must not be baked into the bundle.
+Testing publishes only `sha-<commit>` and `testing` tags. It leaves the legacy
+`latest` bootstrap tag unchanged, so producing a Testing image cannot update an
+old production pod that still uses that tag. CD always deploys by digest.
 
 `Testing` deploys to GitHub environment `Testing` / namespace
 `essers-mapping-testing`; `main` deploys to `Production` /
@@ -317,8 +339,7 @@ Full live Kubernetes deployment and Mapping Proposal service CD fail when the
 key is missing. CI and validation modes need no key and use mocked Gemini calls.
 Service CD restarts Mapping Proposal so a changed key is loaded even when the
 image is unchanged. Use full Kubernetes CD's `restart` mode for a key-only
-rotation there. Mapping Proposal still needs a Dockerfile before service CD
-can publish its image.
+rotation there.
 
 ### Infrastructure CD
 
@@ -360,9 +381,10 @@ Kubernetes apply/diff dry-run is required. Client-side object serialization is
 used only during live reconciliation to preserve released image digests.
 
 Ansible lint explicitly includes `site.yml`, `playbooks/` and `roles/`, rather
-than relying on directory discovery. The existing shared variable prefixes are
-reported as visible `var-naming[no-role-prefix]` warnings to retain the inventory
-configuration API; other lint failures block CI. Task-name style is enforced.
+than relying on directory discovery. The `var-naming[no-role-prefix]` convention
+is skipped because inventories and cooperating roles share public variable
+names. Other variable-naming checks and lint failures still block CI.
+Task-name style is enforced.
 
 The existing order is Terraform plan/apply -> Ansible -> Kubernetes. Ansible
 also runs when an authorized apply request produces a successful no-change plan;

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useProposalStore } from '../../stores/proposalStore'
-import { getProposal, deleteProposal } from '../../services/proposalService'
+import { getProposal, deleteProposal, approveProposal } from '../../services/proposalService'
 
 vi.mock('../../services/proposalService')
 
@@ -129,5 +129,57 @@ describe('proposalStore', () => {
         const state = useProposalStore.getState()
         expect(state.actionError).toBe('Delete failed')
         expect(state.deleteSuccessMessage).toBeNull()
+    })
+
+    it('sets approvalMessage with success and clears proposal when approveProposal succeeds', async () => {
+        // Arrange
+        useProposalStore.setState({ proposal: PROPOSAL, approvalMessage: null })
+        approveProposal.mockResolvedValue(true)
+
+        // Act
+        const result = await useProposalStore.getState().approveProposal('brunos', 'v1', 'Valid change')
+
+        // Assert
+        expect(result).toBe(true)
+        const state = useProposalStore.getState()
+        expect(state.proposal).toBeNull()
+        expect(state.approvalMessage).toEqual({
+            type: 'success',
+            title: 'Voorstel goedgekeurd.',
+            message: 'Het voorstel is goedgekeurd en geconverteerd naar een Mapping Package.',
+        })
+        expect(approveProposal).toHaveBeenCalledWith('brunos', 'v1', 'inbound', 'Valid change')
+    })
+
+    it('sets actionError and approvalMessage error when approveProposal fails', async () => {
+        // Arrange
+        useProposalStore.setState({ proposal: PROPOSAL, approvalMessage: null })
+        approveProposal.mockRejectedValue(new Error('Approve failed'))
+
+        // Act
+        const result = await useProposalStore.getState().approveProposal('brunos', 'v1', 'Valid change')
+
+        // Assert
+        expect(result).toBe(false)
+        const state = useProposalStore.getState()
+        expect(state.actionError).toBe('Approve failed')
+        expect(state.approvalMessage).toEqual({
+            type: 'error',
+            title: 'Goedkeuren mislukt.',
+            message: 'Approve failed',
+        })
+    })
+
+    it('clears approvalMessage when clearApprovalMessage is called', () => {
+        // Arrange
+        useProposalStore.setState({
+            approvalMessage: { type: 'success', title: 'Ok', message: 'Ready' }
+        })
+
+        // Act
+        useProposalStore.getState().clearApprovalMessage()
+
+        // Assert
+        expect(useProposalStore.getState().approvalMessage).toBeNull()
     })
 })

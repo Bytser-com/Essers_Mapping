@@ -30,10 +30,11 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Query, UploadFile
 
 from scripts.config import incoming_dir
 from services.incoming_watcher import PROPOSAL_REF, UPLOAD_MARKER
+from services.metrics import metrics
 from services.proposals import AiStatus, ProposalStatus, ProposalStore, customer_folder_name
 from services.storage import proposal_storage
 
@@ -55,18 +56,22 @@ async def upload_xml(
 ):
     customer = customer_name.strip()
     if not customer:
+        metrics.record_upload('rejected_validation')
         raise HTTPException(status_code=400, detail='Upload mislukt: Vul eerst een klant in.')
 
     prop_type = (proposal_type or '').strip().lower()
     if not prop_type:
+        metrics.record_upload('rejected_validation')
         raise HTTPException(status_code=400, detail='Upload mislukt: proposal_type is verplicht (field is required).')
 
     # Only keep the file name, so a name like "../x.xml" cannot leave the folder
     names = [Path(file.filename or '').name for file in files]
     if not names:
+        metrics.record_upload('rejected_validation')
         raise HTTPException(status_code=400, detail='Upload mislukt: kies eerst een XML-bestand.')
     # Only XML files are allowed (same message as the frontend shows); nothing is stored otherwise
     if any(not name.lower().endswith('.xml') for name in names):
+        metrics.record_upload('rejected_validation')
         raise HTTPException(status_code=400, detail='Upload mislukt: dit is geen XML-bestand.')
 
     file_contents = [(name, await file.read()) for name, file in zip(names, files)]
@@ -74,6 +79,7 @@ async def upload_xml(
     # Check on SFTP if a proposal folder already exists for this company (only 1 proposal per company allowed)
     try:
         if store.has_proposal(customer):
+            metrics.record_upload('rejected_active')
             raise HTTPException(
                 status_code=400,
                 detail=f'Upload mislukt: er is momenteel al een voorstel actief voor {customer}. Dit voorstel moet eerst afgerond worden.',
@@ -81,6 +87,7 @@ async def upload_xml(
     except HTTPException:
         raise
     except Exception as error:
+        metrics.record_upload('error')
         logger.error('Failed to check existing proposals on SFTP for %r: %s', customer, error)
         raise HTTPException(
             status_code=500,
@@ -92,6 +99,7 @@ async def upload_xml(
     try:
         ref = store.create_proposal(customer, proposal_type=prop_type)
     except Exception as error:
+        metrics.record_upload('error')
         logger.error('Failed to create proposal metadata on SFTP for %r: %s', customer, error)
         raise HTTPException(
             status_code=500,
@@ -119,6 +127,7 @@ async def upload_xml(
         temp.write_text(json.dumps({'customer': customer, 'proposal_type': prop_type}, ensure_ascii=False), encoding='utf-8')
         os.replace(temp, folder / UPLOAD_MARKER)
     except Exception as error:
+        metrics.record_upload('error')
         shutil.rmtree(folder, ignore_errors=True)
         try:
             store.set_status(ref, ProposalStatus.AI_GENERATING, AiStatus.FAILED, error=f'Upload error: {error}'[:300])
@@ -127,16 +136,43 @@ async def upload_xml(
         logger.error('Failed to save uploaded files for upload %s: %s', upload_id, error)
         raise HTTPException(status_code=500, detail=f'Upload mislukt: {error}')
 
+    metrics.record_upload('accepted')
     return {'upload_id': upload_id, 'customer': customer, 'proposal_type': prop_type, 'files': names}
 
 
-@router.post('/seed')
-def seed(force: bool = False) -> dict:
-    """Seed sample proposals into the storage (used for testing and dev)."""
-    from scripts.dev_seed import seed_proposals
+def trigger_watcher_retry(store: ProposalStore) -> None:
+    from services.incoming_watcher import IncomingWatcher
     try:
-        seed_proposals(force=force)
-        return {'status': 'ok', 'message': 'Proposals seeded successfully'}
+        IncomingWatcher(incoming_dir(), store).run_once()
     except Exception as e:
-        logger.error('Failed to seed proposals: %s', e)
-        raise HTTPException(status_code=500, detail=f'Seeding failed: {e}')
+        logger.warning('Error running watcher after ai-retry: %s', e)
+
+
+@router.post('/ai-retry')
+def ai_retry(
+    background_tasks: BackgroundTasks,
+    store: ProposalStore = Depends(get_proposal_store),
+    customer: str | None = Query(None),
+    version: int | None = Query(None),
+    proposal_type: str | None = Query(None, alias='proposalType'),
+) -> dict:
+    """Restart stuck (mislukt) proposals by recovering failed uploads and resetting status."""
+    from services.retry import retry_failed_proposals
+
+    retried = retry_failed_proposals(
+        store=store,
+        incoming=incoming_dir(),
+        customer=customer,
+        version=version,
+        proposal_type=proposal_type,
+    )
+
+    metrics.record_retry(len(retried))
+    background_tasks.add_task(trigger_watcher_retry, store)
+
+    return {
+        'status': 'ok',
+        'retried_count': len(retried),
+        'retried_proposals': retried,
+    }
+

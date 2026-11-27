@@ -1,0 +1,361 @@
+"""Unit tests for services/storage.py: the local folder and the SFTP connection.
+
+Copied from Mapping_Proposal/tests/unit/test_storage.py (storage.py is shared on purpose)
+without the ProposalStore tests, plus tests for the SFTP session operations.
+The SFTP tests use a fake paramiko SFTP client on a temporary folder, so no SFTP server
+is needed.
+"""
+from __future__ import annotations
+
+import errno
+import os
+import sys
+import types
+from contextlib import contextmanager
+from pathlib import Path
+
+import pytest
+
+from scripts.errors import StorageError
+from services.storage import (
+    LocalStorage,
+    SftpSettings,
+    SftpStorage,
+    _SftpSession,
+    packages_storage,
+    proposal_storage,
+)
+
+
+# ---------------------------------------------------------------------------
+# Fake paramiko SFTP client (only the methods services/storage.py uses)
+# ---------------------------------------------------------------------------
+class FakeSftpClient:
+    """Behaves like paramiko.SFTPClient on top of a local folder (the "server disk")."""
+
+    def __init__(self, disk: Path, posix_rename: bool = True):
+        self.disk = disk
+        self.supports_posix_rename = posix_rename
+
+    def _local(self, remote: str) -> Path:
+        return self.disk / remote.lstrip('/')
+
+    def stat(self, remote):
+        path = self._local(remote)
+        if not path.exists():
+            raise OSError(errno.ENOENT, 'No such file')
+        return os.stat(path)
+
+    def listdir_attr(self, remote):
+        path = self._local(remote)
+        if not path.is_dir():
+            raise OSError(errno.ENOENT, 'No such folder')
+        return [types.SimpleNamespace(filename=child.name, st_mode=os.stat(child).st_mode)
+                for child in path.iterdir()]
+
+    def mkdir(self, remote):
+        path = self._local(remote)
+        if path.exists() or not path.parent.is_dir():
+            raise OSError('Failure')  # SFTP servers give a generic failure
+        path.mkdir()
+
+    def open(self, remote, mode):
+        return open(self._local(remote), mode)
+
+    def put(self, local, remote):
+        self._local(remote).write_bytes(Path(local).read_bytes())
+
+    def posix_rename(self, old, new):
+        if not self.supports_posix_rename:
+            raise OSError('posix-rename not supported')
+        os.replace(self._local(old), self._local(new))
+
+    def rename(self, old, new):
+        if self._local(new).exists():
+            raise OSError('Failure: target exists')
+        os.rename(self._local(old), self._local(new))
+
+    def remove(self, remote):
+        self._local(remote).unlink()
+
+    def rmdir(self, remote):
+        path = self._local(remote)
+        if path.is_dir():
+            os.rmdir(path)
+
+
+class FakeSftpStorage(SftpStorage):
+    """SftpStorage whose session uses the fake client instead of a network connection."""
+
+    def __init__(self, disk: Path, base_dir: str = '/upload', posix_rename: bool = True):
+        super().__init__(SftpSettings(host='sftp-shared', user='shareduser', base_dir=base_dir))
+        self.client = FakeSftpClient(disk, posix_rename)
+
+    @contextmanager
+    def session(self):
+        yield _SftpSession(self.client, self.root)
+
+
+@pytest.fixture
+def disk(tmp_path):
+    root = tmp_path / 'server'
+    (root / 'Proposals').mkdir(parents=True)  # SFTP_SHARED_PROPOSALS_DIR exists on the server
+    return root
+
+
+# ---------------------------------------------------------------------------
+# Choosing the storage from the configuration
+# ---------------------------------------------------------------------------
+def test_without_sftp_host_the_local_folder_is_used(monkeypatch):
+    monkeypatch.setenv('SFTP_SHARED_HOST', '')
+    assert isinstance(proposal_storage(), LocalStorage)
+
+
+def test_with_sftp_host_the_sftp_server_is_used(monkeypatch):
+    monkeypatch.setenv('SFTP_SHARED_HOST', 'sftp-shared')
+    monkeypatch.setenv('SFTP_SHARED_PORT', '22')
+    monkeypatch.setenv('SFTP_SHARED_USER', 'shareduser')
+    monkeypatch.setenv('SFTP_SHARED_PASSWORD', 'secret')
+    monkeypatch.setenv('SFTP_SHARED_PROPOSALS_DIR', '/upload/Proposals')
+
+    storage = proposal_storage()
+
+    assert isinstance(storage, SftpStorage)
+    assert storage.settings == SftpSettings(host='sftp-shared', port=22, user='shareduser',
+                                            password='secret', base_dir='/upload/Proposals', proposals_dir='')
+    assert storage.root == '/upload/Proposals'
+    assert storage.describe() == 'sftp://shareduser@sftp-shared:22/upload/Proposals'
+
+
+def test_proposals_folder_can_be_changed(monkeypatch):
+    monkeypatch.setenv('SFTP_SHARED_HOST', 'sftp-shared')
+    monkeypatch.setenv('SFTP_SHARED_PROPOSALS_DIR', '/mappings')
+    assert proposal_storage().root == '/mappings'
+
+    monkeypatch.delenv('SFTP_SHARED_PROPOSALS_DIR', raising=False)
+    assert proposal_storage().root == '/Proposals'
+
+
+def test_invalid_port_falls_back_to_22(monkeypatch):
+    monkeypatch.setenv('SFTP_SHARED_HOST', 'sftp-shared')
+    monkeypatch.setenv('SFTP_SHARED_PORT', 'abc')
+    assert proposal_storage().settings.port == 22
+
+
+def test_packages_storage_configuration(monkeypatch):
+    monkeypatch.setenv('SFTP_SHARED_HOST', '')
+    assert isinstance(packages_storage(), LocalStorage)
+
+    monkeypatch.setenv('SFTP_SHARED_HOST', 'sftp-shared')
+    monkeypatch.setenv('SFTP_SHARED_PORT', '22')
+    monkeypatch.setenv('SFTP_SHARED_USER', 'shareduser')
+    monkeypatch.setenv('SFTP_SHARED_PASSWORD', 'secret')
+    monkeypatch.setenv('SFTP_SHARED_PACKAGES_DIR', '/upload/Packages')
+
+    storage = packages_storage()
+    assert isinstance(storage, SftpStorage)
+    assert storage.settings.base_dir == '/upload/Packages'
+    assert storage.root == '/upload/Packages'
+
+
+# ---------------------------------------------------------------------------
+# Connecting
+# ---------------------------------------------------------------------------
+def test_unreachable_sftp_server_gives_a_storage_error(monkeypatch):
+    class FailingTransport:
+        def __init__(self, address):
+            self.address = address
+
+        def connect(self, username, password):
+            raise OSError('Connection refused')
+
+        def close(self):
+            pass
+
+    monkeypatch.setitem(sys.modules, 'paramiko', types.SimpleNamespace(Transport=FailingTransport))
+    storage = SftpStorage(SftpSettings(host='sftp-shared', user='shareduser', password='x'))
+
+    with pytest.raises(StorageError, match='sftp-shared:22'), storage.session():
+        pass
+
+
+def test_sftp_connection_is_closed_after_the_session(monkeypatch):
+    events = []
+
+    class Transport:
+        def __init__(self, address):
+            events.append(('connect-to', address))
+
+        def connect(self, username, password):
+            events.append(('login', username, password))
+
+        def close(self):
+            events.append('transport-closed')
+
+    class Client:
+        def get_channel(self):
+            return types.SimpleNamespace(settimeout=lambda seconds: None)
+
+        def close(self):
+            events.append('client-closed')
+
+    fake_paramiko = types.SimpleNamespace(
+        Transport=Transport, SFTPClient=types.SimpleNamespace(from_transport=lambda transport: Client()))
+    monkeypatch.setitem(sys.modules, 'paramiko', fake_paramiko)
+    storage = SftpStorage(SftpSettings(host='sftp-shared', port=22, user='shareduser', password='pw'))
+
+    with storage.session() as session:
+        assert session.root == '/Proposals'  # the folder Version_Control reads by default
+
+    assert events == [('connect-to', ('sftp-shared', 22)), ('login', 'shareduser', 'pw'),
+                      'client-closed', 'transport-closed']
+
+
+# ---------------------------------------------------------------------------
+# Path safety
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize('bad_path', [
+    '../geheim', 'ostavel/../../x', '..', '/etc/passwd',
+    r'C:\Windows\secret', 'C:secret', r'\\server\share\secret',
+    r'ostavel\..\secret', 'invalid\x00name',
+])
+def test_paths_cannot_leave_the_storage_root(tmp_path, bad_path):
+    with pytest.raises(StorageError):
+        LocalStorage(tmp_path).exists(bad_path)
+
+
+def test_local_upload_accepts_a_workbook_from_outside_the_storage(tmp_path):
+    workbook = tmp_path / 'generated.xlsx'
+    workbook.write_bytes(b'\x00excel\xff')
+    storage = LocalStorage(tmp_path / 'proposals')
+    storage.make_dirs('customer/v1')
+
+    storage.upload_file(workbook, 'customer/v1/mapping.xlsx')
+    storage.write_text('customer/v1/proposal.json', '{"status": "ready"}')
+
+    assert (storage.root / 'customer/v1/mapping.xlsx').read_bytes() == workbook.read_bytes()
+    assert storage.read_text('customer/v1/proposal.json') == '{"status": "ready"}'
+    assert sorted(p.name for p in (storage.root / 'customer/v1').iterdir()) == [
+        'mapping.xlsx', 'proposal.json',
+    ]
+
+
+def test_storage_rejects_a_symlink_to_another_directory(tmp_path):
+    root = tmp_path / 'proposals'
+    root.mkdir()
+    outside = tmp_path / 'private'
+    outside.mkdir()
+    secret = outside / 'secret.txt'
+    secret.write_text('unchanged')
+    try:
+        (root / 'customer').symlink_to(outside, target_is_directory=True)
+    except OSError as error:
+        pytest.skip(f'This machine cannot create symlinks: {error}')
+    storage = LocalStorage(root)
+
+    with pytest.raises(StorageError):
+        storage.read_text('customer/secret.txt')
+    with pytest.raises(StorageError):
+        storage.write_text('customer/secret.txt', 'overwritten')
+    with pytest.raises(StorageError):
+        storage.upload_file(secret, 'customer/upload.txt')
+
+    assert secret.read_text() == 'unchanged'
+    assert not (outside / 'upload.txt').exists()
+
+
+# ---------------------------------------------------------------------------
+# SFTP session operations (fake client on a temporary "server disk")
+# ---------------------------------------------------------------------------
+def test_sftp_session_reads_and_writes_files(disk):
+    storage = FakeSftpStorage(disk, base_dir='/')
+    with storage.session() as s:
+        s.make_dirs('nouryon/v1/inbound')
+        s.write_text('nouryon/v1/inbound/metadata.json', '{"status": "In review"}')
+
+        assert s.exists('nouryon/v1/inbound/metadata.json')
+        assert not s.exists('nouryon/v1/inbound/missing.json')
+        assert s.read_text('nouryon/v1/inbound/metadata.json') == '{"status": "In review"}'
+        assert s.list_dirs('nouryon') == ['v1']
+        assert s.list_dirs('onbekend') == []
+
+    assert (disk / 'Proposals/nouryon/v1/inbound/metadata.json').is_file()
+
+
+def test_sftp_overwrite_works_without_posix_rename(disk):
+    storage = FakeSftpStorage(disk, base_dir='/', posix_rename=False)
+    with storage.session() as s:
+        s.make_dirs('nouryon/v1')
+        s.write_text('nouryon/v1/metadata.json', 'old')
+        s.write_text('nouryon/v1/metadata.json', 'new')
+        assert s.read_text('nouryon/v1/metadata.json') == 'new'
+
+
+def test_sftp_make_dir_reports_whether_it_was_created(disk):
+    storage = FakeSftpStorage(disk, base_dir='/')
+    with storage.session() as s:
+        assert s.make_dir('nouryon') is True
+        assert s.make_dir('nouryon') is False
+
+
+def test_sftp_upload_file(disk, tmp_path):
+    workbook = tmp_path / 'mapping.xlsx'
+    workbook.write_bytes(b'\x00excel\xff')
+    storage = FakeSftpStorage(disk, base_dir='/')
+    with storage.session() as s:
+        s.make_dirs('nouryon/v1')
+        s.upload_file(workbook, 'nouryon/v1/mapping.xlsx')
+
+    assert (disk / 'Proposals/nouryon/v1/mapping.xlsx').read_bytes() == workbook.read_bytes()
+
+
+def test_sftp_session_rejects_paths_outside_the_root(disk):
+    storage = FakeSftpStorage(disk, base_dir='/')
+    with storage.session() as s, pytest.raises(StorageError):
+        s.read_text('../secret.txt')
+
+
+def test_local_storage_file_and_tree_cleanup(tmp_path):
+    storage = LocalStorage(tmp_path / 'proposals')
+    storage.make_dirs('customer/v1')
+    storage.write_text('customer/v1/a.txt', 'hello')
+    storage.write_text('customer/v1/b.txt', 'world')
+
+    assert storage.list_files('customer/v1') == ['a.txt', 'b.txt']
+    assert storage.list_files('customer/nonexistent') == []
+
+    storage.delete_file('customer/v1/a.txt')
+    assert storage.list_files('customer/v1') == ['b.txt']
+
+    storage.delete_file('customer/v1/b.txt')
+    storage.rmdir('customer/v1')
+    assert not (tmp_path / 'proposals/customer/v1').exists()
+
+    storage.make_dirs('customer/v2/sub')
+    storage.write_text('customer/v2/sub/file.txt', 'data')
+    storage.delete_tree('customer/v2')
+    assert not (tmp_path / 'proposals/customer/v2').exists()
+
+
+def test_sftp_session_file_and_tree_cleanup(disk):
+    storage = FakeSftpStorage(disk, base_dir='/')
+    with storage.session() as s:
+        s.make_dirs('nouryon/v1')
+        s.write_text('nouryon/v1/a.txt', 'hello')
+        s.write_text('nouryon/v1/b.txt', 'world')
+
+        assert s.list_files('nouryon/v1') == ['a.txt', 'b.txt']
+        assert s.list_files('nouryon/nonexistent') == []
+
+        s.delete_file('nouryon/v1/a.txt')
+        assert s.list_files('nouryon/v1') == ['b.txt']
+
+        s.delete_file('nouryon/v1/b.txt')
+        s.rmdir('nouryon/v1')
+        assert not (disk / 'Proposals/nouryon/v1').exists()
+
+        s.make_dirs('nouryon/v2/sub')
+        s.write_text('nouryon/v2/sub/file.txt', 'data')
+        s.delete_tree('nouryon/v2')
+        assert not (disk / 'Proposals/nouryon/v2').exists()
+

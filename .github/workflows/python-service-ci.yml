@@ -28,6 +28,7 @@ jobs:
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - name: Checkout repository
+        id: checkout
         uses: actions/checkout@v6
         with:
           persist-credentials: false
@@ -39,12 +40,12 @@ jobs:
           service-path: ${{ inputs.service-path }}
 
       - name: Lint Python
-        if: steps.setup.outputs.enabled == 'true'
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' && steps.setup.outputs.enabled == 'true' }}
         run: python -m ruff check .
 
       # All test categories under tests/ run together; pytest fails if none exist.
       - name: Unit, integration and functional tests with coverage
-        if: steps.setup.outputs.enabled == 'true'
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' && steps.setup.outputs.enabled == 'true' }}
         run: >-
           python -m pytest tests -ra
           --junitxml=test-results/pytest-junit.xml
@@ -54,33 +55,39 @@ jobs:
           --cov-report=html:coverage
 
       - name: Export installed application and test dependencies
-        if: steps.setup.outputs.enabled == 'true'
+        id: inventory
+        if: ${{ !cancelled() && steps.setup.outcome == 'success' && steps.setup.outputs.enabled == 'true' }}
         run: >-
           python "$GITHUB_WORKSPACE/Scripts/dependency-inventory.py"
           --python --output test-results/dependencies.json
 
       - name: Audit installed dependencies
-        if: steps.setup.outputs.enabled == 'true'
+        if: ${{ !cancelled() && steps.inventory.outcome == 'success' }}
         uses: ./.github/actions/dependency-audit
         with:
           lockfile: osv-scanner:${{ inputs.service-path }}/test-results/dependencies.json
           report-path: ${{ inputs.service-path }}/test-results/dependency-audit.json
 
       - name: Setup Docker Buildx
-        if: steps.setup.outputs.enabled == 'true' && hashFiles(format('{0}/Dockerfile', inputs.service-path)) != ''
+        id: buildx
+        if: ${{ !cancelled() && steps.checkout.outcome == 'success' && hashFiles(format('{0}/Dockerfile', inputs.service-path)) != '' && github.ref_name != 'main' }}
         uses: docker/setup-buildx-action@v4
 
       - name: Build container for validation
-        if: steps.setup.outputs.enabled == 'true' && hashFiles(format('{0}/Dockerfile', inputs.service-path)) != ''
+        id: image
+        if: ${{ !cancelled() && steps.buildx.outcome == 'success' }}
         uses: docker/build-push-action@v7
         with:
           context: ${{ inputs.service-path }}
           load: true
           push: false
           tags: service-ci:local
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
 
       - name: Validate container startup and health
-        if: steps.setup.outputs.enabled == 'true' && hashFiles(format('{0}/Dockerfile', inputs.service-path)) != ''
+        if: ${{ !cancelled() && steps.image.outcome == 'success' }}
         working-directory: ${{ github.workspace }}
         env:
           IMAGE: service-ci:local
@@ -98,3 +105,19 @@ jobs:
             ${{ inputs.service-path }}/coverage/
           if-no-files-found: warn
           retention-days: 14
+
+      # Only Testing exports a deployable image. Production reuses its recorded digest.
+      - name: Save the tested container for Testing CD
+        if: success() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'Testing' && steps.image.outcome == 'success'
+        run: docker save --output "$RUNNER_TEMP/image.tar" service-ci:local
+
+      - name: Upload the tested container
+        if: success() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'Testing' && steps.image.outcome == 'success'
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ inputs.service-path }}-image
+          path: ${{ runner.temp }}/image.tar
+          if-no-files-found: error
+          compression-level: 1
+          overwrite: true
+          retention-days: 7

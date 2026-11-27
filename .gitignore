@@ -147,10 +147,12 @@ coverage/
 test-results/
 playwright-report/
 .scannerwork/
+.sonar/
 .coverage
 coverage.xml
 htmlcov/
 .pytest_cache/
 
 # Testbestanden voor de lokale SFTP
-sftp-data/
+sftp-data/data/
+data/

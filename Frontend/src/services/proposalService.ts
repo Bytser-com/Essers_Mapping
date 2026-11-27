@@ -1,6 +1,7 @@
 import type { Proposal } from "../types/proposal";
 
 export const VERSION_CONTROL_API = import.meta.env.VITE_VERSION_CONTROL_API || "/api/version-control";
+export const CONVERTER_API = import.meta.env.VITE_CONVERTER_API || "/api/converter";
 
 export type CompanyProposalOverviewDto = {
   company: string;
@@ -32,6 +33,7 @@ export type ProposalFileDetailsDto = {
 export type ProposalFileDataDto = {
   version: string;
   companyname: string;
+  proposalType?: string | null;
   upload_date?: string | null;
   upload_time?: string | null;
   updated_time?: string | null;
@@ -44,6 +46,12 @@ export type ProposalFileDataDto = {
     score?: string | number | null;
     comment?: string | null;
   }>;
+  ai_review?: {
+    decision?: string;
+    summary?: string;
+    findings?: string[];
+    checked_mappings?: number;
+  } | null;
 };
 
 export async function getProposalFileData(company: string, version: string, proposalType: string): Promise<ProposalFileDataDto> {
@@ -60,8 +68,14 @@ export async function getProposalFileData(company: string, version: string, prop
 
 function parseScore(score: string | number | null | undefined): number | null {
   if (score === null || score === undefined || score === '') return null;
-  const num = typeof score === 'number' ? score : parseFloat(String(score).replace('%', '').trim());
+  const num = typeof score === 'number' ? score : Number.parseFloat(String(score).replace(/%/g, '').trim());
   return Number.isFinite(num) ? Math.round(num) : null;
+}
+
+/** Raw status code as the backend writes it, normalised (e.g. "In review" -> "IN_REVIEW"). */
+function normalizeStatusCode(rawStatus?: string | null): string | undefined {
+  if (!rawStatus) return undefined;
+  return rawStatus.trim().toUpperCase().replaceAll(/\s+/g, "_");
 }
 
 function mapStatusLabel(rawStatus?: string | null): string {
@@ -70,7 +84,7 @@ function mapStatusLabel(rawStatus?: string | null): string {
   if (s === "IN_REVIEW" || rawStatus.toLowerCase() === "in review") return "In review";
   if (s === "READY_FOR_REVIEW") return "Klaar om na te kijken";
   if (s === "AI_GENERATING") return "Wordt gegenereerd";
-  if (s === "AI_CHECKING_REVIEW") return "AI controleert";
+  if (s === "AI_CHECKING_REVIEW") return "AI-controle bezig";
   if (s === "RETURNED") return "Teruggestuurd";
   return "Klaar om na te kijken";
 }
@@ -90,6 +104,7 @@ export async function getProposal(company: string, version?: string, proposalTyp
         versie: versionNum,
         
         status: mapStatusLabel(fileData.status),
+        statusCode: normalizeStatusCode(fileData.status),
         geupload: isoUpload,
         mappings: (fileData.rows || []).map((row, index) => ({
           id: `row-${index + 1}`,
@@ -104,6 +119,7 @@ export async function getProposal(company: string, version?: string, proposalTyp
       if (fileData.updated_date) proposal.updatedDate = fileData.updated_date;
       if (fileData.updated_time) proposal.updatedTime = fileData.updated_time;
       if (fileData.createdBy) proposal.createdBy = fileData.createdBy;
+      if (fileData.ai_review) proposal.aiReview = fileData.ai_review;
       proposal.proposalType = proposalType;
       return proposal;
     } catch (err) {
@@ -146,6 +162,7 @@ export async function getProposal(company: string, version?: string, proposalTyp
       klant: item.company || company,
       versie: versionNum,
       status: mapStatusLabel(item.status),
+      statusCode: normalizeStatusCode(item.status),
       geupload: item.createdDate || new Date().toISOString(),
       mappings: item.mappings,
     };
@@ -172,6 +189,7 @@ export async function getProposal(company: string, version?: string, proposalTyp
       klant: fileData.companyname || item.company || company,
       versie: versionNum,
       status: mapStatusLabel(fileData.status || item.status),
+      statusCode: normalizeStatusCode(fileData.status || item.status),
       geupload: isoUpload,
       mappings: (fileData.rows || []).map((row, index) => ({
         id: `row-${index + 1}`,
@@ -187,6 +205,7 @@ export async function getProposal(company: string, version?: string, proposalTyp
     if (fileData.updated_time) proposal.updatedTime = fileData.updated_time;
     const user = fileData.createdBy || item.createdBy;
     if (user) proposal.createdBy = user;
+    if (fileData.ai_review) proposal.aiReview = fileData.ai_review;
     if (item.proposalType) proposal.proposalType = item.proposalType
     return proposal;
   } catch (err) {
@@ -199,6 +218,7 @@ export async function getProposal(company: string, version?: string, proposalTyp
       klant: item.company || company,
       versie: versionNum,
       status: mapStatusLabel(item.status),
+      statusCode: normalizeStatusCode(item.status),
       geupload: item.createdDate || new Date().toISOString(),
       mappings: item.mappings || [],
     };
@@ -234,11 +254,18 @@ export async function uploadProposalFile(company: string, version: string, propo
   }
 }
 
-export async function approveProposal(company: string, version: string, proposalType: string): Promise<void> {
+export async function approveProposal(
+  company: string,
+  version: string,
+  proposalType: string,
+  description: string,
+): Promise<void> {
   const params = new URLSearchParams({ company, version, proposalType });
 
-  const res = await fetch(`${VERSION_CONTROL_API}/proposals?${params.toString()}`, {
+  const res = await fetch(`${CONVERTER_API}/approve?${params.toString()}`, {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ description }),
   });
 
   if (res.status === 502 || res.status === 503) {
@@ -249,17 +276,12 @@ export async function approveProposal(company: string, version: string, proposal
     let errorDetail = "";
     try {
       const data = await res.json();
-      errorDetail = data.detail || data.title || "";
+      // FastAPI returns {"detail": "<message>"}; validation errors (422) have a list instead.
+      errorDetail = typeof data.detail === "string" ? data.detail : data.title || "";
     } catch {
       // not JSON
     }
-    if (errorDetail) {
-      throw new Error(errorDetail);
-    }
-    if (res.status === 501) {
-      throw new Error("Goedkeuren van voorstellen is nog niet geïmplementeerd");
-    }
-    throw new Error(`Voorstel kon niet worden goedgekeurd (status ${res.status})`);
+    throw new Error(errorDetail || `Voorstel kon niet worden goedgekeurd (status ${res.status})`);
   }
 }
 

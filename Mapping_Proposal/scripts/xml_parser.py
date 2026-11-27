@@ -8,6 +8,9 @@ import xml.etree.ElementTree as ET
 from collections import defaultdict
 from pathlib import Path
 
+from defusedxml import ElementTree as SafeET
+from defusedxml.common import DefusedXmlException
+
 
 def _local(tag: str) -> str:
     return tag.rsplit('}', 1)[-1].split(':')[-1]
@@ -44,8 +47,8 @@ def parse_xml_files(xml_files: list[Path]) -> list[dict]:
 
     for file in sorted(Path(p) for p in xml_files):
         try:
-            root = ET.parse(file).getroot()
-        except ET.ParseError as error:
+            root = SafeET.parse(file).getroot()
+        except (ET.ParseError, DefusedXmlException) as error:
             raise ValueError(f'Invalid XML file {file}: {error}') from error
 
         _visit_xml_node(root, '', file, found)
@@ -130,7 +133,7 @@ def read_raw_xml(file: str | Path) -> str:
 
 def leaf_values(xml_file: str | Path) -> dict[str, list[str]]:
     """Collect values at all leaf element and attribute paths, preserving repetitions."""
-    root = ET.parse(xml_file).getroot()
+    root = SafeET.parse(xml_file).getroot()
     result = defaultdict(list)
 
     def visit(node, parent):

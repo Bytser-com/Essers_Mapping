@@ -386,10 +386,15 @@ def run_mapping(settings: MappingSettings) -> MappingResult:
             verified_historical_evidence=reference_evidence,
         ))
         # Write one row to output/experiments.csv for this execution.
+        workbook_path_str = (
+            workbook.relative_to(ROOT).as_posix()
+            if workbook.is_relative_to(ROOT)
+            else workbook.as_posix()
+        )
         tracker.finish(status='completed', results={
             'mapping_rows': len(accepted), 'placeholders': len(missing),
             'rejected_proposals': len(rejected), 'structural_issues': len(issues),
-            'workbook_path': workbook.relative_to(ROOT).as_posix(),
+            'workbook_path': workbook_path_str,
             'historical_evidence_checked': len(reference_evidence),
             'historical_evidence_rejected': 0,
         })
