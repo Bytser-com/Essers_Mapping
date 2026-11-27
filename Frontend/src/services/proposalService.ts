@@ -68,7 +68,7 @@ export async function getProposalFileData(company: string, version: string, prop
 
 function parseScore(score: string | number | null | undefined): number | null {
   if (score === null || score === undefined || score === '') return null;
-  const num = typeof score === 'number' ? score : parseFloat(String(score).replace(/%/g, '').trim());
+  const num = typeof score === 'number' ? score : Number.parseFloat(String(score).replace(/%/g, '').trim());
   return Number.isFinite(num) ? Math.round(num) : null;
 }
 
