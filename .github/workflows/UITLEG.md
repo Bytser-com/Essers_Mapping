@@ -5,8 +5,9 @@
 - `frontend-ci.yml`: lint, TypeScript, tests, build, browsertests en dependencycheck.
 - `runtime-ci.yml`: bepaalt of Runtime gecontroleerd moet worden en roept Java-CI aan.
 - `java-service-ci.yml`: Maven-tests, coverage, dependencycheck en containercontrole.
-- `mapping-*-ci.yml`: dezelfde opzet voor de toekomstige Python-services.
-- `*-cd.yml`: publicatie en deployment na een geslaagde CI-run.
+- `mapping-*-ci.yml`: dezelfde opzet voor de Python-services.
+- `service-cd.yml`: publicatie en deployment na een geslaagde CI-run.
+- De losse servicebestanden `*-cd.yml`: handmatig een deployment opnieuw proberen.
 
 ## CI in drie stappen
 
@@ -18,11 +19,10 @@ De eindcheck heeft een vaste naam, zoals `Runtime CI Gate`. Die naam kun je verp
 maken in de branchregels. Een ongewijzigde service mag de controles overslaan;
 een fout bij wijzigingsdetectie mag geen groene eindcheck opleveren.
 
-PR's en pushes naar `Development` gebruiken de filters om CI-minuten te besparen.
-Een handmatige run controleert alles. Pushes naar `Testing` en `main` controleren
-ook alles: CD moet artifacts van de nieuwste releasecommit kunnen downloaden.
-Anders zou een nieuwe documentatiecommit een nog wachtende app-deployment kunnen
-blokkeren zonder een vervangend build-artifact te maken.
+PR's en pushes gebruiken filters om CI-minuten te besparen, ook op `Testing` en
+`main`. Een handmatige CI-run controleert de gekozen service altijd. Als een nieuwe
+commit een wachtende deployment inhaalt, weigert CD de oude commit. Start dan de
+service-CI handmatig op de nieuwste `Testing`-commit om opnieuw te bouwen en deployen.
 
 `Scripts/detect-service-changes.py` bevat deze Git-logica. De regressietests maken
 echte tijdelijke Git-commits om onder meer verplaatste bestanden en snelle
@@ -37,8 +37,10 @@ opeenvolgende pushes te controleren.
 4. Met Maven de daadwerkelijk gekozen dependencyversies exporteren, ook testdependencies.
 5. Die lijst met `dependency-inventory.py` omzetten naar het OSV-formaat.
 6. OSV laten controleren op bekende kwetsbaarheden.
-7. De Docker-image bouwen en het HTTP-healthendpoint controleren.
-8. Rapporten bewaren; de JAR wordt alleen bij succes beschikbaar voor CD.
+7. De Docker-image bouwen en het HTTP-healthendpoint controleren; op `main` wordt
+   deze image niet opnieuw gebouwd.
+8. Rapporten en de JAR bewaren. Alleen geslaagde Testing-CI bewaart ook de geteste
+   container voor CD.
 
 Een lang Maven- of pytest-commando bevat vooral opties. `run: >-` vouwt de regels
 samen tot één commando. `run: |` voert meerdere shellregels uit. De workflow houdt
@@ -118,13 +120,43 @@ Vitest- en auditrapporten blijven behouden. Rapporten worden ook na een fout bew
 ## Waarom is CD uitgebreider?
 
 CD heeft rechten om images te publiceren en Kubernetes aan te passen. Daarom
-controleert `service-cd.yml` de bronrepository, releasebranch, succesvolle push-run,
+controleert `service-cd.yml` de repository, releasebranch, geslaagde CI-checks,
 commit en artifacts. Oude commits, PR-runs en forks mogen niet deployen.
 
-Daarna wordt de geteste artifact verpakt, de container gecontroleerd en een image
-naar GHCR gepubliceerd. Kubernetes gebruikt de vaste image-digest. Een tweede
-commitcontrole na het wachten voorkomt deployment van een achterhaalde image.
-Deze controles beschermen de omgeving en blijven behouden.
+## Een keer bouwen, dezelfde image doorzetten
+
+1. Merge `Development` naar `Testing`: CI test de gewijzigde services, bouwt hun
+   containers en controleert het healthendpoint.
+2. Testing-CD publiceert precies die containers naar GHCR en deployt ze met een
+   vaste image-digest. Na een geslaagde rollout bewaart CD per service een klein
+   `release.json`-bestand met de digest en de broncodeversie.
+3. Test de applicatie op Testing. Er wordt niets automatisch naar productie
+   doorgezet. Daarvoor moet iemand apart `Testing` naar `main` mergen.
+4. Main-CD zoekt de geslaagde Testing-release voor dezelfde servicecode en
+   gebruikt dezelfde digest. Er wordt geen nieuwe productie-image gebouwd.
+
+Mergecommits kunnen andere commitnummers hebben. Daarom vergelijkt het script
+de Git-hash van de servicemap: gelijke inhoud geeft dezelfde hash. De download
+komt alleen uit een geslaagde, vertrouwde Testing-workflow. Ontbreekt die release,
+dan stopt productie. Er is geen terugval naar opnieuw bouwen.
+
+De container wordt 7 dagen bewaard als CI-artifact; het kleine releasebestand
+90 dagen. GHCR bewaart de image zelf. Na verlopen artifacts draai je Testing-CI
+opnieuw. Bij de eerste ingebruikname moet elke gewenste productierelease dus
+eerst met deze nieuwe flow succesvol op Testing draaien.
+
+Testing en productie hebben elk hun eigen pods, instellingen, Secrets en opslag.
+Alleen de image wordt hergebruikt. De frontend gebruikt relatieve API-paden;
+Kubernetes levert de proxyconfiguratie en omgevingsinstellingen tijdens het draaien.
+Zet dus geen vaste Testing-URL of echte `.env` in de image.
+Testing publiceert alleen een commit-tag en `:testing`; het gedeelde `:latest`
+wordt niet bijgewerkt. Zo verandert een Testing-build ook geen oude bootstrap-tag
+waar een productiepod mogelijk nog naar verwijst. Deployments gebruiken de digest.
+
+`Scripts/select-service-release.cjs` kiest de vertrouwde run en artifacts.
+`publish-service-image.sh` publiceert de bestaande container; `service-release.py`
+schrijft of controleert het releasebestand. De workflows houden die stappen apart
+zichtbaar. Een tweede commitcontrole na wachten op de omgeving blijft behouden.
 
 De bestaande infrastructuurvolgorde is Terraform → Ansible → Kubernetes.
 Een wijziging aan alleen service-CI start die infrastructuurketen niet.

@@ -48,6 +48,9 @@ jobs:
             .github/workflows/service-cd.yml
             Scripts/smoke-service-image.sh
             Scripts/registry-pull-secret.py
+            Scripts/select-service-release.cjs
+            Scripts/service-release.py
+            Scripts/publish-service-image.sh
 
   checks:
     name: Mapping Proposal checks
@@ -79,13 +82,11 @@ jobs:
   delivery:
     name: Mapping Proposal CD
     needs: [changes, checks, quality-gate]
-    if: github.event_name == 'push' && (github.ref_name == 'Testing' || github.ref_name == 'main') && needs.changes.outputs.changed == 'true'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.ref_name == 'Testing' || github.ref_name == 'main') && needs.changes.outputs.changed == 'true'
     uses: ./.github/workflows/service-cd.yml
     with:
       service-path: Mapping_Proposal
       image-name: mapping-proposal
       deployment: mapping-proposal
       ci-workflow: mapping-proposal-ci.yml
-      artifact-name: mapping-proposal-test-reports
-      artifact-path: ''
     secrets: inherit
