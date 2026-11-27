@@ -409,9 +409,7 @@ jobs:
             helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
               --namespace monitoring \
               --create-namespace \
-              -f "$MONITORING_VALUES" \
-              --wait \
-              --timeout 10m
+              -f "$MONITORING_VALUES"
 
             if [ -f "cluster-addons/monitoring/network-policies.yaml" ]; then
               echo "Applying monitoring Calico Zero-Trust NetworkPolicies..."
@@ -506,7 +504,7 @@ jobs:
             echo "Seeding sample proposals and packages on SFTP for testing environment..."
             PROPOSAL_POD=$(kubectl get pod -n "$NAMESPACE" -l app.kubernetes.io/name=mapping-proposal -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
             if [ -n "$PROPOSAL_POD" ]; then
-              kubectl cp Scripts/seed.py "$NAMESPACE/$PROPOSAL_POD:/tmp/seed.py"
+              kubectl cp "$GITHUB_WORKSPACE/Scripts/seed.py" "$NAMESPACE/$PROPOSAL_POD:/tmp/seed.py"
               kubectl exec -n "$NAMESPACE" "$PROPOSAL_POD" -- python /tmp/seed.py --force || true
             fi
           fi
