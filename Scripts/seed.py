@@ -42,14 +42,33 @@ PROPOSAL_EXAMPLES = [
     ('voorbeeldbedrijf-g', 'Voorbeeldbedrijf G (Foutief)', 1, '2026-10-16T15:00:00+02:00', 'IN_REVIEW', None, 'inbound'),
 ]
 
-TEMPLATE_PATH = ROOT / 'Mapping_Proposal' / 'templates' / 'mapping_template.xlsx'
-FAULTY_TEMPLATE_PATH = ROOT / 'Mapping_Proposal' / 'templates' / 'faulty_mapping_template.xlsx'
+def _resolve_template_path(name: str) -> Path:
+    """Resolve a template workbook path across local dev, CI, and Kubernetes pod execution."""
+    candidates = [
+        ROOT / "Mapping_Proposal" / "templates" / name,
+        Path("/app/templates") / name,
+        ROOT / "templates" / name,
+        Path.cwd() / "templates" / name,
+        Path.cwd() / "Mapping_Proposal" / "templates" / name,
+    ]
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate
+    return candidates[0]
+
+
+TEMPLATE_PATH = _resolve_template_path("mapping_template.xlsx")
+FAULTY_TEMPLATE_PATH = _resolve_template_path("faulty_mapping_template.xlsx")
 
 
 def _get_proposal_workbook_bytes(folder: str) -> bytes:
     """Return workbook bytes for a proposal. Uses faulty workbook for voorbeeldbedrijf-g."""
-    if folder == 'voorbeeldbedrijf-g' and FAULTY_TEMPLATE_PATH.is_file():
-        return FAULTY_TEMPLATE_PATH.read_bytes()
+    faulty = _resolve_template_path("faulty_mapping_template.xlsx")
+    normal = _resolve_template_path("mapping_template.xlsx")
+    if folder == "voorbeeldbedrijf-g" and faulty.is_file():
+        return faulty.read_bytes()
+    if normal.is_file():
+        return normal.read_bytes()
     return TEMPLATE_PATH.read_bytes()
 
 
@@ -477,7 +496,7 @@ def seed_local(
             else:
                 logger.info("Local proposal exists, skipped: %s", meta_path)
 
-            if excel_name and TEMPLATE_PATH.is_file():
+            if excel_name and _resolve_template_path("mapping_template.xlsx").is_file():
                 dest_excel = version_dir / excel_name
                 if force or not dest_excel.is_file():
                     dest_excel.write_bytes(_get_proposal_workbook_bytes(folder))
@@ -603,7 +622,7 @@ def seed_sftp(
                 else:
                     logger.info("SFTP proposal exists, skipped: %s", meta_file)
 
-                if excel_name and TEMPLATE_PATH.is_file():
+                if excel_name and _resolve_template_path("mapping_template.xlsx").is_file():
                     excel_file = posixpath.join(version_dir, excel_name)
                     excel_exists = False
                     try:

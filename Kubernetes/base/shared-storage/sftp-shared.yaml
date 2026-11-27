@@ -73,7 +73,7 @@ spec:
             - sh
             - -c
             - |
-              mkdir -p /srv/sftpgo/data /srv/sftpgo/config /srv/sftpgo/backups /srv/sftpgo/data/Proposals
+              mkdir -p /srv/sftpgo/data /srv/sftpgo/config /srv/sftpgo/backups /srv/sftpgo/data/Proposals /srv/sftpgo/data/Packages
               cat << EOF > /srv/sftpgo/config/loaddata.json
               {
                 "users": [
