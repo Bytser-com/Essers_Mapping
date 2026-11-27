@@ -2,7 +2,8 @@
 # CALICO ZERO-TRUST NETWORK POLICIES FOR MONITORING NAMESPACE
 # Strict isolation ensuring:
 #   1. External access to Grafana is ONLY permitted through the Ingress Controller.
-#   2. Prometheus can scrape telemetry from authorized targets (nodes, kubelet, apps).
+#   2. Prometheus can scrape telemetry from authorized targets (monitoring stack,
+#      nodes, kubelet/cAdvisor, CoreDNS, ingress-nginx, and Essers apps).
 #   3. Unauthorized cross-namespace traffic is blocked.
 # ==============================================================================
 
@@ -16,7 +17,7 @@ spec:
   policyTypes:
     - Ingress
 ---
-# 1. GRAFANA INGRESS: Allow TCP 3000 exclusively from Ingress-Nginx Controller
+# 1. GRAFANA INGRESS: Allow TCP 3000 from Ingress-Nginx Controller and Prometheus metrics scrape
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -33,11 +34,14 @@ spec:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: ingress-nginx
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
       ports:
         - protocol: TCP
           port: 3000
 ---
-# 2. PROMETHEUS INGRESS: Allow query access from Grafana and telemetry push from Alloy on VMs
+# 2. PROMETHEUS INGRESS: Allow query access from Grafana, self-scrape, and telemetry push from Alloy on VMs
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -54,13 +58,16 @@ spec:
         - podSelector:
             matchLabels:
               app.kubernetes.io/name: grafana
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
         - ipBlock:
             cidr: 192.168.100.0/24
       ports:
         - protocol: TCP
           port: 9090
 ---
-# 3. ALERTMANAGER INGRESS: Allow alert notifications from Prometheus
+# 3. ALERTMANAGER INGRESS: Allow alert notifications and metrics scrape from Prometheus
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -81,7 +88,50 @@ spec:
         - protocol: TCP
           port: 9093
 ---
-# 4. PROMETHEUS EGRESS: Allow scraping node telemetry, API server, and workloads
+# 4. MONITORING INTERNAL TARGETS INGRESS: Allow Prometheus to scrape kube-state-metrics,
+#    Prometheus Operator, and Alloy inside the monitoring namespace (required by default-deny).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-prometheus-scrape-monitoring-components
+  namespace: monitoring
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 8081
+        - protocol: TCP
+          port: 10250
+        - protocol: TCP
+          port: 12345
+---
+# 5. PROMETHEUS OPERATOR WEBHOOK INGRESS: Allow Kubernetes API server admission webhook calls
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-apiserver-to-prometheus-operator
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app: kube-prometheus-stack-operator
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 10250
+---
+# 6. PROMETHEUS EGRESS: Allow scraping node telemetry, API server, monitoring stack, and workloads
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -106,26 +156,36 @@ spec:
           port: 6443
         - protocol: TCP
           port: 443
-    # Node Exporter (9100) & Kubelet / cAdvisor (10250)
+    # Node Exporter (9100), CoreDNS (9153), Kubelet / cAdvisor (10250)
     - ports:
         - protocol: TCP
           port: 9100
         - protocol: TCP
+          port: 9153
+        - protocol: TCP
           port: 10250
-    # Kube-State-Metrics & Ingress-Nginx Metrics
+    # Kube-State-Metrics (8080/8081) & Ingress-Nginx Metrics (10254)
     - ports:
         - protocol: TCP
           port: 8080
         - protocol: TCP
+          port: 8081
+        - protocol: TCP
           port: 10254
-    # Alertmanager (9093)
+    # Monitoring stack self-scrapes & Alertmanager inside monitoring namespace
     - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: alertmanager
+        - podSelector: {}
       ports:
         - protocol: TCP
+          port: 3000
+        - protocol: TCP
+          port: 3100
+        - protocol: TCP
+          port: 9090
+        - protocol: TCP
           port: 9093
+        - protocol: TCP
+          port: 12345
     # Scrape Essers Workloads across namespaces (8000, 8080)
     - to:
         - namespaceSelector:
@@ -142,7 +202,7 @@ spec:
         - protocol: TCP
           port: 8080
 ---
-# 5. LOKI INGRESS: Allow log ingestion from Alloy and log queries from Grafana
+# 7. LOKI INGRESS: Allow log ingestion from Alloy and log queries / scrapes from Grafana & Prometheus
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -161,6 +221,9 @@ spec:
               app.kubernetes.io/name: grafana
         - podSelector:
             matchLabels:
+              app.kubernetes.io/name: prometheus
+        - podSelector:
+            matchLabels:
               app.kubernetes.io/name: alloy-k8s
         - ipBlock:
             cidr: 192.168.100.0/24
@@ -168,7 +231,7 @@ spec:
         - protocol: TCP
           port: 3100
 ---
-# 6. ALLOY DAEMONSET EGRESS: Allow streaming logs to Loki & resolving DNS
+# 8. ALLOY DAEMONSET EGRESS: Allow streaming logs to Loki & resolving DNS
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:

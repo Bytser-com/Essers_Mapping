@@ -30,7 +30,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
-from routers import approve, convert, review
+from routers import approve, convert, metrics, review
 from scripts.config import cors_origins, is_swagger_enabled
 
 # Re-exported for backward compatibility and test patching:
@@ -62,6 +62,7 @@ def create_app() -> FastAPI:
     application.include_router(approve.router)
     application.include_router(convert.router)
     application.include_router(review.router)
+    application.include_router(metrics.router)
 
     if swagger_on:
         @application.get("/swagger", include_in_schema=False)

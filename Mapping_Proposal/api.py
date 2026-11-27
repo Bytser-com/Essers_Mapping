@@ -20,6 +20,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
+from routers import metrics as metrics_router
 from routers import upload
 from scripts.config import cors_origins, is_swagger_enabled, watch_incoming_enabled
 from services import incoming_watcher
@@ -56,18 +57,18 @@ def create_app() -> FastAPI:
         application.add_middleware(CORSMiddleware, allow_origins=_origins, allow_methods=['GET', 'POST'], allow_headers=['*'])
 
     application.include_router(upload.router)
+    application.include_router(metrics_router.router)
 
     if swagger_on:
         @application.get('/swagger', include_in_schema=False)
         def swagger_redirect():
             return RedirectResponse(url='/docs')
 
+    @application.get('/health')
+    def health() -> dict:
+        return {'status': 'ok'}
+
     return application
 
 
 app = create_app()
-
-
-@app.get('/health')
-def health() -> dict:
-    return {'status': 'ok'}
