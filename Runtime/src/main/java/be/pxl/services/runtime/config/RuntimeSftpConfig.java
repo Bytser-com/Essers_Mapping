@@ -1,5 +1,6 @@
 package be.pxl.services.runtime.config;
 
+import java.time.Clock;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,16 +29,21 @@ public class RuntimeSftpConfig {
     public static final String RUNTIME_POLLER_SCHEDULER = "runtimePollerTaskScheduler";
     public static final String RUNTIME_WORKER_EXECUTOR = "runtimeWorkerExecutor";
 
+    private static final int MIN_SESSION_POOL_SIZE = 4;
+    private static final int EXTRA_POLLER_SESSIONS = 2;
+
     @Bean(name = RUNTIME_SFTP_SESSION_FACTORY)
     public SessionFactory<SftpClient.DirEntry> runtimeSftpSessionFactory(
             RuntimeSftpProperties sftpProperties,
             RuntimePollerProperties pollerProperties,
             ResourceLoader resourceLoader
     ) {
-        DefaultSftpSessionFactory factory = new DefaultSftpSessionFactory(true);
+        // Dedicated SSH connection per pooled session avoids single-TCP pinning & SSH MaxSessions limits.
+        DefaultSftpSessionFactory factory = new DefaultSftpSessionFactory(false);
         factory.setHost(sftpProperties.host());
         factory.setPort(sftpProperties.port());
         factory.setUser(sftpProperties.user());
+        factory.setTimeout(sftpProperties.connectTimeoutMs());
         if (!sftpProperties.password().isEmpty()) {
             factory.setPassword(sftpProperties.password());
         }
@@ -47,11 +53,15 @@ public class RuntimeSftpConfig {
                 factory.setPrivateKeyPassphrase(sftpProperties.privateKeyPassphrase());
             }
         }
+        if (sftpProperties.knownHosts() != null && !sftpProperties.knownHosts().isBlank()) {
+            factory.setKnownHostsResource(resourceLoader.getResource(sftpProperties.knownHosts()));
+        }
         factory.setAllowUnknownKeys(sftpProperties.allowUnknownKeys());
 
-        CachingSessionFactory<SftpClient.DirEntry> cachingFactory =
-                new CachingSessionFactory<>(factory, pollerProperties.recommendedSessionPoolSize());
+        int poolSize = recommendedSessionPoolSize(pollerProperties.workerConcurrency());
+        CachingSessionFactory<SftpClient.DirEntry> cachingFactory = new CachingSessionFactory<>(factory, poolSize);
         cachingFactory.setSessionWaitTimeout(sftpProperties.sessionWaitTimeoutMs());
+        cachingFactory.setTestSession(true);
         return cachingFactory;
     }
 
@@ -75,5 +85,14 @@ public class RuntimeSftpConfig {
     @Bean(name = RUNTIME_WORKER_EXECUTOR, destroyMethod = "shutdown")
     public ExecutorService runtimeWorkerExecutor() {
         return Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("runtime-worker-", 0).factory());
+    }
+
+    @Bean
+    public Clock runtimeClock() {
+        return Clock.systemUTC();
+    }
+
+    static int recommendedSessionPoolSize(int workerConcurrency) {
+        return Math.max(MIN_SESSION_POOL_SIZE, workerConcurrency + EXTRA_POLLER_SESSIONS);
     }
 }
