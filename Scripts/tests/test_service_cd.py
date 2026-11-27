@@ -49,10 +49,12 @@ class ServiceCdTests(unittest.TestCase):
     def test_managed_image_survives_reconciliation_but_other_configuration_updates(self):
         desired = {"items": [deployment()]}
         live = {"items": [deployment(managed=True)]}
+        live["items"][0]["metadata"]["annotations"]["essers.io/image-source-sha"] = "c" * 40
         result = images.preserve_images(desired, live)["items"][0]
         self.assertEqual(result["spec"]["template"]["spec"]["containers"][0]["image"], DIGEST)
         self.assertEqual(result["spec"]["replicas"], 3)
         self.assertEqual(result["metadata"]["annotations"]["essers.io/source-sha"], "b" * 40)
+        self.assertEqual(result["metadata"]["annotations"]["essers.io/image-source-sha"], "c" * 40)
 
     def test_unmanaged_and_other_namespace_images_follow_manifests(self):
         for existing in (deployment(), deployment(namespace="essers-mapping-production", managed=True)):

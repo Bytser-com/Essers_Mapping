@@ -5,6 +5,7 @@ import {
 } from '../services/mappingPackageOverviewService'
 import { formatUploadedAt } from '../services/proposalOverviewService'
 import { useMappingPackageStore } from '../stores/mappingPackageStore'
+import { useNavigate } from 'react-router-dom'
 
 // Column widths 280 / 150 / 150 / rest / 160 px with a 12 px gap; the row has 16 px side padding
 // (Figma "Lijst – mapping packages"). Each cell's width includes its padding.
@@ -20,8 +21,8 @@ const BODY_CELL = 'py-[13px] align-middle'
 function matchToken(text: string, token: string): boolean {
   if (!text) return false
   if (token.length === 1) {
-    const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    return new RegExp(`(?:^|\\s|[^a-zA-Z0-9])${escaped}`, 'i').test(text)
+    const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)
+    return new RegExp(String.raw`(?:^|\s|[^a-zA-Z0-9])${escaped}`, 'i').test(text)
   }
   return text.toLowerCase().includes(token)
 }
@@ -54,6 +55,7 @@ function matchField(pkg: MappingPackageOverview, token: string): boolean {
 
 // Version Control overview (Figma "07 · Version Control"): all customers and their mapping packages
 export default function VersionControl() {
+  const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
   const fetchPackages = useMappingPackageStore((state) => state.fetchPackages)
 
@@ -144,7 +146,7 @@ export default function VersionControl() {
         </div>
       )}
 
-      {!loading && !error && packages && packages.length === 0 && (
+      {!loading && !error && packages?.length === 0 && (
         <div className="rounded-medium border border-line-grey bg-white px-4 py-6 text-[13px] text-grey">
           Er zijn nog geen mapping packages.
         </div>
@@ -200,7 +202,11 @@ export default function VersionControl() {
                       </td>
                       <td className={`${ACTION_CELL} ${BODY_CELL}`}>
                         {/* Opens the versions of this customer: user story 161 */}
-                        <button type="button" className="btn">
+                        <button
+                          type="button"
+                          className="btn"
+                          onClick={() => navigate(`/package-versions/${mappingPackage.company}/${mappingPackage.packageType}`)}
+                        >
                           Bekijken
                         </button>
                       </td>
@@ -211,7 +217,8 @@ export default function VersionControl() {
             </tbody>
           </table>
         </div>
-      )}
-    </main>
+      )
+      }
+    </main >
   )
 }

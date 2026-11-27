@@ -53,9 +53,10 @@ def preserve_images(desired, live):
                 container["image"] = image
         annotations = metadata.setdefault("annotations", {})
         annotations["essers.io/image-managed-by"] = "service-cd"
-        source_sha = current["metadata"].get("annotations", {}).get("essers.io/source-sha")
-        if source_sha:
-            annotations["essers.io/source-sha"] = source_sha
+        for key in ("essers.io/source-sha", "essers.io/image-source-sha"):
+            value = current["metadata"].get("annotations", {}).get(key)
+            if value:
+                annotations[key] = value
     return desired
 
 

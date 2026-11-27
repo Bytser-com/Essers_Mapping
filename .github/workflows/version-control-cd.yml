@@ -1,10 +1,7 @@
 name: Version Control CD
 
+# Automatic delivery is called once by the CI workflow; this file is manual recovery.
 on:
-  workflow_run:
-    workflows: ['Version Control CI']
-    branches: [Testing, main]
-    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -13,22 +10,15 @@ permissions:
   packages: write
 
 concurrency:
-  group: version-control-cd-${{ github.event.workflow_run.head_branch || github.ref_name }}
+  group: version-control-cd-${{ github.ref_name }}
   cancel-in-progress: false
 
 jobs:
   delivery:
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.event == 'push' &&
-       github.event.workflow_run.head_repository.full_name == github.repository)
     uses: ./.github/workflows/service-cd.yml
     with:
       service-path: Version_Control
       image-name: version-control-backend
       deployment: version-control-backend
       ci-workflow: version-control-ci.yml
-      artifact-name: version-control-jar
-      artifact-path: 'Version_Control/target'
     secrets: inherit
