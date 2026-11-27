@@ -1,7 +1,7 @@
 package be.pxl.services.runtime.storage;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.sshd.sftp.client.SftpClient;
@@ -9,7 +9,8 @@ import org.apache.sshd.sftp.common.SftpConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.integration.file.remote.InputStreamCallback;
+import org.springframework.integration.file.remote.SessionCallback;
+import org.springframework.integration.file.remote.session.Session;
 import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
 import tools.jackson.databind.ObjectMapper;
 
@@ -22,9 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -32,15 +30,21 @@ class SftpMappingPackageStorageTest {
 
     private static final String ROOT = "/Packages";
 
-    private SftpRemoteFileTemplate template;
+    private Session<SftpClient.DirEntry> session;
     private SftpMappingPackageStorage storage;
 
+    @SuppressWarnings("unchecked")
     @BeforeEach
-    void setUp() {
-        template = mock(SftpRemoteFileTemplate.class);
-        // By default nothing exists on the mocked SFTP
-        when(template.exists(anyString())).thenReturn(false);
-        SharedSftpProperties properties = new SharedSftpProperties("localhost", 22, "shareduser", "", ROOT, true);
+    void setUp() throws Exception {
+        SftpRemoteFileTemplate template = mock(SftpRemoteFileTemplate.class);
+        session = mock(Session.class);
+        // The storage does all reads in one session; by default nothing exists on the mocked SFTP
+        when(template.execute(any())).thenAnswer(invocation -> {
+            SessionCallback<SftpClient.DirEntry, Object> callback = invocation.getArgument(0);
+            return callback.doInSession(session);
+        });
+        when(session.finalizeRaw()).thenReturn(true);
+        SharedSftpProperties properties = new SharedSftpProperties("localhost", 22, "shareduser", "", ROOT, true, 0, 0);
         storage = new SftpMappingPackageStorage(template, properties, new ObjectMapper());
     }
 
@@ -176,12 +180,12 @@ class SftpMappingPackageStorageTest {
 
     @Test
     @DisplayName("A broken MPackage.json gives SharedStorageException")
-    void getActivePackageWithBrokenPackageJsonThrowsStorageException() {
+    void getActivePackageWithBrokenPackageJsonThrowsStorageException() throws Exception {
         folder(ROOT, "nouryon");
         folder(ROOT + "/nouryon", "v1");
         folder(ROOT + "/nouryon/v1", "inbound");
-        when(template.exists(ROOT + "/nouryon/v1/inbound")).thenReturn(true);
-        when(template.list(ROOT + "/nouryon/v1/inbound")).thenReturn(new SftpClient.DirEntry[] {fileEntry("MPackage.json")});
+        when(session.exists(ROOT + "/nouryon/v1/inbound")).thenReturn(true);
+        when(session.list(ROOT + "/nouryon/v1/inbound")).thenReturn(new SftpClient.DirEntry[] {fileEntry("MPackage.json")});
         file(ROOT + "/nouryon/v1/inbound/MPackage.json", "{ not json");
 
         assertThrows(SharedStorageException.class, () -> storage.getActivePackage("nouryon", "inbound"));
@@ -189,8 +193,8 @@ class SftpMappingPackageStorageTest {
 
     @Test
     @DisplayName("An SFTP server that cannot be reached gives SharedStorageException")
-    void getActivePackageWithSftpDownThrowsStorageException() {
-        when(template.exists(ROOT)).thenThrow(new IllegalStateException("Connection refused"));
+    void getActivePackageWithSftpDownThrowsStorageException() throws Exception {
+        when(session.exists(ROOT)).thenThrow(new IOException("Connection refused"));
 
         assertThrows(SharedStorageException.class, () -> storage.getActivePackage("nouryon", "inbound"));
     }
@@ -211,14 +215,22 @@ class SftpMappingPackageStorageTest {
         for (int i = 0; i < subfolders.length; i++) {
             entries[i] = dirEntry(subfolders[i]);
         }
-        when(template.exists(path)).thenReturn(true);
-        when(template.list(path)).thenReturn(entries);
+        try {
+            when(session.exists(path)).thenReturn(true);
+            when(session.list(path)).thenReturn(entries);
+        } catch (IOException ex) {
+            throw new IllegalStateException(ex);
+        }
     }
 
     // A type folder (e.g. /Packages/nouryon/v2/inbound) with an MPackage.json
     private void packageFolder(String typePath, String version) {
-        when(template.exists(typePath)).thenReturn(true);
-        when(template.list(typePath)).thenReturn(new SftpClient.DirEntry[] {fileEntry("MPackage.json")});
+        try {
+            when(session.exists(typePath)).thenReturn(true);
+            when(session.list(typePath)).thenReturn(new SftpClient.DirEntry[] {fileEntry("MPackage.json")});
+        } catch (IOException ex) {
+            throw new IllegalStateException(ex);
+        }
         file(typePath + "/MPackage.json", """
                 {
                   "schema_version": "1.0",
@@ -236,14 +248,13 @@ class SftpMappingPackageStorageTest {
 
     // A file with the given content
     private void file(String path, String content) {
-        when(template.exists(path)).thenReturn(true);
-        doAnswer(invocation -> {
-            InputStreamCallback callback = invocation.getArgument(1);
-            try (InputStream in = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8))) {
-                callback.doWithInputStream(in);
-            }
-            return true;
-        }).when(template).get(eq(path), any(InputStreamCallback.class));
+        try {
+            when(session.exists(path)).thenReturn(true);
+            when(session.readRaw(path))
+                    .thenAnswer(invocation -> new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
+        } catch (IOException ex) {
+            throw new IllegalStateException(ex);
+        }
     }
 
     private static SftpClient.DirEntry dirEntry(String name) {

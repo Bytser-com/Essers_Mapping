@@ -18,11 +18,13 @@ import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
 @EnableConfigurationProperties(SharedSftpProperties.class)
 public class SharedSftpConfig {
 
+    public static final String SHARED_SFTP_CONNECTION = "sharedSftpConnection";
     public static final String SHARED_SFTP_SESSION_FACTORY = "sharedSftpSessionFactory";
     public static final String SHARED_SFTP_TEMPLATE = "sharedSftpTemplate";
 
-    @Bean(name = SHARED_SFTP_SESSION_FACTORY)
-    public SessionFactory<SftpClient.DirEntry> sharedSftpSessionFactory(SharedSftpProperties sftpProperties) {
+    // Own bean, so Spring closes the SSH client and its threads when the application stops
+    @Bean(name = SHARED_SFTP_CONNECTION)
+    public DefaultSftpSessionFactory sharedSftpConnection(SharedSftpProperties sftpProperties) {
         DefaultSftpSessionFactory factory = new DefaultSftpSessionFactory(true);
         factory.setHost(sftpProperties.host());
         factory.setPort(sftpProperties.port());
@@ -31,9 +33,21 @@ public class SharedSftpConfig {
             factory.setPassword(sftpProperties.password());
         }
         factory.setAllowUnknownKeys(sftpProperties.allowUnknownKeys());
-        // Reuse SFTP sessions; the first connection is only made on the first request,
-        // so the application also starts when the SFTP server is not reachable yet.
-        return new CachingSessionFactory<>(factory);
+        factory.setTimeout(sftpProperties.timeoutMs());
+        return factory;
+    }
+
+    @Bean(name = SHARED_SFTP_SESSION_FACTORY)
+    public SessionFactory<SftpClient.DirEntry> sharedSftpSessionFactory(
+            @Qualifier(SHARED_SFTP_CONNECTION) DefaultSftpSessionFactory connection,
+            SharedSftpProperties sftpProperties
+    ) {
+        CachingSessionFactory<SftpClient.DirEntry> cachingFactory =
+                new CachingSessionFactory<>(connection, sftpProperties.poolSize());
+        cachingFactory.setSessionWaitTimeout(sftpProperties.timeoutMs());
+        // A session that broke (e.g. after a restart of sftp-shared) is replaced instead of reused
+        cachingFactory.setTestSession(true);
+        return cachingFactory;
     }
 
     @Bean(name = SHARED_SFTP_TEMPLATE)

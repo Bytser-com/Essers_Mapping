@@ -43,7 +43,8 @@ public class PackageController {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException(name + " parameter must not be empty");
         }
-        if (value.length() > MAX_LENGTH) {
+        // Same as the storage: spaces around the value do not count
+        if (value.trim().length() > MAX_LENGTH) {
             throw new IllegalArgumentException(name + " parameter must not exceed " + MAX_LENGTH + " characters");
         }
     }
