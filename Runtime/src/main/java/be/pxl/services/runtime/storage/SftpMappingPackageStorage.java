@@ -157,6 +157,7 @@ public class SftpMappingPackageStorage implements MappingPackageStorage {
         return result;
     }
 
+    // Reads MPackage.json of one type folder; a missing or broken file is a storage problem (502), not a 404
     private JsonNode readMappingPackage(String typePath) {
         String filename = null;
         for (SftpClient.DirEntry entry : listEntries(typePath)) {
@@ -213,6 +214,7 @@ public class SftpMappingPackageStorage implements MappingPackageStorage {
         return names;
     }
 
+    // list() fails on a folder that does not exist, so check first and treat it as an empty folder
     private SftpClient.DirEntry[] listEntries(String path) {
         if (!sftpTemplate.exists(path)) {
             return new SftpClient.DirEntry[0];

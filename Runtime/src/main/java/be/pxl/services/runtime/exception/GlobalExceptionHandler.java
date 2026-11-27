@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
- * Turns exceptions of the REST endpoints into a JSON error response (RFC 9457 problem detail),
- * in the same format as Version_Control.
+ * Turns exceptions into a JSON error response, in the same format as Version_Control.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
