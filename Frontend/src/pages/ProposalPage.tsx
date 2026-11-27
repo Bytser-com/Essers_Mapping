@@ -142,7 +142,7 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
     onApprove,
     (success) => {
       if (success) {
-        navigate("/", {
+        void navigate("/", {
           state: {
             approvalMessage: {
               type: "success",
