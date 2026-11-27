@@ -34,6 +34,7 @@ def test_approve_sets_ai_checking_review_and_stores_description(proposals_root, 
 
     data = read(path)
     assert data['status'] == AI_CHECKING_REVIEW
+    assert data['ai_status'] == 'RUNNING'
     assert data['approval_description'] == 'Eerste versie voor Nouryon'
     assert data['approved_at'] == '2026-11-20T10:00:00+00:00'
     assert data['uploaded_at'] == '2026-11-19T09:00:00+00:00'  # other fields are kept
@@ -149,3 +150,14 @@ def test_folder_without_metadata_is_not_found(proposals_root, proposals_storage)
 def test_invalid_parameters_are_rejected(proposals_storage, company, version, proposal_type, message):
     with pytest.raises(ValueError, match=message):
         approve_proposal(proposals_storage, company, version, proposal_type, 'Ok')
+
+
+def test_approving_clears_an_old_ai_review_error(proposals_root, proposals_storage):
+    """A failed AI review from before must not show as an error while the new one runs."""
+    path = write_metadata(proposals_root, status='IN_REVIEW', ai_status='FAILED', ai_review_error='Gemini 503')
+
+    approve_proposal(proposals_storage, 'nouryon', 'v1', 'inbound', 'Tweede poging', now=NOW)
+
+    data = read(path)
+    assert data['ai_status'] == 'RUNNING'
+    assert 'ai_review_error' not in data

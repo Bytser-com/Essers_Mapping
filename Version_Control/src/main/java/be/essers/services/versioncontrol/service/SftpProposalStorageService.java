@@ -43,9 +43,10 @@ public class SftpProposalStorageService implements ProposalStorageService {
     private static final String EXCEL_XLS_MIME = "application/vnd.ms-excel";
     private static final int MAX_COMPANY_LENGTH = 20;
     private static final int MAX_PROPOSAL_TYPE_LENGTH = 20;
-    // Statuses the overview can show (same values as Mapping_Proposal writes in proposal.json)
+    // Statuses the overview can show (same values as Mapping_Proposal and Mapping_Converter write)
     private static final Set<String> PROPOSAL_STATUSES =
-            Set.of("AI_GENERATING", "READY_FOR_REVIEW", "IN_REVIEW", "In review", "AI_CHECKING_REVIEW", "RETURNED");
+            Set.of("AI_GENERATING", "READY_FOR_REVIEW", "IN_REVIEW", "In review", "AI_CHECKING_REVIEW", "RETURNED",
+                    "APPROVED");
     private static final Set<String> AI_STATUSES = Set.of("RUNNING", "FAILED");
 
     private final SftpRemoteFileTemplate template;

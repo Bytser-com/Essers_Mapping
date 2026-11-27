@@ -278,6 +278,20 @@ class SftpProposalStorageServiceTest {
     }
 
     @Test
+    @DisplayName("IT2627T06-187 an approved proposal (AI review passed) stays in the overview as APPROVED")
+    void listProposals_allCompanies_showsApprovedProposal() {
+        mockCompanies("Nouryon");
+        mockVersions("Nouryon", "v2");
+        mockVersionWithProposalJson("/Proposals/Nouryon/v2", proposalJson("2026-11-20T10:00:00+01:00", "APPROVED"));
+
+        List<CompanyProposalOverviewDto> results = service.listProposals(null);
+
+        assertEquals(1, results.size());
+        assertEquals("Nouryon", results.get(0).company());
+        assertEquals("APPROVED", results.get(0).status());
+    }
+
+    @Test
     @DisplayName("TC-57-01 a proposal with missing or invalid data is skipped, the others are shown")
     void listProposals_allCompanies_skipsInvalidProposals() {
         mockCompanies("KlantB", "BadJson", "UnknownStatus", "NoUploadTime", "NoProposalJson");

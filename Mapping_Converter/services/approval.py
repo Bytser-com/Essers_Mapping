@@ -69,8 +69,10 @@ def approve_proposal(
             raise ProposalConflictError(f"Een voorstel met status '{status}' kan niet goedgekeurd worden")
 
         approved_at = (now or datetime.now(UTC)).isoformat(timespec='seconds')
+        data.pop('ai_review_error', None)
         data.update({
             'status': ProposalStatus.AI_CHECKING_REVIEW.value,
+            'ai_status': 'RUNNING',  # Home refreshes while the AI is busy (frontend ProposalOverview)
             'approval_description': text,
             'approved_at': approved_at,
             'updated_at': approved_at,
