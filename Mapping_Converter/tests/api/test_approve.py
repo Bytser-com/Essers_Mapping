@@ -26,7 +26,9 @@ def make_proposal_workbook():
 
 
 @pytest.fixture
-def client(proposals_root):
+def client(proposals_root, tmp_path, monkeypatch):
+    packages_root = tmp_path / 'packages'
+    monkeypatch.setattr(approve_router, 'get_packages_storage', lambda: LocalStorage(packages_root))
     app.dependency_overrides[approve_router.get_proposal_storage] = lambda: LocalStorage(proposals_root)
     yield TestClient(app)
     app.dependency_overrides.clear()
