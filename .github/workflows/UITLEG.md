@@ -93,8 +93,7 @@ blijft de controles voor pull requests uitvoeren.
 De scan uploadt eerst de analyse zonder zelf op de gate te wachten. Daarna leest
 `Scripts/check-sonar-quality-gate.py` het taaknummer uit `.scannerwork/report-task.txt`.
 Het script wacht maximaal vijf minuten op die taak en controleert de voorwaarden
-van precies die analyse. Alleen `new_coverage` geeft een `::warning::` en exitcode 0.
-Andere gefaalde voorwaarden, ontbrekende resultaten, API-fouten en timeouts geven
+van precies die analyse. Gefaalde voorwaarden (inclusief `new_coverage`), ontbrekende resultaten, API-fouten en timeouts geven
 exitcode 1. Een fout tijdens het scannen zelf blijft ook blokkeren.
 Het JSON-gateresultaat staat in het artifact `sonarqube-reports`, onder
 `test-results/sonarqube-quality-gate.json`.

@@ -1,4 +1,4 @@
-"""Coverage can warn, but scanner/API errors and other failed conditions must block."""
+"""Scanner/API errors, quality gate failures and coverage failures must block CI."""
 
 from contextlib import contextmanager, redirect_stdout
 import copy
@@ -61,13 +61,13 @@ class SonarGateTests(unittest.TestCase):
         self.assertEqual(result, 0)
         self.assertNotIn('::warning::', output)
 
-    def test_only_new_code_coverage_is_advisory(self):
+    def test_new_code_coverage_failure_blocks(self):
         result, output = self.evaluate(gate(COVERAGE))
-        self.assertEqual(result, 0)
-        self.assertIn('::warning::', output)
+        self.assertEqual(result, 1)
+        self.assertIn('::error::', output)
         self.assertIn('69.0%', output)
         self.assertIn('80%', output)
-        self.assertIn('SonarQube gate remains failed', output)
+        self.assertIn('Sonar quality gate failed: new-code coverage', output)
 
     def test_other_conditions_still_block_even_alongside_low_coverage(self):
         for metric in ('new_security_rating', 'new_reliability_rating', 'new_maintainability_rating',
@@ -142,7 +142,7 @@ class SonarGateTests(unittest.TestCase):
                 self.assertEqual(url, 'https://sonarcloud.io/api/qualitygates/project_status?analysisId=analysis-123')
 
     def test_errors_and_warnings_link_to_the_report_and_write_summary_before_failure(self):
-        for condition, expected in ((COVERAGE, 0), ({'metricKey': 'new_violations', 'status': 'ERROR'}, 1)):
+        for condition, expected in ((COVERAGE, 1), ({'metricKey': 'new_violations', 'status': 'ERROR'}, 1)):
             with self.subTest(metric=condition['metricKey']), workspace(), \
                     patch.object(sonar, 'wait_for_gate', return_value=gate(condition)), \
                     patch.object(sonar, 'get_json', return_value={'analyses': [
@@ -169,7 +169,7 @@ class SonarGateTests(unittest.TestCase):
         with workspace(), patch.object(sonar, 'wait_for_gate', return_value=gate(COVERAGE)), \
                 patch.object(sonar, 'get_json', side_effect=URLError('history unavailable')), \
                 redirect_stdout(io.StringIO()) as output:
-            self.assertEqual(sonar.main(), 0)
+            self.assertEqual(sonar.main(), 1)
             self.assertIn('project_status?analysisId=analysis-123', output.getvalue())
 
     def test_authenticated_request_has_a_timeout_and_encodes_parameters(self):
@@ -192,7 +192,7 @@ class SonarGateTests(unittest.TestCase):
         with workspace(), patch.object(sonar, 'wait_for_gate', return_value=gate(COVERAGE)) as wait, \
                 patch.object(sonar, 'analysis_report_url', return_value='https://sonarcloud.io/project/activity?id=project'), \
                 redirect_stdout(io.StringIO()):
-            self.assertEqual(sonar.main(), 0)
+            self.assertEqual(sonar.main(), 1)
             wait.assert_called_once_with('https://sonarcloud.io', 'fake-token', 'task-123', 'project')
             self.assertEqual(json.loads(Path('test-results/sonarqube-quality-gate.json').read_text()), gate(COVERAGE))
 

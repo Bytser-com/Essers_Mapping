@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check this scan's gate: new-code coverage warns; other failures block CI."""
+"""Check this scan's gate: quality-gate failures (including coverage) block CI."""
 
 import json
 import os
@@ -113,17 +113,16 @@ def check_gate(payload, report_url=None):
     blocking = False
     for condition in failed:
         metric = condition['metricKey']
+        report = f'See this analysis: {report_url}' if report_url else 'See the SonarQube report.'
         if metric == 'new_coverage':
             if any(not 0 <= float(condition[key]) <= 100 for key in ('actualValue', 'errorThreshold')):
                 raise ValueError('Sonar returned invalid coverage percentages.')
-            annotation('warning',
-                       f"Sonar new-code coverage: {condition['actualValue']}%; "
-                       f"required: {condition['errorThreshold']}%. Coverage is advisory in GitHub Actions; "
-                       'the SonarQube gate remains failed.'
-                       + (f' See this analysis: {report_url}' if report_url else ''))
+            blocking = True
+            annotation('error',
+                       f"Sonar quality gate failed: new-code coverage is {condition['actualValue']}%; "
+                       f"required: {condition['errorThreshold']}%. {report}")
         else:
             blocking = True
-            report = f'See this analysis: {report_url}' if report_url else 'See the SonarQube report.'
             annotation('error', f'Sonar quality gate failed: {metric}. {report}')
     return 1 if blocking else 0
 
