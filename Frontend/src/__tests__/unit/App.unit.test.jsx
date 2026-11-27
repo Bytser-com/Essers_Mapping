@@ -9,7 +9,7 @@ import { useProposalStore } from '../../stores/proposalStore'
 
 describe('Unit Tests - Frontend Components', () => {
   beforeEach(() => {
-    useProposalStore.setState({ deleteSuccessMessage: null })
+    useProposalStore.setState({ deleteSuccessMessage: null, approvalMessage: null })
   })
 
   it('renders the main App container layout', () => {
@@ -51,5 +51,53 @@ describe('Unit Tests - Frontend Components', () => {
 
     expect(screen.queryByTestId('delete-success-banner')).not.toBeInTheDocument()
     expect(useProposalStore.getState().deleteSuccessMessage).toBeNull()
+  })
+
+  it('renders the approval success banner when approvalMessage is in the store', () => {
+    useProposalStore.setState({
+      approvalMessage: {
+        type: 'success',
+        title: 'Voorstel goedgekeurd.',
+        message: 'Voorstel voor brunos (v1) is succesvol goedgekeurd en omgezet.',
+      },
+    })
+    render(<Home />)
+    const banner = screen.getByTestId('approval-success-banner')
+    expect(banner).toBeInTheDocument()
+    expect(screen.getByText('Voorstel goedgekeurd.')).toBeInTheDocument()
+    expect(screen.getByText('Voorstel voor brunos (v1) is succesvol goedgekeurd en omgezet.')).toBeInTheDocument()
+  })
+
+  it('renders the approval error banner when approvalMessage is an error in the store', () => {
+    useProposalStore.setState({
+      approvalMessage: {
+        type: 'error',
+        title: 'Goedkeuren mislukt.',
+        message: 'AI-controle fout.',
+      },
+    })
+    render(<Home />)
+    const banner = screen.getByTestId('approval-error-banner')
+    expect(banner).toBeInTheDocument()
+    expect(screen.getByText('Goedkeuren mislukt.')).toBeInTheDocument()
+    expect(screen.getByText('AI-controle fout.')).toBeInTheDocument()
+  })
+
+  it('dismisses the approval banner when close button is clicked', async () => {
+    useProposalStore.setState({
+      approvalMessage: {
+        type: 'success',
+        title: 'Voorstel goedgekeurd.',
+        message: 'Gelukt.',
+      },
+    })
+    render(<Home />)
+    expect(screen.getByTestId('approval-success-banner')).toBeInTheDocument()
+
+    const closeBtn = screen.getByRole('button', { name: 'Melding sluiten' })
+    await userEvent.click(closeBtn)
+
+    expect(screen.queryByTestId('approval-success-banner')).not.toBeInTheDocument()
+    expect(useProposalStore.getState().approvalMessage).toBeNull()
   })
 })

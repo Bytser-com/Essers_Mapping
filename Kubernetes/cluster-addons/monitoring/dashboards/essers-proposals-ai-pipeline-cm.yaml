@@ -1,0 +1,551 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-essers-proposals-ai-pipeline
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+    app.kubernetes.io/part-of: essers-mapping
+  annotations:
+    k8s-sidecar-target-directory: "/tmp/dashboards/essers"
+data:
+  essers-proposals-ai-pipeline.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "description": "End-to-end operational overview of Essers Mapping proposals, Gemini AI generation & review outcomes, SFTP storage health, Ingress traffic, and live AI pipeline logs.",
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 1,
+      "id": null,
+      "links": [
+        {
+          "asDropdown": false,
+          "icon": "external link",
+          "includeVars": true,
+          "keepTime": true,
+          "tags": ["essers"],
+          "targetBlank": false,
+          "title": "Essers Dashboards",
+          "type": "dashboards"
+        }
+      ],
+      "liveNow": false,
+      "panels": [
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+          "id": 100,
+          "title": "LIVE PROPOSAL PIPELINE STATUS (SHARED SFTP & AI QUEUE)",
+          "type": "row"
+        },
+        {
+          "gridPos": { "h": 4, "w": 3, "x": 0, "y": 1 },
+          "id": 1,
+          "title": "Active Proposals",
+          "type": "stat",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] },
+              "unit": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "max(essers_proposals_total{cluster=~\"$cluster\", namespace=~\"$namespace\"}) or vector(0)",
+              "legendFormat": "Total",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "gridPos": { "h": 4, "w": 3, "x": 3, "y": 1 },
+          "id": 2,
+          "title": "AI Generating (Bezig)",
+          "type": "stat",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "blue", "value": 1 },
+                  { "color": "#EAB839", "value": 4 }
+                ]
+              },
+              "unit": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "max(essers_proposals_running_total{cluster=~\"$cluster\", namespace=~\"$namespace\"}) or vector(0)",
+              "legendFormat": "Running",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "gridPos": { "h": 4, "w": 3, "x": 6, "y": 1 },
+          "id": 3,
+          "title": "Ready for Review",
+          "type": "stat",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+              "unit": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "max(essers_proposals_ready_for_review_total{cluster=~\"$cluster\", namespace=~\"$namespace\"}) or vector(0)",
+              "legendFormat": "Ready",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "gridPos": { "h": 4, "w": 3, "x": 9, "y": 1 },
+          "id": 4,
+          "title": "In Review / AI Check",
+          "type": "stat",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "purple", "value": null }] },
+              "unit": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "(max(essers_proposals_in_review_total{cluster=~\"$cluster\", namespace=~\"$namespace\"}) or vector(0)) + (max(essers_proposals_ai_checking_review_total{cluster=~\"$cluster\", namespace=~\"$namespace\"}) or vector(0))",
+              "legendFormat": "Reviewing",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "gridPos": { "h": 4, "w": 3, "x": 12, "y": 1 },
+          "id": 5,
+          "title": "Returned (Afgekeurd)",
+          "type": "stat",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "#EAB839", "value": 1 }
+                ]
+              },
+              "unit": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "max(essers_proposals_returned_total{cluster=~\"$cluster\", namespace=~\"$namespace\"}) or vector(0)",
+              "legendFormat": "Returned",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "gridPos": { "h": 4, "w": 3, "x": 15, "y": 1 },
+          "id": 6,
+          "title": "Failed AI Proposals",
+          "type": "stat",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "red", "value": 1 }
+                ]
+              },
+              "unit": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "max(essers_proposals_failed_total{cluster=~\"$cluster\", namespace=~\"$namespace\"}) or vector(0)",
+              "legendFormat": "Failed",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "gridPos": { "h": 4, "w": 3, "x": 18, "y": 1 },
+          "id": 7,
+          "title": "Shared SFTP Status",
+          "type": "stat",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "mappings": [
+                { "options": { "0": { "color": "red", "text": "DOWN" }, "1": { "color": "green", "text": "UP" } }, "type": "value" }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "red", "value": null },
+                  { "color": "green", "value": 1 }
+                ]
+              }
+            }
+          },
+          "targets": [
+            {
+              "expr": "min(essers_proposals_sftp_up{cluster=~\"$cluster\", namespace=~\"$namespace\"})",
+              "legendFormat": "SFTP",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "gridPos": { "h": 4, "w": 3, "x": 21, "y": 1 },
+          "id": 8,
+          "title": "Oldest Running AI Job",
+          "description": "Age of the oldest RUNNING proposal. Values > 15m (900s) trigger the MappingProposalAiStuck Discord alert.",
+          "type": "stat",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "color": { "mode": "thresholds" },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "#EAB839", "value": 300 },
+                  { "color": "red", "value": 900 }
+                ]
+              },
+              "unit": "s"
+            }
+          },
+          "targets": [
+            {
+              "expr": "max(essers_proposals_oldest_running_age_seconds{cluster=~\"$cluster\", namespace=~\"$namespace\"}) or vector(0)",
+              "legendFormat": "Age",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+          "id": 101,
+          "title": "PROPOSAL THROUGHPUT, AI GENERATION & REVIEW METRICS",
+          "type": "row"
+        },
+        {
+          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 6 },
+          "id": 11,
+          "title": "Active Proposals by Status, AI Status & Type",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "lineInterpolation": "stepAfter", "fillOpacity": 15 },
+              "unit": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "max by (status, ai_status, proposal_type) (essers_proposals_by_status{cluster=~\"$cluster\", namespace=~\"$namespace\"})",
+              "legendFormat": "{{status}} / {{ai_status}} ({{proposal_type}})",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 6 },
+          "id": 12,
+          "title": "Incoming Upload Queue & Active AI Reviews",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "bars", "fillOpacity": 50 },
+              "unit": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum by (state) (essers_proposal_incoming_queue_size{cluster=~\"$cluster\", namespace=~\"$namespace\"})",
+              "legendFormat": "Upload Queue: {{state}}",
+              "refId": "A"
+            },
+            {
+              "expr": "sum(essers_converter_ai_reviews_active{cluster=~\"$cluster\", namespace=~\"$namespace\"})",
+              "legendFormat": "Active AI Reviews (Converter)",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "gridPos": { "h": 7, "w": 8, "x": 0, "y": 13 },
+          "id": 13,
+          "title": "XML Upload Outcomes (Last 15m)",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "bars", "fillOpacity": 60 },
+              "unit": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum by (outcome) (increase(essers_proposal_uploads_total{cluster=~\"$cluster\", namespace=~\"$namespace\"}[15m]))",
+              "legendFormat": "{{outcome}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "gridPos": { "h": 7, "w": 8, "x": 8, "y": 13 },
+          "id": 14,
+          "title": "AI Generation & AI Review Outcomes (Last 15m)",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "bars", "fillOpacity": 60 },
+              "unit": "none"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum by (outcome) (increase(essers_proposal_ai_runs_total{cluster=~\"$cluster\", namespace=~\"$namespace\"}[15m]))",
+              "legendFormat": "AI Gen: {{outcome}}",
+              "refId": "A"
+            },
+            {
+              "expr": "sum by (decision) (increase(essers_converter_ai_reviews_total{cluster=~\"$cluster\", namespace=~\"$namespace\"}[15m]))",
+              "legendFormat": "AI Review: {{decision}}",
+              "refId": "B"
+            },
+            {
+              "expr": "sum by (outcome) (increase(essers_converter_conversions_total{cluster=~\"$cluster\", namespace=~\"$namespace\"}[15m]))",
+              "legendFormat": "Excel->JSON: {{outcome}}",
+              "refId": "C"
+            }
+          ]
+        },
+        {
+          "gridPos": { "h": 7, "w": 8, "x": 16, "y": 13 },
+          "id": 15,
+          "title": "Average AI Processing Duration (Generation vs Review)",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
+              "unit": "s"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(rate(essers_proposal_ai_run_duration_seconds_sum{cluster=~\"$cluster\", namespace=~\"$namespace\"}[15m])) / (sum(rate(essers_proposal_ai_run_duration_seconds_count{cluster=~\"$cluster\", namespace=~\"$namespace\"}[15m])) > 0)",
+              "legendFormat": "Avg AI Generation (s)",
+              "refId": "A"
+            },
+            {
+              "expr": "sum(rate(essers_converter_ai_review_duration_seconds_sum{cluster=~\"$cluster\", namespace=~\"$namespace\"}[15m])) / (sum(rate(essers_converter_ai_review_duration_seconds_count{cluster=~\"$cluster\", namespace=~\"$namespace\"}[15m])) > 0)",
+              "legendFormat": "Avg AI Review (s)",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 20 },
+          "id": 102,
+          "title": "EDGE INGRESS TRAFFIC & PROPOSAL SERVICE RESOURCES",
+          "type": "row"
+        },
+        {
+          "gridPos": { "h": 7, "w": 8, "x": 0, "y": 21 },
+          "id": 21,
+          "title": "Ingress HTTP Requests by Status Code",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
+              "unit": "reqps"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum by (status) (rate(nginx_ingress_controller_requests[5m]))",
+              "legendFormat": "HTTP {{status}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "gridPos": { "h": 7, "w": 8, "x": 8, "y": 21 },
+          "id": 22,
+          "title": "Ingress Latency (p95 & p99)",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line" },
+              "unit": "s"
+            }
+          },
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.95, sum(rate(nginx_ingress_controller_request_duration_seconds_bucket[5m])) by (le))",
+              "legendFormat": "p95 Latency",
+              "refId": "A"
+            },
+            {
+              "expr": "histogram_quantile(0.99, sum(rate(nginx_ingress_controller_request_duration_seconds_bucket[5m])) by (le))",
+              "legendFormat": "p99 Latency",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "gridPos": { "h": 7, "w": 8, "x": 16, "y": 21 },
+          "id": 23,
+          "title": "Proposal & Converter Pod Memory",
+          "type": "timeseries",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "lineInterpolation": "smooth" },
+              "unit": "bytes"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum by (pod) (container_memory_working_set_bytes{cluster=~\"$cluster\", namespace=~\"$namespace\", pod=~\"(mapping-proposal|mapping-converter|version-control-backend)-.*\", container!=\"\", container!=\"POD\"})",
+              "legendFormat": "{{pod}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 28 },
+          "id": 103,
+          "title": "LIVE PROPOSAL & AI PIPELINE LOGS (LOKI)",
+          "type": "row"
+        },
+        {
+          "gridPos": { "h": 11, "w": 24, "x": 0, "y": 29 },
+          "id": 31,
+          "title": "Mapping Proposal & Converter Logs (${namespace})",
+          "type": "logs",
+          "datasource": { "type": "loki", "uid": "loki" },
+          "options": {
+            "dedupStrategy": "none",
+            "enableLogDetails": true,
+            "prettifyLogMessage": true,
+            "showCommonLabels": false,
+            "showLabels": true,
+            "showTime": true,
+            "sortOrder": "Descending",
+            "wrapLogMessage": true
+          },
+          "targets": [
+            {
+              "expr": "{namespace=~\"$namespace\", pod=~\"(mapping-proposal|mapping-converter)-.*\"} |= \"$log_filter\"",
+              "legendFormat": "",
+              "refId": "A"
+            }
+          ]
+        }
+      ],
+      "refresh": "15s",
+      "schemaVersion": 38,
+      "style": "dark",
+      "tags": ["essers", "proposals", "ai", "pipeline", "logs"],
+      "templating": {
+        "list": [
+          {
+            "current": { "selected": true, "text": "Prometheus", "value": "Prometheus" },
+            "hide": 0,
+            "label": "Data Source",
+            "name": "datasource",
+            "options": [],
+            "query": "prometheus",
+            "refresh": 1,
+            "type": "datasource"
+          },
+          {
+            "allValue": ".*",
+            "current": { "selected": true, "text": "All", "value": "$__all" },
+            "datasource": { "type": "prometheus", "uid": "${datasource}" },
+            "definition": "label_values(kube_pod_info, cluster)",
+            "hide": 0,
+            "includeAll": true,
+            "label": "Omgeving / Cluster",
+            "multi": false,
+            "name": "cluster",
+            "options": [],
+            "query": { "query": "label_values(kube_pod_info, cluster)", "refId": "ClusterQuery" },
+            "refresh": 2,
+            "sort": 1,
+            "type": "query"
+          },
+          {
+            "allValue": "essers-mapping.*",
+            "current": { "selected": true, "text": "All", "value": "$__all" },
+            "datasource": { "type": "prometheus", "uid": "${datasource}" },
+            "definition": "label_values(kube_pod_info{cluster=~\"$cluster\", namespace=~\"essers-mapping.*\"}, namespace)",
+            "hide": 0,
+            "includeAll": true,
+            "label": "App Namespace",
+            "multi": false,
+            "name": "namespace",
+            "options": [],
+            "query": { "query": "label_values(kube_pod_info{cluster=~\"$cluster\", namespace=~\"essers-mapping.*\"}, namespace)", "refId": "NamespaceQuery" },
+            "refresh": 2,
+            "sort": 1,
+            "type": "query"
+          },
+          {
+            "current": { "selected": false, "value": "" },
+            "hide": 0,
+            "label": "Log Search Filter",
+            "name": "log_filter",
+            "options": [],
+            "query": "",
+            "type": "textbox"
+          }
+        ]
+      },
+      "time": { "from": "now-1h", "to": "now" },
+      "timepicker": { "refresh_intervals": ["10s", "15s", "30s", "1m", "5m"] },
+      "timezone": "browser",
+      "title": "Essers Mapping — Proposals & AI Pipeline",
+      "uid": "essers-proposals-ai-pipeline",
+      "version": 1
+    }

@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+import time
 from typing import Annotated
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
@@ -23,9 +24,10 @@ from pydantic import BaseModel
 
 from scripts.errors import ProposalConflictError, ProposalNotFoundError, StorageError
 from services.approval import approve_proposal
+from services.metrics import metrics
 from services.proposal_files import METADATA_FILES, ProposalLocation, read_metadata, write_metadata
 from services.statuses import ProposalStatus
-from services.storage import Storage, proposal_storage
+from services.storage import Storage, packages_storage, proposal_storage
 
 logger = logging.getLogger(__name__)
 
@@ -43,22 +45,36 @@ def get_proposal_storage() -> Storage:
     return proposal_storage()
 
 
+def get_packages_storage() -> Storage:
+    return packages_storage()
+
+
 # Documented in the OpenAPI schema (/docs); the frontend shows ``detail`` to the analyst.
 ERROR_RESPONSES: dict[int | str, dict] = {
     400: {'description': 'Invalid input: too long description, invalid parameters'},
     404: {'description': 'Customer, version, proposal type or metadata not found'},
     409: {'description': 'Proposal cannot be approved in its current status (e.g. AI review running)'},
-    502: {'description': 'The shared SFTP storage is not reachable'},
+    422: {'description': 'Proposal rejected by AI review'},
+    502: {'description': 'The shared SFTP storage is not reachable or AI review could not complete'},
 }
 
 
-def trigger_ai_review(storage: Storage, company: str, version: str, proposal_type: str) -> dict | None:
-    """Download the proposal's Excel file from storage and run the Gemini review."""
+def trigger_ai_review(
+    storage: Storage,
+    company: str,
+    version: str,
+    proposal_type: str,
+    pkg_storage: Storage | None = None,
+) -> dict | None:
+    """Download the proposal's Excel file from storage, run the Gemini review,
+    and if accepted by AI, convert the proposal to a mapping package on the packages storage.
+    """
     from scripts.pipeline import run_review
     from services.proposal_files import find_proposal, read_metadata, write_metadata
 
     review_key = (company.strip().lower(), version.strip().lower(), proposal_type.strip().lower())
     _active_reviews.add(review_key)
+    started = time.monotonic()
     logger.info('Starting AI review for %s/%s/%s', company, version, proposal_type)
     try:
         contents = None
@@ -78,20 +94,46 @@ def trigger_ai_review(storage: Storage, company: str, version: str, proposal_typ
         decision = review_result.get('decision', 'ACCEPTED')
         logger.info('AI review completed for %s/%s/%s: %s', company, version, proposal_type, decision)
 
-        with storage.session() as s:
-            location = find_proposal(s, company, version, proposal_type)
-            meta = read_metadata(s, location)
-            meta['ai_review'] = review_result
-            if decision == 'REJECTED':
+        if decision == 'REJECTED':
+            with storage.session() as s:
+                location = find_proposal(s, company, version, proposal_type)
+                meta = read_metadata(s, location)
+                meta['ai_review'] = review_result
                 meta['status'] = 'RETURNED'
                 meta['ai_status'] = 'FAILED'
-            else:
-                meta['status'] = None
-                meta['ai_status'] = None
-            write_metadata(s, location, meta)
+                write_metadata(s, location, meta)
+        else:
+            from services.packages import DEFAULT_USER, convert_excel_to_package, format_semver
+            from services.proposal_files import delete_proposal_after_conversion
+
+            if pkg_storage is None:
+                pkg_storage = get_packages_storage()
+
+            with storage.session() as s:
+                location = find_proposal(s, company, version, proposal_type)
+                meta = read_metadata(s, location)
+                user_created = meta.get('uploadUser') or meta.get('upload_user') or meta.get('createdBy') or DEFAULT_USER
+                package_ver = meta.get('package_version') or format_semver(version)
+
+            _, sftp_path = convert_excel_to_package(
+                pkg_storage,
+                contents,
+                company,
+                version,
+                proposal_type,
+                user_created=user_created,
+                package_version=package_ver,
+            )
+            logger.info('Proposal %s/%s/%s converted and saved to package: %s', company, version, proposal_type, sftp_path)
+
+            with storage.session() as s:
+                delete_proposal_after_conversion(s, company, version, proposal_type)
+
+        metrics.record_ai_review(decision, time.monotonic() - started)
         return review_result
 
     except Exception as exc:
+        metrics.record_ai_review('FAILED', time.monotonic() - started)
         logger.warning('AI review for %s/%s/%s did not complete: %s', company, version, proposal_type, exc)
         try:
             with storage.session() as s:
@@ -213,7 +255,6 @@ def ai_retry(
 @router.post('/approve', responses=ERROR_RESPONSES)
 def approve(
     request: ApproveRequest,
-    background_tasks: BackgroundTasks,
     storage: Annotated[Storage, Depends(get_proposal_storage)],
     company: Annotated[str, Query()] = '',
     version: Annotated[str, Query()] = '',
@@ -222,15 +263,47 @@ def approve(
     try:
         result = approve_proposal(storage, company, version, proposal_type, request.description)
     except ValueError as error:
+        metrics.record_approval('invalid')
         raise HTTPException(status_code=400, detail=str(error)) from error
     except ProposalNotFoundError as error:
+        metrics.record_approval('not_found')
         raise HTTPException(status_code=404, detail=str(error)) from error
     except ProposalConflictError as error:
+        metrics.record_approval('conflict')
         raise HTTPException(status_code=409, detail=str(error)) from error
     except StorageError as error:
+        metrics.record_approval('error')
         logger.exception('Approving a proposal failed')
         raise HTTPException(status_code=502, detail='De bestanden zijn tijdelijk niet bereikbaar') from error
 
-    logger.info('Proposal %s/%s/%s approved; AI review scheduled', result.company, result.version, result.proposal_type)
-    background_tasks.add_task(trigger_ai_review, storage, result.company, result.version, result.proposal_type)
-    return result.to_dict()
+    metrics.record_approval('completed')
+    logger.info('Proposal %s/%s/%s approved; running AI review synchronously...', result.company, result.version, result.proposal_type)
+    review_result = trigger_ai_review(storage, result.company, result.version, result.proposal_type)
+
+    if review_result is None:
+        raise HTTPException(
+            status_code=502,
+            detail='De AI-controle kon niet worden voltooid. Probeer het later opnieuw via AI-retry.',
+        )
+
+    decision = review_result.get('decision', 'ACCEPTED')
+    if decision == 'REJECTED':
+        summary = review_result.get('summary', 'Het voorstel voldoet niet aan de kwaliteitseisen.')
+        findings = review_result.get('findings', [])
+        findings_str = f" ({'; '.join(findings[:2])})" if findings else ''
+        raise HTTPException(
+            status_code=422,
+            detail=f'Het voorstel is afgekeurd door de AI-controle: {summary}{findings_str}',
+        )
+
+    return {
+        'status': 'ACCEPTED',
+        'decision': 'ACCEPTED',
+        'company': result.company,
+        'version': result.version,
+        'proposal_type': result.proposal_type,
+        'approval_description': result.approval_description,
+        'summary': review_result.get('summary', ''),
+        'findings': review_result.get('findings', []),
+        'message': 'Het voorstel is goedgekeurd en geconverteerd naar een Mapping Package.',
+    }

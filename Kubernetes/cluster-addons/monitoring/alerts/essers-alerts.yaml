@@ -1,7 +1,7 @@
 # ==============================================================================
-# PROMETHEUS ALERTING RULES: ESSERS MAPPING WORKLOADS & CLUSTER HEALTH
-# Automatically discovered by Prometheus Operator (CRD: PrometheusRule)
-# Evaluated every 15-30s; alerts are dispatched through Alertmanager.
+# PROMETHEUS ALERTING RULES: ESSERS MAPPING WORKLOADS, PROPOSALS & INFRASTRUCTURE
+# Automatically discovered by Prometheus Operator (CRD: PrometheusRule).
+# Evaluated every 15-30s; routed and deduplicated via Alertmanager -> Discord.
 # ==============================================================================
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
@@ -14,64 +14,272 @@ metadata:
     app.kubernetes.io/part-of: essers-mapping
 spec:
   groups:
+    # ==========================================================================
+    # GROUP 1: KUBERNETES WORKLOAD & POD HEALTH
+    # ==========================================================================
     - name: essers-workload-alerts
       rules:
-        # ----------------------------------------------------------------------
-        # 1. Pod CrashLoopBackOff or Frequent Restarts
-        # ----------------------------------------------------------------------
-        - alert: PodFrequentRestarts
-          expr: sum by (pod, namespace) (increase(kube_pod_container_status_restarts_total{namespace=~"essers-mapping-.*"}[15m])) > 3
-          for: 2m
-          labels:
-            severity: warning
-          annotations:
-            summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is restarting frequently"
-            description: "Pod has restarted more than 3 times in the last 15 minutes. Check container logs in Grafana."
-
-        # ----------------------------------------------------------------------
-        # 2. Complete Service Outage (0 Replicas Available)
-        # ----------------------------------------------------------------------
         - alert: ServiceZeroReplicasAvailable
-          expr: kube_deployment_status_replicas_available{namespace=~"essers-mapping-.*"} == 0
+          expr: kube_deployment_status_replicas_available{namespace=~"essers-mapping-.*|monitoring"} == 0 and kube_deployment_spec_replicas{namespace=~"essers-mapping-.*|monitoring"} > 0
           for: 1m
           labels:
             severity: critical
+            category: workloads
           annotations:
-            summary: "Service outage: {{ $labels.deployment }} has 0 available replicas"
-            description: "Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has zero running/ready pods."
+            summary: "Service uitgevallen: {{ $labels.deployment }} heeft 0 beschikbare replicas"
+            description: "Deployment {{ $labels.namespace }}/{{ $labels.deployment }} heeft geen enkele ready pod."
+            runbook: "Controleer `kubectl describe deployment/{{ $labels.deployment }} -n {{ $labels.namespace }}` en recente pod-logs in Grafana."
+            dashboard_uid: "essers-k8s-cluster-overview"
 
-        # ----------------------------------------------------------------------
-        # 3. Persistent Volume (Longhorn PVC) Filling Up
-        # ----------------------------------------------------------------------
-        - alert: PvcStorageSpaceCritical
-          expr: 100 * (kubelet_volume_stats_used_bytes{namespace=~"essers-mapping-.*"} / kubelet_volume_stats_capacity_bytes{namespace=~"essers-mapping-.*"}) > 85
-          for: 5m
+        - alert: PodCrashLooping
+          expr: max by (cluster, namespace, pod, container) (kube_pod_container_status_waiting_reason{namespace=~"essers-mapping-.*|monitoring", reason="CrashLoopBackOff"}) == 1
+          for: 3m
           labels:
             severity: critical
+            category: workloads
           annotations:
-            summary: "PVC {{ $labels.persistentvolumeclaim }} is over 85% full"
-            description: "Volume {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.namespace }} has less than 15% free space remaining."
+            summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} zit in CrashLoopBackOff"
+            description: "Container {{ $labels.container }} blijft crashen en opnieuw opstarten."
+            runbook: "Open de Loki-logs voor deze pod in Grafana of controleer `kubectl logs -p`."
+            dashboard_uid: "essers-k8s-cluster-overview"
 
-        # ----------------------------------------------------------------------
-        # 4. Container Near Memory Limit (OOMKill Risk)
-        # ----------------------------------------------------------------------
+        - alert: PodOOMKilled
+          expr: max by (cluster, namespace, pod, container) (kube_pod_container_status_last_terminated_reason{namespace=~"essers-mapping-.*|monitoring", reason="OOMKilled"}) == 1 and sum by (cluster, namespace, pod, container) (increase(kube_pod_container_status_restarts_total{namespace=~"essers-mapping-.*|monitoring"}[15m])) > 0
+          for: 1m
+          labels:
+            severity: warning
+            category: workloads
+          annotations:
+            summary: "Container {{ $labels.container }} in {{ $labels.pod }} is OOMKilled"
+            description: "De container overschreed zijn RAM-limiet in namespace {{ $labels.namespace }} en werd door de kernel gestopt."
+            runbook: "Controleer het RAM-verloop in Grafana en verhoog indien nodig de memory limit of onderzoek geheugenlekken."
+            dashboard_uid: "essers-k8s-cluster-overview"
+
+        - alert: PodFrequentRestarts
+          expr: sum by (cluster, namespace, pod) (increase(kube_pod_container_status_restarts_total{namespace=~"essers-mapping-.*|monitoring"}[15m])) > 3
+          for: 2m
+          labels:
+            severity: warning
+            category: workloads
+          annotations:
+            summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} herstart herhaaldelijk"
+            description: "Meer dan 3 herstarts in de afgelopen 15 minuten ({{ $value | printf \"%.0f\" }}x)."
+            runbook: "Bekijk de live container-logs in Grafana en controleer liveness/readiness probes."
+            dashboard_uid: "essers-k8s-cluster-overview"
+
+        - alert: PodStuckPending
+          expr: max by (cluster, namespace, pod) (kube_pod_status_phase{namespace=~"essers-mapping-.*|monitoring", phase="Pending"}) == 1
+          for: 5m
+          labels:
+            severity: warning
+            category: workloads
+          annotations:
+            summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} blijft Pending"
+            description: "De pod staat langer dan 5 minuten in Pending (mogelijk CPU/RAM-tekort of PVC-binding)."
+            runbook: "Voer `kubectl describe pod {{ $labels.pod }} -n {{ $labels.namespace }}` uit voor scheduling events."
+            dashboard_uid: "essers-k8s-cluster-overview"
+
         - alert: ContainerNearMemoryLimit
-          expr: 100 * (container_memory_working_set_bytes{namespace=~"essers-mapping-.*", container!=""} / container_spec_memory_limit_bytes{namespace=~"essers-mapping-.*", container!=""}) > 90
+          expr: |
+            (
+              sum by (cluster, namespace, pod, container) (
+                container_memory_working_set_bytes{namespace=~"essers-mapping-.*|monitoring", container!="", container!="POD"}
+              )
+              /
+              (
+                sum by (cluster, namespace, pod, container) (
+                  container_spec_memory_limit_bytes{namespace=~"essers-mapping-.*|monitoring", container!="", container!="POD"}
+                ) > 0
+              )
+            ) * 100 > 90
           for: 3m
           labels:
             severity: warning
+            category: workloads
           annotations:
-            summary: "Container {{ $labels.container }} in pod {{ $labels.pod }} near OOM limit"
-            description: "Container memory working set is above 90% of configured memory limit."
+            summary: "Container {{ $labels.container }} ({{ $labels.pod }}) gebruikt > 90% RAM"
+            description: "Working set memory zit op {{ $value | printf \"%.1f\" }}% van de ingestelde limiet (OOMKill-risico)."
+            runbook: "Controleer het Pod RAM-paneel in Grafana; vergelijk met de MiniPC memory budgetten."
+            dashboard_uid: "essers-k8s-cluster-overview"
 
-        # ----------------------------------------------------------------------
-        # 5. Ingress HTTP 5xx Server Error Rate Spike
-        # ----------------------------------------------------------------------
+        - alert: ContainerHighCpuThrottling
+          expr: |
+            (
+              sum by (cluster, namespace, pod, container) (
+                rate(container_cpu_cfs_throttled_periods_total{namespace=~"essers-mapping-.*|monitoring", container!="", container!="POD"}[5m])
+              )
+              /
+              (
+                sum by (cluster, namespace, pod, container) (
+                  rate(container_cpu_cfs_periods_total{namespace=~"essers-mapping-.*|monitoring", container!="", container!="POD"}[5m])
+                ) > 0
+              )
+            ) * 100 > 50
+          for: 5m
+          labels:
+            severity: warning
+            category: workloads
+          annotations:
+            summary: "Hoge CPU-throttling op {{ $labels.container }} ({{ $labels.pod }})"
+            description: "{{ $value | printf \"%.1f\" }}% van de CPU-periodes wordt afgeremd door de CPU-limiet."
+            runbook: "Controleer het CPU-gebruik in Grafana; verhoog de CPU-limit als dit structureel optreedt."
+            dashboard_uid: "essers-k8s-cluster-overview"
+
+    # ==========================================================================
+    # GROUP 2: MAPPING PROPOSALS & AI PIPELINE HEALTH
+    # ==========================================================================
+    - name: essers-proposal-pipeline-alerts
+      rules:
+        - alert: MappingProposalSftpUnreachable
+          expr: min by (cluster, namespace) (essers_proposals_sftp_up) == 0
+          for: 2m
+          labels:
+            severity: critical
+            category: proposals
+          annotations:
+            summary: "Shared SFTP onbereikbaar voor Mapping Proposal"
+            description: "mapping-proposal in {{ $labels.namespace }} kan de proposal-opslag op sftp-shared niet uitlezen."
+            runbook: "Controleer sftp-shared pod status, PVC en NetworkPolicies via het Proposals & AI Pipeline dashboard."
+            dashboard_uid: "essers-proposals-ai-pipeline"
+
+        - alert: MappingProposalAiFailed
+          expr: max by (cluster, namespace) (essers_proposals_failed_total) > 0
+          for: 2m
+          labels:
+            severity: warning
+            category: proposals
+          annotations:
+            summary: "{{ $value | printf \"%.0f\" }} mapping proposal(s) met status Mislukt"
+            description: "Er staan voorstellen met AI-status FAILED op SFTP in {{ $labels.namespace }}."
+            runbook: "Bekijk de mapping-proposal logs in Grafana (filter op ERROR/Gemini) en herstart indien nodig via /proposals/reset of POST /ai-retry."
+            dashboard_uid: "essers-proposals-ai-pipeline"
+
+        - alert: MappingProposalAiStuck
+          expr: max by (cluster, namespace) (essers_proposals_oldest_running_age_seconds) > 900
+          for: 5m
+          labels:
+            severity: warning
+            category: proposals
+          annotations:
+            summary: "AI-voorstel blijft langer dan 15 min op Bezig hangen"
+            description: "Oudste lopende AI-generatie in {{ $labels.namespace }} draait al {{ $value | humanizeDuration }}."
+            runbook: "Controleer Gemini API rate limits en mapping-proposal logs; gebruik eventueel /proposals/reset."
+            dashboard_uid: "essers-proposals-ai-pipeline"
+
+        - alert: MappingProposalUploadErrors
+          expr: sum by (cluster, namespace) (increase(essers_proposal_uploads_total{outcome="error"}[10m])) > 0
+          for: 1m
+          labels:
+            severity: warning
+            category: proposals
+          annotations:
+            summary: "Serverfouten bij XML-upload in {{ $labels.namespace }}"
+            description: "{{ $value | printf \"%.0f\" }} upload(s) faalden met een interne/SFTP-fout in de afgelopen 10 minuten."
+            runbook: "Controleer mapping-proposal logs en SFTP-connectiviteit."
+            dashboard_uid: "essers-proposals-ai-pipeline"
+
+        - alert: MappingConverterAiReviewErrors
+          expr: sum by (cluster, namespace) (increase(essers_converter_ai_reviews_total{decision="FAILED"}[15m])) > 0
+          for: 1m
+          labels:
+            severity: warning
+            category: proposals
+          annotations:
+            summary: "AI-review gefaald in Mapping Converter ({{ $labels.namespace }})"
+            description: "{{ $value | printf \"%.0f\" }} AI-review(s) kon(den) niet voltooid worden in de afgelopen 15 minuten."
+            runbook: "Controleer mapping-converter logs op Gemini- of SFTP-fouten."
+            dashboard_uid: "essers-proposals-ai-pipeline"
+
+    # ==========================================================================
+    # GROUP 3: STORAGE, NODES, INGRESS & MONITORING TARGET HEALTH
+    # ==========================================================================
+    - name: essers-infrastructure-alerts
+      rules:
+        - alert: PvcStorageSpaceWarning
+          expr: 100 * (kubelet_volume_stats_used_bytes{namespace=~"essers-mapping-.*|monitoring"} / (kubelet_volume_stats_capacity_bytes{namespace=~"essers-mapping-.*|monitoring"} > 0)) > 75
+          for: 10m
+          labels:
+            severity: warning
+            category: storage
+          annotations:
+            summary: "PVC {{ $labels.persistentvolumeclaim }} is > 75% vol"
+            description: "Volume {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} gebruikt {{ $value | printf \"%.1f\" }}% van de capaciteit."
+            runbook: "Controleer opslagverbruik op de MiniPC en Prometheus/Loki retentie-instellingen."
+            dashboard_uid: "essers-k8s-cluster-overview"
+
+        - alert: PvcStorageSpaceCritical
+          expr: 100 * (kubelet_volume_stats_used_bytes{namespace=~"essers-mapping-.*|monitoring"} / (kubelet_volume_stats_capacity_bytes{namespace=~"essers-mapping-.*|monitoring"} > 0)) > 85
+          for: 5m
+          labels:
+            severity: critical
+            category: storage
+          annotations:
+            summary: "PVC {{ $labels.persistentvolumeclaim }} is kritiek vol (> 85%)"
+            description: "Volume {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} gebruikt {{ $value | printf \"%.1f\" }}% (< 15% vrij)."
+            runbook: "Maak ruimte vrij of controleer oude data/backups op SFTP en monitoring-retentie."
+            dashboard_uid: "essers-k8s-cluster-overview"
+
+        - alert: NodeNotReady
+          expr: kube_node_status_condition{condition="Ready", status="true"} == 0
+          for: 2m
+          labels:
+            severity: critical
+            category: infrastructure
+          annotations:
+            summary: "Kubernetes node {{ $labels.node }} is NotReady"
+            description: "Node {{ $labels.node }} rapporteert geen Ready-status meer sinds 2 minuten."
+            runbook: "Controleer Proxmox VM-status, kubelet en netwerk op de MiniPC."
+            dashboard_uid: "essers-k8s-cluster-overview"
+
+        - alert: NodeHighMemoryUsage
+          expr: 100 * (1 - (node_memory_MemAvailable_bytes / (node_memory_MemTotal_bytes > 0))) > 85
+          for: 5m
+          labels:
+            severity: warning
+            category: infrastructure
+          annotations:
+            summary: "Hoog RAM-gebruik op node {{ $labels.instance }} (> 85%)"
+            description: "MiniPC VM {{ $labels.instance }} gebruikt {{ $value | printf \"%.1f\" }}% van het beschikbare geheugen."
+            runbook: "Inspecteer top-memory pods in het Pod & Cluster dashboard."
+            dashboard_uid: "essers-k8s-cluster-overview"
+
+        - alert: NodeHighDiskUsage
+          expr: 100 * (1 - (node_filesystem_avail_bytes{mountpoint="/", fstype!~"tmpfs|overlay"} / (node_filesystem_size_bytes{mountpoint="/", fstype!~"tmpfs|overlay"} > 0))) > 85
+          for: 10m
+          labels:
+            severity: warning
+            category: infrastructure
+          annotations:
+            summary: "Root-schijf op {{ $labels.instance }} is > 85% vol"
+            description: "Bestandssysteem '/' op {{ $labels.instance }} zit op {{ $value | printf \"%.1f\" }}%."
+            runbook: "Controleer container images (`crictl rmi --prune`), Longhorn-volumes en /var/log."
+            dashboard_uid: "essers-k8s-cluster-overview"
+
         - alert: IngressHigh5xxErrorRate
-          expr: sum(rate(nginx_ingress_controller_requests{status=~"5.*"}[5m])) / sum(rate(nginx_ingress_controller_requests[5m])) * 100 > 5
+          expr: |
+            (
+              sum by (cluster) (rate(nginx_ingress_controller_requests{status=~"5.*"}[5m]))
+              /
+              (sum by (cluster) (rate(nginx_ingress_controller_requests[5m])) > 0.05)
+            ) * 100 > 5
           for: 3m
           labels:
             severity: critical
+            category: ingress
           annotations:
-            summary: "Edge Ingress 5xx error rate exceeds 5%"
-            description: "More than 5% of all incoming requests to the NGINX Ingress controller are returning HTTP 5xx errors."
+            summary: "Ingress HTTP 5xx foutpercentage boven 5%"
+            description: "{{ $value | printf \"%.1f\" }}% van het Ingress-verkeer geeft HTTP 5xx terug (bij actief verkeer > 0.05 req/s)."
+            runbook: "Controleer ingress-nginx en backend-logs in Grafana."
+            dashboard_uid: "essers-proposals-ai-pipeline"
+
+        - alert: PrometheusTargetDown
+          expr: up{job=~"mapping-proposal|mapping-converter|kube-state-metrics|kubelet|ingress-nginx-.*|prometheus|alertmanager"} == 0
+          for: 5m
+          labels:
+            severity: warning
+            category: monitoring
+          annotations:
+            summary: "Prometheus target {{ $labels.job }} ({{ $labels.instance }}) is DOWN"
+            description: "Prometheus kan target {{ $labels.job }} al 5 minuten niet succesvol scrapen."
+            runbook: "Controleer Prometheus Targets UI, ServiceMonitors en Calico NetworkPolicies."
+            dashboard_uid: "essers-k8s-cluster-overview"

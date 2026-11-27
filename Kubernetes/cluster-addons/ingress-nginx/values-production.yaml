@@ -29,6 +29,12 @@ controller:
     use-forwarded-headers: "true"
     compute-full-forwarded-for: "true"
     proxy-body-size: "50m"
+  metrics:
+    enabled: true
+    service:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "10254"
   resources:
     requests:
       cpu: 100m

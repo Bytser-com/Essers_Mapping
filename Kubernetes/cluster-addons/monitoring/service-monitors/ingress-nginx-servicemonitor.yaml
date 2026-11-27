@@ -1,6 +1,7 @@
 # ==============================================================================
 # SERVICEMONITOR: NGINX INGRESS CONTROLLER
 # Scrapes Prometheus metrics from the NGINX Ingress Controller (traffic, status codes, latency)
+# Requires `controller.metrics.enabled: true` in ingress-nginx Helm values.
 # ==============================================================================
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -17,7 +18,9 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: ingress-nginx
+      app.kubernetes.io/component: controller
   endpoints:
     - port: metrics
-      interval: 15s
+      path: /metrics
+      interval: 30s
       scrapeTimeout: 10s
