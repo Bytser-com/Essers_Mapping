@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.integration.file.remote.session.CachingSessionFactory;
 import org.springframework.integration.file.remote.session.SessionFactory;
+import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
 import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
@@ -75,10 +76,11 @@ class RuntimePropertiesTest {
     }
 
     @Test
-    @DisplayName("RuntimePollerProperties sanitizes custom instanceId and keeps valid values")
-    void pollerPropertiesSanitizeInstanceId() {
+    @DisplayName("RuntimePollerProperties sanitizes and caps custom instanceId length at 64 characters")
+    void pollerPropertiesSanitizeAndCapInstanceId() {
+        String longId = "runtime-pod-1/bad!chars-" + "a".repeat(80);
         RuntimePollerProperties props = new RuntimePollerProperties(
-                false, 2_000L, 500L, 1_000L, 8, 120_000L, 30_000L, 15, "runtime-pod-1/bad!chars"
+                false, 2_000L, 500L, 1_000L, 8, 120_000L, 30_000L, 15, longId
         );
 
         assertFalse(props.enabled());
@@ -88,24 +90,27 @@ class RuntimePropertiesTest {
         assertEquals(8, props.workerConcurrency());
         assertEquals(10, RuntimeSftpConfig.recommendedSessionPoolSize(props.workerConcurrency()));
         assertEquals(4, RuntimeSftpConfig.recommendedSessionPoolSize(1));
-        assertEquals("runtime-pod-1badchars", props.instanceId());
+        assertEquals(RuntimePollerProperties.MAX_INSTANCE_ID_LENGTH, props.instanceId().length());
+        assertTrue(props.instanceId().startsWith("runtime-pod-1badchars-"));
     }
 
     @Test
-    @DisplayName("RuntimeSftpConfig wires CachingSessionFactory with testSession, privateKey, knownHosts and beans")
+    @DisplayName("RuntimeSftpConfig registers lifecycle-managed DefaultSftpSessionFactory and skips empty passphrase")
     void configCreatesInfrastructureBeans() {
         RuntimeSftpConfig config = new RuntimeSftpConfig();
         RuntimeSftpProperties sftpProps = new RuntimeSftpProperties(
                 "sftp-runtime", 22, "runtimeuser", "dummy-pw",
-                "classpath:application.properties", "dummy-pass", "classpath:application.properties",
+                "classpath:application.properties", "", "classpath:application.properties",
                 "/Clients", false, 5_000L, 8_000, 1_048_576L
         );
         RuntimePollerProperties pollerProps = new RuntimePollerProperties(
                 true, 5_000L, 1_500L, 3_000L, 6, 300_000L, 60_000L, 20, "pod-a"
         );
 
+        DefaultSftpSessionFactory delegate =
+                config.runtimeSftpDelegateSessionFactory(sftpProps, new DefaultResourceLoader());
         SessionFactory<SftpClient.DirEntry> factory =
-                config.runtimeSftpSessionFactory(sftpProps, pollerProps, new DefaultResourceLoader());
+                config.runtimeSftpSessionFactory(delegate, sftpProps, pollerProps);
         SftpRemoteFileTemplate template = config.runtimeSftpTemplate(factory);
         ThreadPoolTaskScheduler scheduler = config.runtimePollerTaskScheduler(pollerProps);
         ExecutorService executor = config.runtimeWorkerExecutor();
@@ -119,6 +124,7 @@ class RuntimePropertiesTest {
             assertNotNull(clock);
         } finally {
             executor.shutdownNow();
+            delegate.destroy();
         }
     }
 }

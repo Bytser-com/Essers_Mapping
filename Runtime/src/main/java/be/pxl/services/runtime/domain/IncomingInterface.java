@@ -5,6 +5,7 @@ import java.util.Objects;
 
 /**
  * Metadata of an unclaimed customer XML interface discovered in {@code incoming/}.
+ * SFTP names and paths are preserved verbatim without trimming so they always match remote paths.
  */
 public record IncomingInterface(
         String customer,
@@ -15,18 +16,21 @@ public record IncomingInterface(
         Instant lastModified
 ) {
     public IncomingInterface {
-        customer = requireNonBlank(customer, "customer");
-        messageType = requireNonBlank(messageType, "messageType");
-        filename = requireNonBlank(filename, "filename");
-        baseDir = requireNonBlank(baseDir, "baseDir");
-        remotePath = requireNonBlank(remotePath, "remotePath");
+        customer = requireExactNonBlank(customer, "customer");
+        messageType = requireExactNonBlank(messageType, "messageType");
+        filename = requireExactNonBlank(filename, "filename");
+        baseDir = requireExactNonBlank(baseDir, "baseDir");
+        remotePath = requireExactNonBlank(remotePath, "remotePath");
         Objects.requireNonNull(lastModified, "lastModified must not be null");
     }
 
-    private static String requireNonBlank(String value, String field) {
+    private static String requireExactNonBlank(String value, String field) {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException(field + " must not be blank");
         }
-        return value.trim();
+        if (!value.equals(value.trim())) {
+            throw new IllegalArgumentException(field + " must not have leading or trailing whitespace");
+        }
+        return value;
     }
 }

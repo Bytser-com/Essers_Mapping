@@ -14,11 +14,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class InterfaceDomainTest {
 
     @Test
-    @DisplayName("IncomingInterface trims fields and rejects blank values or null timestamp")
+    @DisplayName("IncomingInterface preserves exact values and rejects blank, padded or null fields")
     void incomingInterfaceValidatesFields() {
         Instant now = Instant.now();
         IncomingInterface item = new IncomingInterface(
-                " nouryon ", " outbound ", " order1.xml ", "/Clients/nouryon/outbound",
+                "nouryon", "outbound", "order1.xml", "/Clients/nouryon/outbound",
                 "/Clients/nouryon/outbound/incoming/order1.xml", now
         );
 
@@ -31,6 +31,10 @@ class InterfaceDomainTest {
                 " ", "outbound", "order1.xml", "/Clients/nouryon/outbound",
                 "/Clients/nouryon/outbound/incoming/order1.xml", now
         ));
+        assertThrows(IllegalArgumentException.class, () -> new IncomingInterface(
+                "nouryon", "outbound ", "order1.xml", "/Clients/nouryon/outbound",
+                "/Clients/nouryon/outbound/incoming/order1.xml", now
+        ));
         assertThrows(NullPointerException.class, () -> new IncomingInterface(
                 "nouryon", "outbound", "order1.xml", "/Clients/nouryon/outbound",
                 "/Clients/nouryon/outbound/incoming/order1.xml", null
@@ -38,10 +42,10 @@ class InterfaceDomainTest {
     }
 
     @Test
-    @DisplayName("ClaimedInterface trims fields and rejects blank values")
+    @DisplayName("ClaimedInterface preserves exact values and rejects blank or whitespace-padded fields")
     void claimedInterfaceValidatesFields() {
         ClaimedInterface claimed = new ClaimedInterface(
-                " nouryon ", " inbound ", " order1.xml ", "/Clients/nouryon/inbound",
+                "nouryon", "inbound", "order1.xml", "/Clients/nouryon/inbound",
                 "/Clients/nouryon/inbound/processing/order1.xml.pod1.processing"
         );
 
@@ -51,6 +55,10 @@ class InterfaceDomainTest {
 
         assertThrows(IllegalArgumentException.class, () -> new ClaimedInterface(
                 "nouryon", "inbound", "", "/Clients/nouryon/inbound",
+                "/Clients/nouryon/inbound/processing/order1.xml.pod1.processing"
+        ));
+        assertThrows(IllegalArgumentException.class, () -> new ClaimedInterface(
+                " nouryon", "inbound", "order1.xml", "/Clients/nouryon/inbound",
                 "/Clients/nouryon/inbound/processing/order1.xml.pod1.processing"
         ));
     }

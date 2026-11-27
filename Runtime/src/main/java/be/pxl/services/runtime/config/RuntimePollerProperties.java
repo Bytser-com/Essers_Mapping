@@ -32,6 +32,7 @@ public record RuntimePollerProperties(
     public static final long DEFAULT_STALE_CLAIM_TIMEOUT_MS = 300_000L;
     public static final long DEFAULT_STALE_RECOVERY_INTERVAL_MS = 60_000L;
     public static final int DEFAULT_SHUTDOWN_AWAIT_SECONDS = 20;
+    public static final int MAX_INSTANCE_ID_LENGTH = 64;
 
     public RuntimePollerProperties {
         baseIntervalMs = positiveOrDefault("base-interval-ms", baseIntervalMs, DEFAULT_BASE_INTERVAL_MS);
@@ -63,7 +64,8 @@ public record RuntimePollerProperties(
             return "";
         }
         String normalized = raw.trim().replace('.', '-');
-        return INVALID_INSTANCE_ID_CHARS.matcher(normalized).replaceAll("");
+        String cleaned = INVALID_INSTANCE_ID_CHARS.matcher(normalized).replaceAll("");
+        return cleaned.length() > MAX_INSTANCE_ID_LENGTH ? cleaned.substring(0, MAX_INSTANCE_ID_LENGTH) : cleaned;
     }
 
     private static String resolveInstanceId(String raw) {

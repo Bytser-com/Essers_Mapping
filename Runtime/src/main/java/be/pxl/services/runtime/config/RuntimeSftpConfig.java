@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 
 import org.apache.sshd.sftp.client.SftpClient;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +25,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 @EnableConfigurationProperties({ RuntimeSftpProperties.class, RuntimePollerProperties.class })
 public class RuntimeSftpConfig {
 
+    public static final String RUNTIME_SFTP_DELEGATE_FACTORY = "runtimeSftpDelegateSessionFactory";
     public static final String RUNTIME_SFTP_SESSION_FACTORY = "runtimeSftpSessionFactory";
     public static final String RUNTIME_SFTP_TEMPLATE = "runtimeSftpTemplate";
     public static final String RUNTIME_POLLER_SCHEDULER = "runtimePollerTaskScheduler";
@@ -31,11 +33,15 @@ public class RuntimeSftpConfig {
 
     private static final int MIN_SESSION_POOL_SIZE = 4;
     private static final int EXTRA_POLLER_SESSIONS = 2;
+    private static final int MAX_SCHEDULER_AWAIT_SECONDS = 5;
 
-    @Bean(name = RUNTIME_SFTP_SESSION_FACTORY)
-    public SessionFactory<SftpClient.DirEntry> runtimeSftpSessionFactory(
+    /**
+     * Registered as its own Spring bean so Spring invokes {@link DefaultSftpSessionFactory#destroy()}
+     * on shutdown and cleanly closes the underlying Apache MINA {@code SshClient} NIO2 thread pool.
+     */
+    @Bean(name = RUNTIME_SFTP_DELEGATE_FACTORY)
+    public DefaultSftpSessionFactory runtimeSftpDelegateSessionFactory(
             RuntimeSftpProperties sftpProperties,
-            RuntimePollerProperties pollerProperties,
             ResourceLoader resourceLoader
     ) {
         // Dedicated SSH connection per pooled session avoids single-TCP pinning & SSH MaxSessions limits.
@@ -49,7 +55,7 @@ public class RuntimeSftpConfig {
         }
         if (sftpProperties.privateKey() != null && !sftpProperties.privateKey().isBlank()) {
             factory.setPrivateKey(resourceLoader.getResource(sftpProperties.privateKey()));
-            if (sftpProperties.privateKeyPassphrase() != null) {
+            if (sftpProperties.privateKeyPassphrase() != null && !sftpProperties.privateKeyPassphrase().isEmpty()) {
                 factory.setPrivateKeyPassphrase(sftpProperties.privateKeyPassphrase());
             }
         }
@@ -57,9 +63,18 @@ public class RuntimeSftpConfig {
             factory.setKnownHostsResource(resourceLoader.getResource(sftpProperties.knownHosts()));
         }
         factory.setAllowUnknownKeys(sftpProperties.allowUnknownKeys());
+        return factory;
+    }
 
+    @Bean(name = RUNTIME_SFTP_SESSION_FACTORY)
+    public SessionFactory<SftpClient.DirEntry> runtimeSftpSessionFactory(
+            @Qualifier(RUNTIME_SFTP_DELEGATE_FACTORY) DefaultSftpSessionFactory delegateFactory,
+            RuntimeSftpProperties sftpProperties,
+            RuntimePollerProperties pollerProperties
+    ) {
         int poolSize = recommendedSessionPoolSize(pollerProperties.workerConcurrency());
-        CachingSessionFactory<SftpClient.DirEntry> cachingFactory = new CachingSessionFactory<>(factory, poolSize);
+        CachingSessionFactory<SftpClient.DirEntry> cachingFactory =
+                new CachingSessionFactory<>(delegateFactory, poolSize);
         cachingFactory.setSessionWaitTimeout(sftpProperties.sessionWaitTimeoutMs());
         cachingFactory.setTestSession(true);
         return cachingFactory;
@@ -73,16 +88,19 @@ public class RuntimeSftpConfig {
     }
 
     @Bean(name = RUNTIME_POLLER_SCHEDULER)
+    @ConditionalOnProperty(prefix = "runtime.poller", name = "enabled", havingValue = "true", matchIfMissing = true)
     public ThreadPoolTaskScheduler runtimePollerTaskScheduler(RuntimePollerProperties pollerProperties) {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(2);
         scheduler.setThreadNamePrefix("runtime-poller-");
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
-        scheduler.setAwaitTerminationSeconds(pollerProperties.shutdownAwaitSeconds());
+        scheduler.setAwaitTerminationSeconds(
+                Math.min(MAX_SCHEDULER_AWAIT_SECONDS, pollerProperties.shutdownAwaitSeconds()));
         return scheduler;
     }
 
     @Bean(name = RUNTIME_WORKER_EXECUTOR, destroyMethod = "shutdown")
+    @ConditionalOnProperty(prefix = "runtime.poller", name = "enabled", havingValue = "true", matchIfMissing = true)
     public ExecutorService runtimeWorkerExecutor() {
         return Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("runtime-worker-", 0).factory());
     }
