@@ -6,7 +6,6 @@ import be.essers.services.versioncontrol.domain.dto.MappingPackage;
 import be.essers.services.versioncontrol.domain.dto.PackageVersionDto;
 import be.essers.services.versioncontrol.exception.EntityNotFoundException;
 import be.essers.services.versioncontrol.exception.StorageException;
-import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import org.apache.sshd.sftp.client.SftpClient;
 import org.slf4j.Logger;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
@@ -29,7 +27,7 @@ import java.util.*;
  * Reads and manages mapping packages from SFTP. Layout:
  * {@code <sftp.packages-path>/<companyName>/<version>/<type>/MPackage.json}
  * Active package manifest:
- * {@code <sftp.packages-path>/<companyName>/active.json}
+ * {@code <sftp.packages-path>/<companyName>/active.json} (see {@link ActivePackageFile})
  */
 @Service
 public class SftpPackageStorageService implements PackageStorageService {
@@ -37,7 +35,6 @@ public class SftpPackageStorageService implements PackageStorageService {
     private static final Logger log = LoggerFactory.getLogger(SftpPackageStorageService.class);
 
     private static final String METADATA_FILENAME = "MPackage.json";
-    private static final String ACTIVE_FILENAME = "active.json";
     private static final int MAX_COMPANY_LENGTH = 20;
 
     // Alphabetical on the name shown in the list (customerName, or the company folder), then on the type
@@ -47,6 +44,7 @@ public class SftpPackageStorageService implements PackageStorageService {
 
     private final SftpRemoteFileTemplate template;
     private final SftpFolders folders;
+    private final ActivePackageFile activePackages;
     private final String packagesRoot;
     private final ObjectMapper objectMapper;
 
@@ -54,6 +52,7 @@ public class SftpPackageStorageService implements PackageStorageService {
                                      @Value("${sftp.packages-path:/Packages}") String packagesRoot) {
         this.template = template;
         this.folders = new SftpFolders(template);
+        this.activePackages = new ActivePackageFile(template, folders, objectMapper);
         this.packagesRoot = packagesRoot;
         this.objectMapper = objectMapper;
     }
@@ -122,35 +121,13 @@ public class SftpPackageStorageService implements PackageStorageService {
             throw new EntityNotFoundException("Package at " + typePath + " is invalid: " + problem);
         }
 
-        // Read current active.json or start empty
-        Map<String, ActivePackageInfo> activeMap = readActivePackages(companyPath);
+        Map<String, ActivePackageInfo> activeMap = activePackages.read(companyPath);
         String nowIso = Instant.now().toString();
         String effectiveUser = (user != null && !user.isBlank()) ? user.trim() : "analist";
         activeMap.put(sanitizedType, new ActivePackageInfo(resolvedVersion, nowIso, effectiveUser));
 
-        // Write active.json atomically
-        String activeJsonPath = SftpFolders.path(companyPath, ACTIVE_FILENAME);
-        String tempPath = SftpFolders.path(companyPath, "." + ACTIVE_FILENAME + ".tmp");
-        try {
-            byte[] bytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(activeMap);
-            template.execute(session -> {
-                session.write(new ByteArrayInputStream(bytes), tempPath);
-                try {
-                    session.rename(tempPath, activeJsonPath);
-                } catch (Exception e) {
-                    try {
-                        session.remove(activeJsonPath);
-                    } catch (Exception ignored) {
-                    }
-                    session.rename(tempPath, activeJsonPath);
-                }
-                return null;
-            });
-            log.info("Updated active package for {}/{}: version={}, user={}", resolvedCompany, sanitizedType, resolvedVersion, effectiveUser);
-        } catch (Exception e) {
-            log.error("Failed to write active.json at {}: {}", activeJsonPath, e.getMessage(), e);
-            throw new StorageException("Unable to update active.json: " + e.getMessage(), e);
-        }
+        activePackages.write(companyPath, activeMap);
+        log.info("Updated active package for {}/{}: version={}, user={}", resolvedCompany, sanitizedType, resolvedVersion, effectiveUser);
 
         // Return updated overview directly
         String createdAt = extractCreatedAt(typeEntries, metadata);
@@ -186,7 +163,7 @@ public class SftpPackageStorageService implements PackageStorageService {
 
         String companyPath = SftpFolders.path(packagesRoot, resolvedCompany);
         String sanitizedType = SftpFolders.sanitizeSegment(packageType).toLowerCase();
-        Map<String, ActivePackageInfo> activeMap = readActivePackages(companyPath);
+        Map<String, ActivePackageInfo> activeMap = activePackages.read(companyPath);
         ActivePackageInfo activeInfo = activeMap.get(sanitizedType);
 
         List<String> versions = folders.subfolders(companyPath);
@@ -275,7 +252,7 @@ public class SftpPackageStorageService implements PackageStorageService {
      */
     private List<MappingPackageOverviewDto> findLatestPackagesForCompany(String companyName, List<String> versions) {
         String companyPath = SftpFolders.path(packagesRoot, companyName);
-        Map<String, ActivePackageInfo> activeMap = readActivePackages(companyPath);
+        Map<String, ActivePackageInfo> activeMap = activePackages.read(companyPath);
 
         // Group packages by type: packageType -> (version -> VersionPackageData)
         Map<String, String> latestVersionByType = new LinkedHashMap<>();
@@ -353,36 +330,6 @@ public class SftpPackageStorageService implements PackageStorageService {
         }
 
         return result;
-    }
-
-    private Map<String, ActivePackageInfo> readActivePackages(String companyPath) {
-        String activePath = SftpFolders.path(companyPath, ACTIVE_FILENAME);
-        if (!folders.exists(activePath)) {
-            return new HashMap<>();
-        }
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            boolean success = template.get(activePath, in -> in.transferTo(baos));
-            if (success && baos.size() > 0) {
-                JsonNode root = objectMapper.readTree(baos.toByteArray());
-                if (root == null || !root.isObject()) {
-                    return new HashMap<>();
-                }
-                JsonNode typesNode = root.has("types") && root.get("types").isObject() ? root.get("types") : root;
-                Map<String, ActivePackageInfo> result = new HashMap<>();
-                for (var entry : typesNode.properties()) {
-                    String type = entry.getKey().toLowerCase();
-                    ActivePackageInfo info = objectMapper.treeToValue(entry.getValue(), ActivePackageInfo.class);
-                    if (info != null && info.version() != null && !info.version().isBlank()) {
-                        result.put(type, info);
-                    }
-                }
-                return result;
-            }
-        } catch (Exception e) {
-            log.warn("Failed to read active.json at {}: {}", activePath, e.getMessage());
-        }
-        return new HashMap<>();
     }
 
     private String extractCreatedAt(SftpClient.DirEntry[] entries, MappingPackage.Meta metadata) {
