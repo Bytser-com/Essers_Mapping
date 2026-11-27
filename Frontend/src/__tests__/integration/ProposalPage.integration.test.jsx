@@ -11,7 +11,8 @@ const PROPOSAL = {
   klant: 'brunos',
   versie: 1,
   proposalType: 'inbound',
-  status: 'Klaar om na te kijken',
+  status: 'In review',
+  statusCode: 'IN_REVIEW',
   geupload: '2026-10-30T10:00:00',
   mappings: [{ id: 'MP-001', bronveld: 'Klant/Nummer', doelveld: 'Klantnummer', zekerheid: 92, opmerking: '' }],
 }

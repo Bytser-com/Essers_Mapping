@@ -21,7 +21,8 @@ const PROPOSAL: Proposal = {
   klant: 'brunos',
   versie: 2,
   proposalType: 'inbound',
-  status: 'Klaar om na te kijken',
+  status: 'In review',
+  statusCode: 'IN_REVIEW',
   geupload: '2026-10-30T10:00:00',
   mappings: [{ id: 'MP-001', bronveld: 'Klant/Nummer', doelveld: 'Klantnummer', zekerheid: 92, opmerking: '' }],
 }
@@ -304,6 +305,19 @@ describe('ProposalPage actions', () => {
       const button = screen.getByRole('button', { name: 'Goedkeuren' })
       expect(button).toBeDisabled()
       expect(button).toHaveAttribute('title', expect.stringContaining('AI-controle is bezig'))
+    })
+
+    it('disables "Goedkeuren" when status is not In review', () => {
+      // Arrange
+      useProposalStore.setState({ proposal: { ...PROPOSAL, status: 'Klaar om na te kijken', statusCode: 'READY_FOR_REVIEW' } })
+
+      // Act
+      renderPage()
+
+      // Assert
+      const button = screen.getByRole('button', { name: 'Goedkeuren' })
+      expect(button).toBeDisabled()
+      expect(button).toHaveAttribute('title', "Alleen voorstellen met de status 'In review' kunnen worden goedgekeurd")
     })
   })
 

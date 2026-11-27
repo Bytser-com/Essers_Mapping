@@ -49,12 +49,14 @@ function formatDateOnly(dateStr?: string | null): string {
 }
 
 /** Why "Goedkeuren" is disabled, or undefined when the proposal can be approved. */
-function getApproveDisabledReason(hasReviewFields: boolean, isAiChecking: boolean): string | undefined {
-  if (hasReviewFields) {
-    return "Goedkeuren is pas mogelijk als alle velden zijn nagekeken";
-  }
+function getApproveDisabledReason(status?: string, statusCode?: string): string | undefined {
+  const isAiChecking = statusCode === AI_CHECKING_REVIEW || status === "AI-controle bezig";
   if (isAiChecking) {
     return "De AI-controle is bezig; het voorstel kan nu niet opnieuw goedgekeurd worden";
+  }
+  const isInReview = status === IN_REVIEW || status?.toLowerCase() === "in review" || statusCode === "IN_REVIEW";
+  if (!isInReview) {
+    return "Alleen voorstellen met de status 'In review' kunnen worden goedgekeurd";
   }
   return undefined;
 }
@@ -63,7 +65,12 @@ function getApproveDisabledReason(hasReviewFields: boolean, isAiChecking: boolea
  * State of the "Proposal goedkeuren?" dialog (story IT2627T06-185), kept out of the page
  * component so the page stays readable.
  */
-function useApproveDialog(company: string | undefined, version: number | undefined, onApprove?: () => void) {
+function useApproveDialog(
+  company: string | undefined,
+  version: number | undefined,
+  onApprove?: () => void,
+  onComplete?: (success: boolean) => void,
+) {
   const approveProposal = useProposalStore((state) => state.approveProposal);
   const [isOpen, setIsOpen] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
@@ -79,9 +86,12 @@ function useApproveDialog(company: string | undefined, version: number | undefin
   async function confirm(description: string) {
     if (!company || version === undefined) return;
     setIsApproving(true);
-    await approveProposal(company, `v${version}`, description);
+    const success = await approveProposal(company, `v${version}`, description);
     setIsApproving(false);
     setIsOpen(false);
+    if (onComplete) {
+      onComplete(success);
+    }
   }
 
   return { isOpen, isApproving, open, close: () => setIsOpen(false), confirm };
@@ -126,7 +136,39 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
-  const approveDialog = useApproveDialog(company, proposal?.versie, onApprove);
+  const approveDialog = useApproveDialog(
+    company,
+    proposal?.versie,
+    onApprove,
+    (success) => {
+      const versionStr = `v${proposal?.versie ?? 1}`;
+      const compName = proposal?.klant || company || "";
+      if (success) {
+        navigate("/", {
+          state: {
+            approvalMessage: {
+              type: "success",
+              title: "Voorstel goedgekeurd.",
+              message: `Voorstel voor ${compName} (${versionStr}) is succesvol goedgekeurd en omgezet.`,
+            },
+          },
+        });
+      } else {
+        const errorMsg =
+          useProposalStore.getState().actionError ||
+          "Er is een probleem opgetreden bij het goedkeuren van het voorstel.";
+        navigate("/", {
+          state: {
+            approvalMessage: {
+              type: "error",
+              title: "Goedkeuren mislukt.",
+              message: errorMsg,
+            },
+          },
+        });
+      }
+    }
+  );
   const actionError = useProposalStore((state) => state.actionError);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -235,8 +277,7 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
   const reviewCount = proposal.mappings.filter((m) => !m.bronveld).length;
   const matchedCount = totalMappings - reviewCount;
   const hasReviewFields = reviewCount > 0;
-  const isAiChecking = proposal.statusCode === AI_CHECKING_REVIEW;
-  const approveDisabledReason = getApproveDisabledReason(hasReviewFields, isAiChecking);
+  const approveDisabledReason = getApproveDisabledReason(proposal.status, proposal.statusCode);
 
   const filteredMappings = proposal.mappings.filter((mapping) => {
     if (filterMissingOnly && mapping.bronveld) {
