@@ -53,9 +53,12 @@ All settings are configured via environment variables (see the root `.env.exampl
 | `SFTP_RUNTIME_PORT` | `2223` | SFTP port (`22` in Kubernetes, `2223` locally via Docker) |
 | `SFTP_RUNTIME_USER` | `runtimeuser` | SFTP username |
 | `SFTP_RUNTIME_PASSWORD` | *(empty — set in `.env` / K8s Secret)* | SFTP password (always redacted in logs/toString) |
+| `SFTP_RUNTIME_PRIVATE_KEY` | *(empty)* | Optional Spring resource path to SSH private key |
+| `SFTP_RUNTIME_PRIVATE_KEY_PASSPHRASE` | *(empty)* | Optional passphrase for encrypted private key (always redacted) |
 | `SFTP_RUNTIME_REMOTE_DIR` | `/Clients` | Base directory for customer interfaces |
 | `SFTP_ALLOW_UNKNOWN_KEYS` | `false` | Secure-by-default; set `true` in local `.env` or provide `SFTP_KNOWN_HOSTS` |
 | `SFTP_KNOWN_HOSTS` | *(empty)* | Optional Spring resource path to SSH `known_hosts` file |
+| `SFTP_RUNTIME_SESSION_WAIT_TIMEOUT_MS` | `10000` | Max wait time in ms to borrow a pooled SFTP session |
 | `SFTP_RUNTIME_CONNECT_TIMEOUT_MS` | `10000` | SSH/SFTP connect & socket timeout in ms |
 | `SFTP_RUNTIME_MAX_FILE_SIZE_BYTES` | `26214400` | Max XML payload size in bytes (`25 MiB`); larger files move to `error/` |
 | `RUNTIME_POLLER_ENABLED` | `true` | Enable/disable background SFTP polling |
@@ -65,7 +68,8 @@ All settings are configured via environment variables (see the root `.env.exampl
 | `RUNTIME_WORKER_CONCURRENCY` | `4` | Max parallel XML workers per pod |
 | `RUNTIME_POLLER_STALE_CLAIM_TIMEOUT_MS` | `300000` | Claim age after which stuck `processing/` files return to `incoming/` |
 | `RUNTIME_POLLER_STALE_RECOVERY_INTERVAL_MS` | `60000` | Interval for stale-claim recovery scans |
-| `RUNTIME_POLLER_SHUTDOWN_AWAIT_SECONDS` | `20` | Graceful worker drain timeout on shutdown (kept below K8s 30s grace period) |
+| `RUNTIME_POLLER_SHUTDOWN_AWAIT_SECONDS` | `20` | Shared graceful shutdown budget (kept below K8s 30s grace period) |
+| `RUNTIME_POLLER_INSTANCE_ID` | `${HOSTNAME}` or random | Pod/instance identifier embedded in `.processing` claims (capped at 64 chars) |
 
 ---
 
@@ -78,6 +82,7 @@ Spring Boot Actuator exposes `/actuator/health`, `/actuator/health/readiness`, `
 - `runtime_files_processed_total` — Counter of successfully processed interfaces.
 - `runtime_files_failed_total` — Counter of failed interfaces moved to `error/`.
 - `runtime_poller_errors_total` — Counter of failed SFTP poll or stale-recovery cycles.
+- `runtime_storage_errors_total` — Counter of transient SFTP storage errors in workers during `readBytes` or `moveToProcessed`.
 - `runtime_file_processing_duration_seconds` — Timer recording end-to-end processing latency per claimed file.
 
 ### Kubernetes Infra Alignment Notes

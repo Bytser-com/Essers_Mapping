@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
@@ -51,7 +52,6 @@ class InterfacePollerTest {
     private static final String BASE_DIR = "/Clients/nouryon/outbound";
     private static final String INSTANCE_ID = "pod-test-1";
     private static final byte[] SAMPLE_XML = "<order/>".getBytes(StandardCharsets.UTF_8);
-    private static final Clock FIXED_CLOCK = Clock.fixed(Instant.parse("2026-11-27T12:00:00Z"), ZoneOffset.UTC);
 
     private RuntimeInterfaceStorage storage;
     private InterfaceProcessor processor;
@@ -59,6 +59,7 @@ class InterfacePollerTest {
     private ExecutorService workerExecutor;
     private SimpleMeterRegistry meterRegistry;
     private RuntimeMetrics metrics;
+    private MutableClock clock;
     private InterfacePoller poller;
 
     @BeforeEach
@@ -69,8 +70,9 @@ class InterfacePollerTest {
         workerExecutor = Executors.newSingleThreadExecutor();
         meterRegistry = new SimpleMeterRegistry();
         metrics = new RuntimeMetrics(meterRegistry);
+        clock = new MutableClock(Instant.parse("2026-11-27T12:00:00Z"));
         poller = new InterfacePoller(
-                storage, processor, defaultProperties(1_500L, 4), metrics, taskScheduler, workerExecutor, FIXED_CLOCK);
+                storage, processor, defaultProperties(1_500L, 4), metrics, taskScheduler, workerExecutor, clock);
     }
 
     @AfterEach
@@ -103,16 +105,18 @@ class InterfacePollerTest {
     }
 
     @Test
-    @DisplayName("drainOnce returns WORKERS_BUSY without scanning SFTP when all worker slots are occupied")
-    void drainOnceSkipsSftpScanWhenWorkersAreBusy() throws Exception {
+    @DisplayName("WORKERS_BUSY skips SFTP scans immediately, but refreshes backlog gauge after baseIntervalMs")
+    void workersBusySkipsImmediateScanAndRefreshesBacklogAfterBaseInterval() throws Exception {
         InterfacePoller singleWorkerPoller = new InterfacePoller(
-                storage, processor, defaultProperties(0L, 1), metrics, taskScheduler, workerExecutor, FIXED_CLOCK);
+                storage, processor, defaultProperties(0L, 1), metrics, taskScheduler, workerExecutor, clock);
         IncomingInterface incoming = incomingFile("slow.xml");
         ClaimedInterface claimed = claimedFile("slow.xml");
 
         CountDownLatch workerStarted = new CountDownLatch(1);
         CountDownLatch releaseWorker = new CountDownLatch(1);
-        when(storage.listReadyIncoming(any())).thenReturn(List.of(incoming));
+        when(storage.listReadyIncoming(any()))
+                .thenReturn(List.of(incoming))
+                .thenReturn(List.of(incomingFile("q1.xml"), incomingFile("q2.xml"), incomingFile("q3.xml")));
         when(storage.tryClaim(incoming, INSTANCE_ID)).thenReturn(Optional.of(claimed));
         when(storage.readBytes(claimed)).thenReturn(SAMPLE_XML);
         doAnswer(inv -> {
@@ -122,14 +126,18 @@ class InterfacePollerTest {
         }).when(processor).process(eq(claimed), any());
 
         try {
-            DrainOutcome first = singleWorkerPoller.drainOnce();
+            assertEquals(DrainOutcome.WORKERS_BUSY, singleWorkerPoller.drainOnce());
             assertTrue(workerStarted.await(5, TimeUnit.SECONDS));
-            DrainOutcome secondWhileBusy = singleWorkerPoller.drainOnce();
 
-            assertEquals(DrainOutcome.WORKERS_BUSY, first);
-            assertEquals(DrainOutcome.WORKERS_BUSY, secondWhileBusy);
-            // Second drainOnce saw 0 permits and must NOT scan SFTP!
+            // Within baseIntervalMs: zero extra SFTP scan!
+            assertEquals(DrainOutcome.WORKERS_BUSY, singleWorkerPoller.drainOnce());
             verify(storage, times(1)).listReadyIncoming(any());
+
+            // After baseIntervalMs (5s): refreshes backlog gauge so KEDA/HPA sees queued burst!
+            clock.advance(Duration.ofSeconds(5));
+            assertEquals(DrainOutcome.WORKERS_BUSY, singleWorkerPoller.drainOnce());
+            verify(storage, times(2)).listReadyIncoming(any());
+            assertEquals(3, metrics.backlogCount());
         } finally {
             releaseWorker.countDown();
             singleWorkerPoller.stop();
@@ -137,8 +145,8 @@ class InterfacePollerTest {
     }
 
     @Test
-    @DisplayName("drainOnce skips files already claimed by another pod without calling processor")
-    void drainOnceSkipsAlreadyClaimedFile() {
+    @DisplayName("drainOnce subtracts files already claimed by other pods from backlog metric")
+    void drainOnceSkipsAlreadyClaimedFileAndUpdatesBacklog() {
         IncomingInterface incoming = incomingFile("order_1.xml");
         when(storage.listReadyIncoming(any())).thenReturn(List.of(incoming));
         when(storage.tryClaim(incoming, INSTANCE_ID)).thenReturn(Optional.empty());
@@ -146,6 +154,7 @@ class InterfacePollerTest {
         DrainOutcome outcome = poller.drainOnce();
 
         assertEquals(DrainOutcome.IDLE, outcome);
+        assertEquals(0, metrics.backlogCount());
         verify(storage, never()).readBytes(any());
         verify(processor, never()).process(any(), any());
     }
@@ -181,8 +190,8 @@ class InterfacePollerTest {
     }
 
     @Test
-    @DisplayName("processClaimed leaves file in processing/ on transient readBytes or moveToProcessed SFTP failure")
-    void transientStorageErrorsDoNotQuarantineToError() {
+    @DisplayName("Transient readBytes or moveToProcessed SFTP errors record storage metric without moving to error/")
+    void transientStorageErrorsRecordMetricWithoutQuarantine() {
         IncomingInterface readFailIncoming = incomingFile("read_blip.xml");
         IncomingInterface moveFailIncoming = incomingFile("move_blip.xml");
         ClaimedInterface readFailClaimed = claimedFile("read_blip.xml");
@@ -201,6 +210,7 @@ class InterfacePollerTest {
         verify(storage, never()).moveToError(any(), any());
         verify(processor, never()).process(eq(readFailClaimed), any());
         verify(processor).process(moveFailClaimed, SAMPLE_XML);
+        assertEquals(2.0, meterRegistry.get(RuntimeMetrics.STORAGE_ERRORS_METRIC).counter().count());
         assertEquals(0.0, meterRegistry.get(RuntimeMetrics.FILES_FAILED_METRIC).counter().count());
         assertEquals(0.0, meterRegistry.get(RuntimeMetrics.FILES_PROCESSED_METRIC).counter().count());
     }
@@ -212,7 +222,7 @@ class InterfacePollerTest {
         doThrow(new RejectedExecutionException("shutting down")).when(rejectingExecutor).execute(any());
 
         InterfacePoller rejectingPoller = new InterfacePoller(
-                storage, processor, defaultProperties(0L, 2), metrics, taskScheduler, rejectingExecutor, FIXED_CLOCK);
+                storage, processor, defaultProperties(0L, 2), metrics, taskScheduler, rejectingExecutor, clock);
         IncomingInterface f1 = incomingFile("f1.xml");
         IncomingInterface f2 = incomingFile("f2.xml");
         when(storage.listReadyIncoming(any())).thenReturn(List.of(f1, f2));
@@ -225,7 +235,6 @@ class InterfacePollerTest {
         assertEquals(DrainOutcome.IDLE, outcome);
         assertEquals(0, metrics.activeWorkers());
 
-        // Also cover double-failure when moveToError itself throws
         IncomingInterface bad = incomingFile("bad2.xml");
         ClaimedInterface badClaimed = claimedFile("bad2.xml");
         when(storage.listReadyIncoming(any())).thenReturn(List.of(bad));
@@ -252,7 +261,7 @@ class InterfacePollerTest {
         }
 
         InterfacePoller zeroJitterPoller = new InterfacePoller(
-                storage, processor, defaultProperties(0L, 4), metrics, taskScheduler, workerExecutor, FIXED_CLOCK);
+                storage, processor, defaultProperties(0L, 4), metrics, taskScheduler, workerExecutor, clock);
         assertEquals(5_000L, zeroJitterPoller.computeIdleDelayMs());
     }
 
@@ -304,5 +313,32 @@ class InterfacePollerTest {
         return new ClaimedInterface(
                 CUSTOMER, MESSAGE_TYPE, name, BASE_DIR, BASE_DIR + "/processing/" + name + ".processing"
         );
+    }
+
+    private static final class MutableClock extends Clock {
+        private Instant current;
+
+        MutableClock(Instant initial) {
+            this.current = initial;
+        }
+
+        void advance(Duration delta) {
+            this.current = this.current.plus(delta);
+        }
+
+        @Override
+        public ZoneId getZone() {
+            return ZoneOffset.UTC;
+        }
+
+        @Override
+        public Clock withZone(ZoneId zone) {
+            return this;
+        }
+
+        @Override
+        public Instant instant() {
+            return current;
+        }
     }
 }

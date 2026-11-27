@@ -21,6 +21,7 @@ public class RuntimeMetrics {
     public static final String FILES_PROCESSED_METRIC = "runtime.files.processed";
     public static final String FILES_FAILED_METRIC = "runtime.files.failed";
     public static final String POLL_ERRORS_METRIC = "runtime.poller.errors";
+    public static final String STORAGE_ERRORS_METRIC = "runtime.storage.errors";
     public static final String PROCESSING_DURATION_METRIC = "runtime.file.processing.duration";
 
     private final AtomicInteger backlogFiles = new AtomicInteger(0);
@@ -28,6 +29,7 @@ public class RuntimeMetrics {
     private final Counter filesProcessed;
     private final Counter filesFailed;
     private final Counter pollErrors;
+    private final Counter storageErrors;
     private final Timer processingDuration;
 
     public RuntimeMetrics(MeterRegistry meterRegistry) {
@@ -49,6 +51,10 @@ public class RuntimeMetrics {
 
         this.pollErrors = Counter.builder(POLL_ERRORS_METRIC)
                 .description("Total number of failed SFTP poll or stale-recovery cycles")
+                .register(meterRegistry);
+
+        this.storageErrors = Counter.builder(STORAGE_ERRORS_METRIC)
+                .description("Total number of transient SFTP storage errors in workers during read or moveToProcessed")
                 .register(meterRegistry);
 
         this.processingDuration = Timer.builder(PROCESSING_DURATION_METRIC)
@@ -86,6 +92,10 @@ public class RuntimeMetrics {
 
     public void recordPollError() {
         pollErrors.increment();
+    }
+
+    public void recordStorageError() {
+        storageErrors.increment();
     }
 
     public void recordProcessingDuration(long durationNanos) {

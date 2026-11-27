@@ -20,6 +20,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import be.pxl.services.runtime.config.RuntimePollerProperties;
 import be.pxl.services.runtime.domain.ClaimedInterface;
@@ -100,6 +101,42 @@ class InterfacePollerConcurrencyTest {
     }
 
     @Test
+    @DisplayName("Real ThreadPoolTaskScheduler drains full backlog via event-driven worker wakeups without races")
+    void realTaskSchedulerDrainsBacklogViaEventDrivenWakeups() throws Exception {
+        int fileCount = 24;
+        int concurrency = 3;
+        InMemoryAtomicStorage storage = new InMemoryAtomicStorage(fileCount);
+        CountDownLatch allProcessed = new CountDownLatch(fileCount);
+        InterfaceProcessor processor = (claimed, xml) -> allProcessed.countDown();
+
+        ThreadPoolTaskScheduler realScheduler = new ThreadPoolTaskScheduler();
+        realScheduler.setPoolSize(2);
+        realScheduler.setThreadNamePrefix("test-poller-");
+        realScheduler.initialize();
+        ExecutorService virtualExecutor = Executors.newVirtualThreadPerTaskExecutor();
+        RuntimeMetrics metrics = new RuntimeMetrics(new SimpleMeterRegistry());
+        RuntimePollerProperties props = new RuntimePollerProperties(
+                true, 50L, 0L, 0L, concurrency, 300_000L, 60_000L, 5, "pod-scheduler"
+        );
+        InterfacePoller poller = new InterfacePoller(
+                storage, processor, props, metrics, realScheduler, virtualExecutor, Clock.systemUTC());
+
+        try {
+            poller.start();
+            assertTrue(allProcessed.await(10, TimeUnit.SECONDS),
+                    "Event-driven wakeups on real ThreadPoolTaskScheduler must drain all files cleanly");
+            poller.stop();
+        } finally {
+            realScheduler.shutdown();
+            virtualExecutor.shutdownNow();
+        }
+
+        assertEquals(fileCount, storage.processedCount());
+        assertEquals(0, storage.errorCount());
+        assertEquals(0, metrics.activeWorkers());
+    }
+
+    @Test
     @DisplayName("5 pods x 4 workers racing on 50 files process every file exactly once with zero duplicates")
     void multiplePodsClaimAndProcessEveryFileExactlyOnce() throws Exception {
         int fileCount = 50;
@@ -161,8 +198,8 @@ class InterfacePollerConcurrencyTest {
     }
 
     @Test
-    @DisplayName("stop() times out cleanly when an active worker exceeds shutdownAwaitSeconds")
-    void stopTimesOutGracefullyOnStuckWorker() throws Exception {
+    @DisplayName("stop() respects a single shared shutdown deadline when a worker is stuck")
+    void stopTimesOutGracefullyWithinSingleDeadline() throws Exception {
         InMemoryAtomicStorage storage = new InMemoryAtomicStorage(1);
         CountDownLatch workerRunning = new CountDownLatch(1);
         CountDownLatch releaseWorker = new CountDownLatch(1);
@@ -186,7 +223,10 @@ class InterfacePollerConcurrencyTest {
         try {
             poller.drainOnce();
             assertTrue(workerRunning.await(5, TimeUnit.SECONDS));
-            poller.stop(); // waits ~1s and logs warning without throwing
+            long startMs = System.currentTimeMillis();
+            poller.stop();
+            long elapsedMs = System.currentTimeMillis() - startMs;
+            assertTrue(elapsedMs < 2_500L, "Shared shutdown deadline should not double-wait; took " + elapsedMs + "ms");
             assertEquals(1, storage.processingCount());
         } finally {
             releaseWorker.countDown();
@@ -194,9 +234,6 @@ class InterfacePollerConcurrencyTest {
         }
     }
 
-    /**
-     * Thread-safe in-memory storage simulating atomic POSIX SFTP rename via {@link ConcurrentHashMap#remove}.
-     */
     private static final class InMemoryAtomicStorage implements RuntimeInterfaceStorage {
 
         private final Map<String, byte[]> incoming = new ConcurrentHashMap<>();

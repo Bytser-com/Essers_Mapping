@@ -2,6 +2,7 @@ package be.pxl.services.runtime.poller;
 
 import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -50,6 +51,12 @@ public class InterfacePoller implements SmartLifecycle {
         WORKERS_BUSY
     }
 
+    private enum ClaimAttempt {
+        DISPATCHED,
+        ALREADY_CLAIMED,
+        FAILED
+    }
+
     private final RuntimeInterfaceStorage storage;
     private final InterfaceProcessor processor;
     private final RuntimePollerProperties properties;
@@ -61,11 +68,17 @@ public class InterfacePoller implements SmartLifecycle {
 
     private final Object lifecycleLock = new Object();
     private final ReentrantLock drainLock = new ReentrantLock();
+    private final ReentrantLock recoveryLock = new ReentrantLock();
     private final AtomicBoolean running = new AtomicBoolean(false);
     private final AtomicBoolean stopping = new AtomicBoolean(false);
-    private final AtomicBoolean waitingForWorkerSlot = new AtomicBoolean(false);
     private final AtomicReference<ScheduledFuture<?>> pollFuture = new AtomicReference<>();
     private final AtomicReference<ScheduledFuture<?>> recoveryFuture = new AtomicReference<>();
+
+    // Guarded strictly by lifecycleLock to eliminate wakeup/reschedule races.
+    private boolean pollInFlight;
+    private boolean wakeupRequested;
+    private boolean waitingForWorkerSlot;
+    private volatile Instant lastBacklogScanAt = Instant.EPOCH;
 
     @Autowired
     public InterfacePoller(
@@ -94,7 +107,9 @@ public class InterfacePoller implements SmartLifecycle {
                 return;
             }
             stopping.set(false);
-            waitingForWorkerSlot.set(false);
+            pollInFlight = false;
+            wakeupRequested = false;
+            waitingForWorkerSlot = false;
             long initialDelayMs = nextRandomDelay(properties.baseIntervalMs());
             LOGGER.info("Starting SFTP InterfacePoller instanceId={} concurrency={} baseIntervalMs={} maxJitterMs={}",
                     properties.instanceId(), properties.workerConcurrency(),
@@ -109,12 +124,15 @@ public class InterfacePoller implements SmartLifecycle {
         synchronized (lifecycleLock) {
             stopping.set(true);
             running.set(false);
-            waitingForWorkerSlot.set(false);
+            wakeupRequested = false;
+            waitingForWorkerSlot = false;
             cancelFuture(pollFuture.getAndSet(null));
             cancelFuture(recoveryFuture.getAndSet(null));
         }
-        awaitInFlightDrain();
-        awaitActiveWorkers();
+        long deadlineNanos = System.nanoTime() + TimeUnit.SECONDS.toNanos(properties.shutdownAwaitSeconds());
+        awaitLockRelease(drainLock, deadlineNanos, "in-flight SFTP drain cycle");
+        awaitLockRelease(recoveryLock, deadlineNanos, "in-flight stale-claim recovery");
+        awaitActiveWorkers(deadlineNanos);
     }
 
     @Override
@@ -137,11 +155,19 @@ public class InterfacePoller implements SmartLifecycle {
     }
 
     int recoverStaleOnce() {
-        int recovered = storage.recoverStaleClaims(Duration.ofMillis(properties.staleClaimTimeoutMs()));
-        if (recovered > 0) {
-            LOGGER.info("Recovered {} stale interface claim(s) back to incoming/", recovered);
+        recoveryLock.lock();
+        try {
+            if (stopping.get()) {
+                return 0;
+            }
+            int recovered = storage.recoverStaleClaims(Duration.ofMillis(properties.staleClaimTimeoutMs()));
+            if (recovered > 0) {
+                LOGGER.info("Recovered {} stale interface claim(s) back to incoming/", recovered);
+            }
+            return recovered;
+        } finally {
+            recoveryLock.unlock();
         }
-        return recovered;
     }
 
     long computeIdleDelayMs() {
@@ -157,18 +183,40 @@ public class InterfacePoller implements SmartLifecycle {
     }
 
     void pollAndReschedule() {
-        if (!running.get()) {
-            return;
+        synchronized (lifecycleLock) {
+            if (!running.get()) {
+                return;
+            }
+            pollInFlight = true;
+            wakeupRequested = false;
+            waitingForWorkerSlot = false;
         }
+
+        DrainOutcome outcome = DrainOutcome.IDLE;
         long nextDelay;
         try {
-            nextDelay = nextDelayMs(drainOnce());
+            outcome = drainOnce();
+            nextDelay = nextDelayMs(outcome);
         } catch (Exception ex) {
             metrics.recordPollError();
             LOGGER.warn("SFTP poll cycle failed; retrying after backoff: {}", ex.getMessage());
             nextDelay = computeIdleDelayMs();
         }
-        scheduleNextPoll(nextDelay);
+
+        synchronized (lifecycleLock) {
+            pollInFlight = false;
+            if (!running.get()) {
+                return;
+            }
+            if (wakeupRequested || (outcome == DrainOutcome.WORKERS_BUSY && workerSlots.availablePermits() > 0)) {
+                wakeupRequested = false;
+                waitingForWorkerSlot = false;
+                scheduleNextPollLocked(0L);
+            } else {
+                waitingForWorkerSlot = (outcome == DrainOutcome.WORKERS_BUSY);
+                scheduleNextPollLocked(nextDelay);
+            }
+        }
     }
 
     void recoverStaleAndReschedule() {
@@ -189,56 +237,74 @@ public class InterfacePoller implements SmartLifecycle {
             return DrainOutcome.IDLE;
         }
         if (workerSlots.availablePermits() == 0) {
-            waitingForWorkerSlot.set(true);
+            refreshBacklogIfStale();
             return DrainOutcome.WORKERS_BUSY;
         }
 
         List<IncomingInterface> candidates = storage.listReadyIncoming(Duration.ofMillis(properties.minFileAgeMs()));
+        lastBacklogScanAt = clock.instant();
         metrics.setBacklogCount(candidates.size());
         if (candidates.isEmpty()) {
             return DrainOutcome.IDLE;
         }
 
         int claimedCount = 0;
+        int claimedByOthers = 0;
         for (IncomingInterface candidate : candidates) {
             if (stopping.get()) {
                 break;
             }
             if (!workerSlots.tryAcquire()) {
-                waitingForWorkerSlot.set(true);
-                metrics.setBacklogCount(Math.max(0, candidates.size() - claimedCount));
+                metrics.setBacklogCount(Math.max(0, candidates.size() - claimedCount - claimedByOthers));
                 return DrainOutcome.WORKERS_BUSY;
             }
-            if (claimAndDispatch(candidate)) {
+            ClaimAttempt attempt = claimAndDispatch(candidate);
+            if (attempt == ClaimAttempt.DISPATCHED) {
                 claimedCount++;
+            } else if (attempt == ClaimAttempt.ALREADY_CLAIMED) {
+                claimedByOthers++;
             }
         }
 
-        metrics.setBacklogCount(Math.max(0, candidates.size() - claimedCount));
+        metrics.setBacklogCount(Math.max(0, candidates.size() - claimedCount - claimedByOthers));
         if (claimedCount == 0 || stopping.get()) {
             return DrainOutcome.IDLE;
         }
         if (workerSlots.availablePermits() == 0) {
-            waitingForWorkerSlot.set(true);
             return DrainOutcome.WORKERS_BUSY;
         }
         return candidates.size() >= properties.workerConcurrency() ? DrainOutcome.DRAINED : DrainOutcome.IDLE;
     }
 
-    private boolean claimAndDispatch(IncomingInterface candidate) {
+    /**
+     * Keeps {@code runtime_sftp_backlog_files} fresh for KEDA/HPA even while all workers
+     * remain saturated for longer than {@code baseIntervalMs}, without re-introducing busy scans.
+     */
+    private void refreshBacklogIfStale() {
+        Instant lastScan = lastBacklogScanAt;
+        Instant now = clock.instant();
+        if (!Instant.EPOCH.equals(lastScan)
+                && Duration.between(lastScan, now).toMillis() >= properties.baseIntervalMs()) {
+            List<IncomingInterface> waiting = storage.listReadyIncoming(Duration.ofMillis(properties.minFileAgeMs()));
+            lastBacklogScanAt = now;
+            metrics.setBacklogCount(waiting.size());
+        }
+    }
+
+    private ClaimAttempt claimAndDispatch(IncomingInterface candidate) {
         Optional<ClaimedInterface> claimed;
         try {
             claimed = storage.tryClaim(candidate, properties.instanceId());
         } catch (Exception ex) {
             workerSlots.release();
             LOGGER.warn("Failed to claim {}: {}", candidate.remotePath(), ex.getMessage());
-            return false;
+            return ClaimAttempt.FAILED;
         }
         if (claimed.isEmpty()) {
             workerSlots.release();
-            return false;
+            return ClaimAttempt.ALREADY_CLAIMED;
         }
-        return submitToWorker(claimed.get());
+        return submitToWorker(claimed.get()) ? ClaimAttempt.DISPATCHED : ClaimAttempt.FAILED;
     }
 
     private boolean submitToWorker(ClaimedInterface claimed) {
@@ -281,7 +347,8 @@ public class InterfacePoller implements SmartLifecycle {
         try {
             return storage.readBytes(claimed);
         } catch (RuntimeStorageException storageEx) {
-            // Transient SFTP failure: keep file in processing/ for stale-claim recovery instead of error/.
+            // Transient SFTP failure: record metric & leave in processing/ for stale-claim recovery.
+            metrics.recordStorageError();
             LOGGER.warn("Transient SFTP error reading {}; leaving in processing/ for recovery: {}",
                     claimed.claimedPath(), storageEx.getMessage());
             return null;
@@ -293,7 +360,8 @@ public class InterfacePoller implements SmartLifecycle {
             storage.moveToProcessed(claimed);
             return true;
         } catch (RuntimeStorageException storageEx) {
-            // Processing already succeeded; do not move to error/ with a misleading failure note.
+            // Processing already succeeded; record storage error without moving to error/.
+            metrics.recordStorageError();
             LOGGER.error("Processed {} successfully but failed to move to processed/: {}",
                     claimed.claimedPath(), storageEx.getMessage(), storageEx);
             return false;
@@ -310,14 +378,18 @@ public class InterfacePoller implements SmartLifecycle {
     }
 
     private void wakePollerIfWaiting() {
-        if (running.get() && waitingForWorkerSlot.compareAndSet(true, false)) {
-            scheduleNextPoll(0L);
-        }
-    }
-
-    private void scheduleNextPoll(long delayMs) {
         synchronized (lifecycleLock) {
-            scheduleNextPollLocked(delayMs);
+            if (!running.get()) {
+                return;
+            }
+            if (pollInFlight) {
+                wakeupRequested = true;
+                return;
+            }
+            if (waitingForWorkerSlot) {
+                waitingForWorkerSlot = false;
+                scheduleNextPollLocked(0L);
+            }
         }
     }
 
@@ -350,22 +422,24 @@ public class InterfacePoller implements SmartLifecycle {
         }
     }
 
-    private void awaitInFlightDrain() {
+    private void awaitLockRelease(ReentrantLock lock, long deadlineNanos, String description) {
+        long remainingNanos = Math.max(0L, deadlineNanos - System.nanoTime());
         try {
-            if (drainLock.tryLock(properties.shutdownAwaitSeconds(), TimeUnit.SECONDS)) {
-                drainLock.unlock();
+            if (lock.tryLock(remainingNanos, TimeUnit.NANOSECONDS)) {
+                lock.unlock();
             } else {
-                LOGGER.warn("Timed out waiting for in-flight SFTP drain cycle during shutdown");
+                LOGGER.warn("Timed out waiting for {} during shutdown", description);
             }
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
     }
 
-    private void awaitActiveWorkers() {
+    private void awaitActiveWorkers(long deadlineNanos) {
         int permits = properties.workerConcurrency();
+        long remainingNanos = Math.max(0L, deadlineNanos - System.nanoTime());
         try {
-            boolean drained = workerSlots.tryAcquire(permits, properties.shutdownAwaitSeconds(), TimeUnit.SECONDS);
+            boolean drained = workerSlots.tryAcquire(permits, remainingNanos, TimeUnit.NANOSECONDS);
             if (drained) {
                 workerSlots.release(permits);
             } else {
