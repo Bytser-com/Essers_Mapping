@@ -1,15 +1,22 @@
 import { create } from "zustand";
 import {
   fetchPackages as fetchPackagesRequest,
+  fetchPackageVersions as fetchPackageVersionsRequest,
   setActivePackage as setActivePackageRequest,
   type MappingPackageOverview,
+  type PackageVersion,
 } from "../services/mappingPackageOverviewService";
+
 
 type MappingPackageState = {
   packages: MappingPackageOverview[] | null;
   loading: boolean;
   error: string | null;
+  versions: PackageVersion[] | null;
+  versionsLoading: boolean;
+  versionsError: string | null;
   fetchPackages: (company?: string) => Promise<void>;
+  fetchVersions: (company: string, packageType: string) => Promise<void>;
   setActivePackage: (
     company: string,
     packageType: string,
@@ -22,6 +29,9 @@ export const useMappingPackageStore = create<MappingPackageState>()((set, get) =
   packages: null,
   loading: false,
   error: null,
+  versions: null,
+  versionsLoading: false,
+  versionsError: null,
 
   // Loads the latest package(s) of every customer, or of one customer when `company` is given
   fetchPackages: async (company) => {
@@ -34,6 +44,21 @@ export const useMappingPackageStore = create<MappingPackageState>()((set, get) =
         packages: null,
         loading: false,
         error: err instanceof Error ? err.message : "Onbekende fout",
+      });
+    }
+  },
+
+  // Loads all package versions of one customer
+  fetchVersions: async (company, packageType) => {
+    set({ versionsLoading: true, versionsError: null });
+    try {
+      const versions = await fetchPackageVersionsRequest(company, packageType);
+      set({ versions, versionsLoading: false, versionsError: null });
+    } catch (err) {
+      set({
+        versions: null,
+        versionsLoading: false,
+        versionsError: err instanceof Error ? err.message : "Onbekende fout",
       });
     }
   },

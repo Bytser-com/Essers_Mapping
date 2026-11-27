@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useMappingPackageStore } from '../../stores/mappingPackageStore'
-import { fetchPackages, setActivePackage } from '../../services/mappingPackageOverviewService'
+import { fetchPackages, fetchPackageVersions, setActivePackage } from '../../services/mappingPackageOverviewService'
 
 vi.mock('../../services/mappingPackageOverviewService')
 
@@ -8,6 +8,12 @@ const PACKAGES = [
     { company: 'brevalis', latestVersion: 'v1', createdAt: '2025-07-15T12:00:00Z', createdBy: 'analist_b', customerName: 'Brevalis', packageType: 'outbound' },
     { company: 'nouryon', latestVersion: 'v2', createdAt: '2026-11-12T10:00:00Z', createdBy: 'analist_a', customerName: 'Nouryon', packageType: 'inbound' },
     { company: 'nouryon', latestVersion: 'v1', createdAt: '2026-10-02T10:00:00Z', createdBy: 'analist_a', customerName: 'Nouryon', packageType: 'outbound' },
+]
+
+const VERSIONS = [
+    { version: 'v3', createdAt: '2026-11-12T10:00:00Z', createdBy: 'analist_a', description: '2 mappings gewijzigd', isActive: false },
+    { version: 'v2', createdAt: '2026-10-02T10:00:00Z', createdBy: 'analist_b', description: '1 mapping toegevoegd', isActive: true },
+    { version: 'v1', createdAt: '2026-09-29T09:30:00Z', createdBy: 'analist_a', description: 'Eerste versie', isActive: false },
 ]
 
 describe('mappingPackageStore', () => {
@@ -150,6 +156,108 @@ describe('mappingPackageStore', () => {
         expect(state.error).toBe('Onbekende fout')
         expect(state.loading).toBe(false)
     })
+
+    //---
+
+    it('fetchVersions stores the versions', async () => {
+        // Arrange
+        fetchPackageVersions.mockResolvedValue(VERSIONS)
+
+        // Act
+        await useMappingPackageStore.getState().fetchVersions('brevalis', 'inbound')
+
+        // Assert
+        const state = useMappingPackageStore.getState()
+        expect(fetchPackageVersions).toHaveBeenCalledWith('brevalis', 'inbound')
+        expect(state.versions).toEqual(VERSIONS)
+        expect(state.versionsLoading).toBe(false)
+        expect(state.versionsError).toBeNull()
+    })
+
+    it('sets versionsLoading while fetching', async () => {
+        // Arrange
+        fetchPackageVersions.mockResolvedValue(VERSIONS)
+
+        // Act
+        const promise = useMappingPackageStore.getState().fetchVersions('brevalis', 'inbound')
+
+        // Assert
+        const state = useMappingPackageStore.getState()
+        expect(state.versionsLoading).toBe(true)
+
+        await promise
+    })
+
+    it('clears the previous versionsError when fetching again', async () => {
+        // Arrange
+        useMappingPackageStore.setState({ versionsError: 'down' })
+        fetchPackageVersions.mockResolvedValue(VERSIONS)
+
+        // Act
+        const promise = useMappingPackageStore.getState().fetchVersions('brevalis', 'inbound')
+
+        // Assert
+        expect(useMappingPackageStore.getState().versionsError).toBeNull()
+
+        await promise
+    })
+
+    it('stores the versionsError when fetching fails', async () => {
+        // Arrange
+        fetchPackageVersions.mockRejectedValue(new Error('Loading versions failed (HTTP 502)'))
+
+        // Act
+        await useMappingPackageStore.getState().fetchVersions('brevalis', 'inbound')
+
+        // Assert
+        const state = useMappingPackageStore.getState()
+        expect(state.versions).toBeNull()
+        expect(state.versionsLoading).toBe(false)
+        expect(state.versionsError).toBe('Loading versions failed (HTTP 502)')
+    })
+
+    it('clears the version list that was shown when fetching fails', async () => {
+        // Arrange
+        useMappingPackageStore.setState({ versions: VERSIONS })
+        fetchPackageVersions.mockRejectedValue(new Error('down'))
+
+        // Act
+        await useMappingPackageStore.getState().fetchVersions('brevalis', 'inbound')
+
+        // Assert
+        const state = useMappingPackageStore.getState()
+        expect(state.versions).toBeNull()
+        expect(state.versionsError).toBe('down')
+    })
+
+    it('shows a general versionsError when the failure is not an Error', async () => {
+        // Arrange
+        fetchPackageVersions.mockRejectedValue('broken')
+
+        // Act
+        await useMappingPackageStore.getState().fetchVersions('brevalis', 'inbound')
+
+        // Assert
+        const state = useMappingPackageStore.getState()
+        expect(state.versionsError).toBe('Onbekende fout')
+        expect(state.versionsLoading).toBe(false)
+    })
+
+    it('does not touch the overview when fetching versions fails', async () => {
+        // Arrange
+        useMappingPackageStore.setState({ packages: PACKAGES, loading: false, error: null })
+        fetchPackageVersions.mockRejectedValue(new Error('down'))
+
+        // Act
+        await useMappingPackageStore.getState().fetchVersions('brevalis', 'inbound')
+
+        // Assert
+        const state = useMappingPackageStore.getState()
+        expect(state.packages).toEqual(PACKAGES)
+        expect(state.error).toBeNull()
+    })
+
+    //----
 
     it('setActivePackage calls service and updates active package in memory', async () => {
         // Arrange

@@ -7,6 +7,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import VersionControl from '../../pages/VersionControl'
 import { fetchPackages, type MappingPackageOverview } from '../../services/mappingPackageOverviewService'
 import { useMappingPackageStore } from '../../stores/mappingPackageStore'
+import { MemoryRouter } from 'react-router-dom'
 
 // Keep the real types and helpers but replace the API call
 vi.mock('../../services/mappingPackageOverviewService', async (importOriginal) => ({
@@ -15,6 +16,7 @@ vi.mock('../../services/mappingPackageOverviewService', async (importOriginal) =
 }))
 
 const fetchMock = vi.mocked(fetchPackages)
+
 
 // createdAt without timezone: shown as is, whatever the timezone of the test machine
 const brevalis: MappingPackageOverview = {
@@ -34,6 +36,14 @@ const nouryonInbound: MappingPackageOverview = {
   packageType: 'inbound',
 }
 const nouryonOutbound: MappingPackageOverview = { ...nouryonInbound, latestVersion: 'v1', packageType: 'outbound' }
+
+function renderPage() {
+  return render(
+    <MemoryRouter>
+      <VersionControl />
+    </MemoryRouter>,
+  )
+}
 
 // The fake backend answers with the given lists in order; the last one keeps repeating.
 function answers(...responses: Array<MappingPackageOverview[] | Error>) {
@@ -60,7 +70,7 @@ describe('VersionControl', () => {
 
   it('shows the title, the explanation and the search field', () => {
     fetchMock.mockImplementation(() => new Promise<MappingPackageOverview[]>(() => {}))
-    render(<VersionControl />)
+    renderPage()
 
     expect(screen.getByRole('heading', { name: 'Version Control' })).toBeInTheDocument()
     expect(screen.getByText('Alle klanten en hun mapping packages.')).toBeInTheDocument()
@@ -69,7 +79,7 @@ describe('VersionControl', () => {
 
   it('shows "Mapping packages laden…" while the list is loading', () => {
     fetchMock.mockImplementation(() => new Promise<MappingPackageOverview[]>(() => {}))
-    render(<VersionControl />)
+    renderPage()
 
     expect(screen.getByText('Mapping packages laden…')).toBeInTheDocument()
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
@@ -77,7 +87,7 @@ describe('VersionControl', () => {
 
   it('loads all packages once when the page opens', async () => {
     answers([brevalis])
-    render(<VersionControl />)
+    renderPage()
 
     await screen.findByText('Brevalis')
 
@@ -87,7 +97,7 @@ describe('VersionControl', () => {
 
   it('shows the packages in a table with the columns KLANT, TYPE, ACTIEVE VERSIE, LAATSTE WIJZIGING and ACTIE', async () => {
     answers([brevalis, nouryonInbound])
-    render(<VersionControl />)
+    renderPage()
 
     await screen.findByText('Brevalis')
 
@@ -98,7 +108,7 @@ describe('VersionControl', () => {
 
   it('shows customer, type, version, date and author of a package in one row', async () => {
     answers([brevalis])
-    render(<VersionControl />)
+    renderPage()
 
     await screen.findByText('Brevalis')
 
@@ -113,7 +123,7 @@ describe('VersionControl', () => {
 
   it('shows a company once per package type, each with the latest version of that type', async () => {
     answers([brevalis, nouryonInbound, nouryonOutbound])
-    render(<VersionControl />)
+    renderPage()
 
     await screen.findByText('Brevalis')
 
@@ -127,7 +137,7 @@ describe('VersionControl', () => {
 
   it('every row has its own "Bekijken" button', async () => {
     answers([brevalis, nouryonInbound, nouryonOutbound])
-    render(<VersionControl />)
+    renderPage()
 
     await screen.findByText('Brevalis')
 
@@ -136,14 +146,14 @@ describe('VersionControl', () => {
 
   it('shows the company folder when the package has no customer name', async () => {
     answers([{ ...brevalis, customerName: null }])
-    render(<VersionControl />)
+    renderPage()
 
     expect(await screen.findByText('brevalis')).toBeInTheDocument()
   })
 
   it('shows "—" for a missing type or date and leaves out "door" without author', async () => {
     answers([{ ...brevalis, packageType: null, createdAt: null, createdBy: null }])
-    render(<VersionControl />)
+    renderPage()
 
     await screen.findByText('Brevalis')
 
@@ -155,14 +165,14 @@ describe('VersionControl', () => {
 
   it('shows the full type as tooltip, since a long type is cut off', async () => {
     answers([{ ...brevalis, packageType: 'inbound-accept-delivery' }])
-    render(<VersionControl />)
+    renderPage()
 
     expect(await screen.findByText('inbound-accept-delivery')).toHaveAttribute('title', 'inbound-accept-delivery')
   })
 
   it('without packages it says there are no mapping packages yet', async () => {
     answers([])
-    render(<VersionControl />)
+    renderPage()
 
     expect(await screen.findByText('Er zijn nog geen mapping packages.')).toBeInTheDocument()
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
@@ -170,7 +180,7 @@ describe('VersionControl', () => {
 
   it('shows an error with "Opnieuw proberen" when the list cannot be loaded, and retrying works', async () => {
     answers(new Error('HTTP 502'), [brevalis])
-    render(<VersionControl />)
+    renderPage()
 
     const alert = await screen.findByRole('alert')
     expect(alert).toHaveTextContent('De mapping packages konden niet geladen worden.')
@@ -185,7 +195,7 @@ describe('VersionControl', () => {
 
   it('keeps showing the error when retrying fails again', async () => {
     answers(new Error('HTTP 502'))
-    render(<VersionControl />)
+    renderPage()
 
     const alert = await screen.findByRole('alert')
     await userEvent.click(within(alert).getByRole('button', { name: 'Opnieuw proberen' }))
@@ -197,13 +207,17 @@ describe('VersionControl', () => {
   describe('search functionality', () => {
     beforeEach(async () => {
       answers([brevalis, nouryonInbound, nouryonOutbound])
-      render(<VersionControl />)
+      renderPage()
       await screen.findByText('Brevalis')
     })
 
-    it('TC-159-01 filters packages by company / customer name', async () => {
+        it.each([
+      { field: 'company / customer name', search: 'brev' },
+      { field: 'version', search: 'v4' },
+      { field: 'creation date', search: '11/10' }, // Brevalis date: 11/10/2026 14:32
+    ])('TC-159-01 filters packages by $field', async ({ search }) => {
       const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
-      await userEvent.type(searchInput, 'brev')
+      await userEvent.type(searchInput, search)
 
       expect(screen.getByText('Brevalis')).toBeInTheDocument()
       expect(screen.queryByText('Nouryon')).not.toBeInTheDocument()
@@ -218,14 +232,6 @@ describe('VersionControl', () => {
       expect(bodyRows()).toHaveLength(1)
     })
 
-    it('filters packages by version', async () => {
-      const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
-      await userEvent.type(searchInput, 'v4')
-
-      expect(screen.getByText('Brevalis')).toBeInTheDocument()
-      expect(screen.queryByText('Nouryon')).not.toBeInTheDocument()
-    })
-
     it('filters packages by createdBy user name', async () => {
       const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
       await userEvent.type(searchInput, 'Analist A')
@@ -233,16 +239,7 @@ describe('VersionControl', () => {
       expect(screen.queryByText('Brevalis')).not.toBeInTheDocument()
       expect(screen.getAllByText('Nouryon')).toHaveLength(2)
     })
-
-    it('filters packages by creation date', async () => {
-      const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
-      // Brevalis date: 11/10/2026 14:32
-      await userEvent.type(searchInput, '11/10')
-
-      expect(screen.getByText('Brevalis')).toBeInTheDocument()
-      expect(screen.queryByText('Nouryon')).not.toBeInTheDocument()
-    })
-
+    
     it('filters packages by combining company and type (e.g. "nouryon outbound")', async () => {
       const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
       await userEvent.type(searchInput, 'nouryon outbound')
@@ -306,7 +303,7 @@ describe('VersionControl', () => {
 
     it('displays the active version and active updater instead of creation info when active.json is present', async () => {
       answers([pkgWithActive])
-      render(<VersionControl />)
+      renderPage()
 
       await screen.findByText('Nouryon')
       const row = bodyRows()[0]!
