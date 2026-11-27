@@ -12,13 +12,26 @@ configMapGenerator:
     literals:
       - TZ=Europe/Brussels
       - LOG_LEVEL=INFO
+      # AI & LLM Service Configuration (Mapping_Proposal & Mapping_Converter)
       - GEMINI_MODEL=gemini-3.5-flash-lite
+      - GEMINI_REVIEW_MODEL=gemini-3.5-flash-lite
+      - GEMINI_TIMEOUT_MS=120000
+      - GEMINI_REVIEW_TIMEOUT_SECONDS=60
+      - AI_LIMIT_TARGETS=0
+      - AI_SOURCE_SAMPLES=5
+      - AI_HISTORY_PAIRS=2
+      - AI_BATCH_SIZE=10
+      - GEMINI_MAX_ATTEMPTS=20
+      - AI_RETRY_MAX_ATTEMPTS=3
+      - AI_RETRY_DELAY_SECONDS=30
+      - AI_RETRY_MAX_DELAY_SECONDS=300
       # Shared SFTP Server (In-Between Zone)
       - SFTP_SHARED_HOST=sftp-shared
       - SFTP_SHARED_PORT=22
       - SFTP_SHARED_USER=shareduser
       - SFTP_SHARED_PROPOSALS_DIR=/Proposals
       - SFTP_SHARED_PACKAGES_DIR=/Packages
+      - SFTP_ALLOW_UNKNOWN_KEYS=true
       # Runtime SFTP Server (Runtime Zone)
       - SFTP_RUNTIME_HOST=sftp-runtime
       - SFTP_RUNTIME_PORT=22
