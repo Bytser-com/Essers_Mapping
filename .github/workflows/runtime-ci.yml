@@ -45,6 +45,9 @@ jobs:
             .github/workflows/service-cd.yml
             Scripts/smoke-service-image.sh
             Scripts/registry-pull-secret.py
+            Scripts/select-service-release.cjs
+            Scripts/service-release.py
+            Scripts/publish-service-image.sh
 
   checks:
     name: Runtime checks
@@ -76,13 +79,11 @@ jobs:
   delivery:
     name: Runtime CD
     needs: [changes, checks, quality-gate]
-    if: github.event_name == 'push' && (github.ref_name == 'Testing' || github.ref_name == 'main') && needs.changes.outputs.changed == 'true'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.ref_name == 'Testing' || github.ref_name == 'main') && needs.changes.outputs.changed == 'true'
     uses: ./.github/workflows/service-cd.yml
     with:
       service-path: Runtime
       image-name: runtime-backend
       deployment: runtime-backend
       ci-workflow: runtime-ci.yml
-      artifact-name: runtime-jar
-      artifact-path: 'Runtime/target'
     secrets: inherit

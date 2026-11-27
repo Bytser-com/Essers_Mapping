@@ -71,7 +71,7 @@ jobs:
 
       - name: Setup Docker Buildx
         id: buildx
-        if: ${{ !cancelled() && steps.verify.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.verify.outcome == 'success' && github.ref_name != 'main' }}
         uses: docker/setup-buildx-action@v4
 
       - name: Build container for validation
@@ -83,6 +83,9 @@ jobs:
           load: true
           push: false
           tags: service-ci:local
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
 
       - name: Validate container startup and health
         if: ${{ !cancelled() && steps.image.outcome == 'success' }}
@@ -114,4 +117,20 @@ jobs:
           name: ${{ inputs.artifact-prefix }}-jar
           path: ${{ inputs.service-path }}/target/*.jar
           if-no-files-found: error
+          retention-days: 7
+
+      # Only Testing exports a deployable image. Production reuses its recorded digest.
+      - name: Save the tested container for Testing CD
+        if: success() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'Testing' && steps.image.outcome == 'success'
+        run: docker save --output "$RUNNER_TEMP/image.tar" service-ci:local
+
+      - name: Upload the tested container
+        if: success() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'Testing' && steps.image.outcome == 'success'
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ inputs.service-path }}-image
+          path: ${{ runner.temp }}/image.tar
+          if-no-files-found: error
+          compression-level: 1
+          overwrite: true
           retention-days: 7

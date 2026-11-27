@@ -24,7 +24,7 @@ def check_steps(workflow):
     return steps
 
 
-def condition(expression, outcomes, *, successful, cancelled, enabled, dockerfile):
+def condition(expression, outcomes, *, successful, cancelled, enabled, dockerfile, branch, event):
     """Evaluate the scalar guard subset used here, including implicit success()."""
     status = {'success': successful and not cancelled, 'failure': not successful and not cancelled,
               'cancelled': cancelled, 'always': True}
@@ -37,6 +37,7 @@ def condition(expression, outcomes, *, successful, cancelled, enabled, dockerfil
     expression = re.sub(r'steps\.([\w-]+)\.outcome',
                         lambda match: repr(outcomes.get(match[1], 'skipped')), expression)
     expression = expression.replace('steps.setup.outputs.enabled', repr(str(enabled).lower()))
+    expression = expression.replace('github.ref_name', repr(branch)).replace('github.event_name', repr(event))
     expression = expression.replace("hashFiles(format('{0}/Dockerfile', inputs.service-path))",
                                     repr('hash' if dockerfile else ''))
     expression = re.sub(r'!(?!=)', ' not ', expression).replace('&&', ' and ').replace('||', ' or ')
@@ -48,13 +49,14 @@ def condition(expression, outcomes, *, successful, cancelled, enabled, dockerfil
     return bool(eval(compile(tree, '<workflow condition>', 'eval'), {'__builtins__': {}}))
 
 
-def simulate(workflow, failure=None, *, enabled=True, dockerfile=True, cancel_after=None):
+def simulate(workflow, failure=None, *, enabled=True, dockerfile=True, cancel_after=None,
+             branch='Development', event='pull_request'):
     outcomes, results = {}, {}
     failed = cancelled = False
     for step in check_steps(workflow):
         should_run = condition(step.get('if', 'success()'), outcomes,
                                successful=not failed, cancelled=cancelled,
-                               enabled=enabled, dockerfile=dockerfile)
+                               enabled=enabled, dockerfile=dockerfile, branch=branch, event=event)
         result = ('failure' if step['name'] == failure else 'success') if should_run else 'skipped'
         results[step['name']] = result
         if 'id' in step:
@@ -67,6 +69,34 @@ def simulate(workflow, failure=None, *, enabled=True, dockerfile=True, cancel_af
 
 
 class IndependentCiChecksTests(unittest.TestCase):
+    def test_only_successful_testing_runs_export_a_deployable_container(self):
+        for workflow in ('frontend-ci', 'java-service-ci', 'python-service-ci'):
+            for event in ('push', 'workflow_dispatch'):
+                with self.subTest(workflow=workflow, event=event):
+                    results, failed = simulate(workflow, branch='Testing', event=event)
+                    self.assertFalse(failed)
+                    self.assertEqual(results['Upload the tested container'], 'success')
+                    results, failed = simulate(workflow, failure=HEALTH, branch='Testing', event=event)
+                    self.assertTrue(failed)
+                    self.assertEqual(results['Upload the tested container'], 'skipped')
+
+    def test_production_keeps_tests_but_does_not_build_another_container(self):
+        for workflow in ('frontend-ci', 'java-service-ci', 'python-service-ci'):
+            with self.subTest(workflow=workflow):
+                results, failed = simulate(workflow, branch='main', event='push')
+                self.assertFalse(failed)
+                self.assertEqual(results[BUILD], 'skipped')
+                self.assertEqual(results['Upload the tested container'], 'skipped')
+                test_name = TESTS + ' and packaging' if workflow == 'java-service-ci' else TESTS
+                self.assertEqual(results[test_name], 'success')
+
+    def test_pr_container_validation_cannot_export_a_release(self):
+        for workflow in ('frontend-ci', 'java-service-ci', 'python-service-ci'):
+            results, failed = simulate(workflow, branch='123/merge', event='pull_request')
+            self.assertFalse(failed)
+            self.assertEqual(results[BUILD], 'success')
+            self.assertEqual(results['Upload the tested container'], 'skipped')
+
     def test_failures_do_not_skip_independent_checks_or_turn_ci_green(self):
         cases = [
             ('python-service-ci', 'Lint Python', [TESTS, 'Audit installed dependencies', BUILD, HEALTH]),

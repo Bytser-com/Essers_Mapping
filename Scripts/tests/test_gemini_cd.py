@@ -117,7 +117,8 @@ class GeminiDeploymentPatchTests(unittest.TestCase):
             with self.subTest(deployment=deployment):
                 environment = {
                     **os.environ, "DEPLOYMENT": deployment, "IMAGE": "ghcr.io/example/service@sha256:abc",
-                    "SOURCE_SHA": "revision", "GITHUB_RUN_ID": "42", "GITHUB_RUN_ATTEMPT": "2",
+                    "SOURCE_SHA": "revision", "IMAGE_SOURCE_SHA": "tested-revision",
+                    "GITHUB_RUN_ID": "42", "GITHUB_RUN_ATTEMPT": "2",
                 }
                 result = subprocess.run(
                     [sys.executable, "-c", python], env=environment, capture_output=True, text=True, check=False,
@@ -127,6 +128,7 @@ class GeminiDeploymentPatchTests(unittest.TestCase):
                 template = patch["spec"]["template"]
                 self.assertEqual(template["spec"]["containers"], [{"name": deployment, "image": environment["IMAGE"]}])
                 self.assertEqual(patch["metadata"]["annotations"]["essers.io/source-sha"], "revision")
+                self.assertEqual(patch["metadata"]["annotations"]["essers.io/image-source-sha"], "tested-revision")
                 if deployment == "mapping-proposal":
                     self.assertEqual(template["metadata"]["annotations"]["essers.io/gemini-deploy-run"], "42-2")
                 else:

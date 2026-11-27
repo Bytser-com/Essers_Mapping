@@ -45,6 +45,9 @@ jobs:
             .github/workflows/service-cd.yml
             Scripts/smoke-service-image.sh
             Scripts/registry-pull-secret.py
+            Scripts/select-service-release.cjs
+            Scripts/service-release.py
+            Scripts/publish-service-image.sh
             Scripts/cleanup-deployment-overrides.py
 
   checks:
@@ -77,13 +80,11 @@ jobs:
   delivery:
     name: Version Control CD
     needs: [changes, checks, quality-gate]
-    if: github.event_name == 'push' && (github.ref_name == 'Testing' || github.ref_name == 'main') && needs.changes.outputs.changed == 'true'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.ref_name == 'Testing' || github.ref_name == 'main') && needs.changes.outputs.changed == 'true'
     uses: ./.github/workflows/service-cd.yml
     with:
       service-path: Version_Control
       image-name: version-control-backend
       deployment: version-control-backend
       ci-workflow: version-control-ci.yml
-      artifact-name: version-control-jar
-      artifact-path: 'Version_Control/target'
     secrets: inherit
