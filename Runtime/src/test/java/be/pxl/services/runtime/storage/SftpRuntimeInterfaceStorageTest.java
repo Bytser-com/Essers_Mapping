@@ -223,11 +223,11 @@ class SftpRuntimeInterfaceStorageTest {
     void extractOriginalFilenameStripsSuffixes() {
         assertEquals(
                 "order_1.xml",
-                SftpRuntimeInterfaceStorage.extractOriginalFilename("order_1.xml.pod-a.12ab34cd.processing")
+                SftpInterfacePathSupport.extractOriginalFilename("order_1.xml.pod-a.12ab34cd.processing")
         );
         assertEquals(
                 "ORDER.XML",
-                SftpRuntimeInterfaceStorage.extractOriginalFilename("ORDER.XML.pod-b.99ff00aa.processing")
+                SftpInterfacePathSupport.extractOriginalFilename("ORDER.XML.pod-b.99ff00aa.processing")
         );
     }
 
