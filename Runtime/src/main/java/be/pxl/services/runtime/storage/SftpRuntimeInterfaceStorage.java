@@ -41,6 +41,7 @@ import static be.pxl.services.runtime.storage.SftpInterfacePathSupport.buildColl
 import static be.pxl.services.runtime.storage.SftpInterfacePathSupport.buildErrorNote;
 import static be.pxl.services.runtime.storage.SftpInterfacePathSupport.extractModifyTime;
 import static be.pxl.services.runtime.storage.SftpInterfacePathSupport.extractOriginalFilename;
+import static be.pxl.services.runtime.storage.SftpInterfacePathSupport.isAlreadyExistsError;
 import static be.pxl.services.runtime.storage.SftpInterfacePathSupport.isDirectory;
 import static be.pxl.services.runtime.storage.SftpInterfacePathSupport.isEligibleXmlFile;
 import static be.pxl.services.runtime.storage.SftpInterfacePathSupport.isMissingFileError;
@@ -118,17 +119,13 @@ public class SftpRuntimeInterfaceStorage implements RuntimeInterfaceStorage {
             boolean claimed = Boolean.TRUE.equals(
                     sftpTemplate.execute(session -> {
                         ensureDirectoryExists(session, processingDir);
-                        return renameAtomically(session, candidate.remotePath(), claimedPath);
+                        return renameClaimAtomically(session, candidate.remotePath(), claimedPath);
                     }));
             return claimed
                     ? Optional.of(new ClaimedInterface(
                             candidate.customer(), candidate.messageType(), candidate.filename(), candidate.baseDir(), claimedPath))
                     : Optional.empty();
         } catch (Exception ex) {
-            if (isMissingFileError(ex)) {
-                LOGGER.debug("Interface {} was already claimed by another pod/worker", candidate.remotePath());
-                return Optional.empty();
-            }
             throw new RuntimeStorageException("Failed to claim incoming interface " + candidate.remotePath(), ex);
         }
     }
@@ -138,6 +135,7 @@ public class SftpRuntimeInterfaceStorage implements RuntimeInterfaceStorage {
         Objects.requireNonNull(claimed, CLAIMED_REQUIRED_MESSAGE);
         try {
             byte[] bytes = sftpTemplate.execute(session -> {
+                verifyRemoteSizeWithinLimit(session, claimed);
                 BoundedByteArrayOutputStream output =
                         new BoundedByteArrayOutputStream(maxFileSizeBytes, claimed.filename());
                 session.read(claimed.claimedPath(), output);
@@ -160,7 +158,7 @@ public class SftpRuntimeInterfaceStorage implements RuntimeInterfaceStorage {
         try {
             sftpTemplate.execute(session -> {
                 ensureDirectoryExists(session, processedDir);
-                session.rename(claimed.claimedPath(), resolveUniqueDestination(session, processedDir, claimed.filename()));
+                renameWithoutOverwrite(session, claimed.claimedPath(), processedDir, claimed.filename());
                 return null;
             });
         } catch (Exception ex) {
@@ -175,10 +173,9 @@ public class SftpRuntimeInterfaceStorage implements RuntimeInterfaceStorage {
         try {
             sftpTemplate.execute(session -> {
                 ensureDirectoryExists(session, errorDir);
-                String destination = resolveUniqueDestination(session, errorDir, claimed.filename());
-                session.rename(claimed.claimedPath(), destination);
-                byte[] noteBytes = buildErrorNote(claimed, reason, clock.instant()).getBytes(StandardCharsets.UTF_8);
-                session.write(new ByteArrayInputStream(noteBytes), destination + ERROR_NOTE_SUFFIX);
+                Optional<String> destination =
+                        renameWithoutOverwrite(session, claimed.claimedPath(), errorDir, claimed.filename());
+                destination.ifPresent(dest -> writeErrorNoteBestEffort(session, claimed, reason, dest));
                 return null;
             });
         } catch (Exception ex) {
@@ -304,13 +301,114 @@ public class SftpRuntimeInterfaceStorage implements RuntimeInterfaceStorage {
     ) throws IOException {
         String sourcePath = joinPath(processingDir, entry.getFilename());
         String originalFilename = extractOriginalFilename(entry.getFilename());
+        if (!isSafeSegment(originalFilename)) {
+            LOGGER.warn("Skipping stale claim {} because extracted original filename '{}' is unsafe",
+                    sourcePath, originalFilename);
+            return false;
+        }
         ensureDirectoryExists(session, incomingDir);
-        String targetPath = resolveUniqueDestination(session, incomingDir, originalFilename);
-        if (renameAtomically(session, sourcePath, targetPath)) {
-            LOGGER.warn("Recovered stale claim {} back to {}", sourcePath, targetPath);
+        Optional<String> recoveredPath = renameWithoutOverwrite(session, sourcePath, incomingDir, originalFilename);
+        if (recoveredPath.isPresent()) {
+            LOGGER.warn("Recovered stale claim {} back to {}", sourcePath, recoveredPath.get());
             return true;
         }
         return false;
+    }
+
+    /**
+     * Renames {@code sourcePath} into {@code targetDir} without ever overwriting an existing file.
+     * Uses direct {@link SftpClient#rename(String, String)} (no {@code CopyMode.Overwrite}) when
+     * backed by a real SFTP session, falling back to a collision-free name if the target exists.
+     */
+    private Optional<String> renameWithoutOverwrite(
+            Session<SftpClient.DirEntry> session,
+            String sourcePath,
+            String targetDir,
+            String filename
+    ) throws IOException {
+        String primaryTarget = joinPath(targetDir, filename);
+        if (session.getClientInstance() instanceof SftpClient sftpClient) {
+            return renameDirectWithoutOverwrite(sftpClient, sourcePath, targetDir, filename, primaryTarget);
+        }
+        String target = session.exists(primaryTarget)
+                ? joinPath(targetDir, buildCollisionFreeName(filename, clock.millis(), shortToken()))
+                : primaryTarget;
+        return renameClaimAtomically(session, sourcePath, target) ? Optional.of(target) : Optional.empty();
+    }
+
+    private Optional<String> renameDirectWithoutOverwrite(
+            SftpClient sftpClient,
+            String sourcePath,
+            String targetDir,
+            String filename,
+            String primaryTarget
+    ) throws IOException {
+        try {
+            sftpClient.rename(sourcePath, primaryTarget);
+            return Optional.of(primaryTarget);
+        } catch (IOException ex) {
+            if (isMissingFileError(ex)) {
+                LOGGER.debug("File {} was already moved by another pod/worker", sourcePath);
+                return Optional.empty();
+            }
+            if (!isAlreadyExistsError(ex)) {
+                throw ex;
+            }
+            String collisionFreeTarget = joinPath(targetDir, buildCollisionFreeName(filename, clock.millis(), shortToken()));
+            try {
+                sftpClient.rename(sourcePath, collisionFreeTarget);
+                return Optional.of(collisionFreeTarget);
+            } catch (IOException retryEx) {
+                if (isMissingFileError(retryEx)) {
+                    LOGGER.debug("File {} was already moved by another pod/worker", sourcePath);
+                    return Optional.empty();
+                }
+                throw retryEx;
+            }
+        }
+    }
+
+    private boolean renameClaimAtomically(Session<SftpClient.DirEntry> session, String sourcePath, String targetPath)
+            throws IOException {
+        try {
+            if (session.getClientInstance() instanceof SftpClient sftpClient) {
+                sftpClient.rename(sourcePath, targetPath);
+            } else {
+                session.rename(sourcePath, targetPath);
+            }
+            return true;
+        } catch (IOException ex) {
+            if (isMissingFileError(ex)) {
+                LOGGER.debug("File {} was already moved by another pod/worker", sourcePath);
+                return false;
+            }
+            throw ex;
+        }
+    }
+
+    private void verifyRemoteSizeWithinLimit(Session<SftpClient.DirEntry> session, ClaimedInterface claimed)
+            throws IOException {
+        if (session.getClientInstance() instanceof SftpClient sftpClient) {
+            SftpClient.Attributes attrs = sftpClient.stat(claimed.claimedPath());
+            if (attrs != null && attrs.getSize() > maxFileSizeBytes) {
+                throw payloadTooLarge(claimed.filename(), maxFileSizeBytes);
+            }
+        }
+    }
+
+    private void writeErrorNoteBestEffort(
+            Session<SftpClient.DirEntry> session,
+            ClaimedInterface claimed,
+            String reason,
+            String destination
+    ) {
+        try {
+            byte[] noteBytes = buildErrorNote(claimed, reason, clock.instant()).getBytes(StandardCharsets.UTF_8);
+            session.write(new ByteArrayInputStream(noteBytes), destination + ERROR_NOTE_SUFFIX);
+        } catch (IOException noteEx) {
+            LOGGER.warn("Moved {} to {} in error/, but failed to write companion error note: {}",
+                    claimed.claimedPath(), destination, noteEx.getMessage());
+        }
     }
 
     private Optional<List<String>> listRootCustomers(Session<SftpClient.DirEntry> session) throws IOException {
@@ -328,25 +426,10 @@ public class SftpRuntimeInterfaceStorage implements RuntimeInterfaceStorage {
     private void warnMissingClientsRootThrottled() {
         Instant now = clock.instant();
         Instant lastWarn = lastMissingRootWarnAt.get();
-        if (lastWarn == null || !now.isBefore(lastWarn.plus(MISSING_ROOT_WARN_INTERVAL))) {
-            if (lastMissingRootWarnAt.compareAndSet(lastWarn, now)) {
-                LOGGER.warn("Configured SFTP clients root '{}' does not exist on sftp-runtime; "
-                        + "check SFTP_RUNTIME_REMOTE_DIR (expected '/Clients')", clientsRoot);
-            }
-        }
-    }
-
-    private boolean renameAtomically(Session<SftpClient.DirEntry> session, String sourcePath, String targetPath)
-            throws IOException {
-        try {
-            session.rename(sourcePath, targetPath);
-            return true;
-        } catch (IOException ex) {
-            if (isMissingFileError(ex)) {
-                LOGGER.debug("File {} was already moved by another pod/worker", sourcePath);
-                return false;
-            }
-            throw ex;
+        if ((lastWarn == null || !now.isBefore(lastWarn.plus(MISSING_ROOT_WARN_INTERVAL)))
+                && lastMissingRootWarnAt.compareAndSet(lastWarn, now)) {
+            LOGGER.warn("Configured SFTP clients root '{}' does not exist on sftp-runtime; "
+                    + "verify SFTP_RUNTIME_REMOTE_DIR", clientsRoot);
         }
     }
 
@@ -393,16 +476,9 @@ public class SftpRuntimeInterfaceStorage implements RuntimeInterfaceStorage {
         }
     }
 
-    private String resolveUniqueDestination(
-            Session<SftpClient.DirEntry> session,
-            String targetDir,
-            String filename
-    ) throws IOException {
-        String candidate = joinPath(targetDir, filename);
-        if (!session.exists(candidate)) {
-            return candidate;
-        }
-        return joinPath(targetDir, buildCollisionFreeName(filename, clock.millis(), shortToken()));
+    private static InterfacePayloadTooLargeException payloadTooLarge(String filename, long maxBytes) {
+        return new InterfacePayloadTooLargeException(
+                "Interface file '" + filename + "' exceeds maximum allowed size of " + maxBytes + " bytes");
     }
 
     private static InterfacePayloadTooLargeException findPayloadTooLarge(Throwable error) {
@@ -440,6 +516,7 @@ public class SftpRuntimeInterfaceStorage implements RuntimeInterfaceStorage {
 
         @Override
         public void write(byte[] b, int off, int len) {
+            Objects.checkFromIndexSize(off, len, b.length);
             checkLimit(len);
             delegate.write(b, off, len);
             written += len;
@@ -450,9 +527,8 @@ public class SftpRuntimeInterfaceStorage implements RuntimeInterfaceStorage {
         }
 
         private void checkLimit(int incomingBytes) {
-            if (written + incomingBytes > maxBytes) {
-                throw new InterfacePayloadTooLargeException(
-                        "Interface file '" + filename + "' exceeds maximum allowed size of " + maxBytes + " bytes");
+            if (incomingBytes > maxBytes - written) {
+                throw payloadTooLarge(filename, maxBytes);
             }
         }
     }

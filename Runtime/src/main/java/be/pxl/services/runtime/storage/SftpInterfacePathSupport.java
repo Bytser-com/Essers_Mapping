@@ -1,5 +1,6 @@
 package be.pxl.services.runtime.storage;
 
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
@@ -27,6 +28,7 @@ final class SftpInterfacePathSupport {
     static final String PROCESSING_SUFFIX = ".processing";
     static final String ERROR_NOTE_SUFFIX = ".error.txt";
     private static final String XML_EXTENSION = ".xml";
+    private static final long MIN_CLAIM_EPOCH_MILLIS = 1_000_000_000_000L; // 2001-09-09 UTC (13 digits)
 
     private SftpInterfacePathSupport() {
     }
@@ -74,7 +76,7 @@ final class SftpInterfacePathSupport {
         int instanceDot = tokenDot > 0 ? body.lastIndexOf('.', tokenDot - 1) : -1;
         if (instanceDot > 0) {
             int timestampDot = body.lastIndexOf('.', instanceDot - 1);
-            if (timestampDot > 0 && parsePositiveEpochMillis(body.substring(timestampDot + 1, instanceDot)).isPresent()) {
+            if (timestampDot > 0 && parsePlausibleEpochMillis(body.substring(timestampDot + 1, instanceDot)).isPresent()) {
                 return body.substring(0, timestampDot);
             }
             return body.substring(0, instanceDot);
@@ -91,7 +93,7 @@ final class SftpInterfacePathSupport {
         int instanceDot = tokenDot > 0 ? body.lastIndexOf('.', tokenDot - 1) : -1;
         int timestampDot = instanceDot > 0 ? body.lastIndexOf('.', instanceDot - 1) : -1;
         if (timestampDot > 0) {
-            Optional<Long> epochMs = parsePositiveEpochMillis(body.substring(timestampDot + 1, instanceDot));
+            Optional<Long> epochMs = parsePlausibleEpochMillis(body.substring(timestampDot + 1, instanceDot));
             if (epochMs.isPresent()) {
                 return Optional.of(Instant.ofEpochMilli(epochMs.get()));
             }
@@ -104,11 +106,11 @@ final class SftpInterfacePathSupport {
         if (safeReason.isEmpty()) {
             safeReason = "Unknown processing error";
         }
-        return "timestamp=" + timestamp + System.lineSeparator()
-                + "customer=" + sanitizeSingleLine(claimed.customer()) + System.lineSeparator()
-                + "messageType=" + sanitizeSingleLine(claimed.messageType()) + System.lineSeparator()
-                + "filename=" + sanitizeSingleLine(claimed.filename()) + System.lineSeparator()
-                + "reason=" + safeReason + System.lineSeparator();
+        return "timestamp=" + timestamp + "\n"
+                + "customer=" + sanitizeSingleLine(claimed.customer()) + "\n"
+                + "messageType=" + sanitizeSingleLine(claimed.messageType()) + "\n"
+                + "filename=" + sanitizeSingleLine(claimed.filename()) + "\n"
+                + "reason=" + safeReason + "\n";
     }
 
     static boolean isEligibleXmlFile(SftpClient.DirEntry entry, Instant cutoff) {
@@ -134,7 +136,7 @@ final class SftpInterfacePathSupport {
     }
 
     static boolean isSafeSegment(String segment) {
-        if (segment == null || segment.isBlank() || segment.startsWith(".")) {
+        if (segment == null || segment.isBlank() || segment.startsWith(".") || !segment.equals(segment.trim())) {
             return false;
         }
         for (int i = 0; i < segment.length(); i++) {
@@ -184,6 +186,17 @@ final class SftpInterfacePathSupport {
         return false;
     }
 
+    static boolean isAlreadyExistsError(Throwable error) {
+        Throwable current = error;
+        while (current != null) {
+            if (isDirectAlreadyExistsCause(current)) {
+                return true;
+            }
+            current = current.getCause();
+        }
+        return false;
+    }
+
     static String sanitizeSingleLine(String raw) {
         if (raw == null) {
             return "";
@@ -206,8 +219,8 @@ final class SftpInterfacePathSupport {
                 : claimedFilename;
     }
 
-    private static Optional<Long> parsePositiveEpochMillis(String candidate) {
-        if (candidate == null || candidate.isEmpty()) {
+    private static Optional<Long> parsePlausibleEpochMillis(String candidate) {
+        if (candidate == null || candidate.length() < 13) {
             return Optional.empty();
         }
         for (int i = 0; i < candidate.length(); i++) {
@@ -217,7 +230,7 @@ final class SftpInterfacePathSupport {
         }
         try {
             long value = Long.parseLong(candidate);
-            return value > 0 ? Optional.of(value) : Optional.empty();
+            return value >= MIN_CLAIM_EPOCH_MILLIS ? Optional.of(value) : Optional.empty();
         } catch (NumberFormatException ex) {
             return Optional.empty();
         }
@@ -233,6 +246,17 @@ final class SftpInterfacePathSupport {
         }
         String message = cause.getMessage();
         return message != null && message.toLowerCase(Locale.ROOT).contains("no such file");
+    }
+
+    private static boolean isDirectAlreadyExistsCause(Throwable cause) {
+        if (cause instanceof FileAlreadyExistsException) {
+            return true;
+        }
+        if (cause instanceof SftpException sftpEx) {
+            int status = sftpEx.getStatus();
+            return status == SftpConstants.SSH_FX_FILE_ALREADY_EXISTS || status == SftpConstants.SSH_FX_FAILURE;
+        }
+        return false;
     }
 
     private static String requireSafeInstanceId(String instanceId) {

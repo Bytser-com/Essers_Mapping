@@ -40,6 +40,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -66,10 +67,11 @@ class SftpRuntimeInterfaceStorageTest {
     }
 
     @Test
-    @DisplayName("listReadyIncoming filters hidden files, symlinks, control chars, young files and sorts oldest first")
+    @DisplayName("listReadyIncoming filters hidden, padded, symlinks, control chars, young files and sorts oldest first")
     void listReadyIncomingFiltersAndSortsFiles() throws Exception {
         when(session.list("/Clients")).thenReturn(new SftpClient.DirEntry[] {
-                dirEntry("."), dirEntry(".."), dirEntry("../escape"), dirEntry(".hidden"), dirEntry("nouryon")
+                dirEntry("."), dirEntry(".."), dirEntry("../escape"), dirEntry(".hidden"),
+                dirEntry("nouryon "), dirEntry("nouryon")
         });
         when(session.list("/Clients/nouryon")).thenReturn(new SftpClient.DirEntry[] {
                 dirEntry("outbound")
@@ -78,6 +80,7 @@ class SftpRuntimeInterfaceStorageTest {
                 fileEntry("order_new.xml", FIXED_NOW.minusSeconds(1)),
                 fileEntry("order_2.xml", FIXED_NOW.minusSeconds(10)),
                 fileEntry("order..1.XML", FIXED_NOW.minusSeconds(30)),
+                fileEntry(" padded.xml", FIXED_NOW.minusSeconds(60)),
                 fileEntry(".temp_upload.xml", FIXED_NOW.minusSeconds(60)),
                 fileEntry("bad\nname.xml", FIXED_NOW.minusSeconds(60)),
                 symlinkEntry("link.xml", FIXED_NOW.minusSeconds(60)),
@@ -162,6 +165,17 @@ class SftpRuntimeInterfaceStorageTest {
     }
 
     @Test
+    @DisplayName("tryClaim throws RuntimeStorageException when parent directory is missing during mkdir")
+    void tryClaimThrowsWhenParentDirectoryMissingDuringMkdir() throws Exception {
+        IncomingInterface candidate = sampleIncoming();
+        when(session.exists("/Clients/nouryon/outbound/processing")).thenReturn(false);
+        doThrow(new SftpException(SftpConstants.SSH_FX_NO_SUCH_FILE, "Parent missing"))
+                .when(session).mkdir("/Clients/nouryon/outbound/processing");
+
+        assertThrows(RuntimeStorageException.class, () -> storage.tryClaim(candidate, "runtime-pod-1"));
+    }
+
+    @Test
     @DisplayName("tryClaim throws RuntimeStorageException on non-race SFTP errors")
     void tryClaimThrowsOnStorageFailure() throws Exception {
         IncomingInterface candidate = sampleIncoming();
@@ -189,8 +203,22 @@ class SftpRuntimeInterfaceStorageTest {
     }
 
     @Test
-    @DisplayName("readBytes throws InterfacePayloadTooLargeException when file exceeds maxFileSizeBytes")
-    void readBytesRejectsOversizedPayload() throws Exception {
+    @DisplayName("readBytes rejects oversized payload upfront via SftpClient.stat() in zero downloaded bytes")
+    void readBytesRejectsOversizedPayloadViaStat() throws Exception {
+        ClaimedInterface claimed = sampleClaimed();
+        SftpClient sftpClient = mock(SftpClient.class);
+        SftpClient.Attributes attrs = new SftpClient.Attributes();
+        attrs.setSize(MAX_FILE_BYTES + 100);
+        when(session.getClientInstance()).thenReturn(sftpClient);
+        when(sftpClient.stat(claimed.claimedPath())).thenReturn(attrs);
+
+        assertThrows(InterfacePayloadTooLargeException.class, () -> storage.readBytes(claimed));
+        verify(session, never()).read(anyString(), any(OutputStream.class));
+    }
+
+    @Test
+    @DisplayName("readBytes throws InterfacePayloadTooLargeException when stream exceeds maxFileSizeBytes")
+    void readBytesRejectsOversizedPayloadInStream() throws Exception {
         ClaimedInterface claimed = sampleClaimed();
         byte[] oversized = new byte[(int) MAX_FILE_BYTES + 1];
         doAnswer(invocation -> {
@@ -237,13 +265,27 @@ class SftpRuntimeInterfaceStorageTest {
         verify(session).mkdir("/Clients/nouryon/outbound/error");
         verify(session).rename(claimed.claimedPath(), "/Clients/nouryon/outbound/error/order_1.xml");
         String note = capturedNote.toString(StandardCharsets.UTF_8);
-        assertTrue(note.contains("customer=nouryon"));
-        assertTrue(note.contains("reason=Invalid XML payload line2  line3"));
+        assertTrue(note.contains("customer=nouryon\n"));
+        assertTrue(note.contains("reason=Invalid XML payload line2  line3\n"));
     }
 
     @Test
-    @DisplayName("recoverStaleClaims uses embedded claim timestamp instead of POSIX file mtime")
-    void recoverStaleClaimsUsesClaimTimestampNotMtime() throws Exception {
+    @DisplayName("moveToError succeeds even when writing companion .error.txt fails after rename")
+    void moveToErrorToleratesCompanionNoteWriteFailure() throws Exception {
+        ClaimedInterface claimed = sampleClaimed();
+        when(session.exists("/Clients/nouryon/outbound/error")).thenReturn(true);
+        when(session.exists("/Clients/nouryon/outbound/error/order_1.xml")).thenReturn(false);
+        doThrow(new IOException("Quota exceeded"))
+                .when(session).write(any(InputStream.class), eq("/Clients/nouryon/outbound/error/order_1.xml.error.txt"));
+
+        storage.moveToError(claimed, "Invalid XML");
+
+        verify(session).rename(claimed.claimedPath(), "/Clients/nouryon/outbound/error/order_1.xml");
+    }
+
+    @Test
+    @DisplayName("recoverStaleClaims uses embedded claim timestamp and skips unsafe extracted filenames")
+    void recoverStaleClaimsUsesClaimTimestampAndSkipsUnsafeNames() throws Exception {
         long staleClaimMs = FIXED_NOW.minus(Duration.ofMinutes(10)).toEpochMilli();
         long freshClaimMs = FIXED_NOW.minus(Duration.ofMinutes(1)).toEpochMilli();
 
@@ -254,7 +296,9 @@ class SftpRuntimeInterfaceStorageTest {
                 fileEntry("order_1.xml." + staleClaimMs + ".pod-dead.a1b2c3d4.processing", FIXED_NOW),
                 // Fresh claim timestamp (1m ago), even with OLD upload mtime (30m ago) -> MUST NOT recover!
                 fileEntry("order_2.xml." + freshClaimMs + ".pod-live.e5f6g7h8.processing",
-                        FIXED_NOW.minus(Duration.ofMinutes(30)))
+                        FIXED_NOW.minus(Duration.ofMinutes(30))),
+                // Extracted original filename has trailing space ("bad.xml ") -> MUST be skipped safely
+                fileEntry("bad.xml ." + staleClaimMs + ".pod-dead.deadbeef.processing", FIXED_NOW)
         });
         when(session.exists("/Clients/nouryon/outbound/incoming")).thenReturn(true);
         when(session.exists("/Clients/nouryon/outbound/incoming/order_1.xml")).thenReturn(false);
@@ -269,18 +313,25 @@ class SftpRuntimeInterfaceStorageTest {
     }
 
     @Test
-    @DisplayName("extractOriginalFilename parses both claim-timestamp and legacy formats cleanly")
-    void extractOriginalFilenameParsesFormats() {
+    @DisplayName("extractOriginalFilename ignores small numeric segments and parses both formats cleanly")
+    void extractOriginalFilenameParsesFormatsSafely() {
         assertEquals(
                 "order_1.xml",
                 SftpInterfacePathSupport.extractOriginalFilename(
                         "order_1.xml.1764244800000.pod-xml-1.12ab34cd.processing")
+        );
+        // Small numbers like 2026 are NOT treated as 1970 epochMillis!
+        assertEquals(
+                "order.2026",
+                SftpInterfacePathSupport.extractOriginalFilename("order.2026.pod-a.12345678.processing")
         );
         assertEquals(
                 "ORDER.XML",
                 SftpInterfacePathSupport.extractOriginalFilename("ORDER.XML.pod-b.99ff00aa.processing")
         );
         assertFalse(SftpInterfacePathSupport.isSafeSegment(".hidden.xml"));
+        assertFalse(SftpInterfacePathSupport.isSafeSegment(" order.xml"));
+        assertFalse(SftpInterfacePathSupport.isSafeSegment("order.xml "));
         assertTrue(SftpInterfacePathSupport.isSafeSegment("order..1.xml"));
     }
 

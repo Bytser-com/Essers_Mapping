@@ -39,8 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Real end-to-end SFTP integration test against an embedded Apache MINA SSHD server.
- * Proves real POSIX SFTP rename atomicity, claim-timestamp stale recovery (immune to
- * POSIX mtime preservation), bounded readBytes() protection, and folder transitions.
+ * Proves real POSIX SFTP rename atomicity, no-overwrite safety on collisions, claim-timestamp
+ * stale recovery (immune to POSIX mtime preservation), upfront stat() size limits, and clean teardown.
  */
 class SftpRuntimeInterfaceStorageIT {
 
@@ -52,6 +52,7 @@ class SftpRuntimeInterfaceStorageIT {
 
     private Path sftpHome;
     private SshServer sshServer;
+    private DefaultSftpSessionFactory delegateFactory;
     private CachingSessionFactory<SftpClient.DirEntry> cachingFactory;
     private MutableClock testClock;
     private SftpRuntimeInterfaceStorage storage;
@@ -71,15 +72,15 @@ class SftpRuntimeInterfaceStorageIT {
         sshServer.setFileSystemFactory(new VirtualFileSystemFactory(sftpHome));
         sshServer.start();
 
-        DefaultSftpSessionFactory delegate = new DefaultSftpSessionFactory(false);
-        delegate.setHost("127.0.0.1");
-        delegate.setPort(sshServer.getPort());
-        delegate.setUser(SFTP_USER);
-        delegate.setPassword(ephemeralPass);
-        delegate.setTimeout(5_000);
-        delegate.setAllowUnknownKeys(true);
+        delegateFactory = new DefaultSftpSessionFactory(false);
+        delegateFactory.setHost("127.0.0.1");
+        delegateFactory.setPort(sshServer.getPort());
+        delegateFactory.setUser(SFTP_USER);
+        delegateFactory.setPassword(ephemeralPass);
+        delegateFactory.setTimeout(5_000);
+        delegateFactory.setAllowUnknownKeys(true);
 
-        cachingFactory = new CachingSessionFactory<>(delegate, 4);
+        cachingFactory = new CachingSessionFactory<>(delegateFactory, 4);
         cachingFactory.setTestSession(true);
 
         testClock = new MutableClock(Instant.now());
@@ -91,6 +92,9 @@ class SftpRuntimeInterfaceStorageIT {
     void tearDown() throws Exception {
         if (cachingFactory != null) {
             cachingFactory.destroy();
+        }
+        if (delegateFactory != null) {
+            delegateFactory.destroy();
         }
         if (sshServer != null) {
             sshServer.stop(true);
@@ -104,10 +108,8 @@ class SftpRuntimeInterfaceStorageIT {
         Path backlogFile = incomingDir.resolve("backlog_order.xml");
         byte[] payload = "<DELVRY03><IDOC>backlog</IDOC></DELVRY03>".getBytes(StandardCharsets.UTF_8);
         Files.write(backlogFile, payload);
-        // Simulate a 10-minute backlog: POSIX rename preserves this old mtime in processing/!
         Files.setLastModifiedTime(backlogFile, FileTime.from(testClock.instant().minus(Duration.ofMinutes(10))));
 
-        // Hidden dotfile must be ignored
         Path hiddenFile = incomingDir.resolve(".uploading.xml");
         Files.writeString(hiddenFile, "<tmp/>");
         Files.setLastModifiedTime(hiddenFile, FileTime.from(testClock.instant().minus(Duration.ofMinutes(10))));
@@ -116,27 +118,33 @@ class SftpRuntimeInterfaceStorageIT {
         assertEquals(1, ready.size());
         assertEquals("backlog_order.xml", ready.get(0).filename());
 
-        // Pod A atomically claims the file via real SFTP rename
         Optional<ClaimedInterface> podAClaim = storage.tryClaim(ready.get(0), "pod-a");
         assertTrue(podAClaim.isPresent());
-        // Pod B loses the atomic rename race cleanly
         assertTrue(storage.tryClaim(ready.get(0), "pod-b").isEmpty());
         assertArrayEquals(payload, storage.readBytes(podAClaim.get()));
 
-        // 1 second later: Pod B runs stale recovery (5 min threshold). Even though file mtime is 10 min old,
-        // the embedded claim timestamp is only 1s old -> MUST NOT steal Pod A's active file!
+        // 1s later: old upload mtime must NOT cause stale recovery
         testClock.advance(Duration.ofSeconds(1));
         assertEquals(0, storage.recoverStaleClaims(Duration.ofMinutes(5)));
         assertFalse(Files.exists(backlogFile));
 
-        // 6 minutes later: Pod A is presumed dead -> stale recovery MUST now restore it to incoming/!
+        // Simulate customer uploading a brand-new order with the SAME filename while Pod A is stale!
+        String newCustomerOrder = "<DELVRY03><IDOC>brand-new-order</IDOC></DELVRY03>";
+        Files.writeString(backlogFile, newCustomerOrder);
+
+        // 6m later: stale recovery must NOT overwrite the new customer upload; it must use a collision-free name!
         testClock.advance(Duration.ofMinutes(6));
         assertEquals(1, storage.recoverStaleClaims(Duration.ofMinutes(5)));
-        assertTrue(Files.exists(backlogFile));
+        assertEquals(newCustomerOrder, Files.readString(backlogFile),
+                "New customer upload in incoming/ must never be overwritten by stale recovery");
+        try (var files = Files.list(incomingDir)) {
+            long xmlCount = files.filter(p -> p.getFileName().toString().startsWith("backlog_order")).count();
+            assertEquals(2L, xmlCount, "Both new upload and recovered stale claim must exist in incoming/");
+        }
     }
 
     @Test
-    @DisplayName("Real SFTP storage enforces maxFileSizeBytes, moves processed with collision safety, and writes error notes")
+    @DisplayName("Real SFTP storage enforces maxFileSizeBytes, moves processed without overwrite, and writes error notes")
     void realSftpTransitionsAndSizeLimitWorkEndToEnd() throws Exception {
         Path incomingDir = Files.createDirectories(sftpHome.resolve("Clients/nouryon/outbound/incoming"));
         Path okFile = incomingDir.resolve("order_ok.xml");
@@ -147,9 +155,10 @@ class SftpRuntimeInterfaceStorageIT {
         Files.setLastModifiedTime(okFile, FileTime.from(oldTime));
         Files.setLastModifiedTime(bigFile, FileTime.from(oldTime));
 
-        // Pre-populate processed/order_ok.xml to force collision-free rename
+        // Pre-populate processed/order_ok.xml to prove no-overwrite collision handling on real SFTP
         Path processedDir = Files.createDirectories(sftpHome.resolve("Clients/nouryon/outbound/processed"));
-        Files.writeString(processedDir.resolve("order_ok.xml"), "<previous/>");
+        Path existingProcessed = processedDir.resolve("order_ok.xml");
+        Files.writeString(existingProcessed, "<previous/>");
 
         List<IncomingInterface> ready = storage.listReadyIncoming(Duration.ofSeconds(3));
         assertEquals(2, ready.size());
@@ -161,6 +170,8 @@ class SftpRuntimeInterfaceStorageIT {
 
         ClaimedInterface okClaim = storage.tryClaim(okCandidate, "pod-1").orElseThrow();
         storage.moveToProcessed(okClaim);
+        assertEquals("<previous/>", Files.readString(existingProcessed),
+                "Previously processed file must never be overwritten");
         try (var processedFiles = Files.list(processedDir)) {
             assertEquals(2L, processedFiles.count(), "Both original and collision-safe file must exist");
         }
