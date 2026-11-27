@@ -85,6 +85,7 @@ prometheus.scrape "local_node_exporter" {
       "nodename"    = "{{ inventory_hostname }}",
       "role"        = "{{ 'k8s_master' if inventory_hostname in groups['k8s_masters'] else ('k8s_worker' if inventory_hostname in groups['k8s_workers'] else 'runner') }}",
       "environment" = "{{ env_name | default('testing') }}",
+      "cluster"     = "{{ env_name | default('testing') }}",
     },
   ]
   scrape_interval = "15s"

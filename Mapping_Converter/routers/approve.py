@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+import time
 from typing import Annotated
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
@@ -23,6 +24,7 @@ from pydantic import BaseModel
 
 from scripts.errors import ProposalConflictError, ProposalNotFoundError, StorageError
 from services.approval import approve_proposal
+from services.metrics import metrics
 from services.proposal_files import METADATA_FILES, ProposalLocation, read_metadata, write_metadata
 from services.statuses import ProposalStatus
 from services.storage import Storage, proposal_storage
@@ -59,6 +61,7 @@ def trigger_ai_review(storage: Storage, company: str, version: str, proposal_typ
 
     review_key = (company.strip().lower(), version.strip().lower(), proposal_type.strip().lower())
     _active_reviews.add(review_key)
+    started = time.monotonic()
     logger.info('Starting AI review for %s/%s/%s', company, version, proposal_type)
     try:
         contents = None
@@ -89,9 +92,11 @@ def trigger_ai_review(storage: Storage, company: str, version: str, proposal_typ
                 meta['status'] = None
                 meta['ai_status'] = None
             write_metadata(s, location, meta)
+        metrics.record_ai_review(decision, time.monotonic() - started)
         return review_result
 
     except Exception as exc:
+        metrics.record_ai_review('FAILED', time.monotonic() - started)
         logger.warning('AI review for %s/%s/%s did not complete: %s', company, version, proposal_type, exc)
         try:
             with storage.session() as s:
@@ -222,15 +227,20 @@ def approve(
     try:
         result = approve_proposal(storage, company, version, proposal_type, request.description)
     except ValueError as error:
+        metrics.record_approval('invalid')
         raise HTTPException(status_code=400, detail=str(error)) from error
     except ProposalNotFoundError as error:
+        metrics.record_approval('not_found')
         raise HTTPException(status_code=404, detail=str(error)) from error
     except ProposalConflictError as error:
+        metrics.record_approval('conflict')
         raise HTTPException(status_code=409, detail=str(error)) from error
     except StorageError as error:
+        metrics.record_approval('error')
         logger.exception('Approving a proposal failed')
         raise HTTPException(status_code=502, detail='De bestanden zijn tijdelijk niet bereikbaar') from error
 
+    metrics.record_approval('scheduled')
     logger.info('Proposal %s/%s/%s approved; AI review scheduled', result.company, result.version, result.proposal_type)
     background_tasks.add_task(trigger_ai_review, storage, result.company, result.version, result.proposal_type)
     return result.to_dict()

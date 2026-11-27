@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import logging
 import re
+import time
 import unicodedata
 from collections.abc import Callable
 from dataclasses import replace
@@ -29,6 +30,7 @@ from scripts.config import SOURCE_DIR
 from scripts.errors import GeminiError, InputDataError
 from scripts.models import MappingResult, MappingSettings
 
+from .metrics import metrics
 from .proposals import AiStatus, ProposalRef, ProposalStatus, ProposalStore
 from .storage import proposal_storage
 
@@ -90,22 +92,27 @@ def generate_proposal(
     the watcher can resume the same checkpoints. Permanent errors still fail.
     """
     run = run or _default_run()
+    started = time.monotonic()
     try:
         if not any(Path(source_dir).glob('*.xml')):
             raise InputDataError(f'No customer XML files in {source_dir}.')
         result = run(replace(settings, source_dir=Path(source_dir)))
         store.save_file(ref, result.workbook_path, workbook_name(ref.customer, ref.version))
     except BaseException as error:
+        elapsed = time.monotonic() - started
         if retry_temporary and is_retryable_gemini_error(error):
+            metrics.record_ai_run('retrying', elapsed)
             logger.warning('Proposal %s: temporary Gemini failure; keeping it in progress.', ref.id)
         else:
             store.set_status(ref, ProposalStatus.AI_GENERATING, AiStatus.FAILED,
                              error=f'{type(error).__name__}: {error}'[:300])
+            metrics.record_ai_run('failed', elapsed)
             logger.warning('Proposal %s: AI run failed.', ref.id)
         raise
 
     # Done: "Klaar om na te kijken".
     store.set_status(ref, ProposalStatus.READY_FOR_REVIEW, None)
+    metrics.record_ai_run('succeeded', time.monotonic() - started)
     logger.info(f'Proposal {ref.id} is ready for review.')
     return result
 
