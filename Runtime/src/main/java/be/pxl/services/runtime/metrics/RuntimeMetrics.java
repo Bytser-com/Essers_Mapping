@@ -1,10 +1,12 @@
 package be.pxl.services.runtime.metrics;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.springframework.stereotype.Component;
 
 /**
@@ -18,15 +20,19 @@ public class RuntimeMetrics {
     public static final String ACTIVE_WORKERS_METRIC = "runtime.workers.active";
     public static final String FILES_PROCESSED_METRIC = "runtime.files.processed";
     public static final String FILES_FAILED_METRIC = "runtime.files.failed";
+    public static final String POLL_ERRORS_METRIC = "runtime.poller.errors";
+    public static final String PROCESSING_DURATION_METRIC = "runtime.file.processing.duration";
 
     private final AtomicInteger backlogFiles = new AtomicInteger(0);
     private final AtomicInteger activeWorkers = new AtomicInteger(0);
     private final Counter filesProcessed;
     private final Counter filesFailed;
+    private final Counter pollErrors;
+    private final Timer processingDuration;
 
     public RuntimeMetrics(MeterRegistry meterRegistry) {
         Gauge.builder(BACKLOG_FILES_METRIC, backlogFiles, AtomicInteger::get)
-                .description("Current number of ready incoming XML files waiting on sftp-runtime")
+                .description("Current number of ready incoming XML files waiting on sftp-runtime (use max() across replicas)")
                 .register(meterRegistry);
 
         Gauge.builder(ACTIVE_WORKERS_METRIC, activeWorkers, AtomicInteger::get)
@@ -39,6 +45,14 @@ public class RuntimeMetrics {
 
         this.filesFailed = Counter.builder(FILES_FAILED_METRIC)
                 .description("Total number of customer XML interfaces that failed and moved to error/")
+                .register(meterRegistry);
+
+        this.pollErrors = Counter.builder(POLL_ERRORS_METRIC)
+                .description("Total number of failed SFTP poll or stale-recovery cycles")
+                .register(meterRegistry);
+
+        this.processingDuration = Timer.builder(PROCESSING_DURATION_METRIC)
+                .description("End-to-end processing duration per claimed customer XML interface")
                 .register(meterRegistry);
     }
 
@@ -68,5 +82,15 @@ public class RuntimeMetrics {
 
     public void recordFailed() {
         filesFailed.increment();
+    }
+
+    public void recordPollError() {
+        pollErrors.increment();
+    }
+
+    public void recordProcessingDuration(long durationNanos) {
+        if (durationNanos >= 0) {
+            processingDuration.record(durationNanos, TimeUnit.NANOSECONDS);
+        }
     }
 }

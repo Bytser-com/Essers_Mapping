@@ -1,6 +1,7 @@
 package be.pxl.services.runtime.poller;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -68,7 +69,7 @@ class InterfacePollerConcurrencyTest {
                 true, 5_000L, 0L, 0L, maxConcurrency, 300_000L, 60_000L, 10, "pod-bounded"
         );
         InterfacePoller poller = new InterfacePoller(
-                storage, processor, props, metrics, mock(TaskScheduler.class), virtualExecutor);
+                storage, processor, props, metrics, mock(TaskScheduler.class), virtualExecutor, Clock.systemUTC());
 
         try {
             while (!storage.isEmpty()) {
@@ -120,7 +121,7 @@ class InterfacePollerConcurrencyTest {
                 );
                 InterfacePoller podPoller = new InterfacePoller(
                         storage, processor, props, new RuntimeMetrics(new SimpleMeterRegistry()),
-                        mock(TaskScheduler.class), workerExec);
+                        mock(TaskScheduler.class), workerExec, Clock.systemUTC());
 
                 podRunner.execute(() -> {
                     try {

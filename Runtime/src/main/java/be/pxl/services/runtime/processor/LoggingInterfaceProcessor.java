@@ -8,8 +8,9 @@ import org.springframework.stereotype.Component;
 import be.pxl.services.runtime.domain.ClaimedInterface;
 
 /**
- * Default fallback processor for US IT2627T06-56 that validates non-empty XML payloads
- * and logs each fetched interface until the full conversion pipeline (US 52/152/55) is wired in.
+ * Default fallback processor for US IT2627T06-56 that rejects empty payloads
+ * and logs each fetched interface until downstream XML parsing and conversion
+ * (US 52/152/55) are wired into {@link InterfaceProcessor}.
  */
 @Component
 @Fallback
