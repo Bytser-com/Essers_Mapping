@@ -57,6 +57,7 @@ import static be.pxl.services.runtime.storage.SftpInterfacePathSupport.normalize
 public class SftpRuntimeInterfaceStorage implements RuntimeInterfaceStorage {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SftpRuntimeInterfaceStorage.class);
+    private static final String CLAIMED_REQUIRED_MESSAGE = "claimed must not be null";
     private static final Comparator<IncomingInterface> OLDEST_FIRST = Comparator
             .comparing(IncomingInterface::lastModified)
             .thenComparing(IncomingInterface::remotePath);
@@ -114,7 +115,7 @@ public class SftpRuntimeInterfaceStorage implements RuntimeInterfaceStorage {
 
     @Override
     public byte[] readBytes(ClaimedInterface claimed) {
-        Objects.requireNonNull(claimed, "claimed must not be null");
+        Objects.requireNonNull(claimed, CLAIMED_REQUIRED_MESSAGE);
         try {
             byte[] bytes = sftpTemplate.execute(session -> {
                 ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -129,7 +130,7 @@ public class SftpRuntimeInterfaceStorage implements RuntimeInterfaceStorage {
 
     @Override
     public void moveToProcessed(ClaimedInterface claimed) {
-        Objects.requireNonNull(claimed, "claimed must not be null");
+        Objects.requireNonNull(claimed, CLAIMED_REQUIRED_MESSAGE);
         String processedDir = joinPath(claimed.baseDir(), PROCESSED_DIR);
         try {
             sftpTemplate.execute(session -> {
@@ -144,7 +145,7 @@ public class SftpRuntimeInterfaceStorage implements RuntimeInterfaceStorage {
 
     @Override
     public void moveToError(ClaimedInterface claimed, String reason) {
-        Objects.requireNonNull(claimed, "claimed must not be null");
+        Objects.requireNonNull(claimed, CLAIMED_REQUIRED_MESSAGE);
         String errorDir = joinPath(claimed.baseDir(), ERROR_DIR);
         try {
             sftpTemplate.execute(session -> {
