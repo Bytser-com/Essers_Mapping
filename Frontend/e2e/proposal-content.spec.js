@@ -130,9 +130,9 @@ test.describe('End-to-End (E2E) - Proposal content', () => {
     await expect(page.getByText('REVIEW_REQUIRED', { exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Goedkeuren' })).toBeDisabled()
 
-    // Arrange: the same proposal with all fields filled in
+    // Arrange: the same proposal with all fields filled in and status in review
     await page.unroute(PROPOSAL_API)
-    await mockProposal(page, { json: PROPOSAL })
+    await mockProposal(page, { json: { ...PROPOSAL, status: 'In review' } })
 
     // Act
     await page.reload()

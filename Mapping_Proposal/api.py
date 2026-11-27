@@ -18,10 +18,11 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 from routers import metrics as metrics_router
 from routers import upload
-from scripts.config import cors_origins, watch_incoming_enabled
+from scripts.config import cors_origins, is_swagger_enabled, watch_incoming_enabled
 from services import incoming_watcher
 
 logger = logging.getLogger(__name__)
@@ -39,17 +40,35 @@ async def lifespan(app: FastAPI):
         stop.set()
 
 
-app = FastAPI(title='Mapping Proposal API', version='0.1.0', lifespan=lifespan)
+def create_app() -> FastAPI:
+    swagger_on = is_swagger_enabled()
+    application = FastAPI(
+        title='Mapping Proposal API',
+        version='0.1.0',
+        docs_url='/docs' if swagger_on else None,
+        redoc_url=None,
+        openapi_url='/openapi.json' if swagger_on else None,
+        lifespan=lifespan,
+    )
 
-# Only needed when a browser calls this API directly (local frontend development).
-_origins = cors_origins()
-if _origins:
-    app.add_middleware(CORSMiddleware, allow_origins=_origins, allow_methods=['GET', 'POST'], allow_headers=['*'])
+    # Only needed when a browser calls this API directly (local frontend development).
+    _origins = cors_origins()
+    if _origins:
+        application.add_middleware(CORSMiddleware, allow_origins=_origins, allow_methods=['GET', 'POST'], allow_headers=['*'])
 
-app.include_router(upload.router)
-app.include_router(metrics_router.router)
+    application.include_router(upload.router)
+    application.include_router(metrics_router.router)
+
+    if swagger_on:
+        @application.get('/swagger', include_in_schema=False)
+        def swagger_redirect():
+            return RedirectResponse(url='/docs')
+
+    @application.get('/health')
+    def health() -> dict:
+        return {'status': 'ok'}
+
+    return application
 
 
-@app.get('/health')
-def health() -> dict:
-    return {'status': 'ok'}
+app = create_app()
