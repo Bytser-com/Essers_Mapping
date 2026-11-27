@@ -113,6 +113,23 @@ describe('Version Control – version history of a mapping package', () => {
     expect(dates).toEqual(['12/11/2026 10:00', '02/10/2026 09:15', '29/09/2026 09:30'])
   })
 
+  it('every version shows its own description from the backend', async () => {
+    fakeBackend([v3, v2, v1])
+    renderPage()
+    await screen.findByText('v3')
+
+    const descriptions = screen.getAllByRole('row').slice(1).map((tr) => within(tr).getAllByRole('cell')[1]?.textContent)
+    expect(descriptions).toEqual(['2 mappings gewijzigd', '1 mapping toegevoegd', 'Eerste versie'])
+  })
+
+  it('shows "—" when the backend sends no description', async () => {
+    fakeBackend([{ ...v3, description: null }])
+    renderPage()
+
+    await screen.findByText('v3')
+    expect(within(rowOf('v3')).getAllByRole('cell')[1]).toHaveTextContent('—')
+  })
+
   it('shows "—" when the version has no date or author', async () => {
     fakeBackend([{ ...v3, createdAt: null, createdBy: null }])
     renderPage()
@@ -124,7 +141,7 @@ describe('Version Control – version history of a mapping package', () => {
   })
 
   it('shows a loading message while the versions are being loaded', async () => {
-    let answer: (response: Response) => void = () => {}
+    let answer: (response: Response) => void = () => { }
     vi.stubGlobal('fetch', vi.fn(() => new Promise<Response>((resolve) => { answer = resolve })))
     renderPage()
 

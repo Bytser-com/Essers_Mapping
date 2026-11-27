@@ -15,6 +15,11 @@ const VERSIONS_API = '**/api/version-control/packages/versions*'
 const PACKAGES_API = '**/api/version-control/packages*'
 const VERSIONS_PAGE = '/package-versions/brevalis/inbound'
 
+const LONG_DESCRIPTION =
+  'Mapping van het veld leveradres aangepast naar de nieuwe structuur van de klant, extra controle op ' +
+  'postcodes toegevoegd en de standaardwaarde voor het land gewijzigd van BE naar NL voor alle zendingen ' +
+  'die via het depot in Venlo vertrekken'
+
 type PackageVersion = {
   version: string
   isActive: boolean
@@ -118,12 +123,38 @@ test.describe('E2E - Version history of a mapping package', () => {
     await expect(rowOf(page, 'v1').getByText('Actief', { exact: true })).toHaveCount(0)
   })
 
-  test('without date or author "—" is shown', async ({ page }) => {
+  test('each version shows its own description', async ({ page }) => {
+    await mockVersions(page, [
+      packageVersion('v3', { description: '2 mappings gewijzigd' }),
+      packageVersion('v2', { isActive: true, description: '1 mapping toegevoegd' }),
+      packageVersion('v1', { description: 'Eerste versie' }),
+    ])
+
+    await page.goto(VERSIONS_PAGE)
+
+    await expect(rowOf(page, 'v3').getByRole('cell').nth(1)).toHaveText('2 mappings gewijzigd')
+    await expect(rowOf(page, 'v2').getByRole('cell').nth(1)).toHaveText('1 mapping toegevoegd')
+    await expect(rowOf(page, 'v1').getByRole('cell').nth(1)).toHaveText('Eerste versie')
+  })
+
+  test('a long description is shown completely and not cut off', async ({ page }) => {
+    await mockVersions(page, [packageVersion('v1', { description: LONG_DESCRIPTION })])
+
+    await page.goto(VERSIONS_PAGE)
+
+    const cell = rowOf(page, 'v1').getByRole('cell').nth(1)
+    await expect(cell).toHaveText(LONG_DESCRIPTION)
+    // Cut off text is wider than the cell; wrapped text fits in it
+    expect(await cell.evaluate((td) => td.scrollWidth <= td.clientWidth)).toBe(true)
+  })
+
+  test('without description, date or author "—" is shown', async ({ page }) => {
     await mockVersions(page, [packageVersion('v1', { createdAt: null, createdBy: null })])
 
     await page.goto(VERSIONS_PAGE)
 
     const cells = rowOf(page, 'v1').getByRole('cell')
+    await expect(cells.nth(1)).toHaveText('—')
     await expect(cells.nth(2)).toHaveText('—')
     await expect(cells.nth(3)).toHaveText('—')
   })
@@ -172,11 +203,14 @@ test.describe('E2E - Version history of a mapping package', () => {
 
   test('the versions are loaded once and the list does not keep refreshing', async ({ page }) => {
     const calls = await mockVersions(page, [packageVersion('v1')])
+    await page.clock.install()
 
     await page.goto(VERSIONS_PAGE)
     await expect(rowOf(page, 'v1')).toBeVisible()
 
-    await page.waitForTimeout(3_000)
+    // Let 3 seconds pass on the page's clock: a list that keeps refreshing would ask the backend again
+    await page.clock.runFor(3_000)
+    await expect(rowOf(page, 'v1')).toBeVisible()
     expect(calls()).toBe(1)
   })
 
@@ -192,7 +226,7 @@ test.describe('E2E - Version history of a mapping package', () => {
   test('loading message, error with "Opnieuw proberen" and retry', async ({ page }) => {
     // First answer is slow, so the loading message can be seen; then 502 (SFTP unreachable)
     let calls = 0
-    let releaseFirst: () => void = () => {}
+    let releaseFirst: () => void = () => { }
     const firstAnswered = new Promise<void>((resolve) => (releaseFirst = resolve))
     await page.route(VERSIONS_API, async (route) => {
       calls += 1

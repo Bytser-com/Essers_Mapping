@@ -28,6 +28,11 @@ const v3: PackageVersion = {
 const v2: PackageVersion = { ...v3, version: 'v2', isActive: true, createdAt: '2026-10-02T10:00:00', createdBy: 'Analist B', description: '1 mapping toegevoegd' }
 const v1: PackageVersion = { ...v3, version: 'v1', createdAt: '2026-09-29T09:30:00', description: 'Eerste versie' }
 
+const LONG_DESCRIPTION =
+  'Mapping van het veld leveradres aangepast naar de nieuwe structuur van de klant, extra controle op ' +
+  'postcodes toegevoegd en de standaardwaarde voor het land gewijzigd van BE naar NL voor alle zendingen ' +
+  'die via het depot in Venlo vertrekken'
+
 function renderPage() {
   return render(
     <MemoryRouter initialEntries={['/package-versions/brevalis/inbound']}>
@@ -140,7 +145,7 @@ describe('PackageVersions', () => {
 
     const cells = within(bodyRows()[0]!).getAllByRole('cell')
     expect(cells[0]).toHaveTextContent('v3')
-    expect(cells[1]).toHaveTextContent('—')
+    expect(cells[1]).toHaveTextContent('2 mappings gewijzigd')
     expect(cells[2]).toHaveTextContent('12/11/2026 10:00')
     expect(cells[3]).toHaveTextContent('Analist A')
     expect(within(cells[4]!).getByRole('button', { name: 'Openen' })).toBeInTheDocument()
@@ -148,7 +153,7 @@ describe('PackageVersions', () => {
 
   it('shows one row per version in the order of the backend', async () => {
     answers([v3, v2, v1])
-    renderPage()  
+    renderPage()
 
     await screen.findByText('v3')
 
@@ -186,6 +191,37 @@ describe('PackageVersions', () => {
     const cells = within(bodyRows()[0]!).getAllByRole('cell')
     expect(cells[2]).toHaveTextContent('—')
     expect(cells[3]).toHaveTextContent('—')
+  })
+
+  it('every version shows its own description', async () => {
+    answers([v3, v2, v1])
+    renderPage()
+
+    await screen.findByText('v3')
+
+    const descriptions = bodyRows().map((tr) => within(tr).getAllByRole('cell')[1]!.textContent)
+    expect(descriptions).toEqual(['2 mappings gewijzigd', '1 mapping toegevoegd', 'Eerste versie'])
+  })
+
+  it('shows "—" when a version has no description', async () => {
+    answers([{ ...v3, description: null }])
+    renderPage()
+
+    await screen.findByText('v3')
+
+    const cells = within(bodyRows()[0]!).getAllByRole('cell')
+    expect(cells[1]).toHaveTextContent('—')
+  })
+
+  it('shows a long description completely instead of cutting it off', async () => {
+    answers([{ ...v3, description: LONG_DESCRIPTION }])
+    renderPage()
+
+    await screen.findByText('v3')
+
+    const cells = within(bodyRows()[0]!).getAllByRole('cell')
+    expect(cells[1]).toHaveTextContent(LONG_DESCRIPTION)
+    expect(cells[1]).not.toHaveClass('truncate')
   })
 
   it('without versions it says there are no versions yet', async () => {
