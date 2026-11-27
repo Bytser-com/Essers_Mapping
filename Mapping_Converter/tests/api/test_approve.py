@@ -194,15 +194,64 @@ def test_trigger_ai_review_accepted_converts_and_saves_package(proposals_root, t
     assert pkg_data['mappings'][0]['target_path'] == '/DEST/HEADER/DOC_NUM'
     assert pkg_data['mappings'][0]['source_path'] == '/SRC/HEADER/NUMBER'
 
-    # Verify proposal files are NOT removed
-    assert excel_file.exists()
-    assert meta_file.exists()
+    # Verify proposal files are removed from proposals storage after conversion
+    assert not excel_file.exists()
+    assert not meta_file.exists()
+    assert not (proposals_root / 'nouryon').exists()
 
-    # Verify metadata updated
-    updated_meta = json.loads(meta_file.read_text(encoding='utf-8'))
-    assert updated_meta['status'] is None
-    assert updated_meta['ai_status'] is None
-    assert 'MPackage.json' in updated_meta['package_path']
+
+def test_trigger_ai_review_accepted_preserves_other_proposal_types(proposals_root, tmp_path, monkeypatch):
+    packages_root = tmp_path / 'packages'
+    monkeypatch.setattr(approve_router, 'get_packages_storage', lambda: LocalStorage(packages_root))
+
+    storage = LocalStorage(proposals_root)
+    # Create inbound proposal
+    inbound_folder = proposals_root / 'nouryon' / 'v1' / 'inbound'
+    inbound_folder.mkdir(parents=True, exist_ok=True)
+    (inbound_folder / 'proposal.xlsx').write_bytes(make_proposal_workbook())
+    (inbound_folder / 'proposal.json').write_text(json.dumps({
+        'customer': 'nouryon',
+        'version': 'v1',
+        'proposal_type': 'inbound',
+        'status': 'AI_CHECKING_REVIEW',
+        'filename': 'proposal.xlsx',
+        'uploadUser': 'test_analyst',
+    }), encoding='utf-8')
+
+    # Create outbound proposal for same company
+    outbound_folder = proposals_root / 'nouryon' / 'v1' / 'outbound'
+    outbound_folder.mkdir(parents=True, exist_ok=True)
+    outbound_excel = outbound_folder / 'proposal.xlsx'
+    outbound_excel.write_bytes(make_proposal_workbook())
+    outbound_meta = outbound_folder / 'proposal.json'
+    outbound_meta.write_text(json.dumps({
+        'customer': 'nouryon',
+        'version': 'v1',
+        'proposal_type': 'outbound',
+        'status': 'READY_FOR_REVIEW',
+        'filename': 'proposal.xlsx',
+    }), encoding='utf-8')
+
+    monkeypatch.setattr('scripts.pipeline.run_review', lambda contents: {
+        'decision': 'ACCEPTED',
+        'summary': 'All mappings look consistent',
+        'findings': [],
+    })
+
+    result = approve_router.trigger_ai_review(storage, 'nouryon', 'v1', 'inbound')
+    assert result['decision'] == 'ACCEPTED'
+
+    # Package created for inbound
+    pkg_file = packages_root / 'nouryon' / 'v1' / 'inbound' / 'MPackage.json'
+    assert pkg_file.exists()
+
+    # Inbound deleted
+    assert not inbound_folder.exists()
+
+    # Outbound preserved
+    assert outbound_folder.exists()
+    assert outbound_excel.exists()
+    assert outbound_meta.exists()
 
 
 def test_trigger_ai_review_rejected_does_not_convert_or_save_package(proposals_root, tmp_path, monkeypatch):

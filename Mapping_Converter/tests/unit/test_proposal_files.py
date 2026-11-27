@@ -63,3 +63,36 @@ def test_statuses_compare_equal_to_the_codes_in_the_metadata():
     assert ProposalStatus.AI_CHECKING_REVIEW == 'AI_CHECKING_REVIEW'
     assert {'READY_FOR_REVIEW', 'IN_REVIEW', 'In review'} == set(APPROVABLE_STATUSES)
     assert 'RETURNED' not in APPROVABLE_STATUSES
+
+
+def test_delete_proposal_after_conversion_removes_whole_customer_folder(proposals_root, proposals_storage):
+    from services.proposal_files import delete_proposal_after_conversion
+
+    make_proposal(proposals_root, customer='Nouryon', version='v1', proposal_type='inbound')
+
+    with proposals_storage.session() as s:
+        delete_proposal_after_conversion(s, 'Nouryon', 'v1', 'inbound')
+
+    assert not (proposals_root / 'Nouryon').exists()
+
+
+def test_delete_proposal_after_conversion_preserves_other_type(proposals_root, proposals_storage):
+    from services.proposal_files import delete_proposal_after_conversion
+
+    make_proposal(proposals_root, customer='Nouryon', version='v1', proposal_type='inbound')
+    make_proposal(proposals_root, customer='Nouryon', version='v1', proposal_type='outbound')
+
+    with proposals_storage.session() as s:
+        delete_proposal_after_conversion(s, 'Nouryon', 'v1', 'inbound')
+
+    assert not (proposals_root / 'Nouryon' / 'v1' / 'inbound').exists()
+    assert (proposals_root / 'Nouryon' / 'v1' / 'outbound').exists()
+    assert (proposals_root / 'Nouryon').exists()
+
+
+def test_delete_proposal_after_conversion_nonexistent_customer(proposals_storage):
+    from services.proposal_files import delete_proposal_after_conversion
+
+    with proposals_storage.session() as s:
+        delete_proposal_after_conversion(s, 'nonexistent', 'v1', 'inbound')
+

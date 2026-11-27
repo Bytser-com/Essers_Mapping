@@ -35,6 +35,7 @@ class StorageSession(Protocol):
     """Operations on the storage. ``path`` is relative to the root ("" is the root)."""
 
     def list_dirs(self, path: str) -> list[str]: ...          # names of subfolders; [] if missing
+    def list_files(self, path: str) -> list[str]: ...         # names of files; [] if missing
     def exists(self, path: str) -> bool: ...
     def make_dirs(self, path: str) -> None: ...               # like mkdir -p
     def make_dir(self, path: str) -> bool: ...                # False if it already exists
@@ -42,6 +43,9 @@ class StorageSession(Protocol):
     def read_bytes(self, path: str) -> bytes: ...
     def write_text(self, path: str, text: str) -> None: ...   # atomic: never half-written
     def upload_file(self, local_path: Path, path: str) -> None: ...
+    def delete_file(self, path: str) -> None: ...
+    def delete_tree(self, path: str) -> None: ...
+    def rmdir(self, path: str) -> None: ...
 
 
 class Storage(Protocol):
@@ -145,6 +149,32 @@ class LocalStorage:
         target = self._path(path)
         with Path(local_path).open('rb') as source, atomic_writer(target, binary=True) as destination:
             shutil.copyfileobj(source, destination)
+
+    def list_files(self, path: str) -> list[str]:
+        folder = self._path(path)
+        if not folder.is_dir():
+            return []
+        return sorted(p.name for p in folder.iterdir() if p.is_file())
+
+    def delete_file(self, path: str) -> None:
+        target = self._path(path)
+        if target.is_file():
+            target.unlink(missing_ok=True)
+
+    def delete_tree(self, path: str) -> None:
+        target = self._path(path)
+        if target.is_dir():
+            shutil.rmtree(target, ignore_errors=True)
+        elif target.exists():
+            target.unlink(missing_ok=True)
+
+    def rmdir(self, path: str) -> None:
+        target = self._path(path)
+        if target.is_dir():
+            try:
+                target.rmdir()
+            except OSError:
+                pass
 
 
 # ---------------------------------------------------------------------------
@@ -277,3 +307,55 @@ class _SftpSession:
             if self._stat(remote) is not None:
                 self.client.remove(remote)
             self.client.rename(temp, remote)
+
+    def list_files(self, path: str) -> list[str]:
+        try:
+            entries = self.client.listdir_attr(self._path(path))
+        except OSError:
+            return []
+        return sorted(e.filename for e in entries if not stat.S_ISDIR(e.st_mode or 0))
+
+    def delete_file(self, path: str) -> None:
+        remote = self._path(path)
+        try:
+            self.client.remove(remote)
+        except OSError:
+            pass
+
+    def delete_tree(self, path: str) -> None:
+        remote = self._path(path)
+        self._delete_recursive_sftp(remote)
+
+    def _delete_recursive_sftp(self, remote: str) -> None:
+        try:
+            entries = self.client.listdir_attr(remote)
+        except OSError:
+            try:
+                self.client.remove(remote)
+            except OSError:
+                pass
+            return
+
+        for entry in entries:
+            name = entry.filename
+            if name in ('.', '..'):
+                continue
+            child = posixpath.join(remote, name)
+            if stat.S_ISDIR(entry.st_mode or 0):
+                self._delete_recursive_sftp(child)
+            else:
+                try:
+                    self.client.remove(child)
+                except OSError:
+                    pass
+        try:
+            self.client.rmdir(remote)
+        except OSError:
+            pass
+
+    def rmdir(self, path: str) -> None:
+        remote = self._path(path)
+        try:
+            self.client.rmdir(remote)
+        except OSError:
+            pass

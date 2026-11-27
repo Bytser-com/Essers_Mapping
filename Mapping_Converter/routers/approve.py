@@ -100,6 +100,7 @@ def trigger_ai_review(
                 write_metadata(s, location, meta)
         else:
             from services.packages import DEFAULT_USER, convert_excel_to_package, format_semver
+            from services.proposal_files import delete_proposal_after_conversion
 
             if pkg_storage is None:
                 pkg_storage = get_packages_storage()
@@ -122,13 +123,7 @@ def trigger_ai_review(
             logger.info('Proposal %s/%s/%s converted and saved to package: %s', company, version, proposal_type, sftp_path)
 
             with storage.session() as s:
-                location = find_proposal(s, company, version, proposal_type)
-                meta = read_metadata(s, location)
-                meta['ai_review'] = review_result
-                meta['status'] = None
-                meta['ai_status'] = None
-                meta['package_path'] = sftp_path
-                write_metadata(s, location, meta)
+                delete_proposal_after_conversion(s, company, version, proposal_type)
 
         return review_result
 
