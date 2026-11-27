@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useLocation, useInRouterContext } from 'react-router-dom'
 import InterfaceUpload from '../components/InterfaceUpload'
 import ProposalOverview from '../components/ProposalOverview'
+import ApprovedNotices from '../components/ApprovedNotices'
 import { useProposalStore } from '../stores/proposalStore'
 import iconSuccess from '../assets/home/icon-success.svg'
 
@@ -66,6 +67,8 @@ function Home() {
           </button>
         </div>
       )}
+
+      {inRouter && <ApprovedNotices />}
 
       <InterfaceUpload />
       <ProposalOverview />
