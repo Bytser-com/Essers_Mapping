@@ -160,6 +160,22 @@ zichtbaar. Een tweede commitcontrole na wachten op de omgeving blijft behouden.
 
 De bestaande infrastructuurvolgorde is Terraform → Ansible → Kubernetes.
 Een wijziging aan alleen service-CI start die infrastructuurketen niet.
+Voor infrastructuurchecks bij een PR zijn alleen `Development → Testing` en
+`Testing → main` toegestaan. Een feature-PR naar `main` of `Testing` slaat de
+infrastructuurjobs meteen over, voordat er een eigen runner wordt aangevraagd.
+GitHub kan de workflow nog wel tonen; er start dan geen Terraform-job.
+
+`PR Branch Policy` meldt een verkeerde doelbranch met een rode check. Die check
+draait ook opnieuw wanneer iemand de doelbranch corrigeert. Voeg na de eerste
+GitHub-run `Check PR branch direction` toe aan de vereiste checks van `main` en
+`Testing` om ook het mergen van verkeerd gerichte PR's te blokkeren.
+Branch protection alleen voorkomt niet dat iemand zo'n PR opent.
+
+PR-validaties hebben een eigen wachtrij per PR en blokkeren geen live deployment.
+Een nieuwe PR-update annuleert de oudere validatie voor diezelfde PR.
+Live deployments blijven hun bestaande gedeelde lock gebruiken en annuleren
+elkaar niet. Handmatig starten van de infrastructuurketen blijft mogelijk.
+
 De Proxmox-voorcontrole kijkt alleen of de vereiste VM's bestaan en draaien;
 die controle maakt geen infrastructuur aan.
 De hulptests draaien in `Pipeline Validation`, niet opnieuw bij elke deployment.
