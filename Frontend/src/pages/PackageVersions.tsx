@@ -14,9 +14,6 @@ const ACTION_CELL = 'w-[156px] pr-4 text-right' // 140 + 16
 const HEADER_TEXT = 'py-2.5 text-left align-middle text-[11px] font-bold tracking-[0.66px] text-grey'
 const BODY_CELL = 'py-[13px] align-middle'
 
-// The description of a version is added in user story 65; until then the column stays empty
-const DESCRIPTION_PLACEHOLDER = '—'
-
 // Version history of one mapping package (Figma "08 · Versiegeschiedenis")
 export default function PackageVersions() {
   const { company, packageType } = useParams()
@@ -79,7 +76,7 @@ export default function PackageVersions() {
         </div>
       )}
 
-      {!loading && !error && versions && versions.length === 0 && (
+      {!loading && !error && versions?.length === 0 && (
         <div className="rounded-medium border border-line-grey bg-white px-4 py-6 text-[13px] text-grey">
           Er zijn nog geen versies voor dit mapping package.
         </div>
@@ -110,7 +107,9 @@ export default function PackageVersions() {
                       <span className="font-semibold">{version.version}</span>
                     )}
                   </td>
-                  <td className={`${DESCRIPTION_CELL} ${BODY_CELL} truncate`}>{DESCRIPTION_PLACEHOLDER}</td>
+                  <td className={`${DESCRIPTION_CELL} ${BODY_CELL} whitespace-normal break-words`}>
+                    {version.description || '—'}
+                  </td>
                   <td className={`${DATE_CELL} ${BODY_CELL}`}>
                     {version.createdAt ? formatUploadedAt(version.createdAt) : '—'}
                   </td>
