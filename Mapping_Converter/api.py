@@ -24,7 +24,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import approve, convert, review
+from routers import approve, convert, metrics, review
 from scripts.config import cors_origins
 
 # Re-exported for backward compatibility and test patching:
@@ -42,6 +42,7 @@ if _origins:
 app.include_router(approve.router)
 app.include_router(convert.router)
 app.include_router(review.router)
+app.include_router(metrics.router)
 
 
 @app.get("/health")

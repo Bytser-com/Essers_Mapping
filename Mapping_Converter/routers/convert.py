@@ -19,6 +19,7 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, s
 from scripts.errors import StorageError
 from scripts.models import MappingPackage, SavePackageResponse
 from services.excel_converter import parse_mapping_excel
+from services.metrics import metrics
 from services.packages import (
     DEFAULT_USER,
     PACKAGE_FILENAME,
@@ -71,10 +72,12 @@ async def convert_and_upload_proposal(
         sftp_path = save_mapping_package(storage, package, company, version, proposal_type,
                                          user_created=user_created, package_version=package_version)
     except StorageError as error:
+        metrics.record_conversion('error')
         logger.exception('Storing a mapping package failed')
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY,
                             detail='De bestanden zijn tijdelijk niet bereikbaar') from error
 
+    metrics.record_conversion('succeeded')
     return SavePackageResponse(
         sftp_path=sftp_path,
         sftp_server=describe_packages_server(),
@@ -89,19 +92,23 @@ async def convert_and_upload_proposal(
 
 def _require(value: str, message: str) -> None:
     if not value.strip():
+        metrics.record_conversion('invalid')
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=message)
 
 
 def _parse_upload(filename: str | None, content: bytes) -> MappingPackage:
     """Check the uploaded file and parse it; raises HTTPException 400 when it cannot be used."""
     if not (filename or '').lower().endswith(ALLOWED_EXTENSIONS):
+        metrics.record_conversion('invalid')
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail='Invalid file format. Only Excel files (.xlsx, .xls) are accepted.')
     if not content:
+        metrics.record_conversion('invalid')
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Uploaded file is empty.')
     try:
         return parse_mapping_excel(content)
     except Exception as error:  # openpyxl raises many different errors for unreadable files
+        metrics.record_conversion('invalid')
         logger.exception('Parsing an uploaded Excel workbook failed')
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail='Failed to parse Excel workbook.') from error
