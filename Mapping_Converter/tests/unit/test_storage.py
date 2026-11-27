@@ -78,6 +78,11 @@ class FakeSftpClient:
     def remove(self, remote):
         self._local(remote).unlink()
 
+    def rmdir(self, remote):
+        path = self._local(remote)
+        if path.is_dir():
+            os.rmdir(path)
+
 
 class FakeSftpStorage(SftpStorage):
     """SftpStorage whose session uses the fake client instead of a network connection."""
@@ -308,3 +313,49 @@ def test_sftp_session_rejects_paths_outside_the_root(disk):
     storage = FakeSftpStorage(disk, base_dir='/')
     with storage.session() as s, pytest.raises(StorageError):
         s.read_text('../secret.txt')
+
+
+def test_local_storage_file_and_tree_cleanup(tmp_path):
+    storage = LocalStorage(tmp_path / 'proposals')
+    storage.make_dirs('customer/v1')
+    storage.write_text('customer/v1/a.txt', 'hello')
+    storage.write_text('customer/v1/b.txt', 'world')
+
+    assert storage.list_files('customer/v1') == ['a.txt', 'b.txt']
+    assert storage.list_files('customer/nonexistent') == []
+
+    storage.delete_file('customer/v1/a.txt')
+    assert storage.list_files('customer/v1') == ['b.txt']
+
+    storage.delete_file('customer/v1/b.txt')
+    storage.rmdir('customer/v1')
+    assert not (tmp_path / 'proposals/customer/v1').exists()
+
+    storage.make_dirs('customer/v2/sub')
+    storage.write_text('customer/v2/sub/file.txt', 'data')
+    storage.delete_tree('customer/v2')
+    assert not (tmp_path / 'proposals/customer/v2').exists()
+
+
+def test_sftp_session_file_and_tree_cleanup(disk):
+    storage = FakeSftpStorage(disk, base_dir='/')
+    with storage.session() as s:
+        s.make_dirs('nouryon/v1')
+        s.write_text('nouryon/v1/a.txt', 'hello')
+        s.write_text('nouryon/v1/b.txt', 'world')
+
+        assert s.list_files('nouryon/v1') == ['a.txt', 'b.txt']
+        assert s.list_files('nouryon/nonexistent') == []
+
+        s.delete_file('nouryon/v1/a.txt')
+        assert s.list_files('nouryon/v1') == ['b.txt']
+
+        s.delete_file('nouryon/v1/b.txt')
+        s.rmdir('nouryon/v1')
+        assert not (disk / 'Proposals/nouryon/v1').exists()
+
+        s.make_dirs('nouryon/v2/sub')
+        s.write_text('nouryon/v2/sub/file.txt', 'data')
+        s.delete_tree('nouryon/v2')
+        assert not (disk / 'Proposals/nouryon/v2').exists()
+
