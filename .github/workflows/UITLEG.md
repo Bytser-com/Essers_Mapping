@@ -98,6 +98,11 @@ Andere gefaalde voorwaarden, ontbrekende resultaten, API-fouten en timeouts geve
 exitcode 1. Een fout tijdens het scannen zelf blijft ook blokkeren.
 Het JSON-gateresultaat staat in het artifact `sonarqube-reports`, onder
 `test-results/sonarqube-quality-gate.json`.
+De waarschuwingen en fouten bevatten een link naar de bijbehorende analyse op
+SonarQube. De samenvatting van de Actions-run toont die link ook, naast het exacte
+gateresultaat en het projectdashboard. Dat dashboard toont altijd de nieuwste
+analyse. Als de analysehistoriek niet beschikbaar is, verwijst de analyselink
+naar het exacte gateresultaat als JSON; de regels voor slagen of falen blijven gelijk.
 
 De scanner controleert bij de installatie een GPG-handtekening. We bewaren de
 geverifieerde scanner in een cache, ook als de analyse vervolgens een rode gate
