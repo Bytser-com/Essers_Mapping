@@ -307,7 +307,18 @@ describe('ProposalPage actions', () => {
       expect(button).toHaveAttribute('title', expect.stringContaining('AI-controle is bezig'))
     })
 
+    it('disables "Goedkeuren" when status is not In review', () => {
+      // Arrange
+      useProposalStore.setState({ proposal: { ...PROPOSAL, status: 'Klaar om na te kijken', statusCode: 'READY_FOR_REVIEW' } })
 
+      // Act
+      renderPage()
+
+      // Assert
+      const button = screen.getByRole('button', { name: 'Goedkeuren' })
+      expect(button).toBeDisabled()
+      expect(button).toHaveAttribute('title', "Alleen voorstellen met de status 'In review' kunnen worden goedgekeurd")
+    })
   })
 
   it('calls onDelete when "Verwijderen" is clicked with prop', async () => {

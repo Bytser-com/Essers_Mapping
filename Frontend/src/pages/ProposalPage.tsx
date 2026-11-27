@@ -49,12 +49,14 @@ function formatDateOnly(dateStr?: string | null): string {
 }
 
 /** Why "Goedkeuren" is disabled, or undefined when the proposal can be approved. */
-function getApproveDisabledReason(hasReviewFields: boolean, isAiChecking: boolean): string | undefined {
-  if (hasReviewFields) {
-    return "Goedkeuren is pas mogelijk als alle velden zijn nagekeken";
-  }
+function getApproveDisabledReason(status?: string, statusCode?: string): string | undefined {
+  const isAiChecking = statusCode === AI_CHECKING_REVIEW || status === "AI-controle bezig";
   if (isAiChecking) {
     return "De AI-controle is bezig; het voorstel kan nu niet opnieuw goedgekeurd worden";
+  }
+  const isInReview = status === IN_REVIEW || status?.toLowerCase() === "in review" || statusCode === "IN_REVIEW";
+  if (!isInReview) {
+    return "Alleen voorstellen met de status 'In review' kunnen worden goedgekeurd";
   }
   return undefined;
 }
@@ -273,10 +275,7 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
   const reviewCount = proposal.mappings.filter((m) => !m.bronveld).length;
   const matchedCount = totalMappings - reviewCount;
   const hasReviewFields = reviewCount > 0;
-  const isAiChecking =
-    proposal.statusCode === AI_CHECKING_REVIEW ||
-    proposal.status === "AI-controle bezig";
-  const approveDisabledReason = getApproveDisabledReason(hasReviewFields, isAiChecking);
+  const approveDisabledReason = getApproveDisabledReason(proposal.status, proposal.statusCode);
 
   const filteredMappings = proposal.mappings.filter((mapping) => {
     if (filterMissingOnly && mapping.bronveld) {
