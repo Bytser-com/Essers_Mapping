@@ -305,6 +305,19 @@ describe('ProposalPage actions', () => {
       expect(button).toBeDisabled()
       expect(button).toHaveAttribute('title', expect.stringContaining('AI-controle is bezig'))
     })
+
+    it('IT2627T06-187 disables "Goedkeuren" for a proposal that is already approved', () => {
+      // Arrange
+      useProposalStore.setState({ proposal: { ...PROPOSAL, status: 'Goedgekeurd', statusCode: 'APPROVED' } })
+
+      // Act
+      renderPage()
+
+      // Assert
+      const button = screen.getByRole('button', { name: 'Goedkeuren' })
+      expect(button).toBeDisabled()
+      expect(button).toHaveAttribute('title', expect.stringContaining('al goedgekeurd'))
+    })
   })
 
   it('calls onDelete when "Verwijderen" is clicked with prop', async () => {

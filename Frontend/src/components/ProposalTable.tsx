@@ -33,6 +33,7 @@ const STATUS_LABEL_STYLE: Record<ProposalStatus, LabelStyle> = {
   IN_REVIEW: 'outlined',
   AI_CHECKING_REVIEW: 'outlined',
   RETURNED: 'dotted',
+  APPROVED: 'grey',
 }
 
 function getStatusLabel(status: ProposalStatus | string): string {

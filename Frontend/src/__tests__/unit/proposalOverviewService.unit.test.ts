@@ -67,6 +67,7 @@ describe('labels', () => {
       IN_REVIEW: 'In review',
       AI_CHECKING_REVIEW: 'AI-controle bezig',
       RETURNED: 'Teruggestuurd',
+      APPROVED: 'Goedgekeurd',
     })
     expect(AI_STATUS_LABELS).toEqual({ RUNNING: 'Bezig', FAILED: 'Mislukt' })
   })
@@ -79,6 +80,8 @@ describe('labels', () => {
     expect(normalizeStatus('READY_FOR_REVIEW')).toBe('READY_FOR_REVIEW')
     expect(normalizeStatus('AI maakt voorstel')).toBe('AI_GENERATING')
     expect(normalizeStatus(null)).toBe('READY_FOR_REVIEW')
+    expect(normalizeStatus('APPROVED')).toBe('APPROVED')
+    expect(normalizeStatus('Goedgekeurd')).toBe('APPROVED')
   })
 
   it('toProposal converts raw CompanyProposalOverview with In review status to Proposal', () => {

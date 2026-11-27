@@ -6,6 +6,7 @@ export type ProposalStatus =
   | 'IN_REVIEW'
   | 'AI_CHECKING_REVIEW'
   | 'RETURNED'
+  | 'APPROVED'
 
 export type AiStatus = 'RUNNING' | 'FAILED'
 
@@ -57,7 +58,7 @@ export const STATUS_LABELS: Record<ProposalStatus, string> = {
   IN_REVIEW: 'In review',
   AI_CHECKING_REVIEW: 'AI-controle bezig',
   RETURNED: 'Teruggestuurd',
-  
+  APPROVED: 'Goedgekeurd',
 }
 
 export const AI_STATUS_LABELS: Record<AiStatus, string> = {
@@ -107,6 +108,9 @@ export function normalizeStatus(rawStatus?: string | null): ProposalStatus {
   }
   if (upper === 'RETURNED' || trimmed.toLowerCase() === 'teruggestuurd') {
     return 'RETURNED'
+  }
+  if (upper === 'APPROVED' || trimmed.toLowerCase() === 'goedgekeurd') {
+    return 'APPROVED'
   }
 
   return STATUS_LABELS[upper as ProposalStatus]

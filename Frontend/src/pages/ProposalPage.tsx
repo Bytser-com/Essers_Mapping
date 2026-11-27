@@ -21,6 +21,7 @@ type ConfidenceProps = {
 const REVIEW_REQUIRED = "REVIEW_REQUIRED";
 const IN_REVIEW = "In review";
 const AI_CHECKING_REVIEW = "AI_CHECKING_REVIEW";
+const APPROVED = "APPROVED";
 
 const thClass =
   "px-3 py-2.5 first:pl-4 last:pr-4 text-left font-bold text-[11px] tracking-[0.06em] uppercase text-grey select-none";
@@ -49,7 +50,14 @@ function formatDateOnly(dateStr?: string | null): string {
 }
 
 /** Why "Goedkeuren" is disabled, or undefined when the proposal can be approved. */
-function getApproveDisabledReason(hasReviewFields: boolean, isAiChecking: boolean): string | undefined {
+function getApproveDisabledReason(
+  hasReviewFields: boolean,
+  isAiChecking: boolean,
+  isApproved: boolean,
+): string | undefined {
+  if (isApproved) {
+    return "Dit voorstel is al goedgekeurd en omgezet naar een mapping package";
+  }
   if (hasReviewFields) {
     return "Goedkeuren is pas mogelijk als alle velden zijn nagekeken";
   }
@@ -236,7 +244,8 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
   const matchedCount = totalMappings - reviewCount;
   const hasReviewFields = reviewCount > 0;
   const isAiChecking = proposal.statusCode === AI_CHECKING_REVIEW;
-  const approveDisabledReason = getApproveDisabledReason(hasReviewFields, isAiChecking);
+  const isApproved = proposal.statusCode === APPROVED;
+  const approveDisabledReason = getApproveDisabledReason(hasReviewFields, isAiChecking, isApproved);
 
   const filteredMappings = proposal.mappings.filter((mapping) => {
     if (filterMissingOnly && mapping.bronveld) {

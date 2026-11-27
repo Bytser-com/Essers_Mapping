@@ -65,6 +65,7 @@ describe('ProposalTable', () => {
     ['Klaar om na te kijken', 'Klaar om na te kijken'],
     ['AI_CHECKING_REVIEW', 'AI-controle bezig'],
     ['RETURNED', 'Teruggestuurd'],
+    ['APPROVED', 'Goedgekeurd'],
   ] as const)('TC-57-05 status %s is shown as "%s"', (status, label) => {
     render(<ProposalTable proposals={[proposal({ status: status as unknown as Proposal['status'] })]} />)
 

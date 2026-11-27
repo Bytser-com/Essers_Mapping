@@ -86,6 +86,7 @@ function mapStatusLabel(rawStatus?: string | null): string {
   if (s === "AI_GENERATING") return "Wordt gegenereerd";
   if (s === "AI_CHECKING_REVIEW") return "AI-controle bezig";
   if (s === "RETURNED") return "Teruggestuurd";
+  if (s === "APPROVED") return "Goedgekeurd";
   return "Klaar om na te kijken";
 }
 
