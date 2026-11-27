@@ -68,8 +68,10 @@ configMapGenerator:
     behavior: merge
     literals:
       - ENVIRONMENT=production
-      - LOG_LEVEL=WARN
+      - LOG_LEVEL=INFO
       - SPRING_PROFILES_ACTIVE=production
+      - GEMINI_MODEL=gemini-2.5-flash
+      - GEMINI_REVIEW_MODEL=gemini-2.5-flash
       - PUBLIC_FRONTEND_IP=192.168.100.201
       - PUBLIC_SFTP_SHARED_IP=192.168.100.202
       - PUBLIC_SFTP_RUNTIME_IP=192.168.100.203
