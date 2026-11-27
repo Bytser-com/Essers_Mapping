@@ -21,8 +21,8 @@ const BODY_CELL = 'py-[13px] align-middle'
 function matchToken(text: string, token: string): boolean {
   if (!text) return false
   if (token.length === 1) {
-    const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    return new RegExp(`(?:^|\\s|[^a-zA-Z0-9])${escaped}`, 'i').test(text)
+    const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)
+    return new RegExp(String.raw`(?:^|\s|[^a-zA-Z0-9])${escaped}`, 'i').test(text)
   }
   return text.toLowerCase().includes(token)
 }
@@ -146,7 +146,7 @@ export default function VersionControl() {
         </div>
       )}
 
-      {!loading && !error && packages && packages.length === 0 && (
+      {!loading && !error && packages?.length === 0 && (
         <div className="rounded-medium border border-line-grey bg-white px-4 py-6 text-[13px] text-grey">
           Er zijn nog geen mapping packages.
         </div>
@@ -209,16 +209,16 @@ export default function VersionControl() {
                         >
                           Bekijken
                         </button>
-                    </td>
+                      </td>
                     </tr>
-            )
+                  )
                 })
               )}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
         </div>
-  )
-}
+      )
+      }
     </main >
   )
 }

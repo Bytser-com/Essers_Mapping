@@ -211,9 +211,13 @@ describe('VersionControl', () => {
       await screen.findByText('Brevalis')
     })
 
-    it('TC-159-01 filters packages by company / customer name', async () => {
+        it.each([
+      { field: 'company / customer name', search: 'brev' },
+      { field: 'version', search: 'v4' },
+      { field: 'creation date', search: '11/10' }, // Brevalis date: 11/10/2026 14:32
+    ])('TC-159-01 filters packages by $field', async ({ search }) => {
       const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
-      await userEvent.type(searchInput, 'brev')
+      await userEvent.type(searchInput, search)
 
       expect(screen.getByText('Brevalis')).toBeInTheDocument()
       expect(screen.queryByText('Nouryon')).not.toBeInTheDocument()
@@ -228,14 +232,6 @@ describe('VersionControl', () => {
       expect(bodyRows()).toHaveLength(1)
     })
 
-    it('filters packages by version', async () => {
-      const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
-      await userEvent.type(searchInput, 'v4')
-
-      expect(screen.getByText('Brevalis')).toBeInTheDocument()
-      expect(screen.queryByText('Nouryon')).not.toBeInTheDocument()
-    })
-
     it('filters packages by createdBy user name', async () => {
       const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
       await userEvent.type(searchInput, 'Analist A')
@@ -243,16 +239,7 @@ describe('VersionControl', () => {
       expect(screen.queryByText('Brevalis')).not.toBeInTheDocument()
       expect(screen.getAllByText('Nouryon')).toHaveLength(2)
     })
-
-    it('filters packages by creation date', async () => {
-      const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
-      // Brevalis date: 11/10/2026 14:32
-      await userEvent.type(searchInput, '11/10')
-
-      expect(screen.getByText('Brevalis')).toBeInTheDocument()
-      expect(screen.queryByText('Nouryon')).not.toBeInTheDocument()
-    })
-
+    
     it('filters packages by combining company and type (e.g. "nouryon outbound")', async () => {
       const searchInput = screen.getByRole('searchbox', { name: 'Zoek een klant op naam' })
       await userEvent.type(searchInput, 'nouryon outbound')
