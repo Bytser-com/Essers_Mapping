@@ -5,6 +5,7 @@ import {
 } from '../services/mappingPackageOverviewService'
 import { formatUploadedAt } from '../services/proposalOverviewService'
 import { useMappingPackageStore } from '../stores/mappingPackageStore'
+import { useNavigate } from 'react-router-dom'
 
 // Column widths 280 / 150 / 150 / rest / 160 px with a 12 px gap; the row has 16 px side padding
 // (Figma "Lijst – mapping packages"). Each cell's width includes its padding.
@@ -54,6 +55,7 @@ function matchField(pkg: MappingPackageOverview, token: string): boolean {
 
 // Version Control overview (Figma "07 · Version Control"): all customers and their mapping packages
 export default function VersionControl() {
+  const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
   const fetchPackages = useMappingPackageStore((state) => state.fetchPackages)
 
@@ -200,18 +202,23 @@ export default function VersionControl() {
                       </td>
                       <td className={`${ACTION_CELL} ${BODY_CELL}`}>
                         {/* Opens the versions of this customer: user story 161 */}
-                        <button type="button" className="btn">
+                        <button
+                          type="button"
+                          className="btn"
+                          onClick={() => navigate(`/package-versions/${mappingPackage.company}/${mappingPackage.packageType}`)}
+                        >
                           Bekijken
                         </button>
-                      </td>
+                    </td>
                     </tr>
-                  )
+            )
                 })
               )}
-            </tbody>
-          </table>
+          </tbody>
+        </table>
         </div>
-      )}
-    </main>
+  )
+}
+    </main >
   )
 }
