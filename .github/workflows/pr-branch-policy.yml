@@ -1,0 +1,31 @@
+name: PR Branch Policy
+
+on:
+  pull_request:
+    branches: [Development, Testing, main]
+    # Recheck when someone corrects the base branch in the PR editor.
+    types: [opened, synchronize, reopened, edited]
+
+permissions: {}
+
+concurrency:
+  group: pr-branch-policy-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Check PR branch direction
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Require Testing as the source for main
+        if: github.base_ref == 'main' && github.head_ref != 'Testing'
+        run: |
+          echo "::error::Only Testing may be merged into main. Feature PRs must target Development."
+          exit 1
+
+      - name: Require Development as the source for Testing
+        if: github.base_ref == 'Testing' && github.head_ref != 'Development'
+        run: |
+          echo "::error::Only Development may be merged into Testing. Feature PRs must target Development."
+          exit 1

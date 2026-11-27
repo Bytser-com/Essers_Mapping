@@ -20,6 +20,7 @@ name: Infrastructure & Cluster Pipeline
 on:
   pull_request:
     branches: [main, Testing]
+    types: [opened, synchronize, reopened, edited]
     paths:
       - "Infra/**"
       - "Kubernetes/**"
@@ -73,10 +74,13 @@ on:
         options: [apply, validate, restart]
         default: apply
 
-# Shared cluster-write lock with Service CD and Kubernetes deploy (prevents concurrent collisions & race conditions)
+# PR checks use their own group; only deployments hold the shared cluster-write lock.
 concurrency:
-  group: cluster-write-${{ (github.base_ref || github.ref_name) == 'main' && 'production' || 'testing' }}
-  cancel-in-progress: false
+  group: >-
+    ${{ github.event_name == 'pull_request'
+        && format('infra-pr-{0}', github.event.pull_request.number)
+        || format('cluster-write-{0}', github.ref_name == 'main' && 'production' || 'testing') }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -88,6 +92,11 @@ jobs:
   # ----------------------------------------------------------------------------
   terraform:
     name: 1. Provision Infrastructure
+    # Skip accidental feature PRs before requesting a self-hosted runner.
+    if: >-
+      github.event_name != 'pull_request' ||
+      (github.base_ref == 'Testing' && github.head_ref == 'Development') ||
+      (github.base_ref == 'main' && github.head_ref == 'Testing')
     uses: ./.github/workflows/terraform-infra.yml
     with:
       action: ${{ (github.event_name == 'pull_request' && 'plan') || (inputs.terraform_action) || 'apply' }}
