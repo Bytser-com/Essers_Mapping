@@ -10,6 +10,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
@@ -58,8 +59,8 @@ public class InterfacePoller {
     private final Semaphore workerSlots;
     private final AtomicBoolean running = new AtomicBoolean(false);
 
-    private volatile ScheduledFuture<?> pollFuture;
-    private volatile ScheduledFuture<?> recoveryFuture;
+    private final AtomicReference<ScheduledFuture<?>> pollFuture = new AtomicReference<>();
+    private final AtomicReference<ScheduledFuture<?>> recoveryFuture = new AtomicReference<>();
 
     public InterfacePoller(
             RuntimeInterfaceStorage storage,
@@ -94,8 +95,8 @@ public class InterfacePoller {
     @PreDestroy
     public void stop() {
         running.set(false);
-        cancelFuture(pollFuture);
-        cancelFuture(recoveryFuture);
+        cancelFuture(pollFuture.getAndSet(null));
+        cancelFuture(recoveryFuture.getAndSet(null));
         awaitActiveWorkers();
     }
 
@@ -219,13 +220,14 @@ public class InterfacePoller {
 
     private void scheduleNextPoll(long delayMs) {
         if (running.get()) {
-            pollFuture = taskScheduler.schedule(this::pollAndReschedule, Instant.now().plusMillis(delayMs));
+            pollFuture.set(taskScheduler.schedule(this::pollAndReschedule, Instant.now().plusMillis(delayMs)));
         }
     }
 
     private void scheduleNextRecovery(long delayMs) {
         if (running.get()) {
-            recoveryFuture = taskScheduler.schedule(this::recoverStaleAndReschedule, Instant.now().plusMillis(delayMs));
+            recoveryFuture.set(
+                    taskScheduler.schedule(this::recoverStaleAndReschedule, Instant.now().plusMillis(delayMs)));
         }
     }
 
