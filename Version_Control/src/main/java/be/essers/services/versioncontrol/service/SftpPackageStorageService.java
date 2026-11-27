@@ -9,7 +9,6 @@ import be.essers.services.versioncontrol.exception.StorageException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import org.apache.sshd.sftp.client.SftpClient;
-import org.apache.sshd.sftp.common.SftpConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,12 +46,14 @@ public class SftpPackageStorageService implements PackageStorageService {
             .thenComparing(p -> p.packageType() != null ? p.packageType() : "", String.CASE_INSENSITIVE_ORDER);
 
     private final SftpRemoteFileTemplate template;
+    private final SftpFolders folders;
     private final String packagesRoot;
     private final ObjectMapper objectMapper;
 
     public SftpPackageStorageService(SftpRemoteFileTemplate template, ObjectMapper objectMapper,
                                      @Value("${sftp.packages-path:/Packages}") String packagesRoot) {
         this.template = template;
+        this.folders = new SftpFolders(template);
         this.packagesRoot = packagesRoot;
         this.objectMapper = objectMapper;
     }
@@ -64,7 +65,7 @@ public class SftpPackageStorageService implements PackageStorageService {
                 if (company.length() > MAX_COMPANY_LENGTH) {
                     throw new IllegalArgumentException("Company parameter must not exceed " + MAX_COMPANY_LENGTH + " characters");
                 }
-                String sanitized = sanitizePathSegment(company);
+                String sanitized = SftpFolders.sanitizeSegment(company);
                 return getOverviewsForCompany(sanitized);
             } else {
                 return listAllPackages();
@@ -92,29 +93,29 @@ public class SftpPackageStorageService implements PackageStorageService {
             throw new IllegalArgumentException("Version parameter must not be empty");
         }
 
-        String resolvedCompany = resolveDirectoryName(packagesRoot, sanitizePathSegment(company));
+        String resolvedCompany = folders.findSubfolder(packagesRoot, SftpFolders.sanitizeSegment(company));
         if (resolvedCompany == null) {
             throw new EntityNotFoundException("Company directory '" + company + "' does not exist at " + packagesRoot);
         }
 
-        String companyPath = packagesRoot + "/" + resolvedCompany;
-        String sanitizedType = sanitizePathSegment(packageType).toLowerCase();
-        String sanitizedVersion = sanitizePathSegment(version);
+        String companyPath = SftpFolders.path(packagesRoot, resolvedCompany);
+        String sanitizedType = SftpFolders.sanitizeSegment(packageType).toLowerCase();
+        String sanitizedVersion = SftpFolders.sanitizeSegment(version);
 
         // Verify that the requested version directory exists for this company
-        String resolvedVersion = resolveDirectoryName(companyPath, sanitizedVersion);
+        String resolvedVersion = folders.findSubfolder(companyPath, sanitizedVersion);
         if (resolvedVersion == null) {
             throw new EntityNotFoundException("Version directory '" + sanitizedVersion + "' does not exist for company '" + resolvedCompany + "'");
         }
 
-        String versionPath = companyPath + "/" + resolvedVersion;
-        String resolvedType = resolveDirectoryName(versionPath, sanitizedType);
+        String versionPath = SftpFolders.path(companyPath, resolvedVersion);
+        String resolvedType = folders.findSubfolder(versionPath, sanitizedType);
         if (resolvedType == null) {
             throw new EntityNotFoundException("Package type '" + sanitizedType + "' does not exist in version '" + resolvedVersion + "' for company '" + resolvedCompany + "'");
         }
 
-        String typePath = versionPath + "/" + resolvedType;
-        SftpClient.DirEntry[] typeEntries = listEntries(typePath);
+        String typePath = SftpFolders.path(versionPath, resolvedType);
+        SftpClient.DirEntry[] typeEntries = folders.list(typePath);
         MappingPackage.Meta metadata = readMetadata(typePath, typeEntries);
         String problem = findMetadataProblem(metadata);
         if (problem != null) {
@@ -128,8 +129,8 @@ public class SftpPackageStorageService implements PackageStorageService {
         activeMap.put(sanitizedType, new ActivePackageInfo(resolvedVersion, nowIso, effectiveUser));
 
         // Write active.json atomically
-        String activeJsonPath = companyPath + "/" + ACTIVE_FILENAME;
-        String tempPath = companyPath + "/." + ACTIVE_FILENAME + ".tmp";
+        String activeJsonPath = SftpFolders.path(companyPath, ACTIVE_FILENAME);
+        String tempPath = SftpFolders.path(companyPath, "." + ACTIVE_FILENAME + ".tmp");
         try {
             byte[] bytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(activeMap);
             template.execute(session -> {
@@ -178,29 +179,29 @@ public class SftpPackageStorageService implements PackageStorageService {
             throw new IllegalArgumentException("PackageType parameter must not be empty");
         }
 
-        String resolvedCompany = resolveDirectoryName(packagesRoot, sanitizePathSegment(company));
+        String resolvedCompany = folders.findSubfolder(packagesRoot, SftpFolders.sanitizeSegment(company));
         if (resolvedCompany == null) {
             throw new EntityNotFoundException("Company directory '" + company + "' does not exist at " + packagesRoot);
         }
 
-        String companyPath = packagesRoot + "/" + resolvedCompany;
-        String sanitizedType = sanitizePathSegment(packageType).toLowerCase();
+        String companyPath = SftpFolders.path(packagesRoot, resolvedCompany);
+        String sanitizedType = SftpFolders.sanitizeSegment(packageType).toLowerCase();
         Map<String, ActivePackageInfo> activeMap = readActivePackages(companyPath);
         ActivePackageInfo activeInfo = activeMap.get(sanitizedType);
 
-        List<String> versions = listSubdirectories(companyPath);
+        List<String> versions = folders.subfolders(companyPath);
         versions.sort(VersionComparator.INSTANCE);
 
         List<PackageVersionDto> result = new ArrayList<>();
         // Walk from newest to oldest
         for (int i = versions.size() - 1; i >= 0; i--) {
             String version = versions.get(i);
-            String versionPath = companyPath + "/" + version;
+            String versionPath = SftpFolders.path(companyPath, version);
 
-            for (String typeName : listSubdirectories(versionPath)) {
+            for (String typeName : folders.subfolders(versionPath)) {
                 if (sanitizedType.equalsIgnoreCase(typeName)) {
-                    String typePath = versionPath + "/" + typeName;
-                    SftpClient.DirEntry[] typeEntries = listEntries(typePath);
+                    String typePath = SftpFolders.path(versionPath, typeName);
+                    SftpClient.DirEntry[] typeEntries = folders.list(typePath);
                     MappingPackage.Meta metadata = readMetadata(typePath, typeEntries);
                     String problem = findMetadataProblem(metadata);
                     if (problem != null) {
@@ -223,13 +224,13 @@ public class SftpPackageStorageService implements PackageStorageService {
     }
 
     private List<MappingPackageOverviewDto> getOverviewsForCompany(String company) {
-        String resolvedCompany = resolveDirectoryName(packagesRoot, company);
+        String resolvedCompany = folders.findSubfolder(packagesRoot, company);
         if (resolvedCompany == null) {
             throw new EntityNotFoundException("Company directory '" + company + "' does not exist at " + packagesRoot);
         }
 
-        String companyPath = packagesRoot + "/" + resolvedCompany;
-        List<String> versions = listSubdirectories(companyPath);
+        String companyPath = SftpFolders.path(packagesRoot, resolvedCompany);
+        List<String> versions = folders.subfolders(companyPath);
         versions.sort(VersionComparator.INSTANCE);
         if (versions.isEmpty()) {
             throw new EntityNotFoundException("No package versions found for company '" + resolvedCompany + "'");
@@ -249,14 +250,14 @@ public class SftpPackageStorageService implements PackageStorageService {
     }
 
     private List<MappingPackageOverviewDto> listAllPackages() {
-        if (!template.exists(packagesRoot)) {
+        if (!folders.exists(packagesRoot)) {
             log.warn("Root packages directory '{}' does not exist on SFTP server", packagesRoot);
             return Collections.emptyList();
         }
 
         List<MappingPackageOverviewDto> results = new ArrayList<>();
-        for (String companyName : listSubdirectories(packagesRoot)) {
-            List<String> versions = listSubdirectories(packagesRoot + "/" + companyName);
+        for (String companyName : folders.subfolders(packagesRoot)) {
+            List<String> versions = folders.subfolders(SftpFolders.path(packagesRoot, companyName));
             versions.sort(VersionComparator.INSTANCE);
             results.addAll(findLatestPackagesForCompany(companyName, versions));
         }
@@ -273,7 +274,7 @@ public class SftpPackageStorageService implements PackageStorageService {
      * to the latest version found.
      */
     private List<MappingPackageOverviewDto> findLatestPackagesForCompany(String companyName, List<String> versions) {
-        String companyPath = packagesRoot + "/" + companyName;
+        String companyPath = SftpFolders.path(packagesRoot, companyName);
         Map<String, ActivePackageInfo> activeMap = readActivePackages(companyPath);
 
         // Group packages by type: packageType -> (version -> VersionPackageData)
@@ -282,11 +283,11 @@ public class SftpPackageStorageService implements PackageStorageService {
 
         for (int i = versions.size() - 1; i >= 0; i--) {
             String version = versions.get(i);
-            String versionPath = companyPath + "/" + version;
+            String versionPath = SftpFolders.path(companyPath, version);
 
-            for (String typeName : listSubdirectories(versionPath)) {
-                String typePath = versionPath + "/" + typeName;
-                SftpClient.DirEntry[] typeEntries = listEntries(typePath);
+            for (String typeName : folders.subfolders(versionPath)) {
+                String typePath = SftpFolders.path(versionPath, typeName);
+                SftpClient.DirEntry[] typeEntries = folders.list(typePath);
                 MappingPackage.Meta metadata = readMetadata(typePath, typeEntries);
                 String problem = findMetadataProblem(metadata);
                 if (problem != null) {
@@ -355,8 +356,8 @@ public class SftpPackageStorageService implements PackageStorageService {
     }
 
     private Map<String, ActivePackageInfo> readActivePackages(String companyPath) {
-        String activePath = companyPath + "/" + ACTIVE_FILENAME;
-        if (!template.exists(activePath)) {
+        String activePath = SftpFolders.path(companyPath, ACTIVE_FILENAME);
+        if (!folders.exists(activePath)) {
             return new HashMap<>();
         }
         try {
@@ -400,14 +401,14 @@ public class SftpPackageStorageService implements PackageStorageService {
 
     // First type folder of the latest version, even when its MPackage.json is missing or invalid
     private MappingPackageOverviewDto buildCompanyOverviewFallback(String companyName, String version) {
-        String versionPath = packagesRoot + "/" + companyName + "/" + version;
-        List<String> types = listSubdirectories(versionPath);
+        String versionPath = SftpFolders.path(packagesRoot, companyName, version);
+        List<String> types = folders.subfolders(versionPath);
         if (types.isEmpty()) {
             return null;
         }
         String typeName = types.get(0);
-        String typePath = versionPath + "/" + typeName;
-        SftpClient.DirEntry[] typeEntries = listEntries(typePath);
+        String typePath = SftpFolders.path(versionPath, typeName);
+        SftpClient.DirEntry[] typeEntries = folders.list(typePath);
         MappingPackage.Meta metadata = readMetadata(typePath, typeEntries);
         String createdAt = extractCreatedAt(typeEntries, metadata);
         String createdBy = metadata != null ? metadata.userCreated() : null;
@@ -429,22 +430,6 @@ public class SftpPackageStorageService implements PackageStorageService {
 
     private static String displayName(MappingPackageOverviewDto p) {
         return (p.customerName() != null && !p.customerName().isBlank()) ? p.customerName() : p.company();
-    }
-
-    // Names of the subdirectories of a path (without "." and "..")
-    private List<String> listSubdirectories(String path) {
-        List<String> names = new ArrayList<>();
-        for (SftpClient.DirEntry entry : listEntries(path)) {
-            if (!isSpecialDirectory(entry.getFilename()) && isDirectory(entry)) {
-                names.add(entry.getFilename());
-            }
-        }
-        return names;
-    }
-
-    private SftpClient.DirEntry[] listEntries(String path) {
-        SftpClient.DirEntry[] entries = template.list(path);
-        return entries != null ? entries : new SftpClient.DirEntry[0];
     }
 
     // Returns why the package data cannot be shown in the overview, or null when it is valid
@@ -481,7 +466,7 @@ public class SftpPackageStorageService implements PackageStorageService {
             return null;
         }
 
-        String metadataPath = typePath + "/" + metadataFile;
+        String metadataPath = SftpFolders.path(typePath, metadataFile);
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             boolean success = template.get(metadataPath, in -> in.transferTo(baos));
@@ -498,7 +483,7 @@ public class SftpPackageStorageService implements PackageStorageService {
     // Actual filename of MPackage.json in the folder (case-insensitive match), or null
     private String findMetadataFilename(SftpClient.DirEntry[] entries) {
         for (SftpClient.DirEntry entry : entries) {
-            if (METADATA_FILENAME.equalsIgnoreCase(entry.getFilename()) && !isDirectory(entry)) {
+            if (METADATA_FILENAME.equalsIgnoreCase(entry.getFilename()) && !SftpFolders.isDirectory(entry)) {
                 return entry.getFilename();
             }
         }
@@ -509,7 +494,7 @@ public class SftpPackageStorageService implements PackageStorageService {
     private String extractLatestFileTimestamp(SftpClient.DirEntry[] entries) {
         Instant latest = null;
         for (SftpClient.DirEntry entry : entries) {
-            if (isDirectory(entry) || entry.getAttributes() == null) {
+            if (SftpFolders.isDirectory(entry) || entry.getAttributes() == null) {
                 continue;
             }
             FileTime modifyTime = entry.getAttributes().getModifyTime();
@@ -518,37 +503,5 @@ public class SftpPackageStorageService implements PackageStorageService {
             }
         }
         return latest != null ? latest.toString() : null;
-    }
-
-    private String resolveDirectoryName(String parentPath, String targetName) {
-        if (template.exists(parentPath + "/" + targetName)) {
-            return targetName;
-        }
-        for (String name : listSubdirectories(parentPath)) {
-            if (name.equalsIgnoreCase(targetName)) {
-                return name;
-            }
-        }
-        return null;
-    }
-
-    private boolean isSpecialDirectory(String name) {
-        return ".".equals(name) || "..".equals(name);
-    }
-
-    private boolean isDirectory(SftpClient.DirEntry entry) {
-        if (entry.getAttributes() == null) {
-            return false;
-        }
-        return entry.getAttributes().isDirectory()
-                || entry.getAttributes().getType() == SftpConstants.SSH_FILEXFER_TYPE_DIRECTORY;
-    }
-
-    private String sanitizePathSegment(String segment) {
-        String trimmed = segment.trim();
-        if (trimmed.contains("/") || trimmed.contains("\\") || trimmed.contains("..")) {
-            throw new IllegalArgumentException("Path segment contains illegal characters: " + segment);
-        }
-        return trimmed;
     }
 }
