@@ -22,7 +22,7 @@ export default function ProposalResetPage() {
       } finally {
         if (mounted) {
           setStatus('done')
-          navigate('/', { replace: true })
+          void navigate('/', { replace: true })
         }
       }
     }

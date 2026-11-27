@@ -93,11 +93,15 @@ blijft de controles voor pull requests uitvoeren.
 De scan uploadt eerst de analyse zonder zelf op de gate te wachten. Daarna leest
 `Scripts/check-sonar-quality-gate.py` het taaknummer uit `.scannerwork/report-task.txt`.
 Het script wacht maximaal vijf minuten op die taak en controleert de voorwaarden
-van precies die analyse. Alleen `new_coverage` geeft een `::warning::` en exitcode 0.
-Andere gefaalde voorwaarden, ontbrekende resultaten, API-fouten en timeouts geven
+van precies die analyse. Gefaalde voorwaarden (inclusief `new_coverage`), ontbrekende resultaten, API-fouten en timeouts geven
 exitcode 1. Een fout tijdens het scannen zelf blijft ook blokkeren.
 Het JSON-gateresultaat staat in het artifact `sonarqube-reports`, onder
 `test-results/sonarqube-quality-gate.json`.
+De waarschuwingen en fouten bevatten een link naar de bijbehorende analyse op
+SonarQube. De samenvatting van de Actions-run toont die link ook, naast het exacte
+gateresultaat en het projectdashboard. Dat dashboard toont altijd de nieuwste
+analyse. Als de analysehistoriek niet beschikbaar is, verwijst de analyselink
+naar het exacte gateresultaat als JSON; de regels voor slagen of falen blijven gelijk.
 
 De scanner controleert bij de installatie een GPG-handtekening. We bewaren de
 geverifieerde scanner in een cache, ook als de analyse vervolgens een rode gate
@@ -160,6 +164,22 @@ zichtbaar. Een tweede commitcontrole na wachten op de omgeving blijft behouden.
 
 De bestaande infrastructuurvolgorde is Terraform → Ansible → Kubernetes.
 Een wijziging aan alleen service-CI start die infrastructuurketen niet.
+Voor infrastructuurchecks bij een PR zijn alleen `Development → Testing` en
+`Testing → main` toegestaan. Een feature-PR naar `main` of `Testing` slaat de
+infrastructuurjobs meteen over, voordat er een eigen runner wordt aangevraagd.
+GitHub kan de workflow nog wel tonen; er start dan geen Terraform-job.
+
+`PR Branch Policy` meldt een verkeerde doelbranch met een rode check. Die check
+draait ook opnieuw wanneer iemand de doelbranch corrigeert. Voeg na de eerste
+GitHub-run `Check PR branch direction` toe aan de vereiste checks van `main` en
+`Testing` om ook het mergen van verkeerd gerichte PR's te blokkeren.
+Branch protection alleen voorkomt niet dat iemand zo'n PR opent.
+
+PR-validaties hebben een eigen wachtrij per PR en blokkeren geen live deployment.
+Een nieuwe PR-update annuleert de oudere validatie voor diezelfde PR.
+Live deployments blijven hun bestaande gedeelde lock gebruiken en annuleren
+elkaar niet. Handmatig starten van de infrastructuurketen blijft mogelijk.
+
 De Proxmox-voorcontrole kijkt alleen of de vereiste VM's bestaan en draaien;
 die controle maakt geen infrastructuur aan.
 De hulptests draaien in `Pipeline Validation`, niet opnieuw bij elke deployment.

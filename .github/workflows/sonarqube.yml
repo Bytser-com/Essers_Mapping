@@ -147,8 +147,8 @@ jobs:
             -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
             -Dsonar.qualitygate.wait=false
 
-      # Inspect this scan separately so only new-code coverage is advisory.
-      - name: Check Sonar gate (coverage warns, other failures block)
+      # Inspect this scan separately to verify the Quality Gate.
+      - name: Check Sonar gate
         env:
           # --- Secrets ---
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

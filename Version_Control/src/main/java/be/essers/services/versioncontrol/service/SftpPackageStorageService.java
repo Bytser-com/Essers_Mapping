@@ -8,6 +8,7 @@ import be.essers.services.versioncontrol.exception.StorageException;
 import tools.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ public class SftpPackageStorageService implements PackageStorageService {
     private final PackageFolderReader packageReader;
     private final String packagesRoot;
 
-    public SftpPackageStorageService(SftpRemoteFileTemplate template, ObjectMapper objectMapper,
+    public SftpPackageStorageService(@Qualifier("sftpRemoteFileTemplate") SftpRemoteFileTemplate template, ObjectMapper objectMapper,
                                      @Value("${sftp.packages-path:/Packages}") String packagesRoot) {
         this.folders = new SftpFolders(template);
         this.activePackages = new ActivePackageFile(template, folders, objectMapper);
