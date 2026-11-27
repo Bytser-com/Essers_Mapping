@@ -54,7 +54,7 @@ public class SftpProposalStorageService implements ProposalStorageService {
     private final ExcelProposalParser excelProposalParser;
 
     @org.springframework.beans.factory.annotation.Autowired
-    public SftpProposalStorageService(SftpRemoteFileTemplate template,
+    public SftpProposalStorageService(@org.springframework.beans.factory.annotation.Qualifier("sftpRemoteFileTemplate") SftpRemoteFileTemplate template,
                                       SftpProperties properties,
                                       ObjectMapper objectMapper,
                                       ExcelProposalParser excelProposalParser) {

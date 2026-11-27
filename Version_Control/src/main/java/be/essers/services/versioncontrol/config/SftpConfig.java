@@ -34,6 +34,7 @@ public class SftpConfig {
     }
 
     @Bean
+    @org.springframework.context.annotation.Primary
     public SftpRemoteFileTemplate sftpRemoteFileTemplate(SessionFactory<SftpClient.DirEntry> sessionFactory) {
         return new SftpRemoteFileTemplate(sessionFactory);
     }
