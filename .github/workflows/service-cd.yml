@@ -209,8 +209,8 @@ jobs:
           chmod 600 "$kubeconfig_path"
           echo "KUBECONFIG=$kubeconfig_path" >> "$GITHUB_ENV"
 
-      - name: Configure Mapping Proposal Gemini credentials
-        if: inputs.service-path == 'Mapping_Proposal'
+      - name: Configure Gemini credentials for AI services
+        if: inputs.service-path == 'Mapping_Proposal' || inputs.service-path == 'Mapping_Converter'
         env:
           # --- Secrets ---
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -234,7 +234,7 @@ jobs:
           import os
 
           template = {"spec": {"containers": [{"name": os.environ["DEPLOYMENT"], "image": os.environ["IMAGE"]}]}}
-          if os.environ["DEPLOYMENT"] == "mapping-proposal":
+          if os.environ["DEPLOYMENT"] in ("mapping-proposal", "mapping-converter"):
               template["metadata"] = {"annotations": {
                   "essers.io/gemini-deploy-run": os.environ["GITHUB_RUN_ID"] + "-" + os.environ["GITHUB_RUN_ATTEMPT"],
               }}
