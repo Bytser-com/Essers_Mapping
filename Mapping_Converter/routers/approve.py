@@ -52,7 +52,8 @@ ERROR_RESPONSES: dict[int | str, dict] = {
     400: {'description': 'Invalid input: too long description, invalid parameters'},
     404: {'description': 'Customer, version, proposal type or metadata not found'},
     409: {'description': 'Proposal cannot be approved in its current status (e.g. AI review running)'},
-    502: {'description': 'The shared SFTP storage is not reachable'},
+    422: {'description': 'Proposal rejected by AI review'},
+    502: {'description': 'The shared SFTP storage is not reachable or AI review could not complete'},
 }
 
 
@@ -249,7 +250,6 @@ def ai_retry(
 @router.post('/approve', responses=ERROR_RESPONSES)
 def approve(
     request: ApproveRequest,
-    background_tasks: BackgroundTasks,
     storage: Annotated[Storage, Depends(get_proposal_storage)],
     company: Annotated[str, Query()] = '',
     version: Annotated[str, Query()] = '',
@@ -267,6 +267,33 @@ def approve(
         logger.exception('Approving a proposal failed')
         raise HTTPException(status_code=502, detail='De bestanden zijn tijdelijk niet bereikbaar') from error
 
-    logger.info('Proposal %s/%s/%s approved; AI review scheduled', result.company, result.version, result.proposal_type)
-    background_tasks.add_task(trigger_ai_review, storage, result.company, result.version, result.proposal_type)
-    return result.to_dict()
+    logger.info('Proposal %s/%s/%s approved; running AI review synchronously...', result.company, result.version, result.proposal_type)
+    review_result = trigger_ai_review(storage, result.company, result.version, result.proposal_type)
+
+    if review_result is None:
+        raise HTTPException(
+            status_code=502,
+            detail='De AI-controle kon niet worden voltooid. Probeer het later opnieuw via AI-retry.',
+        )
+
+    decision = review_result.get('decision', 'ACCEPTED')
+    if decision == 'REJECTED':
+        summary = review_result.get('summary', 'Het voorstel voldoet niet aan de kwaliteitseisen.')
+        findings = review_result.get('findings', [])
+        findings_str = f" ({'; '.join(findings[:2])})" if findings else ''
+        raise HTTPException(
+            status_code=422,
+            detail=f'Het voorstel is afgekeurd door de AI-controle: {summary}{findings_str}',
+        )
+
+    return {
+        'status': 'ACCEPTED',
+        'decision': 'ACCEPTED',
+        'company': result.company,
+        'version': result.version,
+        'proposal_type': result.proposal_type,
+        'approval_description': result.approval_description,
+        'summary': review_result.get('summary', ''),
+        'findings': review_result.get('findings', []),
+        'message': 'Het voorstel is goedgekeurd en geconverteerd naar een Mapping Package.',
+    }

@@ -91,7 +91,7 @@ export const useProposalStore = create<ProposalState>()((set, get) => ({
         approvalMessage: {
           type: "success",
           title: "Voorstel goedgekeurd.",
-          message: `Voorstel voor ${company} (${version}) is succesvol goedgekeurd en omgezet.`,
+          message: "Het voorstel is goedgekeurd en geconverteerd naar een Mapping Package.",
         },
       });
       return true;

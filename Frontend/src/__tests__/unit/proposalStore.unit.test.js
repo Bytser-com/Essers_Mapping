@@ -146,7 +146,7 @@ describe('proposalStore', () => {
         expect(state.approvalMessage).toEqual({
             type: 'success',
             title: 'Voorstel goedgekeurd.',
-            message: 'Voorstel voor brunos (v1) is succesvol goedgekeurd en omgezet.',
+            message: 'Het voorstel is goedgekeurd en geconverteerd naar een Mapping Package.',
         })
         expect(approveProposal).toHaveBeenCalledWith('brunos', 'v1', 'inbound', 'Valid change')
     })

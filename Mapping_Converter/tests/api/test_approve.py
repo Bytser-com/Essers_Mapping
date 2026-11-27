@@ -32,32 +32,64 @@ def client(proposals_root):
     app.dependency_overrides.clear()
 
 
-def write_metadata(root, status='In review'):
+def write_metadata(root, status='In review', filename='proposal.xlsx'):
     folder = root / 'nouryon' / 'v1' / 'inbound'
     folder.mkdir(parents=True, exist_ok=True)
+    if filename:
+        (folder / filename).write_bytes(make_proposal_workbook())
     path = folder / 'metadata.json'
-    path.write_text(json.dumps({'customer': 'Nouryon', 'status': status}), encoding='utf-8')
+    path.write_text(json.dumps({'customer': 'Nouryon', 'status': status, 'filename': filename}), encoding='utf-8')
     return path
 
 
-def test_approve_returns_200_and_updates_status(client, proposals_root):
-    path = write_metadata(proposals_root)
+def test_approve_returns_200_and_updates_status(client, proposals_root, monkeypatch):
+    monkeypatch.setattr('scripts.pipeline.run_review', lambda contents: {
+        'decision': 'ACCEPTED',
+        'summary': 'All mappings look consistent',
+        'findings': [],
+    })
+    write_metadata(proposals_root)
 
     response = client.post(URL, json={'description': 'Eerste versie voor Nouryon'})
 
     assert response.status_code == 200
     body = response.json()
-    assert body['status'] == 'AI_CHECKING_REVIEW'
+    assert body['status'] == 'ACCEPTED'
+    assert body['decision'] == 'ACCEPTED'
     assert body['approval_description'] == 'Eerste versie voor Nouryon'
-    assert json.loads(path.read_text(encoding='utf-8'))['status'] == 'AI_CHECKING_REVIEW'
 
 
 @pytest.mark.parametrize('description', ['', '   '])
-def test_empty_description_is_optional_and_returns_200(client, proposals_root, description):
+def test_empty_description_is_optional_and_returns_200(client, proposals_root, description, monkeypatch):
+    monkeypatch.setattr('scripts.pipeline.run_review', lambda contents: {
+        'decision': 'ACCEPTED',
+        'summary': 'All mappings look consistent',
+        'findings': [],
+    })
     write_metadata(proposals_root)
     response = client.post(URL, json={'description': description})
     assert response.status_code == 200
-    assert response.json()['status'] == 'AI_CHECKING_REVIEW'
+    assert response.json()['status'] == 'ACCEPTED'
+
+
+def test_approve_rejected_returns_422(client, proposals_root, monkeypatch):
+    monkeypatch.setattr('scripts.pipeline.run_review', lambda contents: {
+        'decision': 'REJECTED',
+        'summary': 'Tegenstrijdige mappings gevonden',
+        'findings': ['Veld X conflicteert met veld Y'],
+    })
+    write_metadata(proposals_root)
+    response = client.post(URL, json={'description': 'Test'})
+    assert response.status_code == 422
+    assert 'Tegenstrijdige mappings gevonden' in response.json()['detail']
+
+
+def test_approve_ai_failure_returns_502(client, proposals_root, monkeypatch):
+    monkeypatch.setattr(approve_router, 'trigger_ai_review', lambda *args, **kwargs: None)
+    write_metadata(proposals_root)
+    response = client.post(URL, json={'description': 'Test'})
+    assert response.status_code == 502
+    assert 'AI-controle kon niet worden voltooid' in response.json()['detail']
 
 
 def test_too_long_description_returns_400(client, proposals_root):
@@ -80,11 +112,8 @@ def test_unknown_proposal_returns_404(client):
 
 
 def test_approving_twice_returns_409(client, proposals_root):
-    write_metadata(proposals_root)
-    assert client.post(URL, json={'description': 'Eerste'}).status_code == 200
-
+    write_metadata(proposals_root, status='AI_CHECKING_REVIEW')
     response = client.post(URL, json={'description': 'Tweede'})
-
     assert response.status_code == 409
     assert 'AI-controle is al bezig' in response.json()['detail']
 

@@ -141,15 +141,13 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
     proposal?.versie,
     onApprove,
     (success) => {
-      const versionStr = `v${proposal?.versie ?? 1}`;
-      const compName = proposal?.klant || company || "";
       if (success) {
         navigate("/", {
           state: {
             approvalMessage: {
               type: "success",
               title: "Voorstel goedgekeurd.",
-              message: `Voorstel voor ${compName} (${versionStr}) is succesvol goedgekeurd en omgezet.`,
+              message: "Het voorstel is goedgekeurd en geconverteerd naar een Mapping Package.",
             },
           },
         });
