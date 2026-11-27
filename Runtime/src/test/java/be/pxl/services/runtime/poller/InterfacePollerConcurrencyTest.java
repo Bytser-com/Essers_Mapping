@@ -40,21 +40,23 @@ class InterfacePollerConcurrencyTest {
     private static final String BASE_DIR = "/Clients/nouryon/outbound";
 
     @Test
-    @DisplayName("Bounded worker pool processes files in parallel without ever exceeding workerConcurrency")
+    @DisplayName("Bounded worker pool fills exact concurrency deterministically and skips scans while busy")
     void boundedWorkerPoolEnforcesConcurrencyLimit() throws Exception {
-        int fileCount = 15;
+        int fileCount = 12;
         int maxConcurrency = 3;
         InMemoryAtomicStorage storage = new InMemoryAtomicStorage(fileCount);
         AtomicInteger active = new AtomicInteger(0);
         AtomicInteger maxObserved = new AtomicInteger(0);
+        CountDownLatch firstWaveStarted = new CountDownLatch(maxConcurrency);
+        CountDownLatch releaseFirstWave = new CountDownLatch(1);
         CountDownLatch allProcessed = new CountDownLatch(fileCount);
 
         InterfaceProcessor processor = (claimed, xml) -> {
             int current = active.incrementAndGet();
             maxObserved.accumulateAndGet(current, Math::max);
             try {
-                // Brief pause so parallel virtual threads genuinely overlap while respecting backpressure.
-                TimeUnit.MILLISECONDS.sleep(25);
+                firstWaveStarted.countDown();
+                releaseFirstWave.await(5, TimeUnit.SECONDS);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             } finally {
@@ -72,21 +74,26 @@ class InterfacePollerConcurrencyTest {
                 storage, processor, props, metrics, mock(TaskScheduler.class), virtualExecutor, Clock.systemUTC());
 
         try {
+            assertEquals(DrainOutcome.WORKERS_BUSY, poller.drainOnce());
+            assertTrue(firstWaveStarted.await(5, TimeUnit.SECONDS), "First wave should fill all worker slots");
+            int scansBeforeBusyCheck = storage.listCalls();
+            assertEquals(DrainOutcome.WORKERS_BUSY, poller.drainOnce());
+            assertEquals(scansBeforeBusyCheck, storage.listCalls(), "WORKERS_BUSY must not scan SFTP");
+
+            releaseFirstWave.countDown();
             while (!storage.isEmpty()) {
-                DrainOutcome outcome = poller.drainOnce();
-                if (outcome == DrainOutcome.WORKERS_BUSY) {
-                    TimeUnit.MILLISECONDS.sleep(10);
+                if (poller.drainOnce() == DrainOutcome.WORKERS_BUSY) {
+                    storage.awaitProgress(100);
                 }
             }
             assertTrue(allProcessed.await(10, TimeUnit.SECONDS), "All files should finish processing");
             poller.stop();
         } finally {
+            releaseFirstWave.countDown();
             virtualExecutor.shutdownNow();
         }
 
-        assertTrue(maxObserved.get() > 1, "Expected parallel execution (>1 active worker), got " + maxObserved.get());
-        assertTrue(maxObserved.get() <= maxConcurrency,
-                "Active workers exceeded configured concurrency: " + maxObserved.get());
+        assertEquals(maxConcurrency, maxObserved.get(), "Expected exact configured concurrency");
         assertEquals(fileCount, storage.processedCount());
         assertEquals(0, storage.errorCount());
         assertEquals(0, metrics.activeWorkers());
@@ -127,7 +134,9 @@ class InterfacePollerConcurrencyTest {
                     try {
                         startGate.await();
                         while (!storage.isEmpty()) {
-                            podPoller.drainOnce();
+                            if (podPoller.drainOnce() == DrainOutcome.WORKERS_BUSY) {
+                                storage.awaitProgress(50);
+                            }
                         }
                         podPoller.stop();
                     } catch (InterruptedException ex) {
@@ -151,6 +160,40 @@ class InterfacePollerConcurrencyTest {
         assertEquals(0, storage.errorCount());
     }
 
+    @Test
+    @DisplayName("stop() times out cleanly when an active worker exceeds shutdownAwaitSeconds")
+    void stopTimesOutGracefullyOnStuckWorker() throws Exception {
+        InMemoryAtomicStorage storage = new InMemoryAtomicStorage(1);
+        CountDownLatch workerRunning = new CountDownLatch(1);
+        CountDownLatch releaseWorker = new CountDownLatch(1);
+        InterfaceProcessor stuckProcessor = (claimed, xml) -> {
+            workerRunning.countDown();
+            try {
+                releaseWorker.await(5, TimeUnit.SECONDS);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+        };
+
+        ExecutorService virtualExecutor = Executors.newVirtualThreadPerTaskExecutor();
+        RuntimePollerProperties props = new RuntimePollerProperties(
+                true, 5_000L, 0L, 0L, 1, 300_000L, 60_000L, 1, "pod-timeout"
+        );
+        InterfacePoller poller = new InterfacePoller(
+                storage, stuckProcessor, props, new RuntimeMetrics(new SimpleMeterRegistry()),
+                mock(TaskScheduler.class), virtualExecutor, Clock.systemUTC());
+
+        try {
+            poller.drainOnce();
+            assertTrue(workerRunning.await(5, TimeUnit.SECONDS));
+            poller.stop(); // waits ~1s and logs warning without throwing
+            assertEquals(1, storage.processingCount());
+        } finally {
+            releaseWorker.countDown();
+            virtualExecutor.shutdownNow();
+        }
+    }
+
     /**
      * Thread-safe in-memory storage simulating atomic POSIX SFTP rename via {@link ConcurrentHashMap#remove}.
      */
@@ -160,6 +203,8 @@ class InterfacePollerConcurrencyTest {
         private final Map<String, byte[]> processing = new ConcurrentHashMap<>();
         private final Set<String> processed = ConcurrentHashMap.newKeySet();
         private final Set<String> errors = ConcurrentHashMap.newKeySet();
+        private final AtomicInteger listCounter = new AtomicInteger(0);
+        private final Object progressMonitor = new Object();
 
         InMemoryAtomicStorage(int fileCount) {
             for (int i = 1; i <= fileCount; i++) {
@@ -172,6 +217,14 @@ class InterfacePollerConcurrencyTest {
             return incoming.isEmpty();
         }
 
+        int listCalls() {
+            return listCounter.get();
+        }
+
+        int processingCount() {
+            return processing.size();
+        }
+
         int processedCount() {
             return processed.size();
         }
@@ -180,8 +233,23 @@ class InterfacePollerConcurrencyTest {
             return errors.size();
         }
 
+        void awaitProgress(long timeoutMs) throws InterruptedException {
+            synchronized (progressMonitor) {
+                if (!incoming.isEmpty()) {
+                    progressMonitor.wait(timeoutMs);
+                }
+            }
+        }
+
+        private void notifyProgress() {
+            synchronized (progressMonitor) {
+                progressMonitor.notifyAll();
+            }
+        }
+
         @Override
         public List<IncomingInterface> listReadyIncoming(Duration minFileAge) {
+            listCounter.incrementAndGet();
             return incoming.keySet().stream()
                     .sorted()
                     .map(name -> new IncomingInterface(
@@ -197,6 +265,7 @@ class InterfacePollerConcurrencyTest {
             }
             String claimedPath = BASE_DIR + "/processing/" + candidate.filename() + "." + instanceId + ".processing";
             processing.put(claimedPath, payload);
+            notifyProgress();
             return Optional.of(new ClaimedInterface(
                     candidate.customer(), candidate.messageType(), candidate.filename(), BASE_DIR, claimedPath));
         }
@@ -210,12 +279,14 @@ class InterfacePollerConcurrencyTest {
         public void moveToProcessed(ClaimedInterface claimed) {
             processing.remove(claimed.claimedPath());
             processed.add(claimed.filename());
+            notifyProgress();
         }
 
         @Override
         public void moveToError(ClaimedInterface claimed, String reason) {
             processing.remove(claimed.claimedPath());
             errors.add(claimed.filename());
+            notifyProgress();
         }
 
         @Override

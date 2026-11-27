@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(properties = "runtime.poller.enabled=false")
 class SwaggerEndpointTest {
 
     @Autowired
@@ -31,7 +31,7 @@ class SwaggerEndpointTest {
 
     @Nested
     @SpringBootTest
-    @TestPropertySource(properties = "ENVIRONMENT=production")
+    @TestPropertySource(properties = { "ENVIRONMENT=production", "runtime.poller.enabled=false" })
     class ProductionSwaggerTest {
         @Autowired
         private WebApplicationContext context;
@@ -48,7 +48,7 @@ class SwaggerEndpointTest {
 
     @Nested
     @SpringBootTest
-    @TestPropertySource(properties = "ENVIRONMENT=staging")
+    @TestPropertySource(properties = { "ENVIRONMENT=staging", "runtime.poller.enabled=false" })
     class StagingSwaggerTest {
         @Autowired
         private WebApplicationContext context;
