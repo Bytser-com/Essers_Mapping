@@ -155,7 +155,7 @@ export default function ProposalPage({ onDownload, onUpload, onApprove, onDelete
         const errorMsg =
           useProposalStore.getState().actionError ||
           "Er is een probleem opgetreden bij het goedkeuren van het voorstel.";
-        navigate("/", {
+        void navigate("/", {
           state: {
             approvalMessage: {
               type: "error",
