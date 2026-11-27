@@ -28,4 +28,16 @@ class RuntimeHealthIT {
 			assertTrue(response.body().contains("\"status\":\"UP\""));
 		}
 	}
+
+	@Test
+	void prometheusEndpointExposesRuntimeBacklogMetrics() throws Exception {
+		try (HttpClient client = HttpClient.newHttpClient()) {
+			HttpRequest request = HttpRequest.newBuilder(
+					URI.create("http://127.0.0.1:" + port + "/actuator/prometheus")).GET().build();
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+			assertEquals(200, response.statusCode());
+			assertTrue(response.body().contains("runtime_sftp_backlog_files"));
+			assertTrue(response.body().contains("runtime_workers_active"));
+		}
+	}
 }
