@@ -9,8 +9,8 @@ This service does **not** generate proposals (that is `Mapping_Proposal`) and do
 1. **The analyst clicks "Goedkeuren"** in the frontend and fills in a short description of the change ("Eerste versie voor <klant>" is suggested for v1).
 2. **The frontend calls `POST /approve`** on this service (through `/api/converter/*`).
 3. **The converter checks the proposal** on the shared SFTP server (`sftp-shared`): it must exist and be in review (`READY_FOR_REVIEW`, `IN_REVIEW` or `In review`).
-4. **The converter updates the metadata** of that version: status `AI_CHECKING_REVIEW` ("AI-controle bezig"), the description and the approval time.
-5. **The AI review starts.** It picks up proposals with status `AI_CHECKING_REVIEW` (separate story). While it runs, the proposal cannot be approved again.
+4. **The converter updates the metadata** of that version: status `AI_CHECKING_REVIEW` ("AI-controle bezig"), `ai_status: RUNNING`, the description and the approval time. The analyst gets an answer straight away.
+5. **The AI review runs in the background** and the result becomes a mapping package or goes back to the analyst, see [After the AI review](#after-the-ai-review-story-187). While it runs, the proposal cannot be approved again, and Home refreshes by itself.
 
 ## What happens during the AI review?
 
@@ -32,6 +32,26 @@ flowchart TD
 1. **Workbook Retrieval**: Retrieves the proposal workbook directly from SFTP (`/Proposals/<company>/<version>/<type>/`).
 2. **Parsing** (`scripts/excel_review.py`): Safely parses mapping rows (`Mapping ID`, `Source full path`, `Target field name`, `Proposed rule type`) without formula execution.
 3. **AI Consistency Gate** (`scripts/gemini_review.py`): Prompts Gemini to evaluate mappings against domain constraints and returns `ACCEPTED` or `REJECTED` with findings.
+
+## After the AI review (story 187)
+
+`trigger_ai_review` in `routers/approve.py` hands the approved proposal to `services/finalization.py`:
+
+| AI decision | What is stored | Proposal status |
+|---|---|---|
+| `ACCEPTED` | `MPackage.json` as a new version in `/Packages/<company>/v<N>/<proposal_type>/`, with the approval description and time in `meta` (`description`, `approved_at`). That version becomes the active one in `/Packages/<company>/active.json`. | `APPROVED` ("Goedgekeurd") |
+| `REJECTED` or an invalid workbook | nothing; the findings are kept in `ai_review` of the metadata | `RETURNED` ("Teruggestuurd"), `ai_status: FAILED` |
+| review unavailable (Gemini, storage, ...) | nothing; the error is kept in `ai_review_error` | stays `AI_CHECKING_REVIEW`, `ai_status: FAILED`, so `POST /ai-retry` can start it again |
+
+- **Version number:** the package gets the version of the proposal. Mapping_Proposal already numbers a new proposal as "latest package + 1" (v1 for a new customer).
+- **Never overwritten:** if the package of that version already exists, nothing is stored and the review counts as failed.
+- **`active.json`** has the same format as Version_Control writes, one entry per package type; the other types keep their active version:
+
+```json
+{
+  "outbound": { "version": "v2", "updated_at": "2026-11-27T09:20:39+00:00", "updated_by": "analist_a" }
+}
+```
 
 ## What happens when you convert a proposal?
 
@@ -73,6 +93,7 @@ Mapping_Converter/
 ├── services/               Business logic
 │   ├── approval.py         Validation and status update when a proposal is approved
 │   ├── excel_converter.py  Parse an Excel mapping proposal into a MappingPackage
+│   ├── finalization.py     After the AI review: mapping package + active version, or back to the analyst
 │   ├── packages.py         Name, add metadata to and store MPackage.json
 │   ├── proposal_files.py   Find a proposal version and read/write its metadata
 │   ├── statuses.py         ProposalStatus enum and the statuses that may be approved
@@ -87,7 +108,7 @@ Mapping_Converter/
 │   └── safe_files.py       Safe paths and atomic file writes
 ├── sftp_service.py         SFTP client operations for proposal retrieval and package storage
 └── tests/
-    ├── conftest.py         Shared fixtures (a temporary proposals folder)
+    ├── conftest.py         Shared fixtures (temporary proposals/packages folders, a mapping workbook)
     ├── api/                Endpoint tests with FastAPI's TestClient
     ├── unit/               Tests for services/ and scripts/
     ├── test_architecture.py AI review configuration tests
@@ -142,7 +163,8 @@ Variables that are already set in the terminal or in Kubernetes always win over 
 | Endpoint | Returns |
 |---|---|
 | `GET /health` | `{"status": "ok", "service": "mapping-converter"}` |
-| `POST /approve` | approves a reviewed proposal, sets status to `AI_CHECKING_REVIEW`, and launches the AI review |
+| `POST /approve` | approves a reviewed proposal, sets status to `AI_CHECKING_REVIEW` and starts the AI review in the background; when it passes, the proposal becomes a mapping package |
+| `POST /ai-retry` | restarts the AI review of proposals that are stuck in `AI_CHECKING_REVIEW` (optional filters `company`, `version`, `proposalType`) |
 | `POST /convert` | converts an Excel proposal and stores `MPackage.json` on SFTP (`/convert-and-upload` and `/convert/save` are hidden aliases) |
 
 ### POST /approve
