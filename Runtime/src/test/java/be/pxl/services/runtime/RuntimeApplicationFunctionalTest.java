@@ -8,7 +8,7 @@ import org.springframework.core.env.Environment;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@SpringBootTest
+@SpringBootTest(properties = "runtime.poller.enabled=false")
 class RuntimeApplicationFunctionalTest {
 
 	@Autowired

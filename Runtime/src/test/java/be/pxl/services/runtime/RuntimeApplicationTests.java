@@ -18,7 +18,10 @@ class RuntimeApplicationTests {
 	@Test
 	@DisplayName("Unit: RuntimeApplication main method starts cleanly")
 	void mainMethodRunsWithoutException() {
-		assertDoesNotThrow(() -> RuntimeApplication.main(new String[] { "--spring.main.web-application-type=none" }));
+		assertDoesNotThrow(() -> RuntimeApplication.main(new String[] {
+				"--spring.main.web-application-type=none",
+				"--runtime.poller.enabled=false"
+		}));
 	}
 
 }
