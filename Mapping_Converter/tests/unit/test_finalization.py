@@ -2,63 +2,26 @@
 
 The AI review is always a fake: ``review=`` is passed to finalize_proposal.
 """
-import io
 import json
 from datetime import UTC, datetime
 
 import pytest
-from openpyxl import Workbook
 
 from scripts.errors import ProposalConflictError, ProposalNotFoundError
 from scripts.excel_review import InvalidWorkbook
 from scripts.gemini_review import ReviewUnavailable
 from services.finalization import INVALID_WORKBOOK, finalize_proposal
-from services.storage import LocalStorage
 
 NOW = datetime(2026, 11, 20, 15, 0, tzinfo=UTC)
 STAMP = '2026-11-20T15:00:00+00:00'
 
 
-def excel_bytes():
-    workbook = Workbook()
-    sheet = workbook.active
-    sheet.title = 'Mapping Proposal'
-    # Readable by both the AI review (scripts/excel_review.py) and the converter.
-    sheet.append(['', 'TARGET', '', 'SOURCE', ''])
-    sheet.append(['Mapping ID', 'Target segment path', 'Target field name', 'Source full path', 'Proposed rule type'])
-    sheet.append(['MP-001', '/TARGET/HDR', 'DOC_ID', '/SOURCE/HEADER/ID', 'DIRECT'])
-    buffer = io.BytesIO()
-    workbook.save(buffer)
-    return buffer.getvalue()
-
-
-_EXCEL: list[bytes] = []
-
-
-def excel_bytes_cache():
-    if not _EXCEL:
-        _EXCEL.append(excel_bytes())
-    return _EXCEL[0]
-
-
 @pytest.fixture
-def packages_root(tmp_path):
-    root = tmp_path / 'packages'
-    root.mkdir()
-    return root
-
-
-@pytest.fixture
-def packages_storage(packages_root):
-    return LocalStorage(packages_root)
-
-
-@pytest.fixture
-def approved(proposals_root):
+def approved(proposals_root, mapping_excel):
     """Nouryon/v2/inbound approved by the analyst; returns the metadata path."""
     folder = proposals_root / 'Nouryon' / 'v2' / 'inbound'
     folder.mkdir(parents=True)
-    (folder / 'MProposal-Nouryon_V2.xlsx').write_bytes(excel_bytes_cache())
+    (folder / 'MProposal-Nouryon_V2.xlsx').write_bytes(mapping_excel)
     metadata = folder / 'metadata.json'
     metadata.write_text(json.dumps({
         'customer': 'Nouryon',
@@ -72,13 +35,13 @@ def approved(proposals_root):
 
 def reviewer(decision, summary='ok', findings=()):
     def review(contents):
-        assert contents == excel_bytes_cache()
+        assert contents.startswith(b'PK')  # the stored workbook (an .xlsx is a zip file)
         return {'decision': decision, 'summary': summary, 'findings': list(findings), 'checked_mappings': 1}
     return review
 
 
 def failing(error):
-    def review(contents):
+    def review(_contents):
         raise error
     return review
 

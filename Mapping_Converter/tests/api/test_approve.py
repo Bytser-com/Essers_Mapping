@@ -1,9 +1,7 @@
-import io
 import json
 
 import pytest
 from fastapi.testclient import TestClient
-from openpyxl import Workbook
 
 from api import app
 from routers import approve as approve_router
@@ -11,13 +9,6 @@ from scripts.errors import StorageError
 from services.storage import LocalStorage
 
 URL = '/approve?company=nouryon&version=v1&proposalType=inbound'
-
-
-@pytest.fixture
-def packages_root(tmp_path):
-    root = tmp_path / 'packages'
-    root.mkdir()
-    return root
 
 
 @pytest.fixture
@@ -185,23 +176,10 @@ def test_failed_approval_starts_nothing(client, started):
     assert started == []
 
 
-def excel_bytes():
-    """A real workbook: readable by the AI review and by the package converter."""
-    workbook = Workbook()
-    sheet = workbook.active
-    sheet.title = 'Mapping Proposal'
-    sheet.append(['', 'TARGET', '', 'SOURCE', ''])
-    sheet.append(['Mapping ID', 'Target segment path', 'Target field name', 'Source full path', 'Proposed rule type'])
-    sheet.append(['MP-001', '/TARGET/HDR', 'DOC_ID', '/SOURCE/HEADER/ID', 'DIRECT'])
-    buffer = io.BytesIO()
-    workbook.save(buffer)
-    return buffer.getvalue()
-
-
-def run_approve_end_to_end(proposals_root, packages_root, monkeypatch, review):
+def run_approve_end_to_end(proposals_root, packages_root, mapping_excel, monkeypatch, review):
     """approve -> background task (TestClient runs it) -> AI review replaced by ``review``."""
     path = write_metadata(proposals_root)
-    (path.parent / 'MProposal-Nouryon_V1.xlsx').write_bytes(excel_bytes())
+    (path.parent / 'MProposal-Nouryon_V1.xlsx').write_bytes(mapping_excel)
     monkeypatch.setattr('scripts.pipeline.review_with_gemini', review)
     app.dependency_overrides[approve_router.get_proposal_storage] = lambda: LocalStorage(proposals_root)
     app.dependency_overrides[approve_router.get_packages_storage] = lambda: LocalStorage(packages_root)
@@ -213,8 +191,8 @@ def run_approve_end_to_end(proposals_root, packages_root, monkeypatch, review):
     return json.loads(path.read_text(encoding='utf-8'))
 
 
-def test_accepted_review_publishes_the_package(proposals_root, packages_root, monkeypatch):
-    data = run_approve_end_to_end(proposals_root, packages_root, monkeypatch, lambda rows: {
+def test_accepted_review_publishes_the_package(proposals_root, packages_root, mapping_excel, monkeypatch):
+    data = run_approve_end_to_end(proposals_root, packages_root, mapping_excel, monkeypatch, lambda _rows: {
         'decision': 'ACCEPTED', 'summary': 'Consistent', 'findings': [], 'checked_mappings': 1,
     })
 
@@ -225,8 +203,8 @@ def test_accepted_review_publishes_the_package(proposals_root, packages_root, mo
     assert active['inbound']['version'] == 'v1'
 
 
-def test_rejected_review_returns_the_proposal(proposals_root, packages_root, monkeypatch):
-    data = run_approve_end_to_end(proposals_root, packages_root, monkeypatch, lambda rows: {
+def test_rejected_review_returns_the_proposal(proposals_root, packages_root, mapping_excel, monkeypatch):
+    data = run_approve_end_to_end(proposals_root, packages_root, mapping_excel, monkeypatch, lambda _rows: {
         'decision': 'REJECTED', 'summary': 'Conflict', 'findings': ['Rij 3: dubbel doelveld'], 'checked_mappings': 1,
     })
 
@@ -236,13 +214,13 @@ def test_rejected_review_returns_the_proposal(proposals_root, packages_root, mon
     assert list(packages_root.iterdir()) == []
 
 
-def test_unavailable_review_can_be_retried(proposals_root, packages_root, monkeypatch):
+def test_unavailable_review_can_be_retried(proposals_root, packages_root, mapping_excel, monkeypatch):
     from scripts.gemini_review import ReviewUnavailable
 
-    def unavailable(rows):
+    def unavailable(_rows):
         raise ReviewUnavailable('Gemini 503')
 
-    data = run_approve_end_to_end(proposals_root, packages_root, monkeypatch, unavailable)
+    data = run_approve_end_to_end(proposals_root, packages_root, mapping_excel, monkeypatch, unavailable)
 
     assert data['status'] == 'AI_CHECKING_REVIEW'  # picked up again by POST /ai-retry
     assert data['ai_status'] == 'FAILED'

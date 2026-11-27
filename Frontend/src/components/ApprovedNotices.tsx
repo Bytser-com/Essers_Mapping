@@ -14,9 +14,8 @@ function ApprovedNotices() {
   return (
     <div className="flex flex-col gap-2">
       {notices.map((notice) => (
-        <div
+        <output
           key={notice.id}
-          role="status"
           data-testid="approved-notice"
           className="flex items-center justify-between gap-3 rounded-lg border border-[#1c1c1f] bg-white px-4 py-3"
         >
@@ -35,7 +34,7 @@ function ApprovedNotices() {
               type="button"
               onClick={() => {
                 dismiss(notice.id)
-                navigate('/version-control')
+                void navigate('/version-control')
               }}
               className="rounded-[8px] border border-[#1c1c1f] bg-white px-4 py-[10px] text-[14px] leading-[normal] font-semibold text-[#1c1c1f] hover:bg-[#f4f4f6]"
             >
@@ -50,7 +49,7 @@ function ApprovedNotices() {
               ✕
             </button>
           </div>
-        </div>
+        </output>
       ))}
     </div>
   )

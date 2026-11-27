@@ -62,10 +62,11 @@ export const useHomeStore = create<HomeState>()((set, get) => ({
       // A failed background refresh keeps the table that is already shown.
       // (A new object, so polling keeps going and tries again later.)
       const current = get().proposalList;
+      const message = err instanceof Error ? err.message : "Onbekende fout";
       set({
         proposalList: current ? { ...current } : null,
         loading: false,
-        error: current ? null : err instanceof Error ? err.message : "Onbekende fout",
+        error: current ? null : message,
       });
     }
   },

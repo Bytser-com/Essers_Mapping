@@ -179,12 +179,13 @@ test.describe('E2E - Approved proposal becomes a mapping package (story 187)', (
 
       // The approval was sent for the right proposal, with the description
       expect(backend.approveRequests).toHaveLength(1)
-      expect(Object.fromEntries(backend.approveRequests[0]!.url.searchParams)).toEqual({
+      const [approveRequest] = backend.approveRequests
+      expect(Object.fromEntries(approveRequest?.url.searchParams ?? [])).toEqual({
         company: FOLDER,
         version: 'v2',
         proposalType: 'outbound',
       })
-      expect(backend.approveRequests[0]!.body.description).toBe(DESCRIPTION)
+      expect(approveRequest?.body.description).toBe(DESCRIPTION)
 
       // While the AI is busy, Home refreshes by itself
       await expect(overviewRow(page)).toContainText('AI-controle bezig')

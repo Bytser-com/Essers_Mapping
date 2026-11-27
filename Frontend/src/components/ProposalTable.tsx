@@ -65,7 +65,7 @@ const HEADER_TEXT =
   "py-[10px] text-left align-middle font-['Inter',sans-serif] text-[11px] font-bold tracking-[0.66px] text-[#6b6b73]"
 const BODY_CELL = 'py-[13px] align-middle'
 
-function Label({ style, children }: { style: LabelStyle; children: string }) {
+function Label({ style, children }: Readonly<{ style: LabelStyle; children: string }>) {
   return (
     <span
       className={`inline-flex items-center rounded-full px-[9px] py-[3px] leading-[normal] font-['Inter',sans-serif] text-[12px] font-medium whitespace-nowrap ${LABEL_STYLES[style]}`}
@@ -75,7 +75,7 @@ function Label({ style, children }: { style: LabelStyle; children: string }) {
   )
 }
 
-function AiStatusCell({ status }: { status: AiStatus | null }) {
+function AiStatusCell({ status }: Readonly<{ status: AiStatus | null }>) {
   if (!status) return <span className="text-[13px] text-[#6b6b73]">—</span>
   return <Label style={AI_STATUS_LABEL_STYLE[status]}>{AI_STATUS_LABELS[status]}</Label>
 }
@@ -86,7 +86,7 @@ const OPEN_BUTTON =
 
 // "Openen" goes to /proposals/<customer>. Inside the app this uses the router (no page
 // reload); without a router (e.g. a component test of Home) it is a normal page load.
-function OpenButton({ proposal }: { proposal: Proposal }) {
+function OpenButton({ proposal }: Readonly<{ proposal: Proposal }>) {
   const inRouter = useInRouterContext()
   if (inRouter) return <RouterOpenButton proposal={proposal} />
   return (
@@ -100,7 +100,7 @@ function OpenButton({ proposal }: { proposal: Proposal }) {
   )
 }
 
-function RouterOpenButton({ proposal }: { proposal: Proposal }) {
+function RouterOpenButton({ proposal }: Readonly<{ proposal: Proposal }>) {
   const navigate = useNavigate()
   return (
     <button
@@ -114,7 +114,7 @@ function RouterOpenButton({ proposal }: { proposal: Proposal }) {
 }
 
 // Table of proposals (Home page). Only shows data; ProposalOverview loads it.
-function ProposalTable({ proposals }: ProposalTableProps) {
+function ProposalTable({ proposals }: Readonly<ProposalTableProps>) {
   return (
     <div className="overflow-hidden rounded-[12px] border border-[#e3e3e8] bg-white">
       <table className="w-full table-fixed border-collapse leading-[normal] font-['Inter',sans-serif] text-[13px] text-[#1c1c1f]">
