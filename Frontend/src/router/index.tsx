@@ -3,6 +3,7 @@ import App from '../App'
 import Home from '../pages/Home'
 import VersionControl from '../pages/VersionControl'
 import ProposalPage from '../pages/ProposalPage'
+import ProposalResetPage from '../pages/ProposalResetPage'
 
 const router = createBrowserRouter([
   {
@@ -16,6 +17,20 @@ const router = createBrowserRouter([
       {
         path: 'version-control',
         element: <VersionControl />,
+      },
+      {
+        path: 'proposals/reset',
+        element: <ProposalResetPage />,
+      },
+    ],
+  },
+  {
+    path: '/proposals/reset',
+    element: <App />,
+    children: [
+      {
+        index: true,
+        element: <ProposalResetPage />,
       },
     ],
   },

@@ -6,6 +6,13 @@ export type Mapping = {
   opmerking: string | null;
 };
 
+export type AiReview = {
+  decision?: string;
+  summary?: string;
+  findings?: string[];
+  checked_mappings?: number;
+};
+
 export type Proposal = {
   klant: string;
   versie: number;
@@ -20,4 +27,5 @@ export type Proposal = {
   updatedTime?: string | null;
   createdBy?: string | null;
   mappings: Mapping[];
+  aiReview?: AiReview | null;
 };

@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useParams } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 import ProposalTable from '../../components/ProposalTable'
-import { formatUploadedAt, type Proposal } from '../../services/proposals'
+import { formatUploadedAt, type Proposal } from '../../services/proposalOverviewService'
 
 function proposal(overrides: Partial<Proposal> = {}): Proposal {
   return {

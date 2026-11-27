@@ -226,3 +226,60 @@ def test_upload_creates_version_based_on_existing_packages(client, tmp_path, sto
     assert proposals[0].version == 4
     assert proposals[0].proposal_type == 'inbound'
     assert proposals[0].id == 'nouryon/v4/inbound'
+
+
+def test_ai_retry_recovers_failed_uploads(client, incoming, store, monkeypatch):
+    from services.proposals import AiStatus
+
+    triggered = []
+    monkeypatch.setattr(upload_router, 'trigger_watcher_retry', lambda s: triggered.append(s))
+
+    # Create a proposal in store that failed
+    ref = store.create_proposal('Ostavel', 'inbound')
+    store.set_status(ref, ProposalStatus.AI_GENERATING, AiStatus.FAILED, error='Gemini failed')
+
+    # Create a failed upload directory in incoming/failed
+    failed_dir = incoming / 'failed' / '20261120-120000_ostavel_abc123'
+    failed_dir.mkdir(parents=True)
+    (failed_dir / 'order.xml').write_text('<root/>', encoding='utf-8')
+    (failed_dir / 'upload.json').write_text(json.dumps({'customer': 'Ostavel', 'proposal_type': 'inbound'}), encoding='utf-8')
+    (failed_dir / 'proposal_ref.json').write_text(
+        json.dumps({'customer': 'Ostavel', 'version': ref.version, 'folder': ref.folder, 'proposal_type': 'inbound'}),
+        encoding='utf-8',
+    )
+    (failed_dir / 'error.txt').write_text('Some error', encoding='utf-8')
+
+    response = client.post('/ai-retry')
+    assert response.status_code == 200
+    data = response.json()
+    assert data['status'] == 'ok'
+    assert data['retried_count'] >= 1
+
+    # Verify failed folder was moved back to incoming
+    assert not failed_dir.exists()
+    restored = list(incoming.glob('*ostavel*'))
+    assert len(restored) == 1
+    assert (restored[0] / 'order.xml').is_file()
+    assert not (restored[0] / 'error.txt').exists()
+
+    # Verify proposal status reset to RUNNING
+    [p] = store.list_proposals()
+    assert p.ai_status is AiStatus.RUNNING
+    assert len(triggered) == 1
+
+
+def test_ai_retry_resets_stuck_proposal_in_store_without_failed_dir(client, store):
+    from services.proposals import AiStatus
+
+    ref = store.create_proposal('Brunos', 'outbound')
+    store.set_status(ref, ProposalStatus.AI_GENERATING, AiStatus.FAILED, error='Gemini 503')
+
+    response = client.post('/ai-retry')
+    assert response.status_code == 200
+    data = response.json()
+    assert data['status'] == 'ok'
+    assert data['retried_count'] == 1
+
+    [p] = store.list_proposals()
+    assert p.ai_status is AiStatus.RUNNING
+

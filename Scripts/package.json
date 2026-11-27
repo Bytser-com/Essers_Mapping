@@ -1,0 +1,9 @@
+{
+  "name": "essers-quality-tools",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Local repository-wide code-quality tooling",
+  "devDependencies": {
+    "jscpd": "^4.0.0"
+  }
+}

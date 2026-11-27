@@ -12,7 +12,7 @@ from openpyxl import Workbook
 from scripts.errors import ProposalConflictError, ProposalNotFoundError
 from scripts.excel_review import InvalidWorkbook
 from scripts.gemini_review import ReviewUnavailable
-from services.finalization import REVIEW_UNAVAILABLE, finalize_in_background, finalize_proposal
+from services.finalization import INVALID_WORKBOOK, finalize_proposal
 from services.storage import LocalStorage
 
 NOW = datetime(2026, 11, 20, 15, 0, tzinfo=UTC)
@@ -32,6 +32,15 @@ def excel_bytes():
     return buffer.getvalue()
 
 
+_EXCEL: list[bytes] = []
+
+
+def excel_bytes_cache():
+    if not _EXCEL:
+        _EXCEL.append(excel_bytes())
+    return _EXCEL[0]
+
+
 @pytest.fixture
 def packages_root(tmp_path):
     root = tmp_path / 'packages'
@@ -49,7 +58,7 @@ def approved(proposals_root):
     """Nouryon/v2/inbound approved by the analyst; returns the metadata path."""
     folder = proposals_root / 'Nouryon' / 'v2' / 'inbound'
     folder.mkdir(parents=True)
-    (folder / 'MProposal-Nouryon_V2.xlsx').write_bytes(excel_bytes())
+    (folder / 'MProposal-Nouryon_V2.xlsx').write_bytes(excel_bytes_cache())
     metadata = folder / 'metadata.json'
     metadata.write_text(json.dumps({
         'customer': 'Nouryon',
@@ -62,14 +71,14 @@ def approved(proposals_root):
 
 
 def reviewer(decision, summary='ok', findings=()):
-    def review(workbook):
-        assert workbook.path.endswith('MProposal-Nouryon_V2.xlsx')
+    def review(contents):
+        assert contents == excel_bytes_cache()
         return {'decision': decision, 'summary': summary, 'findings': list(findings), 'checked_mappings': 1}
     return review
 
 
 def failing(error):
-    def review(workbook):
+    def review(contents):
         raise error
     return review
 
@@ -102,9 +111,31 @@ def test_accepted_makes_it_the_active_version(proposals_storage, packages_storag
     run(proposals_storage, packages_storage, reviewer('ACCEPTED'))
 
     active = read(packages_root / 'nouryon' / 'active.json')
-    assert active['active_version'] == 'v2'
-    assert active['description'] == 'Leverdatum mapt nu op DeliveryDate'
-    assert active['activated_at'] == STAMP
+    assert active == {'inbound': {'version': 'v2', 'updated_at': STAMP, 'updated_by': 'analist_a'}}
+
+
+def test_other_types_keep_their_active_version(proposals_storage, packages_storage, packages_root, approved):
+    """Same file as Version_Control writes: one entry per package type."""
+    active_file = packages_root / 'nouryon' / 'active.json'
+    active_file.parent.mkdir(parents=True)
+    outbound = {'version': 'v1', 'updated_at': '2026-11-01T10:00:00Z', 'updated_by': 'analist_b'}
+    active_file.write_text(json.dumps({'outbound': outbound, 'inbound': {'version': 'v1'}}), encoding='utf-8')
+
+    run(proposals_storage, packages_storage, reviewer('ACCEPTED'))
+
+    active = read(active_file)
+    assert active['outbound'] == outbound
+    assert active['inbound']['version'] == 'v2'
+
+
+def test_unreadable_active_file_is_replaced(proposals_storage, packages_storage, packages_root, approved):
+    active_file = packages_root / 'nouryon' / 'active.json'
+    active_file.parent.mkdir(parents=True)
+    active_file.write_text('not json', encoding='utf-8')
+
+    run(proposals_storage, packages_storage, reviewer('ACCEPTED'))
+
+    assert read(active_file)['inbound']['version'] == 'v2'
 
 
 def test_accepted_sets_the_proposal_to_approved(proposals_storage, packages_storage, approved):
@@ -112,7 +143,9 @@ def test_accepted_sets_the_proposal_to_approved(proposals_storage, packages_stor
 
     data = read(approved)
     assert data['status'] == 'APPROVED'
-    assert data['ai_review'] == {'decision': 'ACCEPTED', 'summary': 'Consistent', 'findings': [], 'checked_at': STAMP}
+    assert data['ai_status'] is None
+    assert data['ai_review'] == {'decision': 'ACCEPTED', 'summary': 'Consistent', 'findings': [],
+                                 'checked_mappings': 1, 'checked_at': STAMP}
     assert data['package_path'].endswith('/nouryon/v2/inbound/MPackage.json')
     assert data['approval_description'] == 'Leverdatum mapt nu op DeliveryDate'  # other fields are kept
     assert data['updated_at'] == STAMP
@@ -138,6 +171,7 @@ def test_rejected_returns_the_proposal_with_findings(proposals_storage, packages
 
     data = read(approved)
     assert data['status'] == 'RETURNED'
+    assert data['ai_status'] == 'FAILED'
     assert data['ai_review']['decision'] == 'REJECTED'
     assert data['ai_review']['findings'] == ['Rij 3: dubbel doelveld']
     assert result.status == 'RETURNED'
@@ -155,25 +189,27 @@ def test_invalid_workbook_returns_the_proposal(proposals_storage, packages_stora
 
     data = read(approved)
     assert data['status'] == 'RETURNED'
+    assert data['ai_review']['summary'] == INVALID_WORKBOOK
     assert data['ai_review']['findings'] == ['Missing "Mapping Proposal" worksheet.']
     assert result.status == 'RETURNED'
 
 
 @pytest.mark.parametrize('error', [ReviewUnavailable('quota'), RuntimeError('boom')])
-def test_unavailable_review_puts_the_proposal_back_in_review(proposals_storage, packages_storage, packages_root,
-                                                              approved, error):
-    result = run(proposals_storage, packages_storage, failing(error))
+def test_unavailable_review_changes_nothing(proposals_storage, packages_storage, packages_root, approved, error):
+    """The caller (routers/approve.py) marks the review as failed; /ai-retry restarts it."""
+    before = read(approved)
 
-    data = read(approved)
-    assert data['status'] == 'IN_REVIEW'
-    assert data['ai_review_error'] == REVIEW_UNAVAILABLE
-    assert result.status == 'IN_REVIEW'
+    with pytest.raises(type(error)):
+        run(proposals_storage, packages_storage, failing(error))
+
+    assert read(approved) == before
     assert list(packages_root.iterdir()) == []
 
 
 def test_old_review_error_is_cleared_on_the_next_run(proposals_storage, packages_storage, approved):
     data = read(approved)
-    data['ai_review_error'] = REVIEW_UNAVAILABLE
+    data['ai_status'] = 'FAILED'
+    data['ai_review_error'] = 'Gemini 503'
     approved.write_text(json.dumps(data), encoding='utf-8')
 
     run(proposals_storage, packages_storage, reviewer('ACCEPTED'))
@@ -202,20 +238,3 @@ def test_result_to_dict(proposals_storage, packages_storage, approved):
     result = run(proposals_storage, packages_storage, reviewer('REJECTED', 'x', ['y'])).to_dict()
     assert result == {'company': 'Nouryon', 'version': 'v2', 'proposal_type': 'inbound', 'status': 'RETURNED',
                       'summary': 'x', 'findings': ['y'], 'package_path': None}
-
-
-# ---------------------------------------------------------------------------
-# Background entry point (started by POST /approve)
-# ---------------------------------------------------------------------------
-def test_background_task_never_raises(proposals_storage, packages_storage, caplog):
-    finalize_in_background(proposals_storage, packages_storage, 'onbekend', 'v1', 'inbound')  # 404 inside
-
-    assert 'Processing an approved proposal failed' in caplog.text
-
-
-def test_background_task_processes_the_proposal(proposals_storage, packages_storage, approved, monkeypatch):
-    monkeypatch.setattr('scripts.pipeline.review_with_gemini', failing(ReviewUnavailable('no key')))
-
-    finalize_in_background(proposals_storage, packages_storage, 'nouryon', 'v2', 'inbound')
-
-    assert read(approved)['status'] == 'IN_REVIEW'

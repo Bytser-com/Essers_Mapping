@@ -34,10 +34,8 @@ class ApprovalResult:
 
 
 def clean_description(description: str | None) -> str:
-    """The change description without surrounding spaces; it must not be empty or too long."""
+    """The change description without surrounding spaces; optional, max 200 characters."""
     text = (description or '').strip()
-    if not text:
-        raise ValueError('De omschrijving van de wijziging mag niet leeg zijn')
     if len(text) > MAX_DESCRIPTION_LENGTH:
         raise ValueError(f'De omschrijving mag maximaal {MAX_DESCRIPTION_LENGTH} tekens bevatten')
     return text

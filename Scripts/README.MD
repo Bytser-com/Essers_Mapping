@@ -14,6 +14,27 @@ Exit code `0` means ready, `2` means missing/stopped VMs, and `1` means the chec
 failed (configuration, API, authentication, network, TLS or response errors).
 Never interpret every nonzero exit code as permission to provision infrastructure.
 
+## Development & Testing Seeders
+
+- `seed.py`: Central seeding script that populates example proposals (`proposal.json` and workbooks)
+  and mapping packages (`MPackage.json`) directly into the shared SFTP server (under `/Proposals/`
+  and `/Packages/`) or local development storage (`--local`).
+
+```bash
+# Seed both proposals and mapping packages to SFTP (configured in .env)
+python3 Scripts/seed.py
+
+# Overwrite existing proposals and mapping packages
+python3 Scripts/seed.py --force
+
+# Seed to local storage folder instead of SFTP
+python3 Scripts/seed.py --local
+
+# Seed only proposals or only mapping packages
+python3 Scripts/seed.py --proposals
+python3 Scripts/seed.py --packages
+```
+
 ## Service CD helpers
 
 - `smoke-service-image.sh`: starts a local image with a read-only root filesystem,

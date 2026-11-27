@@ -16,6 +16,8 @@ import xml.etree.ElementTree as ET
 from collections import defaultdict
 from difflib import SequenceMatcher
 
+from defusedxml import ElementTree as SafeET
+
 
 def _local(tag: str) -> str:
     return tag.rsplit('}', 1)[-1].split(':')[-1]
@@ -23,7 +25,7 @@ def _local(tag: str) -> str:
 
 def _values_by_path(xml_text: str) -> dict[str, set[str]]:
     """Extract literal values from XML leaves/attributes, keeping XPath-style paths."""
-    root = ET.fromstring(xml_text)
+    root = SafeET.fromstring(xml_text)
     values: dict[str, set[str]] = defaultdict(set)
 
     def visit(node: ET.Element, parent: str):

@@ -183,10 +183,10 @@ describe('ProposalPage actions', () => {
 
     async function openApproveDialog() {
       await userEvent.click(screen.getByRole('button', { name: 'Goedkeuren' }))
-      return screen.getByRole('textbox', { name: 'Omschrijving van de wijziging' })
+      return screen.getByRole('textbox', { name: 'Omschrijving' })
     }
 
-    it('opens "Proposal goedkeuren?" with an explanation of the AI review', async () => {
+    it('TC-185-01 opens "Proposal goedkeuren?" with an explanation of the AI review', async () => {
       // Arrange
       renderPage()
 
@@ -199,7 +199,7 @@ describe('ProposalPage actions', () => {
       expect(approveProposal).not.toHaveBeenCalled()
     })
 
-    it('prefills "Eerste versie voor <klant>" for version 1', async () => {
+    it('TC-185-01 prefills "Eerste versie voor <klant>" for version 1', async () => {
       // Arrange
       useProposalStore.setState({ proposal: { ...PROPOSAL, versie: 1 } })
       renderPage()
@@ -211,7 +211,7 @@ describe('ProposalPage actions', () => {
       expect(description).toHaveValue('Eerste versie voor brunos')
     })
 
-    it('starts empty for later versions and cannot be confirmed while empty', async () => {
+    it('starts empty for later versions and is optional', async () => {
       // Arrange
       renderPage()
 
@@ -220,19 +220,19 @@ describe('ProposalPage actions', () => {
 
       // Assert
       expect(description).toHaveValue('')
-      expect(screen.getByRole('button', { name: 'Bevestigen' })).toBeDisabled()
+      expect(screen.getByRole('button', { name: 'Bevestigen' })).toBeEnabled()
     })
 
-    it('cannot be confirmed when the description only contains spaces', async () => {
+    it('can be confirmed when the description is empty', async () => {
       // Arrange
       renderPage()
       const description = await openApproveDialog()
 
       // Act
-      await userEvent.type(description, '   ')
+      await userEvent.clear(description)
 
       // Assert
-      expect(screen.getByRole('button', { name: 'Bevestigen' })).toBeDisabled()
+      expect(screen.getByRole('button', { name: 'Bevestigen' })).toBeEnabled()
     })
 
     it('limits the description to 200 characters', async () => {
@@ -246,7 +246,7 @@ describe('ProposalPage actions', () => {
       expect(description).toHaveAttribute('maxLength', '200')
     })
 
-    it('closes without changes when "Annuleren" is clicked', async () => {
+    it('TC-185-01 closes without changes when "Annuleren" is clicked', async () => {
       // Arrange
       renderPage()
       await openApproveDialog()

@@ -8,7 +8,7 @@ import {
   type AiStatus,
   type Proposal,
   type ProposalStatus,
-} from '../services/proposals'
+} from '../services/proposalOverviewService'
 
 type ProposalTableProps = {
   proposals: Proposal[]

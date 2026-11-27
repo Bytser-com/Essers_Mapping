@@ -1,7 +1,9 @@
+import io
 import json
 
 import pytest
 from fastapi.testclient import TestClient
+from openpyxl import Workbook
 
 from api import app
 from routers import approve as approve_router
@@ -20,9 +22,9 @@ def packages_root(tmp_path):
 
 @pytest.fixture
 def started(monkeypatch):
-    """Records the background tasks instead of running the AI review."""
+    """Records the background AI reviews instead of running them."""
     calls = []
-    monkeypatch.setattr(approve_router, 'finalize_in_background', lambda *args: calls.append(args))
+    monkeypatch.setattr(approve_router, 'trigger_ai_review', lambda *args: calls.append(args))
     return calls
 
 
@@ -54,10 +56,17 @@ def test_approve_returns_200_and_updates_status(client, proposals_root):
     assert json.loads(path.read_text(encoding='utf-8'))['status'] == 'AI_CHECKING_REVIEW'
 
 
-@pytest.mark.parametrize('description', ['', '   ', 'a' * 201])
-def test_invalid_description_returns_400(client, proposals_root, description):
+@pytest.mark.parametrize('description', ['', '   '])
+def test_empty_description_is_optional_and_returns_200(client, proposals_root, description):
     write_metadata(proposals_root)
     response = client.post(URL, json={'description': description})
+    assert response.status_code == 200
+    assert response.json()['status'] == 'AI_CHECKING_REVIEW'
+
+
+def test_too_long_description_returns_400(client, proposals_root):
+    write_metadata(proposals_root)
+    response = client.post(URL, json={'description': 'a' * 201})
     assert response.status_code == 400
     assert response.json()['detail']
 
@@ -98,10 +107,66 @@ def test_storage_error_returns_502(client, monkeypatch):
 def test_storage_dependency_uses_the_configured_storage(monkeypatch):
     monkeypatch.setenv('SFTP_SHARED_HOST', '')
     assert isinstance(approve_router.get_proposal_storage(), LocalStorage)
+    assert isinstance(approve_router.get_packages_storage(), LocalStorage)
+
+
+def test_ai_retry_restarts_stuck_proposals(client, proposals_root, monkeypatch):
+    # Setup stuck proposal
+    folder = proposals_root / 'nouryon' / 'v1' / 'inbound'
+    folder.mkdir(parents=True, exist_ok=True)
+    meta_path = folder / 'metadata.json'
+    meta_path.write_text(json.dumps({
+        'customer': 'Nouryon',
+        'status': 'AI_CHECKING_REVIEW',
+        'ai_status': 'FAILED',
+        'ai_review_error': 'Gemini 503 error',
+    }), encoding='utf-8')
+
+    triggered = []
+    monkeypatch.setattr(
+        approve_router, 'trigger_ai_review',
+        lambda storage, comp, ver, pt, packages: triggered.append((comp, ver, pt)),
+    )
+
+    response = client.post('/ai-retry')
+    assert response.status_code == 200
+    body = response.json()
+    assert body['status'] == 'ok'
+    assert body['retried_count'] == 1
+    assert body['retried_proposals'] == [{
+        'company': 'nouryon',
+        'version': 'v1',
+        'proposal_type': 'inbound',
+    }]
+
+    # Check metadata updated
+    updated_meta = json.loads(meta_path.read_text(encoding='utf-8'))
+    assert updated_meta['ai_status'] == 'RUNNING'
+    assert 'ai_review_error' not in updated_meta
+    assert len(triggered) == 1
+    assert triggered[0] == ('nouryon', 'v1', 'inbound')
+
+
+def test_ai_retry_no_stuck_proposals(client, proposals_root):
+    # Setup proposal not in AI_CHECKING_REVIEW
+    folder = proposals_root / 'nouryon' / 'v1' / 'inbound'
+    folder.mkdir(parents=True, exist_ok=True)
+    meta_path = folder / 'metadata.json'
+    meta_path.write_text(json.dumps({
+        'customer': 'Nouryon',
+        'status': 'READY_FOR_REVIEW',
+        'ai_status': None,
+    }), encoding='utf-8')
+
+    response = client.post('/ai-retry')
+    assert response.status_code == 200
+    body = response.json()
+    assert body['retried_count'] == 0
+    assert body['retried_proposals'] == []
 
 
 # ---------------------------------------------------------------------------
-# Story 187: after approving, the AI review starts in the background
+# Story 187: after approving, the AI review runs in the background
 # ---------------------------------------------------------------------------
 def test_approve_starts_the_ai_review_in_the_background(client, proposals_root, started):
     write_metadata(proposals_root)
@@ -109,7 +174,7 @@ def test_approve_starts_the_ai_review_in_the_background(client, proposals_root, 
     assert client.post(URL, json={'description': 'Ok'}).status_code == 200
 
     assert len(started) == 1
-    proposals, packages, company, version, proposal_type = started[0]
+    proposals, company, version, proposal_type, packages = started[0]
     assert isinstance(proposals, LocalStorage)
     assert isinstance(packages, LocalStorage)
     assert (company, version, proposal_type) == ('nouryon', 'v1', 'inbound')
@@ -120,21 +185,66 @@ def test_failed_approval_starts_nothing(client, started):
     assert started == []
 
 
-def test_background_review_updates_the_proposal(proposals_root, packages_root, mapping_workbook, monkeypatch):
-    """End to end without Gemini: approve -> background task -> RETURNED with the findings."""
+def excel_bytes():
+    """A real workbook: readable by the AI review and by the package converter."""
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = 'Mapping Proposal'
+    sheet.append(['', 'TARGET', '', 'SOURCE', ''])
+    sheet.append(['Mapping ID', 'Target segment path', 'Target field name', 'Source full path', 'Proposed rule type'])
+    sheet.append(['MP-001', '/TARGET/HDR', 'DOC_ID', '/SOURCE/HEADER/ID', 'DIRECT'])
+    buffer = io.BytesIO()
+    workbook.save(buffer)
+    return buffer.getvalue()
+
+
+def run_approve_end_to_end(proposals_root, packages_root, monkeypatch, review):
+    """approve -> background task (TestClient runs it) -> AI review replaced by ``review``."""
     path = write_metadata(proposals_root)
-    (path.parent / 'MProposal-Nouryon_V1.xlsx').write_bytes(mapping_workbook())
-    monkeypatch.setattr('scripts.pipeline.review_with_gemini', lambda rows: {
-        'decision': 'REJECTED', 'summary': 'Conflict', 'findings': ['Rij 3: dubbel doelveld'], 'checked_mappings': 1,
-    })
+    (path.parent / 'MProposal-Nouryon_V1.xlsx').write_bytes(excel_bytes())
+    monkeypatch.setattr('scripts.pipeline.review_with_gemini', review)
     app.dependency_overrides[approve_router.get_proposal_storage] = lambda: LocalStorage(proposals_root)
     app.dependency_overrides[approve_router.get_packages_storage] = lambda: LocalStorage(packages_root)
     try:
-        response = TestClient(app).post(URL, json={'description': 'Ok'})  # TestClient runs background tasks
+        response = TestClient(app).post(URL, json={'description': 'Eerste versie'})
     finally:
         app.dependency_overrides.clear()
-
     assert response.json()['status'] == 'AI_CHECKING_REVIEW'  # the analyst gets an answer straight away
-    data = json.loads(path.read_text(encoding='utf-8'))
+    return json.loads(path.read_text(encoding='utf-8'))
+
+
+def test_accepted_review_publishes_the_package(proposals_root, packages_root, monkeypatch):
+    data = run_approve_end_to_end(proposals_root, packages_root, monkeypatch, lambda rows: {
+        'decision': 'ACCEPTED', 'summary': 'Consistent', 'findings': [], 'checked_mappings': 1,
+    })
+
+    assert data['status'] == 'APPROVED'
+    package = json.loads((packages_root / 'nouryon' / 'v1' / 'inbound' / 'MPackage.json').read_text(encoding='utf-8'))
+    assert package['meta']['description'] == 'Eerste versie'
+    active = json.loads((packages_root / 'nouryon' / 'active.json').read_text(encoding='utf-8'))
+    assert active['inbound']['version'] == 'v1'
+
+
+def test_rejected_review_returns_the_proposal(proposals_root, packages_root, monkeypatch):
+    data = run_approve_end_to_end(proposals_root, packages_root, monkeypatch, lambda rows: {
+        'decision': 'REJECTED', 'summary': 'Conflict', 'findings': ['Rij 3: dubbel doelveld'], 'checked_mappings': 1,
+    })
+
     assert data['status'] == 'RETURNED'
+    assert data['ai_status'] == 'FAILED'
     assert data['ai_review']['findings'] == ['Rij 3: dubbel doelveld']
+    assert list(packages_root.iterdir()) == []
+
+
+def test_unavailable_review_can_be_retried(proposals_root, packages_root, monkeypatch):
+    from scripts.gemini_review import ReviewUnavailable
+
+    def unavailable(rows):
+        raise ReviewUnavailable('Gemini 503')
+
+    data = run_approve_end_to_end(proposals_root, packages_root, monkeypatch, unavailable)
+
+    assert data['status'] == 'AI_CHECKING_REVIEW'  # picked up again by POST /ai-retry
+    assert data['ai_status'] == 'FAILED'
+    assert 'Gemini 503' in data['ai_review_error']
+    assert list(packages_root.iterdir()) == []

@@ -76,9 +76,8 @@ def test_metadata_json_wins_over_proposal_json(proposals_root, proposals_storage
 # --- description ------------------------------------------------------------
 
 @pytest.mark.parametrize('description', [None, '', '   ', '\t\n'])
-def test_empty_description_is_rejected(description):
-    with pytest.raises(ValueError, match='niet leeg'):
-        clean_description(description)
+def test_empty_description_is_allowed(description):
+    assert clean_description(description) == ''
 
 
 def test_description_of_200_characters_is_allowed():
@@ -93,7 +92,7 @@ def test_description_longer_than_200_characters_is_rejected():
 def test_invalid_description_does_not_change_metadata(proposals_root, proposals_storage):
     path = write_metadata(proposals_root)
     with pytest.raises(ValueError):
-        approve_proposal(proposals_storage, 'nouryon', 'v1', 'inbound', '   ')
+        approve_proposal(proposals_storage, 'nouryon', 'v1', 'inbound', 'a' * 201)
     assert read(path)['status'] == 'In review'
 
 
