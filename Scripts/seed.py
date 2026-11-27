@@ -39,9 +39,18 @@ PROPOSAL_EXAMPLES = [
     ('voorbeeldbedrijf-d', 'Voorbeeldbedrijf D', 3, '2026-10-19T09:15:00+02:00', 'RETURNED', 'FAILED', 'inbound'),
     ('voorbeeldbedrijf-e', 'Voorbeeldbedrijf E', 1, '2026-10-18T11:00:00+02:00', 'READY_FOR_REVIEW', None, 'outbound'),
     ('voorbeeldbedrijf-f', 'Voorbeeldbedrijf F', 2, '2026-10-17T13:20:00+02:00', 'IN_REVIEW', None, 'inbound'),
+    ('voorbeeldbedrijf-g', 'Voorbeeldbedrijf G (Foutief)', 1, '2026-10-16T15:00:00+02:00', 'IN_REVIEW', None, 'inbound'),
 ]
 
 TEMPLATE_PATH = ROOT / 'Mapping_Proposal' / 'templates' / 'mapping_template.xlsx'
+FAULTY_TEMPLATE_PATH = ROOT / 'Mapping_Proposal' / 'templates' / 'faulty_mapping_template.xlsx'
+
+
+def _get_proposal_workbook_bytes(folder: str) -> bytes:
+    """Return workbook bytes for a proposal. Uses faulty workbook for voorbeeldbedrijf-g."""
+    if folder == 'voorbeeldbedrijf-g' and FAULTY_TEMPLATE_PATH.is_file():
+        return FAULTY_TEMPLATE_PATH.read_bytes()
+    return TEMPLATE_PATH.read_bytes()
 
 
 def _build_proposal_metadata(
@@ -471,7 +480,7 @@ def seed_local(
             if excel_name and TEMPLATE_PATH.is_file():
                 dest_excel = version_dir / excel_name
                 if force or not dest_excel.is_file():
-                    dest_excel.write_bytes(TEMPLATE_PATH.read_bytes())
+                    dest_excel.write_bytes(_get_proposal_workbook_bytes(folder))
                     logger.info("Created local proposal workbook: %s", dest_excel)
 
     # 2. Seed mapping packages
@@ -603,7 +612,9 @@ def seed_sftp(
                     except OSError:
                         pass
                     if force or not excel_exists:
-                        sftp.put(str(TEMPLATE_PATH), excel_file)
+                        content_bytes = _get_proposal_workbook_bytes(folder)
+                        with sftp.open(excel_file, "wb") as f:
+                            f.write(content_bytes)
                         logger.info("Created SFTP proposal workbook: %s", excel_file)
 
         # 2. Seed packages

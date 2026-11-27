@@ -68,11 +68,11 @@ export default function ApproveProposalDialog({
           </button>
           <button
             type="button"
-            className="btn btn--primary"
+            className="btn btn--primary flex items-center gap-2"
             onClick={() => onConfirm(description.trim())}
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Goedkeuren…" : "Bevestigen"}
+            {isSubmitting ? "AI-controle uitvoeren…" : "Bevestigen"}
           </button>
         </div>
       </dialog>
