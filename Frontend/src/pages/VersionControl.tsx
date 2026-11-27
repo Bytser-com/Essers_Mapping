@@ -53,6 +53,11 @@ function matchField(pkg: MappingPackageOverview, token: string): boolean {
   )
 }
 
+// Page with all versions of one mapping package (user story 161); names are encoded for the URL
+function versionsPath(company: string, packageType: string): string {
+  return `/package-versions/${encodeURIComponent(company)}/${encodeURIComponent(packageType)}`
+}
+
 // Version Control overview (Figma "07 · Version Control"): all customers and their mapping packages
 export default function VersionControl() {
   const navigate = useNavigate()
@@ -176,6 +181,7 @@ export default function VersionControl() {
                   const displayVersion = mappingPackage.activeVersion || mappingPackage.latestVersion
                   const changeDate = mappingPackage.activeUpdatedAt || mappingPackage.createdAt
                   const changeUser = mappingPackage.activeUpdatedBy || mappingPackage.createdBy
+                  const packageType = mappingPackage.packageType
 
                   return (
                     // A company can be listed once per package type (e.g. nouryon inbound + nouryon outbound)
@@ -202,13 +208,15 @@ export default function VersionControl() {
                       </td>
                       <td className={`${ACTION_CELL} ${BODY_CELL}`}>
                         {/* Opens the versions of this customer: user story 161 */}
-                        <button
-                          type="button"
-                          className="btn"
-                          onClick={() => navigate(`/package-versions/${mappingPackage.company}/${mappingPackage.packageType}`)}
-                        >
-                          Bekijken
-                        </button>
+                        {packageType && (
+                          <button
+                            type="button"
+                            className="btn"
+                            onClick={() => void navigate(versionsPath(mappingPackage.company, packageType))}
+                          >
+                            Bekijken
+                          </button>
+                        )}
                       </td>
                     </tr>
                   )
@@ -217,8 +225,7 @@ export default function VersionControl() {
             </tbody>
           </table>
         </div>
-      )
-      }
-    </main >
+      )}
+    </main>
   )
 }
