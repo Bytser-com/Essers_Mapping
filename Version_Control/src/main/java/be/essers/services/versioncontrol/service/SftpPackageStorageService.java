@@ -2,25 +2,17 @@ package be.essers.services.versioncontrol.service;
 
 import be.essers.services.versioncontrol.domain.dto.ActivePackageInfo;
 import be.essers.services.versioncontrol.domain.dto.MappingPackageOverviewDto;
-import be.essers.services.versioncontrol.domain.dto.MappingPackage;
 import be.essers.services.versioncontrol.domain.dto.PackageVersionDto;
 import be.essers.services.versioncontrol.exception.EntityNotFoundException;
 import be.essers.services.versioncontrol.exception.StorageException;
 import tools.jackson.databind.ObjectMapper;
-import org.apache.sshd.sftp.client.SftpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
-import java.nio.file.attribute.FileTime;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 
 /**
@@ -34,7 +26,6 @@ public class SftpPackageStorageService implements PackageStorageService {
 
     private static final Logger log = LoggerFactory.getLogger(SftpPackageStorageService.class);
 
-    private static final String METADATA_FILENAME = "MPackage.json";
     private static final int MAX_COMPANY_LENGTH = 20;
 
     // Alphabetical on the name shown in the list (customerName, or the company folder), then on the type
@@ -42,19 +33,17 @@ public class SftpPackageStorageService implements PackageStorageService {
             .comparing((MappingPackageOverviewDto p) -> displayName(p), String.CASE_INSENSITIVE_ORDER)
             .thenComparing(p -> p.packageType() != null ? p.packageType() : "", String.CASE_INSENSITIVE_ORDER);
 
-    private final SftpRemoteFileTemplate template;
     private final SftpFolders folders;
     private final ActivePackageFile activePackages;
+    private final PackageFolderReader packageReader;
     private final String packagesRoot;
-    private final ObjectMapper objectMapper;
 
     public SftpPackageStorageService(SftpRemoteFileTemplate template, ObjectMapper objectMapper,
                                      @Value("${sftp.packages-path:/Packages}") String packagesRoot) {
-        this.template = template;
         this.folders = new SftpFolders(template);
         this.activePackages = new ActivePackageFile(template, folders, objectMapper);
+        this.packageReader = new PackageFolderReader(template, folders, objectMapper);
         this.packagesRoot = packagesRoot;
-        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -113,12 +102,11 @@ public class SftpPackageStorageService implements PackageStorageService {
             throw new EntityNotFoundException("Package type '" + sanitizedType + "' does not exist in version '" + resolvedVersion + "' for company '" + resolvedCompany + "'");
         }
 
-        String typePath = SftpFolders.path(versionPath, resolvedType);
-        SftpClient.DirEntry[] typeEntries = folders.list(typePath);
-        MappingPackage.Meta metadata = readMetadata(typePath, typeEntries);
-        String problem = findMetadataProblem(metadata);
+        PackageFolder pkg = packageReader.read(versionPath, resolvedType);
+        String problem = pkg.problem();
         if (problem != null) {
-            throw new EntityNotFoundException("Package at " + typePath + " is invalid: " + problem);
+            throw new EntityNotFoundException(
+                    "Package at " + SftpFolders.path(versionPath, resolvedType) + " is invalid: " + problem);
         }
 
         Map<String, ActivePackageInfo> activeMap = activePackages.read(companyPath);
@@ -130,16 +118,12 @@ public class SftpPackageStorageService implements PackageStorageService {
         log.info("Updated active package for {}/{}: version={}, user={}", resolvedCompany, sanitizedType, resolvedVersion, effectiveUser);
 
         // Return updated overview directly
-        String createdAt = extractCreatedAt(typeEntries, metadata);
-        String createdBy = metadata != null ? metadata.userCreated() : null;
-        String customerName = metadata != null ? metadata.clientName() : null;
-
         return new MappingPackageOverviewDto(
                 resolvedCompany,
                 resolvedVersion,
-                createdAt,
-                createdBy,
-                customerName,
+                pkg.createdAt(),
+                pkg.createdBy(),
+                pkg.customerName(),
                 sanitizedType,
                 resolvedVersion,
                 nowIso,
@@ -177,11 +161,8 @@ public class SftpPackageStorageService implements PackageStorageService {
 
             for (String typeName : folders.subfolders(versionPath)) {
                 if (sanitizedType.equalsIgnoreCase(typeName)) {
-                    String typePath = SftpFolders.path(versionPath, typeName);
-                    SftpClient.DirEntry[] typeEntries = folders.list(typePath);
-                    MappingPackage.Meta metadata = readMetadata(typePath, typeEntries);
-                    String problem = findMetadataProblem(metadata);
-                    if (problem != null) {
+                    PackageFolder pkg = packageReader.read(versionPath, typeName);
+                    if (!pkg.isValid()) {
                         continue;
                     }
 
@@ -189,11 +170,8 @@ public class SftpPackageStorageService implements PackageStorageService {
                             ? version.equalsIgnoreCase(activeInfo.version())
                             : (i == versions.size() - 1); // default newest is active if no active.json
 
-                    String createdAt = extractCreatedAt(typeEntries, metadata);
-                    String createdBy = metadata != null ? metadata.userCreated() : null;
-                    String description = metadata != null ? metadata.description() : null;
-
-                    result.add(new PackageVersionDto(version, isActive, createdAt, createdBy, description));
+                    result.add(new PackageVersionDto(version, isActive, pkg.createdAt(), pkg.createdBy(),
+                            pkg.description()));
                 }
             }
         }
@@ -243,8 +221,6 @@ public class SftpPackageStorageService implements PackageStorageService {
         return results;
     }
 
-    private record VersionPackageData(String version, SftpClient.DirEntry[] entries, MappingPackage.Meta metadata) {}
-
     /**
      * Walks the versions and active.json for a company and returns one overview per package type.
      * The active version is retrieved from {@code active.json} if present, otherwise falling back
@@ -254,27 +230,24 @@ public class SftpPackageStorageService implements PackageStorageService {
         String companyPath = SftpFolders.path(packagesRoot, companyName);
         Map<String, ActivePackageInfo> activeMap = activePackages.read(companyPath);
 
-        // Group packages by type: packageType -> (version -> VersionPackageData)
+        // Group packages by type: packageType -> (version -> package folder)
         Map<String, String> latestVersionByType = new LinkedHashMap<>();
-        Map<String, Map<String, VersionPackageData>> versionsByType = new LinkedHashMap<>();
+        Map<String, Map<String, PackageFolder>> versionsByType = new LinkedHashMap<>();
 
         for (int i = versions.size() - 1; i >= 0; i--) {
             String version = versions.get(i);
             String versionPath = SftpFolders.path(companyPath, version);
 
             for (String typeName : folders.subfolders(versionPath)) {
-                String typePath = SftpFolders.path(versionPath, typeName);
-                SftpClient.DirEntry[] typeEntries = folders.list(typePath);
-                MappingPackage.Meta metadata = readMetadata(typePath, typeEntries);
-                String problem = findMetadataProblem(metadata);
+                PackageFolder pkg = packageReader.read(versionPath, typeName);
+                String problem = pkg.problem();
                 if (problem != null) {
-                    log.warn("Skipping package {}: {}", typePath, problem);
+                    log.warn("Skipping package {}: {}", SftpFolders.path(versionPath, typeName), problem);
                     continue;
                 }
-                String packageType = resolvePackageType(metadata, typeName);
+                String packageType = pkg.packageType();
                 latestVersionByType.putIfAbsent(packageType, version);
-                versionsByType.computeIfAbsent(packageType, k -> new LinkedHashMap<>())
-                        .put(version, new VersionPackageData(version, typeEntries, metadata));
+                versionsByType.computeIfAbsent(packageType, k -> new LinkedHashMap<>()).put(version, pkg);
             }
         }
 
@@ -288,8 +261,8 @@ public class SftpPackageStorageService implements PackageStorageService {
                     ? activeInfo.version()
                     : latestVer;
 
-            Map<String, VersionPackageData> typeVersions = versionsByType.get(packageType);
-            VersionPackageData activeData = (typeVersions != null) ? typeVersions.get(activeVer) : null;
+            Map<String, PackageFolder> typeVersions = versionsByType.get(packageType);
+            PackageFolder activeData = (typeVersions != null) ? typeVersions.get(activeVer) : null;
             if (activeData == null && typeVersions != null) {
                 // If active version in active.json points to a version not found, fallback to latest
                 activeData = typeVersions.get(latestVer);
@@ -298,23 +271,15 @@ public class SftpPackageStorageService implements PackageStorageService {
 
             String activeUpdatedAt = (activeInfo != null && activeInfo.updatedAt() != null)
                     ? activeInfo.updatedAt()
-                    : (activeData != null ? extractCreatedAt(activeData.entries(), activeData.metadata()) : null);
+                    : (activeData != null ? activeData.createdAt() : null);
 
             String activeUpdatedBy = (activeInfo != null && activeInfo.updatedBy() != null)
                     ? activeInfo.updatedBy()
-                    : (activeData != null && activeData.metadata() != null ? activeData.metadata().userCreated() : null);
+                    : (activeData != null ? activeData.createdBy() : null);
 
-            String customerName = activeData != null && activeData.metadata() != null
-                    ? activeData.metadata().clientName()
-                    : null;
-
-            String createdAt = activeData != null
-                    ? extractCreatedAt(activeData.entries(), activeData.metadata())
-                    : null;
-
-            String createdBy = activeData != null && activeData.metadata() != null
-                    ? activeData.metadata().userCreated()
-                    : null;
+            String customerName = activeData != null ? activeData.customerName() : null;
+            String createdAt = activeData != null ? activeData.createdAt() : null;
+            String createdBy = activeData != null ? activeData.createdBy() : null;
 
             result.add(new MappingPackageOverviewDto(
                     companyName,
@@ -332,20 +297,6 @@ public class SftpPackageStorageService implements PackageStorageService {
         return result;
     }
 
-    private String extractCreatedAt(SftpClient.DirEntry[] entries, MappingPackage.Meta metadata) {
-        return (metadata != null && metadata.dateCreated() != null)
-                ? metadata.dateCreated()
-                : extractLatestFileTimestamp(entries);
-    }
-
-    // meta.package_type of the package, or the type folder name when it is missing; lowercase
-    private String resolvePackageType(MappingPackage.Meta metadata, String typeFolderName) {
-        String type = (metadata != null && metadata.packageType() != null && !metadata.packageType().isBlank())
-                ? metadata.packageType().trim()
-                : typeFolderName;
-        return type.toLowerCase();
-    }
-
     // First type folder of the latest version, even when its MPackage.json is missing or invalid
     private MappingPackageOverviewDto buildCompanyOverviewFallback(String companyName, String version) {
         String versionPath = SftpFolders.path(packagesRoot, companyName, version);
@@ -353,102 +304,21 @@ public class SftpPackageStorageService implements PackageStorageService {
         if (types.isEmpty()) {
             return null;
         }
-        String typeName = types.get(0);
-        String typePath = SftpFolders.path(versionPath, typeName);
-        SftpClient.DirEntry[] typeEntries = folders.list(typePath);
-        MappingPackage.Meta metadata = readMetadata(typePath, typeEntries);
-        String createdAt = extractCreatedAt(typeEntries, metadata);
-        String createdBy = metadata != null ? metadata.userCreated() : null;
-        String customerName = metadata != null ? metadata.clientName() : null;
-        String packageType = resolvePackageType(metadata, typeName);
-
+        PackageFolder pkg = packageReader.read(versionPath, types.get(0));
         return new MappingPackageOverviewDto(
                 companyName,
                 version,
-                createdAt,
-                createdBy,
-                customerName,
-                packageType,
+                pkg.createdAt(),
+                pkg.createdBy(),
+                pkg.customerName(),
+                pkg.packageType(),
                 version,
-                createdAt,
-                createdBy
+                pkg.createdAt(),
+                pkg.createdBy()
         );
     }
 
     private static String displayName(MappingPackageOverviewDto p) {
         return (p.customerName() != null && !p.customerName().isBlank()) ? p.customerName() : p.company();
-    }
-
-    // Returns why the package data cannot be shown in the overview, or null when it is valid
-    private String findMetadataProblem(MappingPackage.Meta metadata) {
-        if (metadata == null) {
-            return METADATA_FILENAME + " is missing, not valid JSON or has no \"meta\" block";
-        }
-        if (parseUploadTime(metadata.dateCreated()) == null) {
-            return "creation time is missing or not an ISO 8601 timestamp";
-        }
-        return null;
-    }
-
-    // ISO 8601 time, e.g. 2026-10-22T14:05:00+02:00; a time without timezone is taken as UTC
-    static Instant parseUploadTime(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        String text = value.trim();
-        try {
-            return OffsetDateTime.parse(text).toInstant();
-        } catch (DateTimeParseException e) {
-            try {
-                return LocalDateTime.parse(text).toInstant(ZoneOffset.UTC);
-            } catch (DateTimeParseException ignored) {
-                return null;
-            }
-        }
-    }
-
-    private MappingPackage.Meta readMetadata(String typePath, SftpClient.DirEntry[] typeEntries) {
-        String metadataFile = findMetadataFilename(typeEntries);
-        if (metadataFile == null) {
-            return null;
-        }
-
-        String metadataPath = SftpFolders.path(typePath, metadataFile);
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            boolean success = template.get(metadataPath, in -> in.transferTo(baos));
-            if (success && baos.size() > 0) {
-                MappingPackage mappingPackage = objectMapper.readValue(baos.toByteArray(), MappingPackage.class);
-                return mappingPackage != null ? mappingPackage.meta() : null;
-            }
-        } catch (Exception e) {
-            log.warn("Failed to parse metadata file at {}: {}", metadataPath, e.getMessage());
-        }
-        return null;
-    }
-
-    // Actual filename of MPackage.json in the folder (case-insensitive match), or null
-    private String findMetadataFilename(SftpClient.DirEntry[] entries) {
-        for (SftpClient.DirEntry entry : entries) {
-            if (METADATA_FILENAME.equalsIgnoreCase(entry.getFilename()) && !SftpFolders.isDirectory(entry)) {
-                return entry.getFilename();
-            }
-        }
-        return null;
-    }
-
-    // Newest modify time of the files in a package folder, used when the metadata has no creation time
-    private String extractLatestFileTimestamp(SftpClient.DirEntry[] entries) {
-        Instant latest = null;
-        for (SftpClient.DirEntry entry : entries) {
-            if (SftpFolders.isDirectory(entry) || entry.getAttributes() == null) {
-                continue;
-            }
-            FileTime modifyTime = entry.getAttributes().getModifyTime();
-            if (modifyTime != null && (latest == null || modifyTime.toInstant().isAfter(latest))) {
-                latest = modifyTime.toInstant();
-            }
-        }
-        return latest != null ? latest.toString() : null;
     }
 }

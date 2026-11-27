@@ -442,15 +442,15 @@ class SftpPackageStorageServiceTest {
     }
 
     @Test
-    @DisplayName("parseUploadTime reads ISO 8601 with and without timezone and rejects other text")
-    void parseUploadTime_parsesIsoTimes() {
+    @DisplayName("parseCreationTime reads ISO 8601 with and without timezone and rejects other text")
+    void parseCreationTime_parsesIsoTimes() {
         assertEquals(Instant.parse("2026-10-22T12:05:00Z"),
-                SftpPackageStorageService.parseUploadTime("2026-10-22T14:05:00+02:00"));
+                PackageFolder.parseCreationTime("2026-10-22T14:05:00+02:00"));
         assertEquals(Instant.parse("2026-10-22T14:05:00Z"),
-                SftpPackageStorageService.parseUploadTime("2026-10-22T14:05:00"));
-        assertNull(SftpPackageStorageService.parseUploadTime("22/10/2026"));
-        assertNull(SftpPackageStorageService.parseUploadTime(" "));
-        assertNull(SftpPackageStorageService.parseUploadTime(null));
+                PackageFolder.parseCreationTime("2026-10-22T14:05:00"));
+        assertNull(PackageFolder.parseCreationTime("22/10/2026"));
+        assertNull(PackageFolder.parseCreationTime(" "));
+        assertNull(PackageFolder.parseCreationTime(null));
     }
 
     @Test
