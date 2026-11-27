@@ -21,11 +21,6 @@ from __future__ import annotations
 
 import logging
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-)
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
@@ -35,6 +30,11 @@ from scripts.config import cors_origins, is_swagger_enabled
 
 # Re-exported for backward compatibility and test patching:
 from sftp_service import download_proposal_excel_from_sftp
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
 
 logger = logging.getLogger(__name__)
 
