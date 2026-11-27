@@ -13,14 +13,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.integration.file.remote.InputStreamCallback;
+import org.springframework.integration.file.remote.SessionCallback;
+import org.springframework.integration.file.remote.session.Session;
 import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -547,5 +551,269 @@ class SftpPackageStorageServiceTest {
         assertFalse(versions.get(0).isActive());
         assertEquals("v1", versions.get(1).version());
         assertTrue(versions.get(1).isActive());
+    }
+
+    // -------------------------------------------------------------------------
+    // Safety net for the refactor (IT2627T06-248): setActivePackage, listVersions
+    // and the reading of active.json, including the paths that were not tested yet.
+    // -------------------------------------------------------------------------
+
+    private static final String ACTIVE_PATH = "/Packages/Nouryon/active.json";
+    private static final String TEMP_PATH = "/Packages/Nouryon/.active.json.tmp";
+
+    // Puts an active.json with the given content on the mocked SFTP
+    private void mockActiveJson(String json) {
+        when(template.exists(ACTIVE_PATH)).thenReturn(true);
+        doAnswer(inv -> {
+            InputStreamCallback cb = inv.getArgument(1);
+            try (InputStream in = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8))) {
+                cb.doWithInputStream(in);
+            }
+            return true;
+        }).when(template).get(eq(ACTIVE_PATH), any(InputStreamCallback.class));
+    }
+
+    // Nouryon/v1/inbound exists with a valid MPackage.json
+    private void mockValidPackageV1Inbound() {
+        when(template.exists("/Packages/Nouryon")).thenReturn(true);
+        when(template.exists("/Packages/Nouryon/v1")).thenReturn(true);
+        when(template.exists("/Packages/Nouryon/v1/inbound")).thenReturn(true);
+        mockTypeWithPackage("/Packages/Nouryon/v1/inbound",
+                packageJson("nouryon", "inbound", "2024-06-19T12:00:00Z", "analist_a"));
+    }
+
+    // Runs the session callback of template.execute on the given session and returns the bytes written to it
+    @SuppressWarnings("unchecked")
+    private byte[][] runWritesOn(Session<SftpClient.DirEntry> session) throws IOException {
+        byte[][] written = new byte[1][];
+        doAnswer(inv -> {
+            written[0] = ((InputStream) inv.getArgument(0)).readAllBytes();
+            return null;
+        }).when(session).write(any(InputStream.class), eq(TEMP_PATH));
+        when(template.execute(any())).thenAnswer(inv -> {
+            SessionCallback<SftpClient.DirEntry, Object> callback = inv.getArgument(0);
+            return callback.doInSession(session);
+        });
+        return written;
+    }
+
+    @Test
+    @DisplayName("setActivePackage writes active.json via a temp file and keeps the active version of other types")
+    @SuppressWarnings("unchecked")
+    void setActivePackage_writesAtomicallyAndKeepsOtherTypes() throws IOException {
+        mockValidPackageV1Inbound();
+        mockActiveJson("""
+                { "outbound": { "version": "v3", "updated_at": "2024-01-01T00:00:00Z", "updated_by": "analist_b" } }
+                """);
+        Session<SftpClient.DirEntry> session = mock(Session.class);
+        byte[][] written = runWritesOn(session);
+
+        service.setActivePackage("Nouryon", "inbound", "v1", "analist_x");
+
+        verify(session).rename(TEMP_PATH, ACTIVE_PATH);
+        Map<String, Map<String, String>> active = new ObjectMapper().readValue(written[0], Map.class);
+        assertEquals("v3", active.get("outbound").get("version"));
+        assertEquals("analist_b", active.get("outbound").get("updated_by"));
+        assertEquals("v1", active.get("inbound").get("version"));
+        assertEquals("analist_x", active.get("inbound").get("updated_by"));
+    }
+
+    @Test
+    @DisplayName("setActivePackage replaces an existing active.json when the rename fails the first time")
+    @SuppressWarnings("unchecked")
+    void setActivePackage_renameFails_removesOldFileAndRenamesAgain() throws IOException {
+        mockValidPackageV1Inbound();
+        Session<SftpClient.DirEntry> session = mock(Session.class);
+        runWritesOn(session);
+        doThrow(new IOException("file exists")).doNothing().when(session).rename(TEMP_PATH, ACTIVE_PATH);
+
+        service.setActivePackage("Nouryon", "inbound", "v1", "analist_x");
+
+        verify(session).remove(ACTIVE_PATH);
+        verify(session, times(2)).rename(TEMP_PATH, ACTIVE_PATH);
+    }
+
+    @Test
+    @DisplayName("setActivePackage still renames when removing the old active.json fails")
+    @SuppressWarnings("unchecked")
+    void setActivePackage_removeFails_stillRenames() throws IOException {
+        mockValidPackageV1Inbound();
+        Session<SftpClient.DirEntry> session = mock(Session.class);
+        runWritesOn(session);
+        doThrow(new IOException("file exists")).doNothing().when(session).rename(TEMP_PATH, ACTIVE_PATH);
+        when(session.remove(ACTIVE_PATH)).thenThrow(new IOException("no such file"));
+
+        assertDoesNotThrow(() -> service.setActivePackage("Nouryon", "inbound", "v1", "analist_x"));
+
+        verify(session, times(2)).rename(TEMP_PATH, ACTIVE_PATH);
+    }
+
+    @Test
+    @DisplayName("setActivePackage throws StorageException when active.json cannot be written")
+    void setActivePackage_writeFails_throwsStorageException() {
+        mockValidPackageV1Inbound();
+        when(template.execute(any())).thenThrow(new IllegalStateException("SFTP down"));
+
+        StorageException error = assertThrows(StorageException.class,
+                () -> service.setActivePackage("Nouryon", "inbound", "v1", "analist_x"));
+        assertTrue(error.getMessage().contains("active.json"));
+    }
+
+    @Test
+    @DisplayName("setActivePackage uses 'analist' when no user is given")
+    void setActivePackage_blankUser_usesDefaultUser() {
+        mockValidPackageV1Inbound();
+
+        MappingPackageOverviewDto updated = service.setActivePackage("Nouryon", "inbound", "v1", "  ");
+
+        assertEquals("analist", updated.activeUpdatedBy());
+        assertEquals("inbound", updated.packageType());
+        assertEquals("nouryon", updated.customerName());
+        assertEquals("2024-06-19T12:00:00Z", updated.createdAt());
+    }
+
+    @Test
+    @DisplayName("setActivePackage resolves company, version and type case-insensitively")
+    void setActivePackage_resolvesFoldersCaseInsensitively() {
+        mockDirectories("/Packages", "Nouryon");
+        mockDirectories("/Packages/Nouryon", "V1");
+        mockDirectories("/Packages/Nouryon/V1", "Inbound");
+        mockTypeWithPackage("/Packages/Nouryon/V1/Inbound",
+                packageJson("nouryon", "inbound", "2024-06-19T12:00:00Z", "analist_a"));
+
+        MappingPackageOverviewDto updated = service.setActivePackage("nouryon", "INBOUND", "v1", "analist_x");
+
+        assertEquals("Nouryon", updated.company());
+        assertEquals("V1", updated.activeVersion());
+        assertEquals("inbound", updated.packageType());
+    }
+
+    @Test
+    @DisplayName("setActivePackage rejects empty, too long or unsafe parameters")
+    void setActivePackage_invalidParameters_throwIllegalArgument() {
+        assertThrows(IllegalArgumentException.class, () -> service.setActivePackage(null, "inbound", "v1", "u"));
+        assertThrows(IllegalArgumentException.class, () -> service.setActivePackage(" ", "inbound", "v1", "u"));
+        assertThrows(IllegalArgumentException.class,
+                () -> service.setActivePackage("a".repeat(21), "inbound", "v1", "u"));
+        assertThrows(IllegalArgumentException.class, () -> service.setActivePackage("Nouryon", " ", "v1", "u"));
+        assertThrows(IllegalArgumentException.class, () -> service.setActivePackage("Nouryon", "inbound", null, "u"));
+        assertThrows(IllegalArgumentException.class, () -> service.setActivePackage("../etc", "inbound", "v1", "u"));
+        verifyNoInteractions(template);
+    }
+
+    @Test
+    @DisplayName("setActivePackage throws EntityNotFoundException for an unknown company, version or type")
+    void setActivePackage_unknownFolders_throwNotFound() {
+        assertThrows(EntityNotFoundException.class, () -> service.setActivePackage("Onbekend", "inbound", "v1", "u"));
+
+        when(template.exists("/Packages/Nouryon")).thenReturn(true);
+        assertThrows(EntityNotFoundException.class, () -> service.setActivePackage("Nouryon", "inbound", "v9", "u"));
+
+        when(template.exists("/Packages/Nouryon/v1")).thenReturn(true);
+        assertThrows(EntityNotFoundException.class, () -> service.setActivePackage("Nouryon", "outbound", "v1", "u"));
+    }
+
+    @Test
+    @DisplayName("setActivePackage throws EntityNotFoundException when the package has no valid MPackage.json")
+    void setActivePackage_invalidPackage_throwsNotFound() {
+        when(template.exists("/Packages/Nouryon")).thenReturn(true);
+        when(template.exists("/Packages/Nouryon/v1")).thenReturn(true);
+        when(template.exists("/Packages/Nouryon/v1/inbound")).thenReturn(true);
+        when(template.list("/Packages/Nouryon/v1/inbound")).thenReturn(new SftpClient.DirEntry[0]);
+
+        EntityNotFoundException error = assertThrows(EntityNotFoundException.class,
+                () -> service.setActivePackage("Nouryon", "inbound", "v1", "u"));
+        assertTrue(error.getMessage().contains("invalid"));
+    }
+
+    @Test
+    @DisplayName("listVersions marks the newest version as active when there is no active.json")
+    void listVersions_withoutActiveJson_newestIsActive() {
+        when(template.exists("/Packages/Nouryon")).thenReturn(true);
+        mockDirectories("/Packages/Nouryon", "v1", "v2");
+        mockDirectories("/Packages/Nouryon/v1", "inbound");
+        mockDirectories("/Packages/Nouryon/v2", "inbound", "outbound");
+        mockTypeWithPackage("/Packages/Nouryon/v1/inbound",
+                packageJson("nouryon", "inbound", "2024-06-19T12:00:00Z", "analist_a"));
+        mockTypeWithPackage("/Packages/Nouryon/v2/inbound",
+                packageJson("nouryon", "inbound", "2024-07-20T12:00:00Z", "analist_b"));
+
+        var versions = service.listVersions("Nouryon", "inbound");
+
+        assertEquals(List.of("v2", "v1"), versions.stream().map(v -> v.version()).toList());
+        assertTrue(versions.get(0).isActive());
+        assertFalse(versions.get(1).isActive());
+        assertEquals("analist_b", versions.get(0).createdBy());
+        assertEquals("Mapping for inbound IDOC conversion", versions.get(0).description());
+    }
+
+    @Test
+    @DisplayName("listVersions skips a version without a valid MPackage.json")
+    void listVersions_skipsInvalidPackage() {
+        when(template.exists("/Packages/Nouryon")).thenReturn(true);
+        mockDirectories("/Packages/Nouryon", "v1", "v2");
+        mockDirectories("/Packages/Nouryon/v1", "inbound");
+        mockDirectories("/Packages/Nouryon/v2", "inbound");
+        mockTypeWithPackage("/Packages/Nouryon/v1/inbound",
+                packageJson("nouryon", "inbound", "2024-06-19T12:00:00Z", "analist_a"));
+        when(template.list("/Packages/Nouryon/v2/inbound")).thenReturn(new SftpClient.DirEntry[0]);
+
+        var versions = service.listVersions("Nouryon", "inbound");
+
+        assertEquals(1, versions.size());
+        assertEquals("v1", versions.get(0).version());
+    }
+
+    @Test
+    @DisplayName("listVersions rejects empty parameters and an unknown company")
+    void listVersions_invalidParameters() {
+        assertThrows(IllegalArgumentException.class, () -> service.listVersions(null, "inbound"));
+        assertThrows(IllegalArgumentException.class, () -> service.listVersions("Nouryon", " "));
+        assertThrows(EntityNotFoundException.class, () -> service.listVersions("Onbekend", "inbound"));
+    }
+
+    @Test
+    @DisplayName("active.json in the older format with a \"types\" block is still read")
+    void listPackages_readsActiveJsonWithTypesBlock() {
+        when(template.exists("/Packages/Nouryon")).thenReturn(true);
+        mockDirectories("/Packages/Nouryon", "v1", "v2");
+        mockDirectories("/Packages/Nouryon/v1", "inbound");
+        mockDirectories("/Packages/Nouryon/v2", "inbound");
+        mockTypeWithPackage("/Packages/Nouryon/v1/inbound",
+                packageJson("nouryon", "inbound", "2024-06-19T12:00:00Z", "analist_a"));
+        mockTypeWithPackage("/Packages/Nouryon/v2/inbound",
+                packageJson("nouryon", "inbound", "2024-07-20T12:00:00Z", "analist_b"));
+        mockActiveJson("""
+                { "types": { "Inbound": { "version": "v1", "updated_at": "2024-08-01T15:00:00Z" } } }
+                """);
+
+        MappingPackageOverviewDto dto = service.listPackages("Nouryon").get(0);
+
+        assertEquals("v1", dto.activeVersion());
+        assertEquals("2024-08-01T15:00:00Z", dto.activeUpdatedAt());
+        assertEquals("analist_a", dto.activeUpdatedBy()); // no updated_by: the creator of v1
+    }
+
+    @Test
+    @DisplayName("an unreadable active.json or one pointing to a missing version falls back to the newest version")
+    void listPackages_invalidActiveJson_fallsBackToNewestVersion() {
+        when(template.exists("/Packages/Nouryon")).thenReturn(true);
+        mockDirectories("/Packages/Nouryon", "v1", "v2");
+        mockDirectories("/Packages/Nouryon/v1", "inbound");
+        mockDirectories("/Packages/Nouryon/v2", "inbound");
+        mockTypeWithPackage("/Packages/Nouryon/v1/inbound",
+                packageJson("nouryon", "inbound", "2024-06-19T12:00:00Z", "analist_a"));
+        mockTypeWithPackage("/Packages/Nouryon/v2/inbound",
+                packageJson("nouryon", "inbound", "2024-07-20T12:00:00Z", "analist_b"));
+
+        mockActiveJson("not json");
+        assertEquals("v2", service.listPackages("Nouryon").get(0).activeVersion());
+
+        mockActiveJson("""
+                { "inbound": { "version": "v9" }, "outbound": { "version": " " } }
+                """);
+        MappingPackageOverviewDto dto = service.listPackages("Nouryon").get(0);
+        assertEquals("v2", dto.activeVersion());
+        assertEquals("v2", dto.latestVersion());
     }
 }
